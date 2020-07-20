@@ -1,10 +1,10 @@
-;;; package --- Main customization file for emacs
+;;; init.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
 ;; Author: Mattias
 ;; Maintainer: Mattias <mattias@ocamlpro.com>
-;; Version: 0.1
+;; Vesrion: 0.1
 ;; Licence: GPL2+
 ;; Keywords: convenience, configuration
 
@@ -39,6 +39,36 @@
 
 ;; These options can't be customized from M-x customize
 
+;; START MATTHEWZMD
+;; See https://github.com/MatthewZMD/.emacs.d for the following options
+;; CheckVer
+(cond ((version< emacs-version "26.1")
+       (warn "M-EMACS requires Emacs 26.1 and above!"))
+      ((let* ((early-init-f (expand-file-name "early-init.el" user-emacs-directory))
+              (early-init-do-not-edit-d (expand-file-name "early-init-do-not-edit/" user-emacs-directory))
+              (early-init-do-not-edit-f (expand-file-name "early-init.el" early-init-do-not-edit-d)))
+         (and (version< emacs-version "27")
+              (or (not (file-exists-p early-init-do-not-edit-f))
+                  (file-newer-than-file-p early-init-f early-init-do-not-edit-f)))
+         (make-directory early-init-do-not-edit-d t)
+         (copy-file early-init-f early-init-do-not-edit-f t t t t)
+         (add-to-list 'load-path early-init-do-not-edit-d)
+         (require 'early-init))))
+;; -CheckVer
+
+;; BetterGC
+(defvar better-gc-cons-threshold 67108864 ; 64mb
+  "The default value to use for `gc-cons-threshold'.
+If you experience freezing, decrease this.  If you experience stuttering, increase this.")
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold better-gc-cons-threshold)
+            (setq file-name-handler-alist file-name-handler-alist-original)
+            (makunbound 'file-name-handler-alist-original)))
+;; -BetterGC
+;; END MATTHEWZMD
+
 ;; Start the window on the upper right corner with a fixed size
 ;; Loading custom-file containing all the custom variables and faces
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -53,6 +83,13 @@
 
 (setq max-specpdl-size 10000
       max-lisp-eval-depth 5000)
+
+;;;;; Unbind unneeded keys
+
+(global-set-key (kbd "C-z") nil)
+(global-set-key (kbd "M-z") nil)
+(global-set-key (kbd "C-x C-z") nil)
+(global-set-key (kbd "M-/") nil)
 
 ;;;;; Hooks:
 
@@ -95,11 +132,24 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
              '("org" . "http://orgmode.org/elpa/") t)
 (package-initialize)
 
+;; ConfigurePackageManager
+(unless (bound-and-true-p package--initialized)
+  (setq package-enable-at-startup nil)          ; To prevent initializing twice
+  (package-initialize))
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
-(eval-when-compile (require 'use-package))
+(eval-and-compile
+  (setq use-package-expand-minimally t)
+  (setq use-package-compute-statistics t)
+  (setq use-package-enable-imenu-support t))
+
+(eval-when-compile
+  (require 'use-package)
+  (require 'bind-key))
+;; -ConfigureUsePackage
 
 ;; Will be used to download non-emacs packages needed by emacs packages
 (use-package use-package-ensure-system-package
@@ -120,16 +170,51 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; instead of editing this file. Avoid, then, using :config here for variables
 ;; that can be customized directly.
 
+;;;;; Crux
+
+(use-package crux
+  :bind-keymap ("M-m" . crux-map)
+  :bind (:map crux-map
+              ("w" . crux-view-url)                ; Open a new buffer containing the contents of URL.
+              ("o" . crux-open-with)               ; Open visited file in default external program.
+              ("e" . crux-sudo-edit)               ; Edit currently visited file as root.
+              ("i" . crux-insert-date)             ; Insert a timestamp according to locale's date and time format.
+              ("t" . crux-transpose-windows)       ; Transpose the buffers shown in two windows.
+              ("j" . crux-top-join-line)           ; Join the current line with the line beneath it.
+              ("u" . crux-upcase-region)           ; `upcase-region' when `transient-mark-mode' is on and region is active.
+              ("d" . crux-downcase-region)         ; `downcase-region' when `transient-mark-mode' is on and region is active.
+              ("c" . crux-capitalize-region)       ; `capitalize-region' when `transient-mark-mode' is on and region is active.
+              ("r" . crux-recompile-init)          ; Byte-compile all your dotfiles again.
+              ("k" . crux-smart-kill-line)         ; Kill to the end of the line and kill whole line on the next call.
+              ("M-k" . crux-kill-line-backwards)   ; Kill line backwards and adjust the indentation.
+              ("a" . crux-move-beginning-of-line)  ; Move point back to indentation/beginning (toggle) of line.
+              ("s" . crux-ispell-word-then-abbrev) ; Call `ispell-word', then create an abbrev for it.
+              )
+  (("C-a" . crux-move-beginning-of-line)
+   ("C-x 4 t" . crux-transpose-windows)
+   ("C-x K" . crux-kill-other-buffers)
+   ("C-k" . crux-smart-kill-line)
+   ("M-u" . crux-upcase-region)
+   ("M-d" . crux-downcase-region)
+   ("M-c" . crux-capitalize-region)
+   )
+  :config
+  (define-prefix-command 'crux-map nil "Crux-")
+  (crux-with-region-or-buffer indent-region)
+  (crux-with-region-or-buffer untabify)
+  (crux-with-region-or-point-to-eol kill-ring-save)
+  (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
+
 ;;;;; Outline, outshines and friends:
 
 (use-package outline
   :hook (prog-mode . outline-minor-mode) ; globally at startup
-  ;; Outline-minor-mode key map
   :config
   (define-prefix-command 'cm-map nil "Outline-")
   (set-display-table-slot standard-display-table
                           'selective-display
                           (string-to-vector "+++"))
+  ;; Outline-minor-mode key map
   :bind-keymap ("C-o" . cm-map)
   :bind (:map cm-map
               ;; HIDE
@@ -200,7 +285,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; The file with all the user defined abbrevs should be in .emacs.d/abbrev_defs
 ;; https://www.emacswiki.org/emacs/AbbrevMode
 (use-package abbrev
-  :diminish abbrev-mode
   :init (abbrev-mode 1) ; globally at startup
   :config
   (if (file-exists-p abbrev-file-name)
@@ -232,17 +316,19 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; M-x all-the-icons-insert-* will allow to directly insert a unicode symbol
 (use-package all-the-icons)
 
-;; Counsel, Ivy and friends:
-;;
+;;;;; Counsel, Ivy and friends:
+
 (use-package ivy
-  :diminish (ivy-mode . "")
-  :init (ivy-mode 1) ; globally at startup
+  :init
+  (use-package amx
+    :defer t)
+  (use-package counsel
+    :config (counsel-mode 1))
+  (use-package swiper
+    :defer t)
+  (ivy-mode 1) ; globally at startup
   :bind (:map ivy-minibuffer-map
               ("<return>" . ivy-alt-done))
-  )
-
-;; Override the basic Emacs commands
-(use-package counsel
   ;;The * means that these bindings will override all minor mode binding
   :bind*
   (("M-x"     . counsel-M-x)
@@ -270,6 +356,70 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :requires all-the-icons
   :init (all-the-icons-ivy-setup)
   )
+
+;;;;; Windows management
+(use-package winner
+  :ensure nil
+  :custom
+  (winner-boring-buffers
+   '("*Completions*"
+     "*Compile-Log*"
+     "*inferior-lisp*"
+     "*Fuzzy Completions*"
+     "*Apropos*"
+     "*Help*"
+     "*cvs*"
+     "*Buffer List*"
+     "*Ibuffer*"
+     "*esh command on file*"))
+  :config
+  (winner-mode 1))
+
+;; Resizes the window width based on the input
+(defun resize-window-width (w)
+  "Resizes the window width based on W."
+  (interactive (list (if (> (count-windows) 1)
+                         (read-number "Set the current window width in [1~9]x10%: ")
+                       (error "You need more than 1 window to execute this function!"))))
+  (message "%s" w)
+  (window-resize nil (- (truncate (* (/ w 10.0) (frame-width))) (window-total-width)) t))
+
+;; Resizes the window height based on the input
+(defun resize-window-height (h)
+  "Resizes the window height based on H."
+  (interactive (list (if (> (count-windows) 1)
+                         (read-number "Set the current window height in [1~9]x10%: ")
+                       (error "You need more than 1 window to execute this function!"))))
+  (message "%s" h)
+  (window-resize nil (- (truncate (* (/ h 10.0) (frame-height))) (window-total-height)) nil))
+
+;; Setup shorcuts for window resize width and height
+(global-set-key (kbd "C-z w") #'resize-window-width)
+(global-set-key (kbd "C-z h") #'resize-window-height)
+
+(defun resize-window (width delta)
+  "Resize the current window's size.  If WIDTH is non-nil, resize width by some DELTA."
+  (if (> (count-windows) 1)
+      (window-resize nil delta width)
+    (error "You need more than 1 window to execute this function!")))
+
+;; Setup shorcuts for window resize width and height
+(global-set-key (kbd "M-J") (lambda () (interactive) (resize-window t 5)))
+(global-set-key (kbd "M-L") (lambda () (interactive) (resize-window t -5)))
+
+(global-set-key (kbd "M-I") (lambda () (interactive) (resize-window nil 5)))
+(global-set-key (kbd "M-K") (lambda () (interactive) (resize-window nil -5)))
+
+;;;;; Minions
+
+(use-package minions
+  :config (minions-mode 1)
+  )
+
+;;;;; Discover Major modes
+
+(use-package discover-my-major
+  :bind ("C-h C-m" . discover-my-major))
 
 ;;;; ORG MODE:
 
@@ -365,20 +515,18 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 ;;;; META PROGRAMMING:
 
-;; (flycheck, completion ...)
+;;;;;; Separedit:
 
-;; Separedit:
-;;
 ;; https://github.com/twlz0ne/separedit.le
 (use-package separedit
   :ensure t
   :bind (("C-c C-e" . separedit))
   :config
-  (setq separedit-default-mode 'org-mode)
+  (setq separedit-default-mode 'markdown-mode)
   )
 
-;; Conf mode:
-;;
+;;;;;; Conf mode:
+
 (use-package conf-mode
   :ensure nil
   :mode (
@@ -387,22 +535,22 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
          ("_tags\\'" . conf-mode)
          ("_log\\'" . conf-mode)))
 
-;; Flycheck:
-;;
+;;;;;; Flycheck:
+
 ;; Enabled when in prog mode
 (use-package flycheck
-  :hook (prog-mode . flycheck-mode)
+  :hook ((prog-mode markdown-mode) . flycheck-mode)
   )
 
 ;; Quick-peek:
-;;
+
 ;; Will be used to allow seeing the inline flycheck in a stylised way
 (use-package quick-peek
   :ensure t
   )
 
 ;; Flycheck inline mode:
-;;
+
 ;; Enabled when Flycheck is enabled
 (use-package flycheck-inline
   :hook (flycheck-mode . flycheck-inline-mode)
@@ -416,8 +564,8 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 		flycheck-inline-clear-function #'quick-peek-hide)
   )
 
-;; Company mode:
-;;
+;;;;;; Company mode:
+
 ;; Enabled when in prog mode
 (use-package company
   :hook ((prog-mode . company-mode)
@@ -425,6 +573,19 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :bind
   ;; Autocomplete (calling company) when shift-tab
   ([backtab] . company-complete)
+  )
+
+(use-package company-tabnine
+  :defer 1
+  :custom
+  (company-tabnine-max-num-results 9)
+  :bind
+  (("M-q" . company-other-backend)
+   ("C-z t" . company-tabnine))
+  :hook (kill-emacs . company-tabnine-kill-process)
+  :config
+  ;; Enable TabNine on default
+  (add-to-list 'company-backends #'company-tabnine)
   )
 
 (use-package company-math
@@ -435,7 +596,14 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (TeX-mode . (lambda ()
                 (setq-local company-backends '((company-math-symbols-latex
                                                 company-latex-commands
-                                                company-capf))))))
+                                                company-capf)))))
+  (TeX-mode . my/latex-mode-setup)
+  :config
+  (defun my/latex-mode-setup ()
+    (setq-local company-backends
+                (append '((company-math-symbols-latex company-latex-commands))
+                        company-backends)))
+  )
 
 (use-package company-web
   :preface
@@ -447,8 +615,8 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
                                                       company-web-jade
                                                       company-web-slim
                                                       company-capf))))))
-;; nlinum;
-;;
+;;;;;; nlinum;
+
 ;; Configuration of the width of the line number displayed on the left
 (use-package nlinum
   :config
@@ -464,22 +632,47 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;;   :hook (prog-mode . smartparens-mode)
 ;;   )
 
-;; Aggressive indentation;
-;;
+;;;;;; Aggressive indentation;
+
 ;; Should indent as you type
 (use-package aggressive-indent
   :hook (prog-mode . aggressive-indent-mode)
   )
 
-;; Bug reference;
-;;
+;;;;;; Bug reference;
+
 ;; Is supposed to provide links to bugs listed in source code
 (use-package bug-reference
   :ensure nil
   :hook ((prog-mode . bug-reference-prog-mode)
          (text-mode . bug-reference-mode)))
 
+;;;;;; Projectile
+
+(use-package projectile
+  :bind
+  ("M-p" . projectile-command-map)
+  :custom
+  (projectile-completion-system 'ivy)
+  :init
+  (projectile-mode 1)
+  ;; :config
+  ;; (add-to-list 'projectile-globally-ignored-directories "node_modules")
+  )
+
+;;;;;; Jump to definition
+
+(use-package dumb-jump
+  :bind
+  (:map prog-mode-map
+        (("C-c C-o" . dumb-jump-go-other-window)
+         ("C-c C-j" . dumb-jump-go)
+         ("C-c C-i" . dumb-jump-go-prompt)))
+  :custom (dumb-jump-selector 'ivy))
+
 ;;;; EDITING ENHANCEMENTS:
+
+;;;;;; Multiple cursors
 
 (use-package multiple-cursors
   :bind
@@ -488,6 +681,16 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
    ("C-c a" . mc/mark-all-like-this)
    )
   )
+
+;;;;;; Delete block
+
+(use-package delete-block
+  :load-path (lambda () (expand-file-name "site-elisp/delete-block" user-emacs-directory))
+  :bind
+  (("M-d" . delete-block-forward)
+   ("C-<backspace>" . delete-block-backward)
+   ("M-<backspace>" . delete-block-backward)
+   ("M-DEL" . delete-block-backward)))
 
 ;;;; SPELL CHECKING:
 
@@ -667,9 +870,14 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 ;;;;; OCaml:
 
+(use-package opam-user-setup
+  :after tuareg
+  :load-path "custom/"
+  :config (ignore "Loaded 'flycheck-popup")
+  )
+
 (use-package tuareg
   :hook (
-         ;; (tuareg-mode . my/tuareg-outline-regexp-setup)
          (tuareg-mode . my/set-ocaml-error-regexp)
          ;; The following line will be added again when all the
          ;; small errors it's provoking will be fixed (by me)
@@ -734,6 +942,12 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 ;;;; KEY BINDINDS:
 
+
+;;;;; Adjust font size like web browsers
+(global-set-key (kbd "C-=") #'text-scale-increase)
+(global-set-key (kbd "C-+") #'text-scale-increase)
+(global-set-key (kbd "C--") #'text-scale-decrease)
+
 ;;;;; Which key:
 
 (use-package which-key
@@ -757,7 +971,9 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
         which-key-idle-delay 0.5)
-  :diminish which-key-mode
+  :custom
+  (which-key-separator " ")
+  (which-key-prefix-prefix "+")
   )
 
 
@@ -815,7 +1031,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (global-set-key (kbd "C-c V") 'ivy-switch-view)
 
 ;; use ace-window for navigating windows
-(global-set-key (kbd "C-x O") 'ace-window)
+(global-set-key (kbd "C-x C-o") 'ace-window)
 (with-eval-after-load "ace-window"
   (setq aw-dispatch-always t)
   (set-face-attribute 'aw-leading-char-face nil :height 2.5))
@@ -824,14 +1040,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (global-set-key (kbd "C-c r w") 'rotate-window)
 (global-set-key (kbd "C-c r l") 'rotate-layout)
 ;; *****************************************************************************
-
-;;;; AUTOMATIC CONFIGS FROM PROGRAMS:
-
-;;;;; OCaml configuration:
-
-;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
-(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-;; ## end of OPAM user-setup addition for emacs / base ## keep this line
 
 ;;;; Footer
 
