@@ -160,24 +160,22 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 (use-package outline-ivy
   :load-path "custom/"
-  :defer t
-  ;; :after (outline ivy)
-  ;; :hook (outline-minor-mode . oi-jump)
+  :after (outline ivy)
   :bind (:map outline-minor-mode-map
               ("C-j" . oi-jump)
               )
   )
 
-;; (use-package pretty-outlines
-;;   :defer t
-;;   :load-path "custom/"
-;;   :hook ((outline-mode . pretty-outlines-set-display-table)
-;;          (outline-minor-mode . pretty-outlines-set-display-table)
-;;          (emacs-lisp-mode . pretty-outlines-add-bullets)
-;;          (tuareg-mode . pretty-outlines-add-bullets)
-;;          (rust-mode . pretty-outlines-add-bullets)
-;;          )
-;;   )
+(use-package pretty-outlines
+  :defer t
+  :load-path "custom/"
+  :hook ((outline-mode . pretty-outlines-set-display-table)
+         (outline-minor-mode . pretty-outlines-set-display-table)
+         (emacs-lisp-mode . pretty-outlines-add-bullets)
+         (tuareg-mode . pretty-outlines-add-bullets)
+         (rust-mode . pretty-outlines-add-bullets)
+         )
+  )
 
 ;; ;; Working on fixing a bug for this one:
 ;; (use-package outline-minor-faces
