@@ -1,14 +1,42 @@
 ;;; package --- Main customization file for emacs
+
+;; Copyright (c) 2020-2020 Mattias and contributors.
+
+;; Author: Mattias
+;; Maintainer: Mattias <mattias@ocamlpro.com>
+;; Version: 0.1
+;; Licence: GPL2+
+;; Keywords: convenience, configuration
+
+;;; License:
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 2 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ;;; Commentary:
+
 ;; In case of variable/face customization, try not to put it here and instead
 ;; use M-x customize-variable/face <ret> name_of_the_variable/face
 ;;
 ;; This file mainly focuses on setting modes and some options that
 ;; can't be set through customize-variable/face
+
 ;;; Code:
 
-;;;; A BIG BUNCH OF CUSTOM OPTIONS:
-;; ****************************************************************************
+;;;; A BIG BUNCH OF CUSTOM OPTIONS
+
 ;; These options can't be customized from M-x customize
 
 ;; Start the window on the upper right corner with a fixed size
@@ -30,7 +58,8 @@
 
 ;; Delete trailing whitespaces when saving:
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; Wraps automatically too long line:
+
+;; Wraps automatically too long lines:
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 (setq frame-title-format '(buffer-file-name "%b (%f)" "%b"))
@@ -57,7 +86,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
       (comment-or-uncomment-region (line-beginning-position) (line-end-position))
     (comment-dwim arg)))
 
-;;;; PACKAGE sources and use-package:
+;;;; PACKAGE SOURCES AND USE-PACKAGE:
 
 (require 'package)
 (add-to-list 'package-archives
@@ -77,7 +106,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :ensure t)
 
 ;;;; GLOBAL MINOR MODES:
-;; *****************************************************************************
+
 ;; Some minor packages have the following line:
 ;;   `:init (*-mode 1) ; globally at startup'
 ;; This allows to load the mode for all buffers
@@ -92,6 +121,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; that can be customized directly.
 
 ;;;;; Outline, outshines and friends:
+
 (use-package outline
   :hook (prog-mode . outline-minor-mode) ; globally at startup
   ;; Outline-minor-mode key map
@@ -130,22 +160,24 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 (use-package outline-ivy
   :load-path "custom/"
-  :after (outline ivy)
+  :defer t
+  ;; :after (outline ivy)
   ;; :hook (outline-minor-mode . oi-jump)
   :bind (:map outline-minor-mode-map
               ("C-j" . oi-jump)
               )
   )
 
-(use-package pretty-outlines
-  :defer t
-  :load-path "custom/"
-  :hook ((outline-mode . pretty-outlines-set-display-table)
-         (outline-minor-mode . pretty-outlines-set-display-table)
-         (emacs-lisp-mode . pretty-outlines-add-bullets)
-         (tuareg-mode . pretty-outlines-add-bullets)
-         )
-  )
+;; (use-package pretty-outlines
+;;   :defer t
+;;   :load-path "custom/"
+;;   :hook ((outline-mode . pretty-outlines-set-display-table)
+;;          (outline-minor-mode . pretty-outlines-set-display-table)
+;;          (emacs-lisp-mode . pretty-outlines-add-bullets)
+;;          (tuareg-mode . pretty-outlines-add-bullets)
+;;          (rust-mode . pretty-outlines-add-bullets)
+;;          )
+;;   )
 
 ;; ;; Working on fixing a bug for this one:
 ;; (use-package outline-minor-faces
@@ -242,7 +274,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   )
 
 ;;;; ORG MODE:
-;;
+
 ;; This one is actually a big mess, some things are commented because I'm
 ;; still working on how they fit my style or not
 
@@ -334,7 +366,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   )
 
 ;;;; META PROGRAMMING:
-;;
+
 ;; (flycheck, completion ...)
 
 ;; Separedit:
@@ -507,7 +539,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;;;; LANGUAGE SPECIFIC PACKAGES:
 
 ;;;;; LaTeX:
-;;
+
 (use-package tex-site
   :mode "\\.tex\\'"
   :hook (tex-site . turn-on-auto-fill)
@@ -518,34 +550,34 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   )
 
 ;;;;; Cubicle:
-;;
+
 (use-package cubicle-mode
   :mode "\\.cub$"
   )
 
 ;;;;; Why3:
-;;
+
 (use-package why3-mode
   :load-path "custom/"
   :mode "\\.\\(\\(mlw\\)\\|\\(why\\)\\)$"
   )
 
 ;;;;; Dune:
-;;
+
 (use-package dune-mode
   :mode ("dune" "dune-project")
   )
 
 ;;;;; Rust:
-;;
+
 (use-package rust-mode
   :mode "\\.rs'"
   :bind ("C-M-;" . rust-doc-comment-dwim-following)
   :bind ("C-M-," . rust-doc-comment-dwim-enclosing)
-  :hook (rust-mode . my/rust-mode-outline-regexp-setup)
+  ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
   :config
-  (defun my/rust-mode-outline-regexp-setup ()
-    (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
+  ;; (defun my/rust-mode-outline-regexp-setup ()
+  ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
   (defun rust-doc-comment-dwim (c)
     "Comment or uncomment the current line or text selection."
     (interactive)
@@ -635,22 +667,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (use-package flycheck-rust
   :hook (rust-mode . flycheck-rust-setup))
 
-;; ;;;;; Elisp:
-;; (use-package elisp-mode
-;;   :ensure nil ; built-in
-;;   :hook ((emacs-lisp-mode . my/elisp-outline-regexp-setup))
-
-;;   :config
-;;   (defun my/elisp-outline-regexp-setup ()
-;;     ;; The default outline-regexp for elisp-mode includes autoloads and any
-;;     ;; lisp structure starting at the beginning of the line, which is
-;;     ;; confusing. The default value is defined in 'lisp-mode.el':
-;;     ;; (setq-local outline-regexp ";;;\\(;* [^ \t\n]\\|###autoload\\)\\|(")
-;;     ;; Better results with:
-;;     (setq-local outline-regexp ";;[;]\\{1,8\\}[^ \t]")))
-
 ;;;;; OCaml:
-;;
 
 (use-package tuareg
   :hook (
@@ -679,7 +696,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :hook (tuareg-mode . flycheck-ocaml-setup))
 
 ;;;;; Markdown:
-;;
+
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'"       . markdown-mode)
@@ -690,7 +707,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
          (pandoc-mode . pandoc-load-default-settings)))
 
 ;;;;; Web:
-;;
+
 (use-package web-mode
   :init
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
@@ -699,13 +716,13 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   )
 
 ;;;;; CSS:
-;;
+
 (use-package css-mode
   :ensure nil
   :mode "\\.css\\'")
 
 ;;;;; JSON:
-;;
+
 (use-package json-mode
   :mode (("\\.bowerrc$"     . json-mode)
          ("\\.jshintrc$"    . json-mode)
@@ -718,7 +735,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (make-local-variable 'js-indent-level))
 
 ;;;; KEY BINDINDS:
-;;
 
 ;;;;; Which key:
 
@@ -748,6 +764,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 
 ;;;;; Global utility keys:
+
 (global-set-key (kbd "C-c h b") 'describe-personal-keybindings)
 
 ;; Custom comment overwriting comment-dwim key binding
@@ -788,7 +805,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; *****************************************************************************
 
 ;;;;; Window management (move):
-;;
+
 ;; windmove
 (global-set-key (kbd "C-x <left>") 'windmove-left)
 (global-set-key (kbd "C-x <right>") 'windmove-right)
@@ -818,6 +835,9 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line
 
-;;; end:
+;;;; Footer
+
+;; End:
 (provide 'init)
+
 ;;; init.el ends here
