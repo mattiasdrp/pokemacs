@@ -165,8 +165,8 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (require 'bind-key)
   )
 
-(require 'use-package-ensure)
-(setq use-package-always-ensure t)
+;; (require 'use-package-ensure)
+;; (setq use-package-always-ensure t)
 ;; -ConfigureUsePackage
 
 ;; Will be used to download non-emacs packages needed by emacs packages
