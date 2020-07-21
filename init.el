@@ -39,7 +39,8 @@
 
 ;; These options can't be customized from M-x customize
 
-;; START MATTHEWZMD
+;;;;; From MatthewZMD
+
 ;; See https://github.com/MatthewZMD/.emacs.d for the following options
 ;; CheckVer
 (cond ((version< emacs-version "26.1")
@@ -69,6 +70,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; -BetterGC
 ;; END MATTHEWZMD
 
+;;;;; Custom
 ;; Start the window on the upper right corner with a fixed size
 ;; Loading custom-file containing all the custom variables and faces
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -83,6 +85,18 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (setq max-specpdl-size 10000
       max-lisp-eval-depth 5000)
+
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+
+;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+
 
 ;;;;; Unbind unneeded keys
 
@@ -148,7 +162,11 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 (eval-when-compile
   (require 'use-package)
-  (require 'bind-key))
+  (require 'bind-key)
+  )
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
 ;; -ConfigureUsePackage
 
 ;; Will be used to download non-emacs packages needed by emacs packages
