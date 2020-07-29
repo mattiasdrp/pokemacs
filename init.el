@@ -97,7 +97,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Wraps automatically too long lines:
-(add-hook 'text-mode-hook 'turn-on-auto-fill)
+;; (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 (setq frame-title-format '(buffer-file-name "%b (%f)" "%b"))
 
@@ -327,6 +327,17 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (use-package swiper
     :defer t)
   (ivy-mode 1) ; globally at startup
+  :config
+  (defun ivy-yank-action (x)
+    (kill-new x))
+
+  (defun ivy-copy-to-buffer-action (x)
+    (with-ivy-window
+      (insert x)))
+  (ivy-set-actions
+   t
+   '(("i" ivy-copy-to-buffer-action "insert")
+     ("y" ivy-yank-action "yank")))
   :bind (:map ivy-minibuffer-map
               ("<return>" . ivy-alt-done))
   ;;The * means that these bindings will override all minor mode binding
@@ -621,6 +632,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (use-package nlinum
   :config
   (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
+  (global-nlinum-mode)
   )
 
 ;; smart paren;
@@ -669,6 +681,20 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
          ("C-c C-j" . dumb-jump-go)
          ("C-c C-i" . dumb-jump-go-prompt)))
   :custom (dumb-jump-selector 'ivy))
+
+;;;;;; Code folding
+
+(use-package hideshow
+  :commands (hs-minor-mode
+             hs-toggle-hiding)
+  :init
+  (add-hook 'prog-mode-hook #'hs-minor-mode)
+  :diminish hs-minor-mode
+  :config
+  (setq hs-isearch-open t)
+  :bind (("M-+" . hs-toggle-hiding)
+         ("M-*" . hs-show-all))
+  )
 
 ;;;; EDITING ENHANCEMENTS:
 
