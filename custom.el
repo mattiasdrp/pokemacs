@@ -32,9 +32,6 @@
  '(compilation-scroll-output nil)
  '(compilation-search-path '(nil "src"))
  '(compilation-window-height 12)
- '(current-language-environment "UTF-8")
- '(custom-safe-themes
-   '("5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" default))
  '(delete-selection-mode t)
  '(electric-indent-mode nil)
  '(enable-recursive-minibuffers t)
@@ -58,7 +55,6 @@
  '(ivy-height 10)
  '(ivy-use-selectable-prompt t)
  '(ivy-use-virtual-buffers t)
- '(keyboard-coding-system 'utf-8-unix)
  '(line-move-visual t)
  '(minions-mode t)
  '(minions-mode-line-lighter "☰")
@@ -69,15 +65,15 @@
  '(org-support-shift-select 'always)
  '(outshine-preserve-delimiter-whitespace nil)
  '(package-selected-packages
-   '(vimish-fold tuareg company-tabnine crux outline-minor-faces pretty-outlines dash-functional outshine json-mode run-ocaml dune-mode why3-mode LaTeX-math-mode tex-site gitignore-mode org-present diminish delight org-bullets rainbow-mode aggressive-indent all-the-icons all-the-icons-ivy apropospriate-theme auctex auto-complete caml-debug caml-mode cargo company-math company-racer company-web counsel cubicle-mode dictionary dune flycheck-inline flycheck-ocaml flycheck-rust git-messenger magit merlin-eldoc minions multiple-cursors nlinum org-plus-contrib pandoc-mode php-mode quick-peek racer rotate separedit smartparens smex sort-words toml-mode undo-tree unfill use-package vlf web-mode which-key))
+   '(tuareg company-tabnine crux outline-minor-faces pretty-outlines dash-functional outshine json-mode run-ocaml dune-mode why3-mode LaTeX-math-mode tex-site gitignore-mode org-present diminish delight org-bullets rainbow-mode aggressive-indent all-the-icons all-the-icons-ivy apropospriate-theme auctex auto-complete caml-debug caml-mode cargo company-math company-racer company-web counsel cubicle-mode dictionary dune flycheck-inline flycheck-ocaml flycheck-rust git-messenger magit merlin-eldoc minions multiple-cursors nlinum org-plus-contrib pandoc-mode php-mode quick-peek racer rotate separedit smartparens smex sort-words toml-mode undo-tree unfill use-package vlf web-mode which-key))
  '(pos-tip-background-color "#3a933a933a93")
  '(pos-tip-foreground-color "#9E9E9E")
  '(prettify-symbols-unprettify-at-point nil)
  '(require-final-newline t)
  '(save-abbrevs 'silently)
+ '(save-interprogram-paste-before-kill t)
  '(save-place-mode t)
  '(scroll-bar-mode nil)
- '(selection-coding-system 'utf-8)
  '(sentence-end-double-space nil)
  '(show-paren-delay 0)
  '(show-paren-mode t)
@@ -89,8 +85,7 @@
  '(tuareg-electric-indent t)
  '(tuareg-prettify-symbols-full t)
  '(use-package-verbose t)
- '(visible-bell t)
- '(x-select-request-type '(COMPOUND_TEXT UTF8_STRING STRING TEXT)))
+ '(visible-bell t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
