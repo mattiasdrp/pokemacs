@@ -604,18 +604,18 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   ([backtab] . company-complete)
   )
 
-(use-package company-tabnine
-  :defer 1
-  :custom
-  (company-tabnine-max-num-results 9)
-  :bind
-  (("M-q" . company-other-backend)
-   ("C-z t" . company-tabnine))
-  :hook (kill-emacs . company-tabnine-kill-process)
-  :config
-  ;; Enable TabNine on default
-  (add-to-list 'company-backends #'company-tabnine)
-  )
+;; (use-package company-tabnine
+;;   :defer 1
+;;   :custom
+;;   (company-tabnine-max-num-results 9)
+;;   :bind
+;;   (("M-q" . company-other-backend)
+;;    ("C-z t" . company-tabnine))
+;;   :hook (kill-emacs . company-tabnine-kill-process)
+;;   :config
+;;   ;; Enable TabNine on default
+;;   (add-to-list 'company-backends #'company-tabnine)
+;;   )
 
 (use-package company-math
   :preface
@@ -821,6 +821,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :bind ("C-M-," . rust-doc-comment-dwim-enclosing)
   ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
   :config
+  (setq rust-format-on-save t)
   ;; (defun my/rust-mode-outline-regexp-setup ()
   ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
   (defun rust-doc-comment-dwim (c)
