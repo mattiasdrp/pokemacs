@@ -21,7 +21,7 @@
  '(blink-matching-paren-on-screen t)
  '(column-number-mode t)
  '(comment-style (quote indent))
- '(company-idle-delay nil)
+ ;; '(company-idle-delay nil)
  '(company-minimum-prefix-length 1)
  '(company-show-numbers (quote (quote left)))
  '(company-tooltip-align-annotations t)

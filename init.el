@@ -584,13 +584,13 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (use-package flycheck-inline
   :hook (flycheck-mode . flycheck-inline-mode)
   :config (setq flycheck-inline-display-function
-		(lambda (msg pos)
-		  (let* ((ov (quick-peek-overlay-ensure-at pos))
-			 (contents (quick-peek-overlay-contents ov)))
-		    (setf (quick-peek-overlay-contents ov)
-			  (concat contents (when contents "\n") msg))
-		    (quick-peek-update ov)))
-		flycheck-inline-clear-function #'quick-peek-hide)
+        	(lambda (msg pos err)
+                  (let* ((ov (quick-peek-overlay-ensure-at pos))
+                         (contents (quick-peek-overlay-contents ov)))
+                    (setf (quick-peek-overlay-contents ov)
+                          (concat contents (when contents "\n") msg))
+                    (quick-peek-update ov)))
+                flycheck-inline-clear-function #'quick-peek-hide)
   )
 
 ;;;;;; Company mode:
@@ -922,20 +922,20 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   )
 
 (use-package tuareg
-  :hook (
-         (tuareg-mode . my/set-ocaml-error-regexp)
-         ;; The following line will be added again when all the
-         ;; small errors it's provoking will be fixed (by me)
-         ;; (tuareg-mode . my/tuareg-mode-outline-regexp-setup)
-         )
-  :config
-  (defun my/tuareg-mode-outline-regexp-setup ()
-    (setq-local outline-regexp "(\\*[;]\\{0,8\\}[^ \t]"))
-  (defun my/set-ocaml-error-regexp ()
-    (set
-     'compilation-error-regexp-alist
-     (list '("[Ff]ile \\(\"\\(.*?\\)\", line \\(-?[0-9]+\\)\\(, characters \\(-?[0-9]+\\)-\\([0-9]+\\)\\)?\\)\\(:\n\\(\\(Warning .*?\\)\\|\\(Error\\)\\):\\)?"
-             2 3 (5 . 6) (9 . 11) 1 (8 compilation-message-face)))))
+  ;; :hook (
+  ;;        (tuareg-mode . my/set-ocaml-error-regexp)
+  ;;        ;; The following line will be added again when all the
+  ;;        ;; small errors it's provoking will be fixed (by me)
+  ;;        ;; (tuareg-mode . my/tuareg-mode-outline-regexp-setup)
+  ;;        )
+  ;; :config
+  ;; (defun my/tuareg-mode-outline-regexp-setup ()
+  ;;   (setq-local outline-regexp "(\\*[;]\\{0,8\\}[^ \t]"))
+  ;; (defun my/set-ocaml-error-regexp ()
+  ;;   (set
+  ;;    'compilation-error-regexp-alist
+  ;;    (list '("[Ff]ile \\(\"\\(.*?\\)\", line \\(-?[0-9]+\\)\\(, characters \\(-?[0-9]+\\)-\\([0-9]+\\)\\)?\\)\\(:\n\\(\\(Warning .*?\\)\\|\\(Error\\)\\):\\)?"
+  ;;            2 3 (5 . 6) (9 . 11) 1 (8 compilation-message-face)))))
   )
 
 (use-package merlin-mode
@@ -945,6 +945,15 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 (use-package flycheck-ocaml
   :hook (tuareg-mode . flycheck-ocaml-setup))
+
+(with-eval-after-load 'merlin
+  ;; Disable Merlin's own error checking
+  (setq merlin-error-after-save nil)
+
+  ;; Enable Flycheck checker
+  (flycheck-ocaml-setup))
+
+(add-hook 'tuareg-mode-hook #'merlin-mode)
 
 ;;;;; Markdown:
 
