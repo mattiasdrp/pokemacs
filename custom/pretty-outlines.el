@@ -9,7 +9,7 @@
 ;;; Code:
 ;;;; Requires
 
-(require 'cl)
+;; (require 'cl)
 (require 'dash)
 (require 'dash-functional)
 (require 'outshine)
@@ -109,6 +109,7 @@ These properties are applied to only the *bullet* part of the outline.")
        (-take pretty-outlines--max-outline-depth)
        pretty-outlines--build-rgx-composition-face-alist
        (-map (-applify #'pretty-outlines--build-keyword))
-       (font-lock-add-keywords nil)))
+       (font-lock-add-keywords nil)
+       ))
 
 (provide 'pretty-outlines)

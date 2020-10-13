@@ -4,7 +4,7 @@
 
 ;; Author: Mattias
 ;; Maintainer: Mattias <mattias@ocamlpro.com>
-;; Vesrion: 0.1
+;; Version: 0.1
 ;; Licence: GPL2+
 ;; Keywords: convenience, configuration
 
@@ -226,7 +226,8 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;;;;; Outline, outshines and friends:
 
 (use-package outline
-  :hook (prog-mode . outline-minor-mode) ; globally at startup
+  :hook ((prog-mode . outline-minor-mode)
+         (text-mode . outline-minor-mode))
   :config
   (define-prefix-command 'cm-map nil "Outline-")
   (set-display-table-slot standard-display-table
@@ -277,6 +278,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
          (emacs-lisp-mode . pretty-outlines-add-bullets)
          (tuareg-mode . pretty-outlines-add-bullets)
          (rust-mode . pretty-outlines-add-bullets)
+         (LaTeX-mode . pretty-outlines-add-bullets)
          )
   )
 
@@ -584,7 +586,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (use-package flycheck-inline
   :hook (flycheck-mode . flycheck-inline-mode)
   :config (setq flycheck-inline-display-function
-        	(lambda (msg pos err)
+                (lambda (msg pos)
                   (let* ((ov (quick-peek-overlay-ensure-at pos))
                          (contents (quick-peek-overlay-contents ov)))
                     (setf (quick-peek-overlay-contents ov)
@@ -786,8 +788,24 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;;;;; LaTeX:
 
 (use-package tex-site
-  :mode "\\.tex\\'"
-  :hook (tex-site . turn-on-auto-fill)
+  :ensure auctex
+  :mode ("\\.tex\\'" . latex-mode)
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              ;; (rainbow-delimiters-mode)
+              ;; (pretty-outlines-add-bullets)
+              (company-mode)
+              ;; (smartparens-mode)
+              (turn-on-reftex)
+              (setq reftex-plug-into-AUCTeX t)
+              (reftex-isearch-minor-mode)
+              (setq TeX-PDF-mode t)
+              (setq TeX-source-correlate-method 'synctex)
+              (setq TeX-source-correlate-start-server t)))
   )
 
 (use-package LaTeX-math-mode
