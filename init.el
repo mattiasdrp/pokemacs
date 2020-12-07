@@ -200,11 +200,19 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; instead of editing this file. Avoid, then, using :config here for variables
 ;; that can be customized directly.
 
-;;;;; Doommode line
+;;;;; Doom-modeline
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  )
+
+;;;;; Minions
+
+(use-package minions
+  :config (minions-mode)
+  :custom
+  (minions-mode-line-lighter "☰")
+  )
 
 ;;;;; Crux
 
@@ -481,12 +489,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (global-set-key (kbd "M-I") (lambda () (interactive) (resize-window nil 5)))
 (global-set-key (kbd "M-K") (lambda () (interactive) (resize-window nil -5)))
 
-;; ;;;;; Minions
-
-;; (use-package minions
-;;   :config (minions-mode 1)
-;;   )
-
 ;;;;; Discover Major modes
 
 (use-package discover-my-major
@@ -707,9 +709,10 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;;;;;; Aggressive indentation;
 
 ;; Should indent as you type
-(use-package aggressive-indent
-  :hook (prog-mode . aggressive-indent-mode)
-  )
+;; I actually don't like it
+;; (use-package aggressive-indent
+;;   :hook (prog-mode . aggressive-indent-mode)
+;;   )
 
 ;;;;;; Bug reference;
 
