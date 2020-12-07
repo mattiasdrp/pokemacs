@@ -39,6 +39,12 @@
 
 ;; These options can't be customized from M-x customize
 
+;; Get rid of the cl is deprecated warning
+(setq byte-compile-warnings '(cl-functions))
+
+(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 ;;;;; From MatthewZMD
 
 ;; See https://github.com/MatthewZMD/.emacs.d for the following options
@@ -78,10 +84,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
 
-(when window-system
-  (setq frame-resize-pixelwise t
-        x-frame-normalize-before-maximize t)
-  (add-to-list 'default-frame-alist '(fullscreen . maximized)))
+;; (when window-system
+;;   (setq frame-resize-pixelwise t
+;;         x-frame-normalize-before-maximize t)
+;;   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
 (setq max-specpdl-size 10000
       max-lisp-eval-depth 5000)
@@ -97,13 +103,19 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
-
 ;;;;; Unbind unneeded keys
 
 (global-set-key (kbd "C-z") nil)
 (global-set-key (kbd "M-z") nil)
 (global-set-key (kbd "C-x C-z") nil)
 (global-set-key (kbd "M-/") nil)
+(define-key input-decode-map [?\C-m] [C-m])
+(define-key input-decode-map [?\C-i] [C-i])
+
+;;;;; Useful keys
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;;;;; Hooks:
 
@@ -187,6 +199,12 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 ;; is configures and it's actually simpler to just M-x customize <package>
 ;; instead of editing this file. Avoid, then, using :config here for variables
 ;; that can be customized directly.
+
+;;;;; Doommode line
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 
 ;;;;; Crux
 
@@ -297,6 +315,10 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :init (rainbow-mode 1) ; globally at startup
   :delight)
 
+;; rainbox delimiters
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 ;; Abbrev mode:
 ;;
 ;; Expand defined abbrevs
@@ -388,6 +410,24 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   :init (all-the-icons-ivy-setup)
   )
 
+(use-package all-the-icons-ivy-rich
+  :init (all-the-icons-ivy-rich-mode 1))
+
+(use-package ivy-rich
+  :init (ivy-rich-mode 1))
+
+;;;;; Helpful
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
 ;;;;; Windows management
 (use-package winner
   :ensure nil
@@ -441,11 +481,11 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (global-set-key (kbd "M-I") (lambda () (interactive) (resize-window nil 5)))
 (global-set-key (kbd "M-K") (lambda () (interactive) (resize-window nil -5)))
 
-;;;;; Minions
+;; ;;;;; Minions
 
-(use-package minions
-  :config (minions-mode 1)
-  )
+;; (use-package minions
+;;   :config (minions-mode 1)
+;;   )
 
 ;;;;; Discover Major modes
 
@@ -546,7 +586,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 ;;;; META PROGRAMMING:
 
-;;;;;; Separedit:
+;;;;; Separedit:
 
 ;; https://github.com/twlz0ne/separedit.le
 (use-package separedit
@@ -556,7 +596,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (setq separedit-default-mode 'markdown-mode)
   )
 
-;;;;;; Conf mode:
+;;;;; Conf mode:
 
 (use-package conf-mode
   :ensure nil
@@ -566,7 +606,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
          ("_tags\\'" . conf-mode)
          ("_log\\'" . conf-mode)))
 
-;;;;;; Flycheck:
+;;;;; Flycheck:
 
 ;; Enabled when in prog mode
 (use-package flycheck
@@ -586,7 +626,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (use-package flycheck-inline
   :hook (flycheck-mode . flycheck-inline-mode)
   :config (setq flycheck-inline-display-function
-                (lambda (msg pos)
+                (lambda (msg pos err)
                   (let* ((ov (quick-peek-overlay-ensure-at pos))
                          (contents (quick-peek-overlay-contents ov)))
                     (setf (quick-peek-overlay-contents ov)
@@ -691,6 +731,9 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   ;; :config
   ;; (add-to-list 'projectile-globally-ignored-directories "node_modules")
   )
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
 
 ;;;;;; Jump to definition
 
@@ -972,6 +1015,24 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (flycheck-ocaml-setup))
 
 (add-hook 'tuareg-mode-hook #'merlin-mode)
+
+
+;;;;; Fsharp
+
+(use-package fsharp-mode
+  :config (require 'eglot-fsharp)
+  :defer t
+  :ensure t)
+
+(use-package eglot
+  :ensure t
+  :commands (eglot eglot-ensure)
+  :hook ((fsharp-mode . eglot-ensure)
+         (rust-mode . eglot-ensure)
+         )
+  :config
+  (setq eglot-confirm-server-initiated-edits nil)
+  )
 
 ;;;;; Markdown:
 

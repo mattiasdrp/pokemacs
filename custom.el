@@ -57,8 +57,6 @@
  '(ivy-use-virtual-buffers t)
  '(ivy-wrap t)
  '(line-move-visual t)
- '(minions-mode t)
- '(minions-mode-line-lighter "☰")
  '(next-error-highlight t)
  '(next-error-highlight-no-select t)
  '(next-line-add-newlines nil)
@@ -66,7 +64,7 @@
  '(org-support-shift-select 'always)
  '(outshine-preserve-delimiter-whitespace nil)
  '(package-selected-packages
-   '(zzz-to-char auctex-latexmk auto-complete-auctex company-auctex merlin-mode tuareg dumb-jump flycheck discover-my-major amx abbrev rust-mode use-package-ensure-system-package crux outline-minor-faces pretty-outlines dash-functional outshine json-mode run-ocaml dune-mode why3-mode LaTeX-math-mode tex-site gitignore-mode org-present diminish delight org-bullets rainbow-mode aggressive-indent all-the-icons all-the-icons-ivy apropospriate-theme auctex auto-complete caml-debug caml-mode cargo company-math company-racer company-web counsel cubicle-mode dictionary dune flycheck-inline flycheck-ocaml flycheck-rust git-messenger magit merlin-eldoc minions multiple-cursors nlinum org-plus-contrib pandoc-mode php-mode quick-peek racer rotate separedit smartparens smex sort-words toml-mode undo-tree unfill use-package vlf web-mode which-key))
+   '(counsel-projectile doom-modeline all-the-icons-ivy-rich ivy-rich rainbow-delimiters helpful projectile ob-fsharp fsharp-mode dash zzz-to-char auctex-latexmk auto-complete-auctex company-auctex merlin-mode tuareg dumb-jump flycheck discover-my-major amx abbrev rust-mode use-package-ensure-system-package crux outline-minor-faces pretty-outlines dash-functional outshine json-mode run-ocaml dune-mode why3-mode LaTeX-math-mode tex-site gitignore-mode org-present diminish delight org-bullets rainbow-mode aggressive-indent all-the-icons all-the-icons-ivy apropospriate-theme auctex auto-complete caml-debug caml-mode cargo company-math company-racer company-web counsel cubicle-mode dictionary dune flycheck-inline flycheck-ocaml flycheck-rust git-messenger magit merlin-eldoc minions multiple-cursors nlinum org-plus-contrib pandoc-mode php-mode quick-peek racer rotate separedit smartparens smex sort-words toml-mode undo-tree unfill use-package vlf web-mode which-key))
  '(pos-tip-background-color "#3a933a933a93")
  '(pos-tip-foreground-color "#9E9E9E")
  '(prettify-symbols-unprettify-at-point nil)
