@@ -3,8 +3,8 @@
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
 ;; Author: Mattias
-;; Maintainer: Mattias <mattias@ocamlpro.com>
-;; Version: 0.1
+;; Maintainer: Mattias <mattias@email.com>
+;; Version: 1.0
 ;; Licence: GPL2+
 ;; Keywords: convenience, configuration
 
@@ -27,11 +27,6 @@
 
 ;;; Commentary:
 
-;; In case of variable/face customization, try not to put it here and instead
-;; use M-x customize-variable/face <ret> name_of_the_variable/face
-;;
-;; This file mainly focuses on setting modes and some options that
-;; can't be set through customize-variable/face
 
 ;;; Code:
 
@@ -74,669 +69,127 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 ;; -BetterGC
+
+;; AutoGC
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (if (boundp 'after-focus-change-function)
+                (add-function :after after-focus-change-function
+                              (lambda ()
+                                (unless (frame-focus-state)
+                                  (garbage-collect))))
+              (add-hook 'after-focus-change-function 'garbage-collect))
+            (defun gc-minibuffer-setup-hook ()
+              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+
+            (defun gc-minibuffer-exit-hook ()
+              (garbage-collect)
+              (setq gc-cons-threshold better-gc-cons-threshold))
+
+            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+;; -AutoGC
+
+;; LoadPath
+(defun update-to-load-path (folder)
+  "Update FOLDER and its subdirectories to `load-path'."
+  (let ((base folder))
+    (unless (member base load-path)
+      (add-to-list 'load-path base))
+    (dolist (f (directory-files base))
+      (let ((name (concat base "/" f)))
+        (when (and (file-directory-p name)
+                   (not (equal f ".."))
+                   (not (equal f ".")))
+          (unless (member base load-path)
+            (add-to-list 'load-path name)))))))
+
+(update-to-load-path (expand-file-name "elisp-configs" user-emacs-directory))
+
+;; -LoadPath
+
 ;; END MATTHEWZMD
 
-;;;;; Custom
-;; Start the window on the upper right corner with a fixed size
-;; Loading custom-file containing all the custom variables and faces
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file)
-
-(set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
-
-;; (when window-system
-;;   (setq frame-resize-pixelwise t
-;;         x-frame-normalize-before-maximize t)
-;;   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
-
-(setq max-specpdl-size 10000
-      max-lisp-eval-depth 5000)
-
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
-
-;; Treat clipboard input as UTF-8 string first; compound text next, etc.
-(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
-
-;;;;; Unbind unneeded keys
-
-(global-set-key (kbd "C-z") nil)
-(global-set-key (kbd "M-z") nil)
-(global-set-key (kbd "C-x C-z") nil)
-(global-set-key (kbd "M-/") nil)
-(define-key input-decode-map [?\C-m] [C-m])
-(define-key input-decode-map [?\C-i] [C-i])
-
-;;;;; Useful keys
-
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;;;;; Hooks:
-
-;; Delete trailing whitespaces when saving:
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; Wraps automatically too long lines:
-;; (add-hook 'text-mode-hook 'turn-on-auto-fill)
-
-(setq frame-title-format '(buffer-file-name "%b (%f)" "%b"))
-
-;; Asks y/n instead of yes/no (faster):
-(fset 'yes-or-no-p 'y-or-n-p)
-
-;; Adapting the compilation directory matcher for french:
-;; (setq compilation-directory-matcher '("\\(?:Entering\\|Leavin\\(g\\)\\|\\) directory [`']\\(.+\\)'$" (2 . 1)))
-(setq compilation-directory-matcher '("\\(?:on entre dans le\\|on quitte l\\(e\\)\\|\\) répertoire « \\(.+\\) »$" (2 . 1)))
-(setq compilation-page-delimiter "\\(?:on entre dans le\\|on quitte l\\(e\\)\\|\\) répertoire « \\(.+\\) »$")
-
-;; Custom comment function a bit more clever
-;; https://www.emacswiki.org/emacs/CommentingCode
-(defun comment-eclipse (&optional arg)
-  "Replacement for the `comment-dwim' command.
-If no region is selected and current line is not blank and we are not at the
-end of the line, then comment current line.
-Replaces default behaviour of `comment-dwim', when it inserts comment at the
-end of the line. Provides the optional ARG used by `comment-dwim'"
-  (interactive "*P")
-  (comment-normalize-vars)
-  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
-      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
-    (comment-dwim arg)))
-
-;;;; PACKAGE SOURCES AND USE-PACKAGE:
-
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("org" . "http://orgmode.org/elpa/") t)
-(package-initialize)
-
-;; ConfigurePackageManager
-(unless (bound-and-true-p package--initialized)
-  (setq package-enable-at-startup nil)          ; To prevent initializing twice
-  (package-initialize))
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-and-compile
-  (setq use-package-expand-minimally t)
-  (setq use-package-compute-statistics t)
-  (setq use-package-enable-imenu-support t))
-
-(eval-when-compile
-  (require 'use-package)
-  (require 'bind-key)
-  )
-
-;; (require 'use-package-ensure)
-;; (setq use-package-always-ensure t)
-;; -ConfigureUsePackage
-
-;; Will be used to download non-emacs packages needed by emacs packages
-(use-package use-package-ensure-system-package
-  :ensure t)
-
-;;;; GLOBAL MINOR MODES:
-
-;; Some minor packages have the following line:
-;;   `:init (*-mode 1) ; globally at startup'
-;; This allows to load the mode for all buffers
-;; Other minor modes will be loaded when needed
-;;
-;; Important thing!
-;; Most of the configs were made through M-x customize-variable
-;; and are thus found in custom.el. It may seem nicer to configure them
-;; here through :config but it makes it hard to follow how each package
-;; is configures and it's actually simpler to just M-x customize <package>
-;; instead of editing this file. Avoid, then, using :config here for variables
-;; that can be customized directly.
-
-;;;;; Doom-modeline
-
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  )
-
-;;;;; Minions
-
-(use-package minions
-  :config (minions-mode)
-  :custom
-  (minions-mode-line-lighter "☰")
-  )
-
-;;;;; Crux
-
-(use-package crux
-  :bind-keymap ("M-m" . crux-map)
-  :bind (:map crux-map
-              ("w" . crux-view-url)                ; Open a new buffer containing the contents of URL.
-              ("o" . crux-open-with)               ; Open visited file in default external program.
-              ("e" . crux-sudo-edit)               ; Edit currently visited file as root.
-              ("i" . crux-insert-date)             ; Insert a timestamp according to locale's date and time format.
-              ("t" . crux-transpose-windows)       ; Transpose the buffers shown in two windows.
-              ("j" . crux-top-join-line)           ; Join the current line with the line beneath it.
-              ("u" . crux-upcase-region)           ; `upcase-region' when `transient-mark-mode' is on and region is active.
-              ("d" . crux-downcase-region)         ; `downcase-region' when `transient-mark-mode' is on and region is active.
-              ("c" . crux-capitalize-region)       ; `capitalize-region' when `transient-mark-mode' is on and region is active.
-              ("r" . crux-recompile-init)          ; Byte-compile all your dotfiles again.
-              ("k" . crux-smart-kill-line)         ; Kill to the end of the line and kill whole line on the next call.
-              ("M-k" . crux-kill-line-backwards)   ; Kill line backwards and adjust the indentation.
-              ("a" . crux-move-beginning-of-line)  ; Move point back to indentation/beginning (toggle) of line.
-              ("s" . crux-ispell-word-then-abbrev) ; Call `ispell-word', then create an abbrev for it.
-              )
-  (("C-a" . crux-move-beginning-of-line)
-   ("C-x 4 t" . crux-transpose-windows)
-   ("C-x K" . crux-kill-other-buffers)
-   ("C-k" . crux-smart-kill-line)
-   ("M-u" . crux-upcase-region)
-   ("M-d" . crux-downcase-region)
-   ("M-c" . crux-capitalize-region)
-   )
-  :config
-  (define-prefix-command 'crux-map nil "Crux-")
-  (crux-with-region-or-buffer indent-region)
-  (crux-with-region-or-buffer untabify)
-  (crux-with-region-or-point-to-eol kill-ring-save)
-  (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer))
-
-;;;;; Outline, outshines and friends:
-
-(use-package outline
-  :hook ((prog-mode . outline-minor-mode)
-         (text-mode . outline-minor-mode))
-  :config
-  (define-prefix-command 'cm-map nil "Outline-")
-  (set-display-table-slot standard-display-table
-                          'selective-display
-                          (string-to-vector "+++"))
-  ;; Outline-minor-mode key map
-  :bind-keymap ("C-o" . cm-map)
-  :bind (:map cm-map
-              ;; HIDE
-              ("q" . outline-hide-sublevels)    ; Hide everything but the top-level headings
-              ("t" . outline-hide-body)         ; Hide everything but headings (all body lines)
-              ("o" . outline-hide-other)        ; Hide other branches
-              ("c" . outline-hide-entry)        ; Hide this entry's body
-              ("l" . outline-hide-leaves)       ; Hide body lines in this entry and sub-entries
-              ("d" . outline-hide-subtree)      ; Hide everything in this entry and sub-entries
-              ;; SHOW
-              ("a" . outline-show-all)          ; Show (expand) everything
-              ("e" . outline-show-entry)        ; Show this heading's body
-              ("i" . outline-show-children)     ; Show this heading's immediate child sub-headings
-              ("k" . outline-show-branches)     ; Show all sub-headings under this heading
-              ("s" . outline-show-subtree)      ; Show (expand) everything in this heading & below
-              ;; MOVE
-              ("u" . outline-up-heading)                ; Up
-              ("n" . outline-next-visible-heading)      ; Next
-              ("p" . outline-previous-visible-heading)  ; Previous
-              ("f" . outline-forward-same-level)        ; Forward - same level
-              ("b" . outline-backward-same-level)       ; Backward - same level
-              )
-  )
-
-(use-package outshine
-  :hook (outline-minor-mode . outshine-mode)
-  )
-
-(use-package outline-ivy
-  :load-path "custom/"
-  :after (outline ivy)
-  :bind (:map outline-minor-mode-map
-              ("C-j" . oi-jump)
-              )
-  )
-
-(use-package pretty-outlines
-  :defer t
-  :load-path "custom/"
-  :hook ((outline-mode . pretty-outlines-set-display-table)
-         (outline-minor-mode . pretty-outlines-set-display-table)
-         (emacs-lisp-mode . pretty-outlines-add-bullets)
-         (tuareg-mode . pretty-outlines-add-bullets)
-         (rust-mode . pretty-outlines-add-bullets)
-         (LaTeX-mode . pretty-outlines-add-bullets)
-         )
-  )
-
-;; ;; Working on fixing a bug for this one:
-;; (use-package outline-minor-faces
-;;   :after outline
-;;   :config (add-hook 'outline-minor-mode-hook
-;;                     'outline-minor-faces-add-font-lock-keywords))
-
-;;;;; Colors and other small things:
-
-;; rainbow mode:
-;;
-;; Display colors with a background corresponding to the color
-(use-package rainbow-mode
-  :init (rainbow-mode 1) ; globally at startup
-  :delight)
-
-;; rainbox delimiters
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-;; Abbrev mode:
-;;
-;; Expand defined abbrevs
-;; To define an abbrev just type the corresponding letters then
-;; C-x a i g (mnemonic: add inverse global) and the expansion for it
-;; The file with all the user defined abbrevs should be in .emacs.d/abbrev_defs
-;; https://www.emacswiki.org/emacs/AbbrevMode
-(use-package abbrev
-  :init (abbrev-mode 1) ; globally at startup
-  :config
-  (if (file-exists-p abbrev-file-name)
-      (quietly-read-abbrev-file)))
-
-;; ANSI colors in compilation buffer:
-;;
-(use-package ansi-color
-  :ensure nil
-  :hook (compilation-filter . colorize-compilation-buffer)
-  :preface
-  (autoload 'ansi-color-apply-on-region "ansi-color")
-  (defun colorize-compilation-buffer ()
-    (let ((inhibit-read-only t))
-      (ansi-color-apply-on-region (point-min) (point-max)))))
-
-;; Nice theme:
-;;
-(use-package apropospriate-theme
-  :if window-system
-  :init
-  (add-to-list 'custom-theme-load-path
-               (file-name-directory
-                (locate-library "apropospriate-theme")))
-  (load-theme 'apropospriate-dark t))
-
-;; All the icons:
-;;
-;; M-x all-the-icons-insert-* will allow to directly insert a unicode symbol
-(use-package all-the-icons)
-
-;;;;; Counsel, Ivy and friends:
-
-(use-package ivy
-  :init
-  (use-package amx
-    :defer t)
-  (use-package counsel
-    :config (counsel-mode 1))
-  (use-package swiper
-    :defer t)
-  (ivy-mode 1) ; globally at startup
-  :config
-  (defun ivy-yank-action (x)
-    (kill-new x))
-
-  (defun ivy-copy-to-buffer-action (x)
-    (with-ivy-window
-      (insert x)))
-  (ivy-set-actions
-   t
-   '(("i" ivy-copy-to-buffer-action "insert")
-     ("y" ivy-yank-action "yank")))
-  :bind (:map ivy-minibuffer-map
-              ("<return>" . ivy-alt-done))
-  ;;The * means that these bindings will override all minor mode binding
-  :bind*
-  (("M-x"     . counsel-M-x)
-   ;; Not happy with the behaviour of swiper or swiper-isearch
-   ;; ("C-s"     . swiper-isearch)
-   ("C-x C-f" . counsel-find-file)
-   ("C-x C-r" . counsel-recentf)  ; search for recently edited
-   ("C-c g"   . counsel-git)      ; search for files in git repo
-   ("C-c j"   . counsel-git-grep) ; search for regexp in git repo
-   ;; ("C-c /"   . counsel-ag)       ; Use ag for regexp
-   ("C-x l"   . counsel-locate)
-   ("C-x C-f" . counsel-find-file)
-   ("<f1> f"  . counsel-describe-function)
-   ("<f1> v"  . counsel-describe-variable)
-   ("<f1> l"  . counsel-find-library)
-   ("<f2> i"  . counsel-info-lookup-symbol)
-   ("<f2> u"  . counsel-unicode-char)
-   ("C-c C-r" . ivy-resume))     ; Resume last Ivy-based completion
-  )
-
-;; All the icons for Ivy:
-;;
-;; Uses all-the-icons to display ivy results in a nicer way
-(use-package all-the-icons-ivy
-  :requires all-the-icons
-  :init (all-the-icons-ivy-setup)
-  )
-
-(use-package all-the-icons-ivy-rich
-  :init (all-the-icons-ivy-rich-mode 1))
-
-(use-package ivy-rich
-  :init (ivy-rich-mode 1))
-
-;;;;; Helpful
-
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-
-;;;;; Windows management
-(use-package winner
-  :ensure nil
-  :custom
-  (winner-boring-buffers
-   '("*Completions*"
-     "*Compile-Log*"
-     "*inferior-lisp*"
-     "*Fuzzy Completions*"
-     "*Apropos*"
-     "*Help*"
-     "*cvs*"
-     "*Buffer List*"
-     "*Ibuffer*"
-     "*esh command on file*"))
-  :config
-  (winner-mode 1))
-
-;; Resizes the window width based on the input
-(defun resize-window-width (w)
-  "Resizes the window width based on W."
-  (interactive (list (if (> (count-windows) 1)
-                         (read-number "Set the current window width in [1~9]x10%: ")
-                       (error "You need more than 1 window to execute this function!"))))
-  (message "%s" w)
-  (window-resize nil (- (truncate (* (/ w 10.0) (frame-width))) (window-total-width)) t))
-
-;; Resizes the window height based on the input
-(defun resize-window-height (h)
-  "Resizes the window height based on H."
-  (interactive (list (if (> (count-windows) 1)
-                         (read-number "Set the current window height in [1~9]x10%: ")
-                       (error "You need more than 1 window to execute this function!"))))
-  (message "%s" h)
-  (window-resize nil (- (truncate (* (/ h 10.0) (frame-height))) (window-total-height)) nil))
-
-;; Setup shorcuts for window resize width and height
-(global-set-key (kbd "C-z w") #'resize-window-width)
-(global-set-key (kbd "C-z h") #'resize-window-height)
-
-(defun resize-window (width delta)
-  "Resize the current window's size.  If WIDTH is non-nil, resize width by some DELTA."
-  (if (> (count-windows) 1)
-      (window-resize nil delta width)
-    (error "You need more than 1 window to execute this function!")))
-
-;; Setup shorcuts for window resize width and height
-(global-set-key (kbd "M-J") (lambda () (interactive) (resize-window t 5)))
-(global-set-key (kbd "M-L") (lambda () (interactive) (resize-window t -5)))
-
-(global-set-key (kbd "M-I") (lambda () (interactive) (resize-window nil 5)))
-(global-set-key (kbd "M-K") (lambda () (interactive) (resize-window nil -5)))
-
-;;;;; Discover Major modes
-
-(use-package discover-my-major
-  :bind ("C-h C-m" . discover-my-major))
-
-;;;; ORG MODE:
-
-;; This one is actually a big mess, some things are commented because I'm
-;; still working on how they fit my style or not
-
-(use-package org
-  :ensure org-plus-contrib
-  :hook (
-         (org-mode . (lambda ()
-                       (add-hook 'completion-at-point-functions
-                                 'pcomplete-completions-at-point nil t)))
-         (message-mode . turn-on-orgtbl)
-         (org-mode . (lambda ()
-                       (autoload 'org-eldoc-documentation-function "org-eldoc")
-                       (setq-local eldoc-documentation-function
-                                   'org-eldoc-documentation-function)))
-         (org-mode . (lambda ()
-                       (push '("[ ]" . "🞎") prettify-symbols-alist)
-                       (push '("[X]" . "🗹" ) prettify-symbols-alist)
-                       (push '("[-]" . "❍" ) prettify-symbols-alist)
-                       (prettify-symbols-mode)
-                       ))
-         )
-  :bind* (
-          ("C-c c" . org-capture)
-          ("C-c a" . org-agenda)
-          ("C-c l" . org-store-link)
-          ("C-c b" . org-iswitchb)
-          (:map org-mode-map
-                ([backtab] . company-complete)
-                ("C-j" . org-goto)
-                )
-          )
-  :config
-  ;; The following lines define faces for the org checkboxes that strangely
-  ;; don't have face as of now
-  (defface org-checkbox-todo-text
-    '((t (:inherit org-todo)))
-    "Face for the text part of an unchecked org-mode checkbox."
-    :group 'org-faces)
-  (font-lock-add-keywords
-   'org-mode
-   `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?: \\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)" 1 'org-checkbox-todo-text prepend))
-   'append)
-
-  (defface org-checkbox-done-text
-    '((t (:inherit org-done)))
-    "Face for the text part of a checked org-mode checkbox."
-    :group 'org-faces)
-  (font-lock-add-keywords
-   'org-mode
-   `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)" 1 'org-checkbox-done-text prepend))
-   'append)
-
-  (defface org-checkbox-intermediate-text
-    '((t (:inherit org-todo)))
-    "Face for the text part of an intermediate org-mode checkbox."
-    :group 'org-faces)
-  (font-lock-add-keywords
-   'org-mode
-   `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:-\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)" 1 'org-checkbox-intermediate-text prepend))
-   'append)
-
-  ;; ispell should not check code blocks in org mode
-  (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
-  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
-  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
-  (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
-  (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$"))
-
-  (use-package ob-dot
-    :ensure nil
-    :demand)
-  (use-package ox-latex
-    :ensure nil
-    :demand)
-  (use-package ox-beamer
-    :ensure nil
-    :demand)
-  (use-package ox-md
-    :ensure nil
-    :demand)
-  )
-
-(use-package org-bullets
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(use-package org-present
-  :commands org-present
-  )
+(require 'cl-lib)
+
+;;;; EMACS RELATED
+;; Constants, global keybindings, functions, helpers for navigating etc
+
+(update-to-load-path (expand-file-name "elisp-configs/emacs" user-emacs-directory))
+
+;; Useful constants
+(require 'mdrp-constants)
+
+;; Packages
+
+;; Package Management
+(require 'mdrp-packages)
+
+;; Global Functionalities
+(require 'mdrp-global-config)
+
+;; Global functions
+(require 'mdrp-functions)
+
+(require 'mdrp-crux)
+
+(require 'mdrp-winner)
+
+(require 'mdrp-keybindings)
+
+;;;; UI
+
+(update-to-load-path (expand-file-name "elisp-configs/ui" user-emacs-directory))
+
+;;;;; Modeline
+;; The bar below with some infos
+
+(require 'mdrp-doom-modeline)
+
+(require 'mdrp-minions)
+
+;;;;; Outline
+;; Navigating through any file
+
+(require 'mdrp-outline)
+
+(require 'mdrp-outshine)
+
+(require 'mdrp-outline-ivy)
+
+(require 'mdrp-pretty-outlines)
+
+;;;;; Themes, colors and other small things
+
+(require 'mdrp-rainbow-mode)
+
+(require 'mdrp-rainbow-delimiters)
+
+(require 'mdrp-ansi-color)
+
+(require 'mdrp-apropospriate-theme)
+
+(require 'mdrp-all-the-icons)
+
+(require 'mdrp-nlinum)
+
+;;;; Completion
+(update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
+
+;; Minibuffer completion
+(require 'mdrp-ivy-projectile)
+
+(require 'mdrp-company)
 
 ;;;; META PROGRAMMING:
 
-;;;;; Separedit:
+(update-to-load-path (expand-file-name "elisp-configs/meta" user-emacs-directory))
 
-;; https://github.com/twlz0ne/separedit.le
-(use-package separedit
-  :ensure t
-  :bind (("C-c C-e" . separedit))
-  :config
-  (setq separedit-default-mode 'markdown-mode)
-  )
+(require 'mdrp-separedit)
 
-;;;;; Conf mode:
+(require 'mdrp-conf-mode)
 
-(use-package conf-mode
-  :ensure nil
-  :mode (
-         ("/\\.merlin\\'" . conf-mode)
-         ("_oasis\\'" . conf-mode)
-         ("_tags\\'" . conf-mode)
-         ("_log\\'" . conf-mode)))
-
-;;;;; Flycheck:
-
-;; Enabled when in prog mode
-(use-package flycheck
-  :hook ((prog-mode markdown-mode) . flycheck-mode)
-  )
-
-;; Quick-peek:
-
-;; Will be used to allow seeing the inline flycheck in a stylised way
-(use-package quick-peek
-  :ensure t
-  )
-
-;; Flycheck inline mode:
-
-;; Enabled when Flycheck is enabled
-(use-package flycheck-inline
-  :hook (flycheck-mode . flycheck-inline-mode)
-  :config (setq flycheck-inline-display-function
-                (lambda (msg pos err)
-                  (let* ((ov (quick-peek-overlay-ensure-at pos))
-                         (contents (quick-peek-overlay-contents ov)))
-                    (setf (quick-peek-overlay-contents ov)
-                          (concat contents (when contents "\n") msg))
-                    (quick-peek-update ov)))
-                flycheck-inline-clear-function #'quick-peek-hide)
-  )
-
-;;;;;; Company mode:
-
-;; Enabled when in prog mode
-(use-package company
-  :hook ((prog-mode . company-mode)
-         (org-mode . company-mode))
-  :bind
-  ;; Autocomplete (calling company) when shift-tab
-  ([backtab] . company-complete)
-  )
-
-;; (use-package company-tabnine
-;;   :defer 1
-;;   :custom
-;;   (company-tabnine-max-num-results 9)
-;;   :bind
-;;   (("M-q" . company-other-backend)
-;;    ("C-z t" . company-tabnine))
-;;   :hook (kill-emacs . company-tabnine-kill-process)
-;;   :config
-;;   ;; Enable TabNine on default
-;;   (add-to-list 'company-backends #'company-tabnine)
-;;   )
-
-(use-package company-math
-  :preface
-  (autoload 'company-math-symbols-latex "company-math")
-  (autoload 'company-latex-commands "company-math")
-  :hook
-  (TeX-mode . (lambda ()
-                (setq-local company-backends '((company-math-symbols-latex
-                                                company-latex-commands
-                                                company-capf)))))
-  (TeX-mode . my/latex-mode-setup)
-  :config
-  (defun my/latex-mode-setup ()
-    (setq-local company-backends
-                (append '((company-math-symbols-latex company-latex-commands))
-                        company-backends)))
-  )
-
-(use-package company-web
-  :preface
-  (autoload 'company-web-html "company-web-html")
-  (autoload 'company-web-jade "company-web-jade")
-  (autoload 'company-web-slim "company-web-slim")
-  :hook ((web-mode . (lambda ()
-                       (setq-local company-backends '(company-web-html
-                                                      company-web-jade
-                                                      company-web-slim
-                                                      company-capf))))))
-;;;;;; nlinum;
-
-;; Configuration of the width of the line number displayed on the left
-(use-package nlinum
-  :config
-  (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
-  (global-nlinum-mode)
-  )
-
-;; smart paren;
-;;
-;; I'm really not confortable with electric parentheses
-;;
-;; (use-package smartparens
-;;   :ensure t
-;;   :hook (prog-mode . smartparens-mode)
-;;   )
-
-;;;;;; Aggressive indentation;
-
-;; Should indent as you type
-;; I actually don't like it
-;; (use-package aggressive-indent
-;;   :hook (prog-mode . aggressive-indent-mode)
-;;   )
-
-;;;;;; Bug reference;
-
-;; Is supposed to provide links to bugs listed in source code
-(use-package bug-reference
-  :ensure nil
-  :hook ((prog-mode . bug-reference-prog-mode)
-         (text-mode . bug-reference-mode)))
-
-;;;;;; Projectile
-
-(use-package projectile
-  :bind
-  ("M-p" . projectile-command-map)
-  :custom
-  (projectile-completion-system 'ivy)
-  :init
-  (projectile-mode 1)
-  ;; :config
-  ;; (add-to-list 'projectile-globally-ignored-directories "node_modules")
-  )
-
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
+(require 'mdrp-flycheck)
 
 ;;;;;; Jump to definition
 
@@ -979,47 +432,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 ;;;;; OCaml:
 
-(use-package opam-user-setup
-  :after tuareg
-  :load-path "custom/"
-  :config (ignore "Loaded 'flycheck-popup")
-  )
-
-(use-package tuareg
-  ;; :hook (
-  ;;        (tuareg-mode . my/set-ocaml-error-regexp)
-  ;;        ;; The following line will be added again when all the
-  ;;        ;; small errors it's provoking will be fixed (by me)
-  ;;        ;; (tuareg-mode . my/tuareg-mode-outline-regexp-setup)
-  ;;        )
-  ;; :config
-  ;; (defun my/tuareg-mode-outline-regexp-setup ()
-  ;;   (setq-local outline-regexp "(\\*[;]\\{0,8\\}[^ \t]"))
-  ;; (defun my/set-ocaml-error-regexp ()
-  ;;   (set
-  ;;    'compilation-error-regexp-alist
-  ;;    (list '("[Ff]ile \\(\"\\(.*?\\)\", line \\(-?[0-9]+\\)\\(, characters \\(-?[0-9]+\\)-\\([0-9]+\\)\\)?\\)\\(:\n\\(\\(Warning .*?\\)\\|\\(Error\\)\\):\\)?"
-  ;;            2 3 (5 . 6) (9 . 11) 1 (8 compilation-message-face)))))
-  )
-
-(use-package merlin-mode
-  :hook tuareg-mode
-  :config (setq merlin-error-after-save nil)
-  )
-
-(use-package flycheck-ocaml
-  :hook (tuareg-mode . flycheck-ocaml-setup))
-
-(with-eval-after-load 'merlin
-  ;; Disable Merlin's own error checking
-  (setq merlin-error-after-save nil)
-
-  ;; Enable Flycheck checker
-  (flycheck-ocaml-setup))
-
-(add-hook 'tuareg-mode-hook #'merlin-mode)
-
-
 ;;;;; Fsharp
 
 (use-package fsharp-mode
@@ -1111,7 +523,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (which-key-separator " ")
   (which-key-prefix-prefix "+")
   )
-
 
 ;;;;; Global utility keys:
 

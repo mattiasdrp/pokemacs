@@ -6,6 +6,11 @@
 
 # Backup files
 *~
+\#*\#
+.\#*
+
+# elpa packages
+/elpa/
 
 # Undo-tree save-files
 *.~undo-tree

@@ -43,7 +43,6 @@
  '(evil-visual-state-cursor '("#C5E1A5" box))
  '(font-lock-global-modes t)
  '(global-auto-revert-mode t)
- '(global-nlinum-mode t)
  '(global-prettify-symbols-mode t)
  '(highlight-indent-guides-auto-enabled nil)
  '(highlight-symbol-colors
@@ -67,11 +66,12 @@
  '(org-support-shift-select 'always)
  '(outshine-preserve-delimiter-whitespace nil)
  '(package-selected-packages
-   '(counsel-projectile doom-modeline all-the-icons-ivy-rich ivy-rich rainbow-delimiters helpful projectile ob-fsharp fsharp-mode dash zzz-to-char auctex-latexmk auto-complete-auctex company-auctex merlin-mode tuareg dumb-jump flycheck discover-my-major amx abbrev rust-mode use-package-ensure-system-package crux outline-minor-faces pretty-outlines dash-functional outshine json-mode run-ocaml dune-mode why3-mode LaTeX-math-mode tex-site gitignore-mode org-present diminish delight org-bullets rainbow-mode aggressive-indent all-the-icons all-the-icons-ivy apropospriate-theme auctex auto-complete caml-debug caml-mode cargo company-math company-racer company-web counsel cubicle-mode dictionary dune flycheck-inline flycheck-ocaml flycheck-rust git-messenger magit merlin-eldoc minions multiple-cursors nlinum org-plus-contrib pandoc-mode php-mode quick-peek racer rotate separedit smartparens smex sort-words toml-mode undo-tree unfill use-package vlf web-mode which-key))
+   '(company-box ivy-prescient ivy-avy ivy-posframe wgrep yasnippet counsel-projectile doom-modeline all-the-icons-ivy-rich ivy-rich rainbow-delimiters helpful projectile ob-fsharp fsharp-mode dash zzz-to-char auctex-latexmk auto-complete-auctex company-auctex merlin-mode tuareg dumb-jump flycheck discover-my-major amx abbrev rust-mode use-package-ensure-system-package crux outline-minor-faces pretty-outlines dash-functional outshine json-mode run-ocaml dune-mode why3-mode LaTeX-math-mode tex-site gitignore-mode org-present diminish delight org-bullets rainbow-mode all-the-icons all-the-icons-ivy apropospriate-theme auctex auto-complete caml-debug caml-mode cargo company-math company-racer company-web counsel cubicle-mode dictionary dune flycheck-inline flycheck-ocaml flycheck-rust git-messenger magit merlin-eldoc minions multiple-cursors nlinum org-plus-contrib pandoc-mode php-mode quick-peek racer rotate separedit smex sort-words toml-mode undo-tree unfill use-package vlf web-mode which-key))
  '(pos-tip-background-color "#3a933a933a93")
  '(pos-tip-foreground-color "#9E9E9E")
  '(prettify-symbols-unprettify-at-point nil)
  '(require-final-newline t)
+ '(safe-local-variable-values '((git-commit-major-mode . git-commit-elisp-text-mode)))
  '(save-abbrevs 'silently)
  '(save-interprogram-paste-before-kill t)
  '(save-place-mode t)
