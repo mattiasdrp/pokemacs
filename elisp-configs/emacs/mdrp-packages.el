@@ -66,6 +66,8 @@
 (use-package discover-my-major
   :bind ("C-h <C-m>" . discover-my-major))
 
+(setq use-package-verbose t)
+
 (provide 'mdrp-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-packages.el ends here

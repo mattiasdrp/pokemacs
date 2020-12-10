@@ -62,6 +62,28 @@
               )
   )
 
+(use-package outline-ivy
+  :load-path "custom/"
+  :after (outline ivy)
+  :bind (:map outline-minor-mode-map
+              ("M-j" . oi-jump)
+              )
+  )
+
+(use-package outshine
+  :hook (outline-minor-mode . outshine-mode)
+  :config
+  (setq outshine-preserve-delimiter-whitespace nil)
+  )
+
+(use-package pretty-outlines
+  :defer t
+  :load-path "custom/"
+  :hook ((outline-mode . pretty-outlines-set-display-table)
+         (outline-minor-mode . pretty-outlines-set-display-table)
+         (emacs-lisp-mode . pretty-outlines-add-bullets)
+         )
+  )
 
 (provide 'mdrp-outline)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

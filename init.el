@@ -32,8 +32,6 @@
 
 ;;;; A BIG BUNCH OF CUSTOM OPTIONS
 
-;; These options can't be customized from M-x customize
-
 ;; Get rid of the cl is deprecated warning
 (setq byte-compile-warnings '(cl-functions))
 
@@ -137,27 +135,21 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-keybindings)
 
+(require 'mdrp-which-key)
+
 ;;;; UI
 
 (update-to-load-path (expand-file-name "elisp-configs/ui" user-emacs-directory))
 
-;;;;; Modeline
 ;; The bar below with some infos
-
 (require 'mdrp-doom-modeline)
 
 (require 'mdrp-minions)
 
-;;;;; Outline
 ;; Navigating through any file
-
 (require 'mdrp-outline)
 
-(require 'mdrp-outshine)
-
-(require 'mdrp-outline-ivy)
-
-(require 'mdrp-pretty-outlines)
+(require 'mdrp-ligatures)
 
 ;;;;; Themes, colors and other small things
 
@@ -172,6 +164,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-all-the-icons)
 
 (require 'mdrp-nlinum)
+
+(require 'mdrp-highlight)
 
 ;;;; Completion
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
@@ -191,98 +185,23 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-flycheck)
 
-;;;;;; Jump to definition
+(require 'mdrp-dumb-jump)               ; Jumps to definition
 
-(use-package dumb-jump
-  :bind
-  (:map prog-mode-map
-        (("C-c C-o" . dumb-jump-go-other-window)
-         ("C-c C-j" . dumb-jump-go)
-         ("C-c C-i" . dumb-jump-go-prompt)))
-  :custom (dumb-jump-selector 'ivy))
+(require 'mdrp-hideshow)
 
-;;;;;; Code folding
+(require 'mdrp-multiple-cursors)
 
-(use-package hideshow
-  :commands (hs-minor-mode
-             hs-toggle-hiding)
-  :init
-  (add-hook 'prog-mode-hook #'hs-minor-mode)
-  :diminish hs-minor-mode
-  :config
-  (setq hs-isearch-open t)
-  :bind (("M-+" . hs-toggle-hiding)
-         ("M-*" . hs-show-all))
-  )
+(require 'mdrp-delete-block)
 
-;;;; EDITING ENHANCEMENTS:
+(require 'mdrp-flyspell)
 
-;;;;;; Multiple cursors
+(require 'mdrp-git)
 
-(use-package multiple-cursors
-  :bind
-  (("C-c n" . mc/mark-next-like-this)
-   ("C-c p" . mc/mark-previous-like-this)
-   ("C-c a" . mc/mark-all-like-this)
-   )
-  )
-
-;;;;;; Delete block
-
-(use-package delete-block
-  :load-path (lambda () (expand-file-name "site-elisp/delete-block" user-emacs-directory))
-  :bind
-  (("M-d" . delete-block-forward)
-   ("C-<backspace>" . delete-block-backward)
-   ("M-<backspace>" . delete-block-backward)
-   ("M-DEL" . delete-block-backward)))
-
-;;;; SPELL CHECKING:
-
-;; (setq ispell-dictionary "french")
-
-(defun my-english-dict ()
-  "Change dictionary to english."
-  (interactive)
-  (setq ispell-local-dictionary "english")
-  (flyspell-mode 1)
-  (flyspell-buffer))
-
-(defun my-french-dict ()
-  "Change dictionary to french."
-  (interactive)
-  (setq ispell-local-dictionary "french")
-  (flyspell-mode 1)
-  (flyspell-buffer))
-
-(defalias 'ir #'ispell-region)
-;; (add-hook 'text-mode-hook 'my-french-dict)
-
-;; Dictionaries
-(global-set-key (kbd "C-c d") 'dictionary-search)
-(global-set-key (kbd "C-c D") 'dictionary-match-words)
-
-;;;; GIT:
-
-(use-package magit
-  :bind (("C-x g" . magit-status)
-         ("C-x M-g" . magit-dispatch)))
-
-(use-package git-commit
-  :hook (git-commit-mode . my-english-dict))
-
-(use-package git-messenger
-  :bind ("C-x G" . git-messenger:popup-message)
-  :config
-  (setq git-messenger:show-detail t
-        git-messenger:use-magit-popup t))
-
-(use-package gitignore-mode
-  :mode (("/\\.gitignore\\'"      . gitignore-mode)
-         ("/info/exclude\\'"      . gitignore-mode)
-         ("/git/ignore\\'"        . gitignore-mode)))
+(require 'mdrp-pdf)
 
 ;;;; LANGUAGE SPECIFIC PACKAGES:
+
+(update-to-load-path (expand-file-name "elisp-configs/lang" user-emacs-directory))
 
 ;;;;; LaTeX:
 
@@ -432,6 +351,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;;;;; OCaml:
 
+(require 'mdrp-ocaml)
+
 ;;;;; Fsharp
 
 (use-package fsharp-mode
@@ -487,106 +408,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
                   ("C-c <tab>" . json-mode-beautify))
   :config
   (make-local-variable 'js-indent-level))
-
-;;;; KEY BINDINDS:
-
-
-;;;;; Adjust font size like web browsers
-(global-set-key (kbd "C-=") #'text-scale-increase)
-(global-set-key (kbd "C-+") #'text-scale-increase)
-(global-set-key (kbd "C--") #'text-scale-decrease)
-
-;;;;; Which key:
-
-(use-package which-key
-  :init (which-key-mode)
-  :config
-  (which-key-add-major-mode-key-based-replacements 'markdown-mode
-    "C-c TAB" "markdown/images"
-    "C-c C-a" "markdown/links"
-    "C-c C-c" "markdown/process"
-    "C-c C-s" "markdown/style"
-    "C-c C-t" "markdown/header"
-    "C-c C-x" "markdown/structure"
-    "C-c m" "markdown/personal")
-  (which-key-add-major-mode-key-based-replacements 'web-mode
-    "C-c C-a" "web/attributes"
-    "C-c C-b" "web/blocks"
-    "C-c C-d" "web/dom"
-    "C-c C-e" "web/element"
-    "C-c C-t" "web/tags")
-  (which-key-setup-side-window-right-bottom)
-  (setq which-key-sort-order 'which-key-key-order-alpha
-        which-key-side-window-max-width 0.33
-        which-key-idle-delay 0.5)
-  :custom
-  (which-key-separator " ")
-  (which-key-prefix-prefix "+")
-  )
-
-;;;;; Global utility keys:
-
-(global-set-key (kbd "C-c h b") 'describe-personal-keybindings)
-
-;; Custom comment overwriting comment-dwim key binding
-(global-set-key (kbd "M-;") 'comment-eclipse)
-;; Create new line contextualised by the previous one
-;; (will add a comment if in comment mode for example)
-(global-set-key (kbd "C-<return>") 'default-indent-new-line)
-;; emacs autocompletion (not like company)
-(global-set-key (kbd "C-<tab>") 'dabbrev-expand)
-;; emacs autocompletion in the minibuffer (search, search file, M-x etc)
-(define-key minibuffer-local-map (kbd "C-<tab>") 'dabbrev-expand)
-
-;; Shortcuts used for compilation and other bound to function keys
-(global-set-key [f3] 'next-match)
-(defun prev-match () (interactive nil) (next-match -1))
-(global-set-key [(shift f3)] 'prev-match)
-(global-set-key [f4]   'goto-line)
-(global-set-key [f5]   'compile)
-(global-set-key [f6]   'recompile)
-(global-set-key [f7]   'next-error)
-(global-set-key [f8]   'normal-mode)
-
-(global-set-key (kbd "C-n") 'next-error)
-(global-set-key (kbd "C-p") 'previous-error)
-
-(global-set-key (kbd "M-<f1>") 'kill-this-buffer)
-(global-set-key (kbd "M-g") 'goto-line)
-
-;; Rewriting scroll up and down
-(defun up-slightly () (interactive) (scroll-up 5))
-(defun down-slightly () (interactive) (scroll-down 5))
-
-(global-set-key [mouse-4]   'down-slightly)
-(global-set-key [mouse-5]   'up-slightly)
-
-;; enable toggling paragraph un-fill
-(define-key global-map (kbd "M-Q") 'unfill-paragraph)
-;; *****************************************************************************
-
-;;;;; Window management (move):
-
-;; windmove
-(global-set-key (kbd "C-x <left>") 'windmove-left)
-(global-set-key (kbd "C-x <right>") 'windmove-right)
-(global-set-key (kbd "C-x <up>") 'windmove-up)
-(global-set-key (kbd "C-x <down>") 'windmove-down)
-
-;; Store and recall window layouts (views!)
-(global-set-key (kbd "C-c v") 'ivy-push-view)
-(global-set-key (kbd "C-c V") 'ivy-switch-view)
-
-;; use ace-window for navigating windows
-(global-set-key (kbd "C-x C-o") 'ace-window)
-(with-eval-after-load "ace-window"
-  (setq aw-dispatch-always t)
-  (set-face-attribute 'aw-leading-char-face nil :height 2.5))
-
-;; rotate buffers and window arrangements
-(global-set-key (kbd "C-c r w") 'rotate-window)
-(global-set-key (kbd "C-c r l") 'rotate-layout)
-;; *****************************************************************************
 
 ;;;; Footer
 

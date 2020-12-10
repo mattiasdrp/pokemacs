@@ -1,4 +1,4 @@
-;;; mdrp-pretty-outlines.el --- -*- lexical-binding: t -*-
+;;; mdrp-pdf.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
@@ -29,16 +29,23 @@
 
 ;;; Code:
 
+;; IMPORTANT : After installing pdf-tools you need to M-x pdf-tools-install
+;; Don't say I didn't warn you!
+(use-package pdf-tools
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (setq-default pdf-view-display-size 'fit-page)
+  ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
+  (setq pdf-view-use-scaling t
+        pdf-view-use-imagemagick nil)
 
-(use-package pretty-outlines
-  :defer t
-  :load-path "custom/"
-  :hook ((outline-mode . pretty-outlines-set-display-table)
-         (outline-minor-mode . pretty-outlines-set-display-table)
-         (emacs-lisp-mode . pretty-outlines-add-bullets)
-         )
-  )
+  (add-hook 'pdf-view-mode-hook (lambda () (nlinum-mode 0)))
+)
 
-(provide 'mdrp-pretty-outlines)
+(use-package saveplace-pdf-view
+  :after pdf-view)
+
+(provide 'mdrp-pdf)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-pretty-outlines.el ends here
+;;; mdrp-pdf.el ends here

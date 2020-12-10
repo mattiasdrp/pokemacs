@@ -1,4 +1,4 @@
-;;; mdrp-outshine.el --- -*- lexical-binding: t -*-
+;;; mdrp-hideshow.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
@@ -29,10 +29,18 @@
 
 ;;; Code:
 
-(use-package outshine
-  :hook (outline-minor-mode . outshine-mode)
+(use-package hideshow
+  :commands (hs-minor-mode
+             hs-toggle-hiding)
+  :init
+  (add-hook 'prog-mode-hook #'hs-minor-mode)
+  :diminish hs-minor-mode
+  :config
+  (setq hs-isearch-open t)
+  :bind (("M-+" . hs-toggle-hiding)
+         ("M-*" . hs-show-all))
   )
 
-(provide 'mdrp-outshine)
+(provide 'mdrp-hideshow)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-outshine.el ends here
+;;; mdrp-hideshow.el ends here

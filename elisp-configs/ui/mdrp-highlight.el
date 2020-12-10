@@ -1,4 +1,4 @@
-;;; mdrp-outline-ivy.el --- -*- lexical-binding: t -*-
+;;; mdrp-highlight.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
@@ -29,14 +29,12 @@
 
 ;;; Code:
 
-(use-package outline-ivy
-  :load-path "custom/"
-  :after (outline ivy)
-  :bind (:map outline-minor-mode-map
-              ("M-j" . oi-jump)
-              )
-  )
+(use-package highlight-indent-guides
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :config
+  (setq highlight-indent-guides-method 'bitmap)
+)
 
-(provide 'mdrp-outline-ivy)
+(provide 'mdrp-highlight)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-outline-ivy.el ends here
+;;; mdrp-highlight.el ends here

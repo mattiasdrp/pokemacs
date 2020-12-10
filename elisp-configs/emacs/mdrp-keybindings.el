@@ -31,17 +31,102 @@
 ;;
 ;;; Code:
 
+;; DefBindings
+;; Unbind unneeded keys
+(global-set-key (kbd "C-z") nil)
+(global-set-key (kbd "M-z") nil)
+(global-set-key (kbd "M-m") nil)
+(global-set-key (kbd "C-x C-z") nil)
+(global-set-key (kbd "M-/") nil)
+;; Truncate lines
+(global-set-key (kbd "C-x C-l") #'toggle-truncate-lines)
+;; Adjust font size like web browsers
+(global-set-key (kbd "C-=") #'text-scale-increase)
+(global-set-key (kbd "C-+") #'text-scale-increase)
+(global-set-key (kbd "C--") #'text-scale-decrease)
+;; Move up/down paragraph
+(global-set-key (kbd "M-n") #'forward-paragraph)
+(global-set-key (kbd "M-p") #'backward-paragraph)
+
+(define-key input-decode-map [?\C-m] [C-m])
+(define-key input-decode-map [?\C-i] [C-i])
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; -DefBindings
 
 ;; Setup shorcuts for window resize width and height
-(global-set-key (kbd "C-z w") #'resize-window-width)
-(global-set-key (kbd "C-z h") #'resize-window-height)
+(global-set-key (kbd "C-z w") #'mdrp/resize-window-width)
+(global-set-key (kbd "C-z h") #'mdrp/resize-window-height)
 
 ;; Setup shorcuts for window resize width and height
-(global-set-key (kbd "M-J") (lambda () (interactive) (resize-window t 5)))
-(global-set-key (kbd "M-L") (lambda () (interactive) (resize-window t -5)))
+(global-set-key (kbd "M-J") (lambda () (interactive) (mdrp/resize-window t 5)))
+(global-set-key (kbd "M-L") (lambda () (interactive) (mdrp/resize-window t -5)))
 
-(global-set-key (kbd "M-I") (lambda () (interactive) (resize-window nil 5)))
-(global-set-key (kbd "M-K") (lambda () (interactive) (resize-window nil -5)))
+(global-set-key (kbd "M-I") (lambda () (interactive) (mdrp/resize-window nil 5)))
+(global-set-key (kbd "M-K") (lambda () (interactive) (mdrp/resize-window nil -5)))
+
+(global-set-key (kbd "C-c h b") 'describe-personal-keybindings)
+
+;; Custom comment overwriting comment-dwim key binding
+(global-set-key (kbd "M-;") 'mdrp/comment-eclipse)
+;; Create new line contextualised by the previous one
+;; (will add a comment if in comment mode for example)
+(global-set-key (kbd "C-<return>") 'default-indent-new-line)
+;; emacs autocompletion (not like company)
+(global-set-key (kbd "C-<tab>") 'dabbrev-expand)
+;; emacs autocompletion in the minibuffer (search, search file, M-x etc)
+(define-key minibuffer-local-map (kbd "C-<tab>") 'dabbrev-expand)
+
+;; Shortcuts used for compilation and other bound to function keys
+(global-set-key [f3] 'next-match)
+(defun prev-match () (interactive nil) (next-match -1))
+(global-set-key [(shift f3)] 'prev-match)
+(global-set-key [f4]   'goto-line)
+(global-set-key [f5]   'compile)
+(global-set-key [f6]   'recompile)
+(global-set-key [f7]   'next-error)
+(global-set-key [f8]   'normal-mode)
+
+(global-set-key (kbd "C-n") 'next-error)
+(global-set-key (kbd "C-p") 'previous-error)
+
+(global-set-key (kbd "M-<f1>") 'kill-this-buffer)
+(global-set-key (kbd "M-g") 'goto-line)
+
+;; Rewriting scroll up and down
+(defun up-slightly () (interactive) (scroll-up 5))
+(defun down-slightly () (interactive) (scroll-down 5))
+
+(global-set-key [mouse-4]   'down-slightly)
+(global-set-key [mouse-5]   'up-slightly)
+
+;; enable toggling paragraph un-fill
+(define-key global-map (kbd "M-Q") 'unfill-paragraph)
+;; *****************************************************************************
+
+;;;;; Window management (move):
+
+;; windmove
+(global-set-key (kbd "C-x <left>") 'windmove-left)
+(global-set-key (kbd "C-x <right>") 'windmove-right)
+(global-set-key (kbd "C-x <up>") 'windmove-up)
+(global-set-key (kbd "C-x <down>") 'windmove-down)
+
+;; Store and recall window layouts (views!)
+(global-set-key (kbd "C-c v") 'ivy-push-view)
+(global-set-key (kbd "C-c V") 'ivy-switch-view)
+
+;; use ace-window for navigating windows
+(global-set-key (kbd "C-x C-o") 'ace-window)
+(with-eval-after-load "ace-window"
+  (setq aw-dispatch-always t)
+  (set-face-attribute 'aw-leading-char-face nil :height 2.5))
+
+;; rotate buffers and window arrangements
+(global-set-key (kbd "C-c r w") 'rotate-window)
+(global-set-key (kbd "C-c r l") 'rotate-layout)
+;; *****************************************************************************
 
 (provide 'mdrp-keybindings)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

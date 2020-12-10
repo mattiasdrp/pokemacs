@@ -29,35 +29,20 @@
 
 ;;; Code:
 
-;; DefBindings
-;; Unbind unneeded keys
-(global-set-key (kbd "C-z") nil)
-(global-set-key (kbd "M-z") nil)
-(global-set-key (kbd "M-m") nil)
-(global-set-key (kbd "C-x C-z") nil)
-(global-set-key (kbd "M-/") nil)
-;; Truncate lines
-(global-set-key (kbd "C-x C-l") #'toggle-truncate-lines)
-;; Adjust font size like web browsers
-(global-set-key (kbd "C-=") #'text-scale-increase)
-(global-set-key (kbd "C-+") #'text-scale-increase)
-(global-set-key (kbd "C--") #'text-scale-decrease)
-;; Move up/down paragraph
-(global-set-key (kbd "M-n") #'forward-paragraph)
-(global-set-key (kbd "M-p") #'backward-paragraph)
-
-(define-key input-decode-map [?\C-m] [C-m])
-(define-key input-decode-map [?\C-i] [C-i])
-
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-;; -DefBindings
+;; Please oh please emacs, stop creating files everywhere, just put them in one place
+(require 'no-littering)
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "backups/") t)))
 
 ;; Loading custom-file containing all the custom variables and faces
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
 
-;; (set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
+;; Auto-save the visited file, don't create a #file#
+(auto-save-visited-mode 1)
+(setq auto-save-default nil)
+
+(set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
 
 (unless *sys/win32*
   (set-selection-coding-system 'utf-8)
@@ -104,10 +89,15 @@
 
 ;; Better Compilation
 (setq-default compilation-always-kill t) ; kill compilation process before starting another
-
 (setq-default compilation-ask-about-save nil) ; save all buffers on `compile'
+(setq-default compilation-context-lines 2)
+(setq-default compilation-error-screen-columns nil)
+(setq-default compilation-scroll-output nil)
+(setq-default compilation-window-height 12)
+(setq line-move-visual t)
+(setq next-error-highlight t)
+(setq next-error-highlight-no-select t)
 
-(setq-default compilation-scroll-output t)
 
 ;; So Long mitigates slowness due to extremely long lines.
 ;; Currently available in Emacs master branch *only*!
@@ -116,12 +106,44 @@
 
 ;; Add a newline automatically at the end of the file upon save.
 (setq require-final-newline t)
+;; (setq save-interprogram-paste-before-kill t)
 
 ;; Default .args, .in, .out files to text-mode
 (add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
 (add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
 (add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
 ;; -SmallConfigs
+
+;;; SET VARIABLES
+
+(setq blink-matching-paren t)
+(setq blink-matching-paren-dont-ignore-comments t)
+(setq blink-matching-paren-on-screen t)
+
+(setq column-number-mode t)
+(setq comment-style 'indent)
+
+(setq ansi-color-names-vector
+      ["#424242" "#EF9A9A" "#C5E1A5" "#FFEE58" "#64B5F6" "#E1BEE7" "#80DEEA" "#E0E0E0"])
+
+(setq enable-recursive-minibuffers t)
+(setq electric-indent-mode nil)
+(setq-default font-lock-global-modes t)
+(setq-default global-auto-revert-mode t)
+(global-prettify-symbols-mode 1)
+(setq-default indent-tabs-mode nil)
+(setq-default inhibit-startup-screen t)
+(setq-default initial-major-mode 'text-mode)
+(save-place-mode 1)
+(setq scroll-bar-mode nil)
+(setq sentence-end-double-space nil)
+(show-paren-mode 1)
+(setq show-paren-delay 0)
+(setq show-paren-style 'expression)
+(setq show-trailing-whitespace t)
+(setq tool-bar-mode nil)
+(setq truncate-lines nil)
+(setq visible-bell t)
 
 ;; Adapting the compilation directory matcher for french:
 ;; (setq compilation-directory-matcher '("\\(?:Entering\\|Leavin\\(g\\)\\|\\) directory [`']\\(.+\\)'$" (2 . 1)))

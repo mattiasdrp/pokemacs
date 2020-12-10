@@ -29,36 +29,6 @@
 
 ;;; Code:
 
-(defvar +ivy-buffer-preview nil
-  "If non-nil, preview buffers while switching, à la `counsel-switch-buffer'.
-
-When nil, don't preview anything.
-When non-nil, preview non-virtual buffers.
-When 'everything, also preview virtual buffers")
-
-(defvar +ivy-buffer-unreal-face 'font-lock-comment-face
-  "The face for unreal buffers in `ivy-switch-to-buffer'.")
-
-(defvar +ivy-edit-functions nil
-  "A plist mapping ivy/counsel commands to commands that generate an editable
-results buffer.")
-
-;;;###autoload
-(defun +ivy-display-at-frame-center-near-bottom-fn (str)
-  "TODO"
-  (ivy-posframe--display str #'+ivy-poshandler-frame-center-near-bottom-fn))
-
-;;;###autoload
-(defun +ivy-poshandler-frame-center-near-bottom-fn (info)
-  "TODO"
-  (let ((parent-frame (plist-get info :parent-frame))
-        (pos (posframe-poshandler-frame-center info)))
-    (cons (car pos)
-          (truncate (/ (frame-pixel-height parent-frame) 2)))))
-
-;;
-;;; Packages
-
 (use-package ivy
   :init
   (ivy-mode 1)
@@ -73,16 +43,17 @@ results buffer.")
           '((counsel-rg . 1)
             (counsel-search . 2)
             (t . 3))))
-  :bind (
-         ([remap switch-to-buffer]              . +ivy/switch-buffer)
-         ([remap switch-to-buffer-other-window] . +ivy/switch-buffer-other-window)
-         ([remap persp-switch-to-buffer]        . +ivy/switch-workspace-buffer)
-         ([remap evil-show-jumps]               . +ivy/jump-list))
+  :bind ([remap switch-to-buffer]              . ivy-switch-buffer)
   :config
   ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
   ;; is way too big (30,000). Turn it down so big repos affect project
   ;; navigation less.
   (setq ivy-sort-max-size 7500)
+  (setq ivy-count-format "%d/%d ")
+  ;; (setq ivy-height 10)
+  ;; (setq ivy-use-selectable-prompt t)
+  ;; (setq ivy-use-virtual-buffers t)
+  ;; (setq ivy-wrap t)
 
   ;; Counsel changes a lot of ivy's state at startup; to control for that, we
   ;; need to load it as early as possible. Some packages (like `ivy-prescient')
@@ -101,27 +72,6 @@ results buffer.")
         ivy-on-del-error-function #'ignore
         ;; enable ability to select prompt (alternative to `ivy-immediate-done')
         ivy-use-selectable-prompt t)
-
-  ;; Highlight each ivy candidate including the following newline, so that it
-  ;; extends to the right edge of the window
-  ;; (setf (alist-get 't ivy-format-functions-alist)
-  ;;       #'+ivy-format-function-line-or-arrow)
-
-  ;; Integrate `ivy' with `better-jumper'; ensure a jump point is registered
-  ;; before jumping to new locations with ivy
-  (setf (alist-get 't ivy-hooks-alist)
-        (lambda ()
-          (with-ivy-window
-            (setq +ivy--origin (point-marker)))))
-
-  (defun +ivy--set-jump-point-maybe-h ()
-    (and (markerp (bound-and-true-p +ivy--origin))
-         (not (equal (ignore-errors (with-ivy-window (point-marker)))
-                     +ivy--origin))
-         (with-current-buffer (marker-buffer +ivy--origin)
-           (better-jumper-set-jump +ivy--origin)))
-    (setq +ivy--origin nil))
-  (add-hook 'minibuffer-exit-hook #'+ivy--set-jump-point-maybe-h)
 
   (use-package yasnippet
     :hook ('yas-prompt-functions #'+ivy-yas-prompt-fn))
@@ -165,12 +115,6 @@ results buffer.")
   (setq ivy-switch-buffer-faces-alist nil)
   (ivy-set-display-transformer 'internal-complete-buffer nil)
 
-  ;; Highlight buffers differently based on whether they're in the same project
-  ;; as the current project or not.
-  (when-let* ((plist (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer))
-              (switch-buffer-alist (assq 'ivy-rich-candidate (plist-get plist :columns))))
-    (setcar switch-buffer-alist '+ivy-rich-buffer-name))
-
   (ivy-rich-mode +1))
 
 
@@ -196,7 +140,7 @@ results buffer.")
   :bind (
          ([remap apropos]                  . counsel-apropos)
          ([remap bookmark-jump]            . counsel-bookmark)
-         ([remap compile]                  . +ivy/compile)
+         ([remap compile]                  . counsel-compile)
          ([remap describe-bindings]        . counsel-descbinds)
          ([remap describe-face]            . counsel-faces)
          ([remap describe-function]        . counsel-describe-function)
@@ -219,14 +163,6 @@ results buffer.")
          ([remap yank-pop]                 . counsel-yank-pop))
   :config
   ;; (set-popup-rule! "^\\*ivy-occur" :size 0.35 :ttl 0 :quit nil)
-
-  ;; HACK Fix an issue where `counsel-projectile-find-file-action' would try to
-  ;;      open a candidate in an occur buffer relative to the wrong buffer,
-  ;;      causing it to fail to find the file we want.
-  ;; (defadvice! +ivy--run-from-ivy-directory-a (orig-fn &rest args)
-  ;;   :around #'counsel-projectile-find-file-action
-  ;;   (let ((default-directory (ivy-state-directory ivy-last)))
-  ;;     (apply orig-fn args)))
 
   ;; Don't use ^ as initial input. Set this here because `counsel' defines more
   ;; of its own, on top of the defaults.
@@ -253,12 +189,8 @@ results buffer.")
   ;; Record in jumplist when opening files via counsel-{ag,rg,pt,git-grep}
   (add-hook 'counsel-grep-post-action-hook #'better-jumper-set-jump)
   (add-hook 'counsel-grep-post-action-hook #'recenter)
-  (ivy-add-actions
-   'counsel-rg ; also applies to `counsel-rg'
-   '(("O" +ivy-git-grep-other-window-action "open in other window")))
 
-  ;; Make `counsel-compile' projectile-aware (if you prefer it over
-  ;; `+ivy/compile' and `+ivy/project-compile')
+  ;; Make `counsel-compile' projectile-aware
   (add-to-list 'counsel-compile-root-functions #'projectile-project-root)
   (use-package savehist
     ;; Persist `counsel-compile' history
@@ -288,8 +220,6 @@ results buffer.")
   (setf (nth 1 (alist-get 'ddg counsel-search-engines-alist))
         "https://duckduckgo.com/?q=")
 
-  ;; REVIEW Move this somewhere else and perhaps generalize this so both
-  ;;        ivy/helm users can enjoy it.
   (defadvice! +ivy--counsel-file-jump-use-fd-rg-a (args)
     "Change `counsel-file-jump' to use fd or ripgrep, if they are available."
     :override #'counsel--find-return-list

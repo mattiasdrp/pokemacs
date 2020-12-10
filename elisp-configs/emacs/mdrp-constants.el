@@ -56,6 +56,20 @@
   "The filename of the `fd' executable. On some distros it's 'fdfind' (ubuntu,
 debian, and derivatives). On most it's 'fd'.")
 
+(defvar +ivy-buffer-preview nil
+  "If non-nil, preview buffers while switching, à la `counsel-switch-buffer'.
+
+When nil, don't preview anything.
+When non-nil, preview non-virtual buffers.
+When 'everything, also preview virtual buffers")
+
+(defvar +ivy-buffer-unreal-face 'font-lock-comment-face
+  "The face for unreal buffers in `ivy-switch-to-buffer'.")
+
+(defvar +ivy-edit-functions nil
+  "A plist mapping ivy/counsel commands to commands that generate an editable
+results buffer.")
+
 (provide 'mdrp-constants)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-constants.el ends here
