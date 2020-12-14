@@ -23,7 +23,8 @@
 (defvar pretty-outlines-bullets-bullet-list
   ;; (if pretty-outlines-all-the-icons?
   ;;     '(#x25c9 #x25cb #x2738 #x273f)
-  '(#xe3d0 #xe3d1 #xe3d2 #xe3d4)
+  ;; '(#xe3d0 #xe3d1 #xe3d2 #xe3d4)
+  '(? ? ? ? ? ? ?)
 
   "Implemention of `org-bullets-bullet-list' for outlines, provide codepoints.
 
@@ -33,7 +34,7 @@ list, just like for org-bullets.")
 (defvar pretty-outlines-ellipsis
   ;; (if pretty-outlines-all-the-icons?
   ;;     ""
-  " +++"
+  " ▾"
 
   "An implementation of `org-ellipsis' for outlines, provide a string.")
 

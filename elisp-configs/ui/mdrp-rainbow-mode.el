@@ -33,8 +33,8 @@
 ;;
 ;; Display colors with a background corresponding to the color
 (use-package rainbow-mode
-  :init (rainbow-mode 1) ; globally at startup
-  :delight)
+  :hook (prog-mode text-mode)
+  )
 
 (provide 'mdrp-rainbow-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

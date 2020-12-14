@@ -128,6 +128,10 @@
 (global-set-key (kbd "C-c r l") 'rotate-layout)
 ;; *****************************************************************************
 
+;; Org keys
+(global-set-key (kbd "M-o l") 'org-store-link)
+(global-set-key (kbd "M-o a") 'org-agenda)
+
 (provide 'mdrp-keybindings)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-keybindings.el ends here

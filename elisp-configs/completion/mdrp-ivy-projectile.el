@@ -117,7 +117,6 @@
 
   (ivy-rich-mode +1))
 
-
 (use-package all-the-icons-ivy
   :after ivy
   :config
@@ -133,7 +132,6 @@
              counsel-projectile-find-file
              counsel-projectile-find-dir)))
       (all-the-icons-ivy-setup))))
-
 
 (use-package counsel
   :defer t

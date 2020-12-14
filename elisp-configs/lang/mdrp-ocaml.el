@@ -100,6 +100,7 @@
   (utop-minor-mode 1))
 
 (use-package merlin
+  :after company
   :hook (tuareg-mode . merlin-mode)
   :config
   (add-hook 'tuareg-mode-hook
@@ -118,7 +119,6 @@
   (defun +ocaml-init-flycheck-h ()
     "Activate `flycheck-ocaml`"
     ;; Disable Merlin's own error checking
-    (message "flycheck setup")
     (setq merlin-error-after-save nil)
     ;; Enable Flycheck checker
     (flycheck-ocaml-setup)))

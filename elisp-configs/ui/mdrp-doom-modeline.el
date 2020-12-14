@@ -30,11 +30,19 @@
 ;;; Code:
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
+  :hook (after-init . doom-modeline-mode)
   :custom
-  (doom-modeline-height 15)
+  (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
+  (doom-modeline-height 25)
+  (doom-modeline-buffer-file-name 'truncate-all)
   (doom-modeline-icon t)
   (doom-modeline-minor-modes t)
+  (doom-modeline-checker-simple-format nil)
+  (doom-modeline-env-version t)
+  (doom-modeline-github t)
+  :config
+  (set-face-attribute 'mode-line nil :family "Fira Code" :height 140)
+  (set-face-attribute 'mode-line-inactive nil :family "Fira Code" :height 140)
   )
 
 (provide 'mdrp-doom-modeline)

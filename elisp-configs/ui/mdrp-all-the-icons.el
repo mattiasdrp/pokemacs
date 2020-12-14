@@ -34,6 +34,10 @@
 ;; M-x all-the-icons-insert-* will allow to directly insert a unicode symbol
 (use-package all-the-icons)
 
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode)
+  )
+
 (provide 'mdrp-all-the-icons)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-all-the-icons.el ends here

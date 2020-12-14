@@ -118,8 +118,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; Useful constants
 (require 'mdrp-constants)
 
-;; Packages
-
 ;; Package Management
 (require 'mdrp-packages)
 
@@ -202,6 +200,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;;;; LANGUAGE SPECIFIC PACKAGES:
 
 (update-to-load-path (expand-file-name "elisp-configs/lang" user-emacs-directory))
+
+(require 'mdrp-org)
 
 ;;;;; LaTeX:
 
