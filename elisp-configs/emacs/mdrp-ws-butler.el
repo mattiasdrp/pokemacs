@@ -1,4 +1,4 @@
-;;; mdrp-delete-block.el --- -*- lexical-binding: t -*-
+;;; mdrp-ws-butler.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
@@ -29,10 +29,11 @@
 
 ;;; Code:
 
-(use-package delete-block
-  :load-path (lambda () (expand-file-name "site-elisp/delete-block" user-emacs-directory))
-  )
+(use-package ws-butler
+  :config
+  (ws-butler-global-mode)
+)
 
-(provide 'mdrp-delete-block)
+(provide 'mdrp-ws-butler)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-delete-block.el ends here
+;;; mdrp-ws-butler.el ends here

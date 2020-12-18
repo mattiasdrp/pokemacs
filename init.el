@@ -124,6 +124,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; Global Functionalities
 (require 'mdrp-global-config)
 
+(require 'mdrp-ws-butler)
+
 ;; Global functions
 (require 'mdrp-functions)
 
@@ -138,6 +140,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;;;; UI
 
 (update-to-load-path (expand-file-name "elisp-configs/ui" user-emacs-directory))
+
+(require 'mdrp-tab-bar)
 
 ;; The bar below with some infos
 (require 'mdrp-doom-modeline)
@@ -197,11 +201,15 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-pdf)
 
+;;;; ORG MODE
+
+(update-to-load-path (expand-file-name "elisp-configs/org" user-emacs-directory))
+
+(require 'mdrp-org)
+
 ;;;; LANGUAGE SPECIFIC PACKAGES:
 
 (update-to-load-path (expand-file-name "elisp-configs/lang" user-emacs-directory))
-
-(require 'mdrp-org)
 
 ;;;;; LaTeX:
 

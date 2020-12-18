@@ -32,9 +32,19 @@
 (use-package org
   :init
   (setq org-list-allow-alphabetical t)
+  ;; If you don't want the agenda in french you can comment the following
+  ;; expression. You can even set it to your preferred language
+  ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
+  (setq calendar-week-start-day 1
+        calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
+                                 "Jeudi" "Vendredi" "Samedi"]
+        calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
+                                   "Juin" "Juillet" "Août" "Septembre"
+                                   "Octobre" "Novembre" "Décembre"])
   :custom
   (org-ellipsis " ▾")
   (org-startup-truncated nil)
+  (org-adapt-indentation nil)
   (org-support-shift-select 'always)
   (org-agenda-start-with-log-mode t)
   (org-log-done 'time)
@@ -75,30 +85,50 @@
       "* TODO %?\n  %i\n  %a")
      ("r" "Rdv" entry (file+headline "~/org/rdv.org" "Rendez-vous")
       "* RDV %?\n  %i\n  %a")))
-  (font-lock-add-keywords
-   'org-mode
-   '(("^\\(-\\) "
-      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-
-  (font-lock-add-keywords
-   'org-mode
-   `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) "\\}\\(-\\) ")
-      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
-
-  (font-lock-add-keywords
-   'org-mode
-   `((,(concat "^[[:space:]]\\{" (number-to-string
-                                  (* 2 (+ 2 org-list-indent-offset))) "\\}\\(-\\) ")
-      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆")))))
-)
-  (font-lock-add-keywords
-   'org-mode
-   `((,(concat "^[[:space:]]\\{" (number-to-string
-                                  (* 3 (+ 2 org-list-indent-offset))) "\\}\\(-\\) ")
-      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
   :config
+  (setq org-agenda-custom-commands
+        '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
+	   ((org-agenda-span 'month)
+            (org-agenda-show-all-dates nil)
+            ))))
+  (calendar-set-date-style 'iso)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((rust . t)
+     (ocaml . t)
+     ))
+  (let ((re "\\}\\(+\\|*\\|-\\) "))
+    (font-lock-add-keywords
+      'org-mode
+      `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) "\\}\\(+\\|-\\) ")
+         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◈"))))))
+
+     (font-lock-add-keywords
+      'org-mode
+      `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
+         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
+
+     (font-lock-add-keywords
+      'org-mode
+      `((,(concat "^[[:space:]]\\{" (number-to-string
+                                     (* 2 (+ 2 org-list-indent-offset))) re)
+         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
+     (font-lock-add-keywords
+      'org-mode
+      `((,(concat "^[[:space:]]\\{" (number-to-string
+                                     (* 3 (+ 2 org-list-indent-offset))) re)
+         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
+     )
+  )
+
+(use-package org-tempo ;; part of org-mode
+  :after (org)
+  :config
+  (add-to-list 'org-structure-template-alist '("smt" . "src smt-lib"))
+  (add-to-list 'org-structure-template-alist '("oc" . "src ocaml"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   )
 
 (use-package org-bullets

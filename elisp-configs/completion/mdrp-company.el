@@ -37,7 +37,13 @@
 (use-package company
   :hook ((prog-mode . company-mode)
          (org-mode . company-mode))
+  :custom
+  (company-idle-delay 0.1)
   :config
+  (defun add-pcomplete-to-capf ()
+    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+
+  (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
   (setq company-minimum-prefix-length 1
         company-show-numbers ''left
         company-tooltip-align-annotations t
@@ -45,6 +51,7 @@
         )
   (add-to-list 'company-backends 'company-capf)
   (add-to-list 'company-backends 'company-yasnippet)
+  (add-to-list 'company-backends 'merlin-company-backend)
   (global-company-mode 1)
   :bind
   ;; Autocomplete (calling company) when shift-tab

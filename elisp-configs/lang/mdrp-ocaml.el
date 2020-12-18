@@ -100,17 +100,10 @@
   (utop-minor-mode 1))
 
 (use-package merlin
-  :after company
-  :hook (tuareg-mode . merlin-mode)
-  :config
-  (add-hook 'tuareg-mode-hook
-            (lambda ()
-              (make-local-variable 'company-backends)
-              (setq company-backends (copy-tree company-backends))
-              (setf (car company-backends)
-                    (append '(merlin-company-backend) (car company-backends))))
-            )
-  (setq merlin-completion-with-doc t)
+  :hook ((tuareg-mode . merlin-mode)
+         (merlin-mode . company-mode))
+  :custom
+  (merlin-completion-with-doc t)
 )
 
 (use-package flycheck-ocaml

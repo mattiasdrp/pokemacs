@@ -130,6 +130,19 @@
   :group 'faces
   :prefix "ligature-")
 
+(defgroup ligature-faces '((ligature custom-face)) ; tab-bar is defined in faces.el
+  "Faces used in the tab bar."
+  :group 'ligature
+  :group 'faces
+  :version "27.1")
+
+(defface ligature
+  '((default :inherit default))
+  "Ligature face ligatures. Uses by default the default face but
+allows to use a different font"
+  :version "27.1"
+  :group 'ligature-faces)
+
 (defcustom ligature-ignored-major-modes '(minibuffer-inactive-mode)
   "Major modes that will never have ligatures applied to them.
 

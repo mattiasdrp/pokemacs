@@ -41,6 +41,7 @@
 ;; Auto-save the visited file, don't create a #file#
 (auto-save-visited-mode 1)
 (setq auto-save-default nil)
+(setq auto-save-timeout 600)
 
 (set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
 
@@ -56,9 +57,6 @@
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 ;; -UTF8Coding
-
-;; Delete trailing whitespaces when saving:
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Wraps automatically too long lines:
 ;; (add-hook 'text-mode-hook 'turn-on-auto-fill)
@@ -140,7 +138,7 @@
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 (setq show-paren-style 'expression)
-(setq show-trailing-whitespace t)
+(setq-default show-trailing-whitespace t)
 (setq tool-bar-mode nil)
 (setq truncate-lines nil)
 (setq visible-bell t)

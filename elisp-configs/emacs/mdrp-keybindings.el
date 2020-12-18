@@ -131,6 +131,19 @@
 ;; Org keys
 (global-set-key (kbd "M-o l") 'org-store-link)
 (global-set-key (kbd "M-o a") 'org-agenda)
+(global-set-key (kbd "M-j") 'org-goto)
+
+;; Tab bar mode
+(global-set-key (kbd "M-q") 'tab-next)
+(global-set-key (kbd "M-d") 'tab-previous)
+(global-set-key (kbd "C-S-n") 'tab-new)
+(global-set-key (kbd "C-S-q") 'tab-close)
+
+;; Delete block
+(global-set-key (kbd "C-d") 'delete-block-forward)
+(global-set-key (kbd "C-<backspace>") 'delete-block-backward)
+(global-set-key (kbd "M-<backspace>") 'delete-block-backward)
+(global-set-key (kbd "M-DEL") 'delete-block-backward)
 
 (provide 'mdrp-keybindings)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

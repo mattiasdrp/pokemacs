@@ -1,4 +1,4 @@
-;;; mdrp-delete-block.el --- -*- lexical-binding: t -*-
+;;; mdrp-tab-bar.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
@@ -29,10 +29,12 @@
 
 ;;; Code:
 
-(use-package delete-block
-  :load-path (lambda () (expand-file-name "site-elisp/delete-block" user-emacs-directory))
+(use-package tab-bar
+  :config
+  (tab-bar-mode 1)
   )
 
-(provide 'mdrp-delete-block)
+(provide 'mdrp-tab-bar)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-delete-block.el ends here
+;;; mdrp-tab-bar.el ends here
+!
