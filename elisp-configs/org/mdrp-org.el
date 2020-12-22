@@ -42,6 +42,7 @@
                                    "Juin" "Juillet" "Août" "Septembre"
                                    "Octobre" "Novembre" "Décembre"])
   :custom
+  (org-directory "~/org/")
   (org-ellipsis " ▾")
   (org-startup-truncated nil)
   (org-adapt-indentation nil)
@@ -81,13 +82,44 @@
      )
    )
   (org-capture-templates
-   '(("t" "Todo" entry (file+headline "~/org/afaire.org" "A Faire")
+   `(("t" "Todo" entry (file+headline ,(concat org-directory "afaire.org") "A Faire")
       "* TODO %?\n  %i\n  %a")
-     ("r" "Rdv" entry (file+headline "~/org/rdv.org" "Rendez-vous")
-      "* RDV %?\n  %i\n  %a")))
+     ("r" "Rdv" entry (file+headline ,(concat org-directory "rdv.org") "Rendez-vous")
+      "* RDV %?\n  %i\n  %a")
+     ;; ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+     ;;  "* %? [[%:link][%:description]] \nCaptured On: %U")
+     ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+      "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+     ("L" "Protocol Link" entry (file+headline ,(concat org-directory "liens.org") "Inbox")
+      "* %? [[%:link][%:description]] \nCaptured On: %U")
+     )
+   )
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
   :config
+  (defun org-mode-<>-syntax-fix (start end)
+    "Change syntax of characters ?< and ?> to symbol within source code blocks."
+    (let ((case-fold-search t))
+      (when (eq major-mode 'org-mode)
+        (save-excursion
+          (goto-char start)
+          (while (re-search-forward "<\\|>" end t)
+            (when (save-excursion
+                    (and
+                     (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
+                     (string-equal (downcase (match-string 1)) "begin")))
+              ;; This is a < or > in an org-src block
+              (put-text-property (point) (1- (point))
+                                 'syntax-table (string-to-syntax "_"))))))))
+
+  (defun org-setup-<>-syntax-fix ()
+    "Setup for characters ?< and ?> in source code blocks.
+Add this function to `org-mode-hook'."
+    (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
+    (syntax-propertize (point-max)))
+
+  (add-hook 'org-mode-hook #'org-setup-<>-syntax-fix)
+
   (setq org-agenda-custom-commands
         '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
 	   ((org-agenda-span 'month)
@@ -130,6 +162,10 @@
   (add-to-list 'org-structure-template-alist '("oc" . "src ocaml"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   )
+
+(use-package org-protocol
+  :after (org)
+)
 
 (use-package org-bullets
   :after org

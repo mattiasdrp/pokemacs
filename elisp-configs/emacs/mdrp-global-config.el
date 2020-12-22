@@ -45,6 +45,15 @@
 
 (set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
 
+(when (and (eq system-type 'gnu/linux)
+           (string-match
+            "Linux.*Microsoft.*Linux"
+            (shell-command-to-string "uname -a")))
+  (setq
+   browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
+   browse-url-generic-args     '("/c" "start")
+   browse-url-browser-function #'browse-url-generic))
+
 (unless *sys/win32*
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)

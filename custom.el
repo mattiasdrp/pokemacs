@@ -23,6 +23,7 @@
  '(ivy-current-match ((t (:extend t :background "dark olive green"))))
  '(outshine-level-1 ((t (:inherit outline-1 :foreground "sienna" :underline t))))
  '(show-paren-match ((t (:background "indian red" :underline nil))))
+ '(show-paren-mismatch ((t (:foreground "red" :inverse-video t :underline "#E57373"))))
  '(tab-bar ((t (:inherit variable-pitch :height 0.7))))
  '(tab-bar-tab ((t (:inherit tab-bar :background "dim gray" :foreground "#2E3436" :box (:line-width 1 :style pressed-button)))))
  '(tab-bar-tab-inactive ((t nil)))
