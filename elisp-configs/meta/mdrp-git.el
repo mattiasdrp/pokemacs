@@ -30,14 +30,13 @@
 ;;; Code:
 
 (use-package magit
-  :bind (("C-x g" . magit-status)
-         ("C-x M-g" . magit-dispatch)))
+  :ensure t
+)
 
 (use-package git-commit
   :hook (git-commit-mode . my-english-dict))
 
 (use-package git-messenger
-  :bind ("C-x G" . git-messenger:popup-message)
   :config
   (setq git-messenger:show-detail t
         git-messenger:use-magit-popup t))

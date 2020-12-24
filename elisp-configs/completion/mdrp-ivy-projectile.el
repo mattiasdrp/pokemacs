@@ -43,7 +43,6 @@
           '((counsel-rg . 1)
             (counsel-search . 2)
             (t . 3))))
-  :bind ([remap switch-to-buffer]              . ivy-switch-buffer)
   :config
   ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
   ;; is way too big (30,000). Turn it down so big repos affect project
@@ -135,30 +134,6 @@
 
 (use-package counsel
   :defer t
-  :bind (
-         ([remap apropos]                  . counsel-apropos)
-         ([remap bookmark-jump]            . counsel-bookmark)
-         ([remap compile]                  . counsel-compile)
-         ([remap describe-bindings]        . counsel-descbinds)
-         ([remap describe-face]            . counsel-faces)
-         ([remap describe-function]        . counsel-describe-function)
-         ([remap describe-variable]        . counsel-describe-variable)
-         ([remap evil-ex-registers]        . counsel-evil-registers)
-         ([remap evil-show-marks]          . counsel-mark-ring)
-         ([remap execute-extended-command] . counsel-M-x)
-         ([remap find-file]                . counsel-find-file)
-         ([remap find-library]             . counsel-find-library)
-         ([remap imenu]                    . counsel-imenu)
-         ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
-         ([remap load-theme]               . counsel-load-theme)
-         ([remap locate]                   . counsel-locate)
-         ([remap org-goto]                 . counsel-org-goto)
-         ([remap org-set-tags-command]     . counsel-org-tag)
-         ([remap recentf-open-files]       . counsel-recentf)
-         ([remap set-variable]             . counsel-set-variable)
-         ([remap swiper]                   . counsel-grep-or-swiper)
-         ([remap unicode-chars-list-chars] . counsel-unicode-char)
-         ([remap yank-pop]                 . counsel-yank-pop))
   :config
   ;; (set-popup-rule! "^\\*ivy-occur" :size 0.35 :ttl 0 :quit nil)
 
@@ -248,13 +223,6 @@
 
 (use-package counsel-projectile
   :defer t
-  :init
-  :bind (
-         ([remap projectile-find-dir]         . counsel-projectile-find-dir)
-         ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
-         ([remap projectile-grep]             . counsel-projectile-grep)
-         ([remap projectile-ag]               . counsel-projectile-ag)
-         ([remap projectile-switch-project]   . counsel-projectile-switch-project))
   :config
 
   ;; no highlighting visited files; slows down the filtering
@@ -326,10 +294,6 @@
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
   :bind (
-         ([remap describe-function] . counsel-describe-function)
-         ([remap describe-command] . helpful-command)
-         ([remap describe-variable] . counsel-describe-variable)
-         ([remap describe-key] . helpful-key)
          )
   )
 

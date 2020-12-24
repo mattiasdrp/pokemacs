@@ -36,37 +36,11 @@
   (set-display-table-slot standard-display-table
                           'selective-display
                           (string-to-vector "+++"))
-  ;; Outline-minor-mode key map
-  :bind-keymap ("C-o" . cm-map)
-  :bind (:map cm-map
-              ;; HIDE
-              ("q" . outline-hide-sublevels)    ; Hide everything but the top-level headings
-              ("t" . outline-hide-body)         ; Hide everything but headings (all body lines)
-              ("o" . outline-hide-other)        ; Hide other branches
-              ("c" . outline-hide-entry)        ; Hide this entry's body
-              ("l" . outline-hide-leaves)       ; Hide body lines in this entry and sub-entries
-              ("d" . outline-hide-subtree)      ; Hide everything in this entry and sub-entries
-              ;; SHOW
-              ("a" . outline-show-all)          ; Show (expand) everything
-              ("e" . outline-show-entry)        ; Show this heading's body
-              ("i" . outline-show-children)     ; Show this heading's immediate child sub-headings
-              ("k" . outline-show-branches)     ; Show all sub-headings under this heading
-              ("s" . outline-show-subtree)      ; Show (expand) everything in this heading & below
-              ;; MOVE
-              ("u" . outline-up-heading)                ; Up
-              ("n" . outline-next-visible-heading)      ; Next
-              ("p" . outline-previous-visible-heading)  ; Previous
-              ("f" . outline-forward-same-level)        ; Forward - same level
-              ("b" . outline-backward-same-level)       ; Backward - same level
-              )
   )
 
 (use-package outline-ivy
   :load-path "custom/"
   :after (outline ivy)
-  :bind (:map outline-minor-mode-map
-              ("M-j" . oi-jump)
-              )
   )
 
 (use-package outshine

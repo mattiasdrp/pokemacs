@@ -104,6 +104,9 @@
          (merlin-mode . company-mode))
   :custom
   (merlin-completion-with-doc t)
+  :config
+  (message "merlin")
+  (add-to-list 'company-backends 'merlin-company-backend)
 )
 
 (use-package flycheck-ocaml
@@ -131,6 +134,10 @@
     "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
     (when (executable-find "ocp-indent")
       (ocp-setup-indent))))
+
+(use-package dune-mode
+  :mode ("dune" "dune-project")
+  )
 
 (provide 'mdrp-ocaml)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

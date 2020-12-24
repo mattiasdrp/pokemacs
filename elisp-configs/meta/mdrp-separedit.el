@@ -36,7 +36,6 @@
 ;; https://github.com/twlz0ne/separedit.le
 (use-package separedit
   :ensure t
-  :bind (("C-c C-e" . separedit))
   :config
   (setq separedit-default-mode 'markdown-mode)
   )

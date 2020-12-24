@@ -29,6 +29,9 @@
 
 ;;; Code:
 
+(require 'server)
+(unless (server-running-p) (server-start))
+
 ;; Please oh please emacs, stop creating files everywhere, just put them in one place
 (require 'no-littering)
 (setq auto-save-file-name-transforms
@@ -151,6 +154,7 @@
 (setq tool-bar-mode nil)
 (setq truncate-lines nil)
 (setq visible-bell t)
+(setq prescient-persist-mode t)
 
 ;; Adapting the compilation directory matcher for french:
 ;; (setq compilation-directory-matcher '("\\(?:Entering\\|Leavin\\(g\\)\\|\\) directory [`']\\(.+\\)'$" (2 . 1)))

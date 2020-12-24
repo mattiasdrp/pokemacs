@@ -56,17 +56,11 @@ e.g. proselint and langtool."
                       (executable-find "proselint"))
                  (featurep 'langtool))
              (setq-local flyspell-mark-duplications-flag nil))))
-
-    :bind (:map flyspell-mouse-map
-                ("RET" . flyspell-correct-at-point)
-                ([return] . flyspell-correct-at-point)
-                ;; ([mouse-1] . flyspell-correct-at-point)
-                )
     )
+
 
 (use-package flyspell-correct
   :commands flyspell-correct-previous
-  :bind ([remap ispell-word] . flyspell-correct-at-point)
   :config
   (require 'flyspell-correct-ivy)
   (require 'flyspell-correct-popup)

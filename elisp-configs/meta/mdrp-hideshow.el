@@ -37,8 +37,6 @@
   :diminish hs-minor-mode
   :config
   (setq hs-isearch-open t)
-  :bind (("M-+" . hs-toggle-hiding)
-         ("M-*" . hs-show-all))
   )
 
 (provide 'mdrp-hideshow)

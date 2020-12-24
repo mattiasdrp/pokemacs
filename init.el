@@ -169,6 +169,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-highlight)
 
+(require 'mdrp-ace-window)
+
 ;;;; Completion
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
 
@@ -211,211 +213,15 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (update-to-load-path (expand-file-name "elisp-configs/lang" user-emacs-directory))
 
-;;;;; LaTeX:
+(require 'mdrp-latex)
 
-(use-package tex-site
-  :ensure auctex
-  :mode ("\\.tex\\'" . latex-mode)
-  :config
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              ;; (rainbow-delimiters-mode)
-              ;; (pretty-outlines-add-bullets)
-              (company-mode)
-              ;; (smartparens-mode)
-              (turn-on-reftex)
-              (setq reftex-plug-into-AUCTeX t)
-              (reftex-isearch-minor-mode)
-              (setq TeX-PDF-mode t)
-              (setq TeX-source-correlate-method 'synctex)
-              (setq TeX-source-correlate-start-server t)))
-  )
-
-(use-package LaTeX-math-mode
-  :hook tex-site
-  )
-
-;;;;; Cubicle:
-
-(use-package cubicle-mode
-  :mode "\\.cub$"
-  )
-
-;;;;; Why3:
-
-(use-package why3-mode
-  :load-path "custom/"
-  :mode "\\.\\(\\(mlw\\)\\|\\(why\\)\\)$"
-  )
-
-;;;;; Dune:
-
-(use-package dune-mode
-  :mode ("dune" "dune-project")
-  )
-
-;;;;; Rust:
-
-(use-package rust-mode
-  :mode "\\.rs'"
-  :bind ("C-M-;" . rust-doc-comment-dwim-following)
-  :bind ("C-M-," . rust-doc-comment-dwim-enclosing)
-  ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
-  :config
-  (setq rust-format-on-save t)
-  ;; (defun my/rust-mode-outline-regexp-setup ()
-  ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
-  (defun rust-doc-comment-dwim (c)
-    "Comment or uncomment the current line or text selection."
-    (interactive)
-
-    ;; If there's no text selection, comment or uncomment the line
-    ;; depending whether the WHOLE line is a comment. If there is a text
-    ;; selection, using the first line to determine whether to
-    ;; comment/uncomment.
-    (let (p1 p2)
-      (if (use-region-p)
-          (save-excursion
-            (setq p1 (region-beginning) p2 (region-end))
-            (goto-char p1)
-            (if (wholeLineIsCmt-p c)
-                (my-uncomment-region p1 p2 c)
-              (my-comment-region p1 p2 c)
-              ))
-        (progn
-          (if (wholeLineIsCmt-p c)
-              (my-uncomment-current-line c)
-            (my-comment-current-line c)
-            )) )))
-
-  (defun wholeLineIsCmt-p (c)
-    (save-excursion
-      (beginning-of-line 1)
-      (looking-at (concat "[ \t]*//" c))
-      ))
-
-  (defun my-comment-current-line (c)
-    (interactive)
-    (beginning-of-line 1)
-    (insert (concat "//" c))
-    )
-
-  (defun my-uncomment-current-line (c)
-    "Remove “//c” (if any) in the beginning of current line."
-    (interactive)
-    (when (wholeLineIsCmt-p c)
-      (beginning-of-line 1)
-      (search-forward (concat "//" c))
-      (delete-backward-char 4)
-      ))
-
-  (defun my-comment-region (p1 p2 c)
-    "Add “//c” to the beginning of each line of selected text."
-    (interactive "r")
-    (let ((deactivate-mark nil))
-      (save-excursion
-        (goto-char p2)
-        (while (>= (point) p1)
-          (my-comment-current-line c)
-          (previous-line)
-          ))))
-
-  (defun my-uncomment-region (p1 p2 c)
-    "Remove “//c” (if any) in the beginning of each line of selected text."
-    (interactive "r")
-    (let ((deactivate-mark nil))
-      (save-excursion
-        (goto-char p2)
-        (while (>= (point) p1)
-          (my-uncomment-current-line c)
-          (previous-line) )) ))
-
-  (defun rust-doc-comment-dwim-following ()
-    (interactive)
-    (rust-doc-comment-dwim "/ "))
-  (defun rust-doc-comment-dwim-enclosing ()
-    (interactive)
-    (rust-doc-comment-dwim "! "))
-  )
-
-(use-package cargo
-  :hook (rust-mode . cargo-minor-mode))
-
-(use-package racer
-  :hook (rust-mode . racer-mode)
-  :bind ("C-c C-t" . 'racer-find-definition))
-
-(use-package eldoc
-  :hook (racer-mode . eldoc-mode))
-
-(use-package toml-mode
-  :hook cargo)
-
-(use-package flycheck-rust
-  :hook (rust-mode . flycheck-rust-setup))
-
-;;;;; OCaml:
+(require 'mdrp-rust)
 
 (require 'mdrp-ocaml)
 
-;;;;; Fsharp
+(require 'mdrp-md-pandoc)
 
-(use-package fsharp-mode
-  :config (require 'eglot-fsharp)
-  :defer t
-  :ensure t)
-
-(use-package eglot
-  :ensure t
-  :commands (eglot eglot-ensure)
-  :hook ((fsharp-mode . eglot-ensure)
-         (rust-mode . eglot-ensure)
-         )
-  :config
-  (setq eglot-confirm-server-initiated-edits nil)
-  )
-
-;;;;; Markdown:
-
-(use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'"       . markdown-mode)
-         ("\\.markdown\\'" . gfm-mode)))
-
-(use-package pandoc-mode
-  :hook ((markdown-mode . pandoc-mode)
-         (pandoc-mode . pandoc-load-default-settings)))
-
-;;;;; Web:
-
-(use-package web-mode
-  :init
-  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-  :bind (:map web-mode-map
-              ([backtab] . company-complete))
-  )
-
-;;;;; CSS:
-
-(use-package css-mode
-  :ensure nil
-  :mode "\\.css\\'")
-
-;;;;; JSON:
-
-(use-package json-mode
-  :mode (("\\.bowerrc$"     . json-mode)
-         ("\\.jshintrc$"    . json-mode)
-         ("\\.json_schema$" . json-mode)
-         ("\\.json\\'" . json-mode))
-  :bind (:package json-mode-map
-                  :map json-mode-map
-                  ("C-c <tab>" . json-mode-beautify))
-  :config
-  (make-local-variable 'js-indent-level))
+(require 'mdrp-web-modes)
 
 ;;;; Footer
 

@@ -63,6 +63,7 @@
   :ensure t)
 
 (use-package discover-my-major
+  :defer t
   :bind ("C-h <C-m>" . discover-my-major))
 
 (setq use-package-verbose t)

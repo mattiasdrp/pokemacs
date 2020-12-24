@@ -82,6 +82,10 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (flyspell-mode 1)
   (flyspell-buffer))
 
+(defun prev-match () (interactive nil) (next-match -1))
+(defun up-slightly () (interactive) (scroll-up 5))
+(defun down-slightly () (interactive) (scroll-down 5))
+
 ;;; FROM DOOM EMACS
 
 (defun mdrp/enlist (exp)

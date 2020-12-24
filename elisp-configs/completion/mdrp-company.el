@@ -51,7 +51,6 @@
         )
   (add-to-list 'company-backends 'company-capf)
   (add-to-list 'company-backends 'company-yasnippet)
-  (add-to-list 'company-backends 'merlin-company-backend)
   (global-company-mode 1)
   :bind
   ;; Autocomplete (calling company) when shift-tab
@@ -141,6 +140,11 @@
             (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
             (Template . ,(all-the-icons-material "format_align_left" :height 0.8 :v-adjust -0.15)))
           company-box-icons-alist 'company-box-icons-all-the-icons)))
+
+(use-package company-prescient
+  :after company
+  :config
+  (company-prescient-mode 1))
 
 (provide 'mdrp-company)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
