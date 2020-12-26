@@ -43,15 +43,16 @@
                                    "Octobre" "Novembre" "Décembre"])
   :custom
   (org-directory "~/org/")
+  (org-agenda-files `(,(concat org-directory "agenda.org")))
   (org-ellipsis " ▾")
   (org-startup-truncated nil)
   (org-adapt-indentation nil)
   (org-support-shift-select 'always)
   (org-agenda-start-with-log-mode t)
+  (org-agenda-start-day "1d")
+  (org-agenda-span 'week)
+  (org-agenda-start-on-weekday nil)
   (org-log-done 'time)
-  (org-agenda-files
-   '("~/org/afaire.org"
-     "~/org/rdv.org"))
   (org-tag-persistent-alist
    '((:startgroup . nil)
      ("Maison" . ?m)
@@ -82,21 +83,32 @@
      )
    )
   (org-capture-templates
-   `(("t" "Todo" entry (file+headline ,(concat org-directory "afaire.org") "A Faire")
+   `(("t" "Todo" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
       "* TODO %?\n  %i\n  %a")
-     ("r" "Rdv" entry (file+headline ,(concat org-directory "rdv.org") "Rendez-vous")
+     ("r" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Rendez-vous")
       "* RDV %?\n  %i\n  %a")
      ;; ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
      ;;  "* %? [[%:link][%:description]] \nCaptured On: %U")
-     ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+     ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
       "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-     ("L" "Protocol Link" entry (file+headline ,(concat org-directory "liens.org") "Inbox")
+     ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
       "* %? [[%:link][%:description]] \nCaptured On: %U")
      )
    )
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
+  :bind-keymap ("M-o" . mdrp-org-map)
+  :bind (
+         (:map mdrp-org-map
+               ("l"                       . org-store-link)
+               ("a"                       . org-agenda)
+               )
+         (:map org-mode-map
+               ("M-j"                     . org-goto)
+               )
+         )
   :config
+  (define-prefix-command 'mdrp-org-map nil "Org-")
   (defun org-mode-<>-syntax-fix (start end)
     "Change syntax of characters ?< and ?> to symbol within source code blocks."
     (let ((case-fold-search t))
@@ -170,8 +182,8 @@ Add this function to `org-mode-hook'."
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("" "" "" "" "" "" ""))
+  ;; :custom
+  ;; (org-bullets-bullet-list '("" "" "" "" "" "" ""))
 )
 
 (use-package visual-fill-column

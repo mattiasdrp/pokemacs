@@ -32,6 +32,13 @@
 (use-package tab-bar
   :config
   (tab-bar-mode 1)
+
+  :bind (
+         ("C-S-n"                   . tab-new)
+         ("C-S-q"                   . tab-close)
+         ("M-q"                     . tab-next)
+         ("M-d"                     . tab-previous)
+         )
   :custom
   (tab-bar-new-tab-choice "~/")
   (tab-bar-tab-name-function 'tab-bar-tab-name-current)

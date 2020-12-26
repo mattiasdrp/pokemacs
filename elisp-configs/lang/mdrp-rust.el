@@ -33,6 +33,13 @@
 (use-package rust-mode
   :mode "\\.rs'"
   ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
+  :bind (
+         :map rust-mode-map
+              ("C-M-;"                   . rust-doc-comment-dwim-following)
+              ("C-M-,"                   . rust-doc-comment-dwim-enclosing)
+              ("C-c C-t"                 . racer-find-definition)
+              )
+
   :config
   (setq rust-format-on-save t)
   ;; (defun my/rust-mode-outline-regexp-setup ()
@@ -115,6 +122,8 @@
 
 (use-package racer
   :hook (rust-mode . racer-mode)
+  :config
+  (setq racer-rust-src-path (concat (getenv "HOME") "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library"))
 )
 
 (use-package eldoc

@@ -31,7 +31,14 @@
 
 (use-package magit
   :ensure t
-)
+  :bind-keymap
+  ("M-m"                   . magit-mode-map)
+  :bind (:map magit-mode-map
+              ("g"                       . magit-status)
+              ("G"                       . git-messenger:popup-message)
+              ("M-g"                     . magit-dispatch)
+              )
+  )
 
 (use-package git-commit
   :hook (git-commit-mode . my-english-dict))

@@ -133,9 +133,21 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-winner)
 
+;; KEYBINGINS
+
 (require 'mdrp-keybindings)
 
 (require 'mdrp-which-key)
+
+(require 'mdrp-hydra)
+
+(require 'mdrp-selected)
+
+(require 'mdrp-god-mode)
+
+;;- KEYBINGINS
+
+(require 'mdrp-whitespace)
 
 ;;;; UI
 
