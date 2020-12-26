@@ -43,7 +43,7 @@
                                    "Octobre" "Novembre" "Décembre"])
   :custom
   (org-directory "~/org/")
-  (org-agenda-files `(,(concat org-directory "agenda.org")))
+  (org-agenda-files `(,org-directory))
   (org-ellipsis " ▾")
   (org-startup-truncated nil)
   (org-adapt-indentation nil)
@@ -134,7 +134,7 @@ Add this function to `org-mode-hook'."
 
   (setq org-agenda-custom-commands
         '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
-	   ((org-agenda-span 'month)
+           ((org-agenda-span 'month)
             (org-agenda-show-all-dates nil)
             ))))
   (calendar-set-date-style 'iso)

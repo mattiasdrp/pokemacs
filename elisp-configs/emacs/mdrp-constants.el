@@ -51,6 +51,7 @@
   "Are we running on a Mac system?")
 ;; -Consts
 
+
 (defvar mdrp/fd-binary
   (cl-find-if #'executable-find (list "fdfind" "fd"))
   "The filename of the `fd' executable. On some distros it's 'fdfind' (ubuntu,
