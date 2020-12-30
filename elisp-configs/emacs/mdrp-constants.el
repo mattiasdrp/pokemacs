@@ -2,8 +2,8 @@
 ;;
 ;; Filename: init-const.el
 ;; Description: Initialize Constants
-;; Author: Mattias
-;; Copyright (C) 2020 Mattias
+;; Author: mdrp
+;; Copyright (C) 2020 mdrp
 ;; Version: 1.0
 ;; Compatibility: emacs-version >= 26.1
 ;;
@@ -33,8 +33,8 @@
 ;;; Code:
 
 ;; UserInfo
-(setq user-full-name "Mattias")
-(setq user-mail-address "mattias@email.com")
+(setq user-full-name "mdrp")
+(setq user-mail-address "https://github.com/MonsieurPi")
 ;; -UserInfo
 
 ;; Consts

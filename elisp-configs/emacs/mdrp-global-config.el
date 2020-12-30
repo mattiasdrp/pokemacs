@@ -1,9 +1,9 @@
 ;;; mdrp-global-config.el --- -*- lexical-binding: t -*-
 
-;; Copyright (c) 2020-2020 Mattias and contributors.
+;; Copyright (c) 2020-2020 mdrp and contributors.
 
-;; Author: Mattias
-;; Maintainer: Mattias <mattias@email.com>
+;; Author: mdrp
+;; Maintainer: mdrp <https://github.com/MonsieurPi>
 ;; Version: 1.0
 ;; Licence: GPL2+
 ;; Keywords: convenience, configuration
@@ -135,15 +135,16 @@
  echo-keystrokes 0.1
  )
 
+;; Inspirations possibles : https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 (setq org-capture-templates
  `(("t" "Todo" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
-    "* TODO %?\n  %i\n  %a")
-   ("r" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Rendez-vous")
-    "* RDV %?\n  %i\n  %a")
+    "* TODO %?\n" :empty-lines 1 :kill-buffer t)
+   ("r" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+    "* %?%i\n %T" :empty-lines 1 :kill-buffer t)
    ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
-    "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+    "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?" :empty-lines 1 :kill-buffer t)
    ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
-    "* %? [[%:link][%:description]] \nCaptured On: %U")
+    "* %? [[%:link][%:description]] \nCaptured On: %U" :empty-lines 1 :kill-buffer t)
    )
  )
 

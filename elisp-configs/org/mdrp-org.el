@@ -1,9 +1,9 @@
 ;;; mdrp-org.el --- -*- lexical-binding: t -*-
 
-;; Copyright (c) 2020-2020 Mattias and contributors.
+;; Copyright (c) 2020-2020 mdrp and contributors.
 
-;; Author: Mattias
-;; Maintainer: Mattias <mattias@email.com>
+;; Author: mdrp
+;; Maintainer: mdrp <https://github.com/MonsieurPi>
 ;; Version: 1.0
 ;; Licence: GPL2+
 ;; Keywords: convenience, configuration
@@ -93,6 +93,7 @@
          (:map mdrp-org-map
                ("l"                       . org-store-link)
                ("a"                       . org-agenda)
+               ("c"                       . org-capture)
                )
          (:map org-mode-map
                ("M-j"                     . org-goto)
@@ -200,7 +201,7 @@ Add this function to `org-mode-hook'."
   :custom
   (cfw:org-capture-template
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-     "* %? %(cfw:org-capture-day)")
+     "* %?\n%(cfw:org-capture-day)" :empty-lines 1)
    )
   )
 

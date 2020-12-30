@@ -2,8 +2,8 @@
 ;;
 ;; Filename: init-const.el
 ;; Description: Initialize Whitespace
-;; Author: Mattias
-;; Copyright (C) 2020 Mattias
+;; Author: mdrp
+;; Copyright (C) 2020 mdrp
 ;; Version: 1.0
 ;; Compatibility: emacs-version >= 26.1
 ;;
