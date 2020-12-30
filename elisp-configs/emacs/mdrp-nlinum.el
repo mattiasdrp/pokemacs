@@ -35,7 +35,11 @@
 (use-package nlinum
   :config
   (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
-  (global-nlinum-mode)
+  :hook (
+         (prog-mode . nlinum-mode)
+         (text-mode . nlinum-mode)
+         (org-mode . nlinum-mode)
+         )
   )
 
 (provide 'mdrp-nlinum)

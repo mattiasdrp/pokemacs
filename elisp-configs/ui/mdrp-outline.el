@@ -77,7 +77,8 @@
 (use-package pretty-outlines
   :defer t
   :load-path "custom/"
-  :hook ((outline-mode . pretty-outlines-set-display-table)
+  :hook (
+         (outline-mode . pretty-outlines-set-display-table)
          (outline-minor-mode . pretty-outlines-set-display-table)
          (emacs-lisp-mode . pretty-outlines-add-bullets)
          )

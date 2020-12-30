@@ -77,8 +77,6 @@
         ;; enable ability to select prompt (alternative to `ivy-immediate-done')
         ivy-use-selectable-prompt t)
 
-  (use-package yasnippet
-    :hook ('yas-prompt-functions #'+ivy-yas-prompt-fn))
   )
 
 

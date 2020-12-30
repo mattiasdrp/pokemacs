@@ -29,7 +29,10 @@
 
 ;;; Code:
 
+(require 'org-protocol)
+
 (use-package org
+  :ensure t
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -42,9 +45,10 @@
                                    "Juin" "Juillet" "Août" "Septembre"
                                    "Octobre" "Novembre" "Décembre"])
   :custom
-  (org-directory "~/org/")
   (org-agenda-files `(,org-directory))
   (org-ellipsis " ▾")
+  (org-footnote-auto-adjust t)
+  (org-cycle-separator-lines -1)
   (org-startup-truncated nil)
   (org-adapt-indentation nil)
   (org-support-shift-select 'always)
@@ -53,6 +57,8 @@
   (org-agenda-span 'week)
   (org-agenda-start-on-weekday nil)
   (org-log-done 'time)
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
   (org-tag-persistent-alist
    '((:startgroup . nil)
      ("Maison" . ?m)
@@ -82,21 +88,6 @@
      ("Difficile" . (:foreground "OrangeRed" :weight bold))
      )
    )
-  (org-capture-templates
-   `(("t" "Todo" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
-      "* TODO %?\n  %i\n  %a")
-     ("r" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Rendez-vous")
-      "* RDV %?\n  %i\n  %a")
-     ;; ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-     ;;  "* %? [[%:link][%:description]] \nCaptured On: %U")
-     ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
-      "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-     ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
-      "* %? [[%:link][%:description]] \nCaptured On: %U")
-     )
-   )
-  (org-src-fontify-natively t)
-  (org-src-tab-acts-natively t)
   :bind-keymap ("M-o" . mdrp-org-map)
   :bind (
          (:map mdrp-org-map
@@ -130,7 +121,7 @@ Add this function to `org-mode-hook'."
     (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
     (syntax-propertize (point-max)))
 
-  (add-hook 'org-mode-hook #'org-setup-<>-syntax-fix)
+  (add-hook 'org-mod-hook #'org-setup-<>-syntax-fix)
 
   (setq org-agenda-custom-commands
         '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
@@ -142,29 +133,30 @@ Add this function to `org-mode-hook'."
    'org-babel-load-languages
    '((rust . t)
      (ocaml . t)
+     (latex . t)
      ))
-  (let ((re "\\}\\(+\\|*\\|-\\) "))
-    (font-lock-add-keywords
-      'org-mode
-      `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) "\\}\\(+\\|-\\) ")
-         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◈"))))))
+  ;; (let ((re "\\}\\(+\\|*\\|-\\) "))
+  ;;   (font-lock-add-keywords
+  ;;     'org-mode
+  ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) "\\}\\(+\\|-\\) ")
+  ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◈"))))))
 
-     (font-lock-add-keywords
-      'org-mode
-      `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
-         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
+  ;;    (font-lock-add-keywords
+  ;;     'org-mode
+  ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
+  ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
 
-     (font-lock-add-keywords
-      'org-mode
-      `((,(concat "^[[:space:]]\\{" (number-to-string
-                                     (* 2 (+ 2 org-list-indent-offset))) re)
-         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
-     (font-lock-add-keywords
-      'org-mode
-      `((,(concat "^[[:space:]]\\{" (number-to-string
-                                     (* 3 (+ 2 org-list-indent-offset))) re)
-         (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
-     )
+  ;;    (font-lock-add-keywords
+  ;;     'org-mode
+  ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
+  ;;                                    (* 2 (+ 2 org-list-indent-offset))) re)
+  ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
+  ;;    (font-lock-add-keywords
+  ;;     'org-mode
+  ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
+  ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
+  ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
+  ;;    )
   )
 
 (use-package org-tempo ;; part of org-mode
@@ -175,16 +167,42 @@ Add this function to `org-mode-hook'."
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   )
 
-(use-package org-protocol
-  :after (org)
-)
-
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode)
   ;; :custom
   ;; (org-bullets-bullet-list '("" "" "" "" "" "" ""))
 )
+
+(use-package calfw
+  :config
+  (setq cfw:fchar-junction ?╋
+        cfw:fchar-vertical-line ?┃
+        cfw:fchar-horizontal-line ?━
+        cfw:fchar-left-junction ?┣
+        cfw:fchar-right-junction ?┫
+        cfw:fchar-top-junction ?┯
+        cfw:fchar-top-left-corner ?┏
+        cfw:fchar-top-right-corner ?┓)
+)
+
+(use-package calfw-org
+  :after calfw
+  :config
+  (define-prefix-command 'mdrp-calfw-map nil "Cal-")
+  :bind-keymap ("M-c" . mdrp-calfw-map)
+  :bind (
+         (:map mdrp-calfw-map
+               ("c" . cfw:open-calendar-buffer)
+               ("o" . cfw:open-org-calendar)
+               )
+         )
+  :custom
+  (cfw:org-capture-template
+   `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+     "* %? %(cfw:org-capture-day)")
+   )
+  )
 
 (use-package visual-fill-column
   :custom

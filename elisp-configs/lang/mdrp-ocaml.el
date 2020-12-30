@@ -94,16 +94,23 @@
    )
   )
 
-(use-package utop
+(use-package opam-user-setup
   :after tuareg
-  :config
-  (utop-minor-mode 1))
+  :load-path "custom/"
+  :config (ignore "Loaded 'flycheck-popup")
+  )
+
+;; (use-package utop
+;;   :after tuareg
+;;   :config
+;;   (utop-minor-mode 1))
 
 (use-package merlin
   :hook ((tuareg-mode . merlin-mode)
          (merlin-mode . company-mode))
   :custom
-  (merlin-completion-with-doc t)
+  (merlin-error-after-save nil)
+  (merlin-completion-with-doc nil)
   :config
   (message "merlin")
   (add-to-list 'company-backends 'merlin-company-backend)
@@ -114,8 +121,6 @@
   :config
   (defun +ocaml-init-flycheck-h ()
     "Activate `flycheck-ocaml`"
-    ;; Disable Merlin's own error checking
-    (setq merlin-error-after-save nil)
     ;; Enable Flycheck checker
     (flycheck-ocaml-setup)))
 

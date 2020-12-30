@@ -32,6 +32,10 @@
 (require 'server)
 (unless (server-running-p) (server-start))
 
+;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+;; (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+;;       url-history-file (expand-file-name "url/history" user-emacs-directory))
+
 ;; Please oh please emacs, stop creating files everywhere, just put them in one place
 (require 'no-littering)
 (setq auto-save-file-name-transforms
@@ -102,6 +106,7 @@
 ;;; SET VARIABLES
 
 (setq
+ org-directory "~/org/"
  line-move-visual t
  next-error-highlight t
  next-error-highlight-no-select t
@@ -127,7 +132,20 @@
 ;; Turn Off Cursor Alarms
  ring-bell-function 'ignore
 ;; Show Keystrokes in Progress Instantly
- echo-keystrokes 0.1)
+ echo-keystrokes 0.1
+ )
+
+(setq org-capture-templates
+ `(("t" "Todo" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
+    "* TODO %?\n  %i\n  %a")
+   ("r" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Rendez-vous")
+    "* RDV %?\n  %i\n  %a")
+   ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
+    "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+   ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
+    "* %? [[%:link][%:description]] \nCaptured On: %U")
+   )
+ )
 
 ;;; GLOBAL MODES
 

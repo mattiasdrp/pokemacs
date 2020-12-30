@@ -36,14 +36,18 @@
   (setq god-mode-enable-function-key-translation nil)
   :config
   (defun my-god-mode-update-modeline ()
-    (let ((limited-colors-p (> 257 (length (defined-colors)))))
-      (cond (god-local-mode (progn
-                              (set-face-background 'mode-line (if limited-colors-p "white" "#e9e2cb"))
-                              (set-face-background 'mode-line-inactive (if limited-colors-p "white" "#e9e2cb"))))
-            (t (progn
-                 (set-face-background 'mode-line (if limited-colors-p "black" "#0a2832"))
-                 (set-face-background 'mode-line-inactive (if limited-colors-p "black" "#0a2832")))))))
-
+    (cond (god-local-mode (progn
+                            (set-face-background 'mode-line "#e9e2cb")
+                            (set-face-foreground 'mode-line "black")
+                            (set-face-background 'mode-line-inactive "#e9e2cb")
+                            (set-face-foreground 'mode-line-inactive "black")
+                            ))
+          (t (progn
+               (set-face-background 'mode-line "#0a2832")
+               (set-face-foreground 'mode-line "white")
+               (set-face-background 'mode-line-inactive "#0a2832")
+               (set-face-foreground 'mode-line-inactive "white")
+               ))))
   (add-hook 'god-mode-enabled-hook #'my-god-mode-update-modeline)
   (add-hook 'god-mode-disabled-hook #'my-god-mode-update-modeline)
   (setq god-exempt-major-modes nil)

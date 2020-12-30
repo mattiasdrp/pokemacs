@@ -33,7 +33,7 @@
 ;;
 ;; Display colors with a background corresponding to the color
 (use-package rainbow-mode
-  :hook (prog-mode text-mode)
+  :hook (help-mode prog-mode text-mode)
   )
 
 (provide 'mdrp-rainbow-mode)

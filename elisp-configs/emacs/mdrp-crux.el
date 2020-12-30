@@ -38,9 +38,6 @@
          ("C-x 4 t" . crux-transpose-windows)
          ("C-x K" . crux-kill-other-buffers)
          ("C-k" . crux-smart-kill-line)
-         ("M-u" . crux-upcase-region)
-         ("M-d" . crux-downcase-region)
-         ("M-c" . crux-capitalize-region)
          (:map mdrp-crux-map
                ("w" . crux-view-url)                ; Open a new buffer containing the contents of URL.
                ("o" . crux-open-with)               ; Open visited file in default external program.

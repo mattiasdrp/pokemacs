@@ -48,6 +48,7 @@
   "M-m"
   "M-h"
   "M-/"
+  "M-l"
   )
 
 ;;; Remappings
@@ -59,6 +60,10 @@
 
 (general-define-key
  ;; Prefixed by C
+ "C-x C-1"                 'delete-other-windows
+ "C-x C-2"                 'split-window-below
+ "C-x C-3"                 'split-window-right
+ "C-x C-0"                 'delete-window
 
  "C-x C-l"                 'toggle-truncate-lines
  "C-="                     'text-scale-increase

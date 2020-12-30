@@ -38,11 +38,19 @@
   :hook ((prog-mode . company-mode)
          (org-mode . company-mode))
   :custom
-  (company-idle-delay 0.1)
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0)
   :config
+  (defun mdrp/disable-automatic-company ()
+    (interactive)
+    (setq company-idle-delay nil)
+    )
+  (defun mdrp/enable-automatic-company (i)
+    (interactive "nIdle-delay:")
+    (setq-local company-idle-delay i)
+    )
   (defun add-pcomplete-to-capf ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
   (setq company-minimum-prefix-length 1
         company-show-numbers ''left
@@ -50,11 +58,17 @@
         company-require-match 'never
         )
   (add-to-list 'company-backends 'company-capf)
-  (add-to-list 'company-backends 'company-yasnippet)
   (global-company-mode 1)
   :bind
-  ;; Autocomplete (calling company) when shift-tab
-  ([backtab] . company-complete)
+  (:map company-mode-map
+        ([remap indent-for-tab-command] . company-indent-or-complete-common)
+        )
+  (:map company-active-map
+        ;; ("<tab>"                          . company-complete)
+        ;; ("TAB"                          . company-complete)
+        ;; ("RET"                          . nil)
+        ;; ("<return>"                     . nil)
+        )
   )
 
 (use-package company-math
