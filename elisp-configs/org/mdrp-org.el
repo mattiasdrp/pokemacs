@@ -191,6 +191,16 @@ Add this function to `org-mode-hook'."
   :after calfw
   :config
   (define-prefix-command 'mdrp-calfw-map nil "Cal-")
+  (defun cfw:org-capture-day ()
+    (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
+      (let ((pos (cfw:cursor-to-nearest-date)))
+        (concat "<"
+                (format-time-string  "%Y-%m-%d %a 09:00"
+                                     (encode-time 0 0 0
+                                                  (calendar-extract-day pos)
+                                                  (calendar-extract-month pos)
+                                                  (calendar-extract-year pos)))
+                ">"))))
   :bind-keymap ("M-c" . mdrp-calfw-map)
   :bind (
          (:map mdrp-calfw-map
@@ -201,7 +211,7 @@ Add this function to `org-mode-hook'."
   :custom
   (cfw:org-capture-template
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-     "* %?\n%(cfw:org-capture-day)" :empty-lines 1)
+     "* %?\nnSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
    )
   )
 
