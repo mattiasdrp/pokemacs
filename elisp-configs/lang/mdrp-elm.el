@@ -1,4 +1,4 @@
-;;; mdrp-apropospriate-theme.el --- -*- lexical-binding: t -*-
+;;; mdrp-elm.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 Mattias and contributors.
 
@@ -29,16 +29,7 @@
 
 ;;; Code:
 
-;; Nice theme:
-;;
-(use-package apropospriate-theme
-  :if window-system
-  :init
-  (add-to-list 'custom-theme-load-path
-               (file-name-directory
-                (locate-library "apropospriate-theme")))
-  (load-theme 'apropospriate-dark t))
 
-(provide 'mdrp-apropospriate-theme)
+(provide 'mdrp-elm)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-apropospriate-theme.el ends here
+;;; mdrp-elm.el ends here
