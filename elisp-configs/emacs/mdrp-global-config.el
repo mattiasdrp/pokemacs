@@ -97,7 +97,7 @@
  initial-scratch-message ""
  select-enable-clipboard t
  font-lock-global-modes t
- global-auto-revert-mode t
+ auto-revert-mode t
  indent-tabs-mode nil
  inhibit-startup-screen t
  initial-major-mode 'text-mode
@@ -137,14 +137,21 @@
 
 ;; Inspirations possibles : https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 (setq org-capture-templates
- `(("t" "Todo" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
-    "* TODO %?\n" :empty-lines 1 :kill-buffer t)
-   ("r" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-    "* %?%i\n %T" :empty-lines 1 :kill-buffer t)
-   ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
-    "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?" :empty-lines 1 :kill-buffer t)
-   ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
-    "* %? [[%:link][%:description]] \nCaptured On: %U" :empty-lines 1 :kill-buffer t)
+      `(
+        ("t" "Todos")
+        ("tt" "Todo (simple)" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
+         "* TODO %?\n" :empty-lines 1 :kill-buffer t)
+        ("td" "Todo (date)" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
+         "* TODO %?\nSCHEDULED: %t\n" :empty-lines 1 :kill-buffer t)
+        ("c" "Calendrier")
+        ("cr" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+         "* %?%i\n%T" :empty-lines 1 :kill-buffer t)
+        ("cj" "Jour" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+         "* %?%i\n%t" :empty-lines 1 :kill-buffer t)
+        ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
+         "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?" :empty-lines 1 :kill-buffer t)
+        ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
+         "* %? [[%:link][%:description]] \nCaptured On: %U" :empty-lines 1 :kill-buffer t)
    )
  )
 
