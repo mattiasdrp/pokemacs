@@ -50,7 +50,7 @@
 (setq auto-save-default nil)
 (setq auto-save-timeout 600)
 
-(set-fontset-font t '(#xe3d0 . #xe3d4) "Material Icons")
+(set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
 
 (when (and (eq system-type 'gnu/linux)
            (string-match
@@ -119,7 +119,7 @@
  comment-style 'indent
  ansi-color-names-vector ["#424242" "#EF9A9A" "#C5E1A5" "#FFEE58" "#64B5F6" "#E1BEE7" "#80DEEA" "#E0E0E0"]
  enable-recursive-minibuffers t
- electric-indent-mode nil
+ electric-indent-mode t
  scroll-bar-mode nil
  sentence-end-double-space nil
  show-paren-delay 0
@@ -143,27 +143,28 @@
          "* TODO %?\n" :empty-lines 1 :kill-buffer t)
         ("td" "Todo (date)" entry (file+headline ,(concat org-directory "agenda.org") "A Faire")
          "* TODO %?\nSCHEDULED: %t\n" :empty-lines 1 :kill-buffer t)
-        ("r" "Calendrier")
+         ("r" "Calendrier")
         ("rr" "Rdv" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-         "* %?%i\nnSCHEDULED: %T" :empty-lines 1 :kill-buffer t)
+         "* %?%i\nSCHEDULED: %T" :empty-lines 1 :kill-buffer t)
         ("rj" "Jour" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-         "* %?%i\nnSCHEDULED: %t" :empty-lines 1 :kill-buffer t)
+         "* %?%i\nSCHEDULED: %t" :empty-lines 1 :kill-buffer t)
         ("p" "Protocol" entry (file+headline ,(concat org-directory "agenda.org") "Citations")
          "* %^{Title}\nSource: %:link\nCaptured On: %U\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?" :empty-lines 1 :kill-buffer t)
         ("L" "Protocol Link" entry (file+headline ,(concat org-directory "agenda.org") "Liens")
          "* %? [[%:link][%:description]] \nCaptured On: %U" :empty-lines 1 :kill-buffer t)
-   )
+        ("s" "Courses" checkitem (file+headline ,(concat org-directory "agenda.org") "Courses")
+         "- [ ] %?\nSCHEDULED: %t\n" :empty-lines 1 :kill-buffer t)
+        )
  )
 
 ;;; GLOBAL MODES
 
 (global-prettify-symbols-mode 1)
+;; When buffer is closed, saves the cursor location
 (save-place-mode 1)
 (show-paren-mode 1)
 ;; Replace selection on insert
 (delete-selection-mode 1)
-;; When buffer is closed, saves the cursor location
-(save-place-mode 1)
 
 ;; So Long mitigates slowness due to extremely long lines.
 ;; Currently available in Emacs master branch *only*!

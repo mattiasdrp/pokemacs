@@ -32,7 +32,7 @@
 (use-package magit
   :ensure t
   :bind-keymap
-  ("M-m"                   . magit-mode-map)
+  ("M-v"                   . magit-mode-map)
   :bind (:map magit-mode-map
               ("g"                       . magit-status)
               ("G"                       . git-messenger:popup-message)

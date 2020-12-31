@@ -33,6 +33,7 @@
 
 (use-package org
   :ensure t
+  ;; :hook (org-mode . variable-pitch-mode)
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -51,6 +52,10 @@
   (org-cycle-separator-lines -1)
   (org-startup-truncated nil)
   (org-adapt-indentation nil)
+  (org-hide-emphasis-markers t)
+  (org-fontify-done-headline t)
+  (org-hide-leading-stars t)
+  (org-pretty-entities t)
   (org-support-shift-select 'always)
   (org-agenda-start-with-log-mode t)
   (org-agenda-start-day "1d")
@@ -136,11 +141,41 @@ Add this function to `org-mode-hook'."
      (ocaml . t)
      (latex . t)
      ))
-  ;; (let ((re "\\}\\(+\\|*\\|-\\) "))
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (push '("- [ ]" . "") prettify-symbols-alist)
+              (push '("+ [ ]" . "") prettify-symbols-alist)
+              (push '("* [ ]" . "") prettify-symbols-alist)
+              (push '("- [X]" . "") prettify-symbols-alist)
+              (push '("+ [X]" . "") prettify-symbols-alist)
+              (push '("* [X]" . "") prettify-symbols-alist)
+              (push '("- [-]" . "") prettify-symbols-alist)
+              (push '("+ [-]" . "") prettify-symbols-alist)
+              (push '("* [-]" . "") prettify-symbols-alist)
+              (prettify-symbols-mode)
+              ))
+  (custom-theme-set-faces
+   'user
+   '(org-block                 ((t (:inherit fixed-pitch))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-property-value        ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword       ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-tag                   ((t (:inherit (shadow fixed-pitch) :weight bold))))
+   '(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
+   `(org-level-1               ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
+   `(org-level-2               ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+   `(org-level-3               ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
+   `(org-level-4               ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
+   `(org-level-5               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   `(org-level-6               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   `(org-level-7               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   `(org-level-8               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   `(org-document-title ((t (:inherit variable-pitch :height 2 :weight bold :underline nil)))))
+  ;; (let ((re "\\}\\(+\\|-\\) "))
   ;;   (font-lock-add-keywords
   ;;     'org-mode
-  ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) "\\}\\(+\\|-\\) ")
-  ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◈"))))))
+  ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) re)
+  ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   ;;    (font-lock-add-keywords
   ;;     'org-mode
@@ -211,7 +246,7 @@ Add this function to `org-mode-hook'."
   :custom
   (cfw:org-capture-template
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-     "* %?\nnSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
+     "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
    )
   )
 

@@ -46,7 +46,7 @@
     (setq company-idle-delay nil)
     )
   (defun mdrp/enable-automatic-company (i)
-    (interactive "nIdle-delay:")
+    (interactive "nIdle-delay: ")
     (setq-local company-idle-delay i)
     )
   (defun add-pcomplete-to-capf ()

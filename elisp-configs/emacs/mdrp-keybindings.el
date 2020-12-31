@@ -49,6 +49,7 @@
   "M-h"
   "M-/"
   "M-l"
+  "M-f"
   )
 
 ;;; Remappings
@@ -130,18 +131,18 @@
 
 (general-define-key
  :prefix "M-h"
- "a"                       'hydra-applications/body
  "d"                       'hydra-dates/body
- "e"                       'hydra-eyebrowse/body
- "f"                       'hydra-flycheck/body
- "g"                       'hydra-git/body
- "i"                       'hydra-ivy/body
- "o"                       'me/hydra-super-maybe
- "p"                       'hydra-projectile/body
- "s"                       'hydra-system/body
- "u"                       'hydra-ui/body
- "w"                       'hydra-windows/body
- "x"                       'hydra-x/body
+ ;; "a"                       'hydra-applications/body
+ ;; "e"                       'hydra-eyebrowse/body
+ ;; "f"                       'hydra-flycheck/body
+ ;; "g"                       'hydra-git/body
+ ;; "i"                       'hydra-ivy/body
+ ;; "o"                       'me/hydra-super-maybe
+ ;; "p"                       'hydra-projectile/body
+ ;; "s"                       'hydra-system/body
+ ;; "u"                       'hydra-ui/body
+ ;; "w"                       'hydra-windows/body
+ ;; "x"                       'hydra-x/body
  )
 
 ;;; Local maps

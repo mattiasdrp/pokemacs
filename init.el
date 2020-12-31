@@ -133,7 +133,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-winner)
 
-;; KEYBINGINS
+;; KEYBINDINGS
 
 (require 'mdrp-keybindings)
 
@@ -145,7 +145,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-god-mode)
 
-;;- KEYBINGINS
+;;- KEYBINDINGS
 
 (require 'mdrp-whitespace)
 
@@ -170,8 +170,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-rainbow-mode)
 
 (require 'mdrp-rainbow-delimiters)
-
-(require 'mdrp-ansi-color)
 
 (require 'mdrp-theme)
 
