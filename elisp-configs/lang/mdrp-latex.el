@@ -33,25 +33,27 @@
   :ensure auctex
   :mode ("\\.tex\\'" . latex-mode)
   :config
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
   (setq-default TeX-master nil)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-              ;; (rainbow-delimiters-mode)
-              ;; (pretty-outlines-add-bullets)
-              (company-mode)
-              ;; (smartparens-mode)
-              (turn-on-reftex)
-              (setq reftex-plug-into-AUCTeX t)
-              (reftex-isearch-minor-mode)
-              (setq TeX-PDF-mode t)
-              (setq TeX-source-correlate-method 'synctex)
-              (setq TeX-source-correlate-start-server t)))
+  (turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+  (reftex-isearch-minor-mode)
+  (setq TeX-PDF-mode t)
+  (setq TeX-source-correlate-method 'synctex)
+  (setq TeX-source-correlate-start-server t)
+  )
+
+(use-package auctex-latexmk
+  :after auctex
+  :config
+  (auctex-latexmk-setup)
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
   )
 
 (use-package LaTeX-math-mode
-  :hook tex-site
+  :hook auctex
   )
 
 (provide 'mdrp-latex)

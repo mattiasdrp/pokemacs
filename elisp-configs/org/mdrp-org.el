@@ -195,6 +195,21 @@ Add this function to `org-mode-hook'."
   ;;    )
   )
 
+(use-package ivy-bibtex
+  :defer t)
+
+(use-package org-ref
+  :after org
+  :init
+  (setq
+   org-ref-completion-library 'org-ref-ivy-cite
+   )
+  :custom
+  (org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+  )
+
+
+
 (use-package org-tempo ;; part of org-mode
   :after (org)
   :config
