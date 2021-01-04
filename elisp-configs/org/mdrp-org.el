@@ -265,6 +265,42 @@ Add this function to `org-mode-hook'."
    )
   )
 
+(use-package json
+  :config
+  (defun get-gcal-config-value (key)
+    "Return the value of the json file gcal_secrets for key"
+    (cdr (assoc key (json-read-file "~/.secrets/gcal-secrets.json")))
+    )
+  )
+
+(use-package org-gcal
+  :custom
+  (org-gcal-client-id (get-gcal-config-value 'org-gcal-cliend-id))
+  (org-gcal-client-secret (get-gcal-config-value 'org-gcal-client-secret))
+  (org-gcal-fetch-file-alist
+   `(
+     (,(get-gcal-config-value 'calendar-company) . "~/org/calendar_company.org")
+     (,(get-gcal-config-value 'calendar-user) . "~/org/calendar_user.org")
+     )
+   )
+  )
+
+(use-package org-super-agenda
+  :ensure t
+  :config
+  (setq org-super-agenda-groups
+        '(;; Each group has an implicit Boolean OR operator between its selectors.
+          (:name "ASDSD"  ; Optionally specify section name
+                 :time-grid t  ; Items that appear on the time grid
+                 )
+          ;; After the last group, the agenda will display items that didn't
+          ;; match any of these groups, with the default order position of 99
+          ))
+  (org-super-agenda-mode)
+  (org-agenda nil "a")
+  ;; (setq org-agenda-log-mode 1)
+  )
+
 (use-package visual-fill-column
   :custom
   (visual-fill-column-width 100)

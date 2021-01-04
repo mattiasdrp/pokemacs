@@ -117,7 +117,34 @@
   (setq ivy-switch-buffer-faces-alist nil)
   (ivy-set-display-transformer 'internal-complete-buffer nil)
 
-  (ivy-rich-mode +1))
+  (progn
+    (defvar ek/ivy-rich-cache
+      (make-hash-table :test 'equal))
+
+    (defun ek/ivy-rich-cache-lookup (delegate candidate)
+      (let ((result (gethash candidate ek/ivy-rich-cache)))
+        (unless result
+          (setq result (funcall delegate candidate))
+          (puthash candidate result ek/ivy-rich-cache))
+        result))
+
+    (defun ek/ivy-rich-cache-reset ()
+      (clrhash ek/ivy-rich-cache))
+
+    (defun ek/ivy-rich-cache-rebuild ()
+      (mapc (lambda (buffer)
+              (ivy-rich--ivy-switch-buffer-transformer (buffer-name buffer)))
+            (buffer-list)))
+
+    (defun ek/ivy-rich-cache-rebuild-trigger ()
+      (ek/ivy-rich-cache-reset)
+      (run-with-idle-timer 1 nil 'ek/ivy-rich-cache-rebuild))
+
+    (advice-add 'ivy-rich--ivy-switch-buffer-transformer :around 'ek/ivy-rich-cache-lookup)
+    (advice-add 'ivy-switch-buffer :after 'ek/ivy-rich-cache-rebuild-trigger))
+  (ivy-rich-mode +1)
+  )
+
 
 (use-package all-the-icons-ivy
   :after ivy
