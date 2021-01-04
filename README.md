@@ -8,6 +8,12 @@
 
 `M-x package-install-selected-packages`
 
+If this command fails:
+
+`M-x package-refresh-contents`
+
+And try again the previous command
+
 ### Additionnal packages
 
 `M-x all-the-icons-install-fonts`
