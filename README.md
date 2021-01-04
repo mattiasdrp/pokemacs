@@ -34,4 +34,4 @@ If this command fails:
 
 Restart emacs and everything should work
 
-(thanks to @coquera for forcing me to create a README, this was one big example of procrastination)
+(thanks to [@coquera](https://github.com/coquera) for forcing me to create a README, this was one big example of procrastination)
