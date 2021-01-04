@@ -56,13 +56,13 @@ If this command fails:
 
 Restart emacs and everything should work
 
-### Big Thanks
+## Big Thanks
 
  - [daviwil](https://github.com/daviwil) for his [emacs from scratch](https://github.com/daviwil/emacs-from-scratch) serie
  - [hlissner](https://github.com/hlissner) for [doom-emacs](https://github.com/hlissner/doom-emacs/)
  - Many other that I stupidly didn't store for small config tricks, bug fixes etc that I found on StackOverflow, Reddit, GitHub, personal blogs etc
 
-### TODOS:
+## TODOS:
  - [ ] Rewrite this README in org
  - [ ] Maybe try this "literate" programming thing
  - [ ] I experimented with `emacs-daemon` and `emacsclient` but not enough to make it viable
