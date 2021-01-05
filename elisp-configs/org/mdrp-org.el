@@ -273,9 +273,15 @@ Add this function to `org-mode-hook'."
     )
   )
 
+;; The request can be wrong depending on Google updates, evaluate this:
+;; (concat org-gcal-auth-url
+;;         "?client_id=" (url-hexify-string org-gcal-client-id)
+;;         "&response_type=code"
+;;         "&redirect_uri=" (url-hexify-string "urn:ietf:wg:oauth:2.0:oob")
+;;         "&scope=" (url-hexify-string org-gcal-resource-url))
 (use-package org-gcal
   :custom
-  (org-gcal-client-id (get-gcal-config-value 'org-gcal-cliend-id))
+  (org-gcal-client-id (get-gcal-config-value 'org-gcal-client-id))
   (org-gcal-client-secret (get-gcal-config-value 'org-gcal-client-secret))
   (org-gcal-fetch-file-alist
    `(
@@ -297,7 +303,7 @@ Add this function to `org-mode-hook'."
           ;; match any of these groups, with the default order position of 99
           ))
   (org-super-agenda-mode)
-  (org-agenda nil "a")
+  ;; (org-agenda nil "a")
   ;; (setq org-agenda-log-mode 1)
   )
 

@@ -110,9 +110,8 @@
          (merlin-mode . company-mode))
   :custom
   (merlin-error-after-save nil)
-  (merlin-completion-with-doc nil)
+  (merlin-completion-with-doc t)
   :config
-  (message "merlin")
   (add-to-list 'company-backends 'merlin-company-backend)
 )
 
@@ -125,7 +124,11 @@
     (flycheck-ocaml-setup)))
 
 (use-package merlin-eldoc
-  :hook (merlin-mode . merlin-eldoc-setup))
+  :hook (merlin-mode . merlin-eldoc-setup)
+  :custom
+  (eldoc-echo-area-use-multiline-p t) ; use multiple lines when necessary
+  (merlin-eldoc-max-lines 8)          ; but not more than 8)
+  )
 
 (use-package merlin-imenu
   :hook (merlin-mode . merlin-use-merlin-imenu))
