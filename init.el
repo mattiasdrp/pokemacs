@@ -235,6 +235,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-lsp)
 
+(require 'mdrp-smt)
+
 ;;;; Footer
 
 ;; End:
