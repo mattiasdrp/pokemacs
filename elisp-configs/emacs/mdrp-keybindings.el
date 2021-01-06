@@ -66,6 +66,11 @@
  "C-x C-3"                 'split-window-right
  "C-x C-0"                 'delete-window
 
+ "C-x &"                 'delete-other-windows
+ "C-x é"                 'split-window-below
+ "C-x \""                 'split-window-right
+ "C-x '"                 'delete-window
+
  "C-x C-l"                 'toggle-truncate-lines
  "C-="                     'text-scale-increase
  "C-+"                     'text-scale-increase

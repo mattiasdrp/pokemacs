@@ -41,7 +41,7 @@
   )
 
 (use-package git-commit
-  :hook (git-commit-mode . my-english-dict))
+  :hook (git-commit-mode . mdrp/english-dict))
 
 (use-package git-messenger
   :config
