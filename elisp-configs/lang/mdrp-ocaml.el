@@ -63,7 +63,7 @@
              ;; ("==" . ?≡)
              ;; ("!=" . ?≢)
              ;; ("<=>" . ?⇔)
-             ("infinity" . ?∞)
+             ;; ("infinity" . ?∞)
              ;; Some greek letters for type parameters.
              ("'a" . ?α)
              ("'b" . ?β)

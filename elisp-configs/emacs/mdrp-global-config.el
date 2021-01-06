@@ -160,6 +160,7 @@
 ;;; GLOBAL MODES
 
 (global-prettify-symbols-mode 1)
+(setq prettify-symbols-unprettify-at-point 1)
 ;; When buffer is closed, saves the cursor location
 (save-place-mode 1)
 (show-paren-mode 1)
