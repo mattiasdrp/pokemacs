@@ -49,12 +49,12 @@
      (setq prettify-symbols-alist
            '(
              ("sqrt" . ?√)
-             ("&&" . ?∧)        ; 'LOGICAL AND' (U+2227)
-             ("||" . ?∨)        ; 'LOGICAL OR' (U+2228)
+             ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+             ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
              ;; ("+." . ?∔)        ;DOT PLUS (U+2214)
              ;; ("-." . ?∸)        ;DOT MINUS (U+2238)
              ;; ("*." . ?×)
-             ;; ("*." . ?)   ; BULLET OPERATOR
+             ;; ("*." . ?•)   ; BULLET OPERATOR
              ;; ("/." . ?÷)
              ;; ("<-" . ?←)
              ;; ("<=" . ?≤)

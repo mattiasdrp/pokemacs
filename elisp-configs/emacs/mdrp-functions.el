@@ -68,20 +68,6 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
       (window-resize nil delta width)
     (error "You need more than 1 window to execute this function!")))
 
-(defun mdrp/english-dict ()
-  "Change dictionary to english."
-  (interactive)
-  (setq ispell-local-dictionary "english")
-  (flyspell-mode 1)
-  (flyspell-buffer))
-
-(defun mdrp/french-dict ()
-  "Change dictionary to french."
-  (interactive)
-  (setq ispell-local-dictionary "french")
-  (flyspell-mode 1)
-  (flyspell-buffer))
-
 (defun prev-match () (interactive nil) (next-match -1))
 (defun up-slightly () (interactive) (scroll-up 5))
 (defun down-slightly () (interactive) (scroll-down 5))
