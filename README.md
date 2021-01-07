@@ -14,6 +14,22 @@
 
  - `sudo apt install fonts-firacode fonts-material-design-icons-iconfont`
 
+### Rest
+
+
+ - ripgrep (for rg. Can be installed through cargo or apt)
+ - aspell, aspell-fr, aspell-en
+ 
+#### Rust
+ - RLS:
+   - install [rustup](http://rustup.rs/)
+   - rustup update
+   - rustup component add rls rust-analysis rust-src
+ - Racer:
+   - rustup toolchain add nightly
+   - rustup component add rust-src
+   - cargo +nightly install racer
+
 ### Once emacs is installed:
 
  - `M-x package-install` <kbd>RET</kbd> `no-littering`
