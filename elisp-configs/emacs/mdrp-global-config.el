@@ -133,6 +133,8 @@
  ring-bell-function 'ignore
 ;; Show Keystrokes in Progress Instantly
  echo-keystrokes 0.1
+ split-width-threshold nil
+ split-height-threshold 0
  )
 
 ;; Inspirations possibles : https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/

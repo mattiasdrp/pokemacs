@@ -1,6 +1,7 @@
-;;; mdrp-conf-mode.el --- -*- lexical-binding: t -*-
+;;; mdrp-spotify.el --- -*- lexical-binding: t -*-
 ;;
-;; Description: Initialize Conf-Mode
+;; Filename: init-const.el
+;; Description: Initialize Spotify
 ;; Author: mdrp
 ;; Copyright (C) 2020 mdrp
 ;; Version: 1.0
@@ -10,7 +11,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; This initializes conf-mode
+;; This initializes spotify
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -31,18 +32,13 @@
 ;;
 ;;; Code:
 
-(use-package conf-mode
-  :ensure nil
-  :mode (
-         ("/\\.merlin\\'" . conf-mode)
-         ("_oasis\\'" . conf-mode)
-         ("_tags\\'" . conf-mode)
-         ("^dune$" . conf-mode)
-         ("^dune-project$" . conf-mode)
-         ("_log\\'" . conf-mode)
-         )
+(use-package counsel-spotify
+  :after ivy
+  :custom
+  (counsel-spotify-client-id (get-secrets-config-value 'counsel-spotify-client-id))
+  (counsel-spotify-client-secret (get-secrets-config-value 'counsel-spotify-client-secret))
   )
 
-(provide 'mdrp-conf-mode)
+(provide 'mdrp-spotify)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-conf-mode.el ends here
+;;; mdrp-spotify.el ends here

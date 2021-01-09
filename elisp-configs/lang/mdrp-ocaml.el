@@ -49,7 +49,8 @@
      (setq prettify-symbols-alist
            '(
              ("sqrt" . ?√)
-             ("&&" . ?∧)        ; 'LOGICAL AND' (U+2227)
+             ;; ("&&" . ?∧)        ; 'LOGICAL AND' (U+2227)
+             ("&&" . ?a)        ; 'LOGICAL AND' (U+2227)
              ("||" . ?∨)        ; 'LOGICAL OR' (U+2228)
              ;; ("+." . ?∔)        ;DOT PLUS (U+2214)
              ;; ("-." . ?∸)        ;DOT MINUS (U+2238)
@@ -94,11 +95,11 @@
    )
   )
 
-(use-package opam-user-setup
-  :after tuareg
-  :load-path "custom/"
-  :config (ignore "Loaded 'flycheck-popup")
-  )
+;; (use-package opam-user-setup
+;;   :after tuareg
+;;   :load-path "custom/"
+;;   :config (ignore "Loaded 'flycheck-popup")
+;;   )
 
 ;; (use-package utop
 ;;   :after tuareg
@@ -113,6 +114,7 @@
   (merlin-completion-with-doc t)
   :config
   (add-to-list 'company-backends 'merlin-company-backend)
+  (message "merlin")
 )
 
 (use-package flycheck-ocaml
@@ -144,7 +146,7 @@
       (ocp-setup-indent))))
 
 (use-package dune-mode
-  :mode ("dune" "dune-project")
+  :mode ("^dune$" "^dune-project$")
   )
 
 (provide 'mdrp-ocaml)
