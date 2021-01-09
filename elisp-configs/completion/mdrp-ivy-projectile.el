@@ -190,7 +190,15 @@
          ([remap yank-pop]                 . counsel-yank-pop))
   :config
   ;; (set-popup-rule! "^\\*ivy-occur" :size 0.35 :ttl 0 :quit nil)
+  (defun mdrp/just-use-current-directory ()
+    "Just return the directory of the current file or default-directory."
+    (let ((bf (buffer-file-name (current-buffer))))
+      (if bf
+          (file-name-directory bf)
+        default-directory)))
 
+  (add-to-list 'counsel-compile-root-functions
+               'mdrp/just-use-current-directory t)
   ;; Don't use ^ as initial input. Set this here because `counsel' defines more
   ;; of its own, on top of the defaults.
   (setq ivy-initial-inputs-alist nil)
