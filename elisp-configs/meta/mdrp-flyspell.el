@@ -49,15 +49,40 @@
           flyspell-issue-message-flag nil)
 
     (add-hook 'flyspell-mode-hook
-      (defun +spell-inhibit-duplicate-detection-maybe-h ()
-        "Don't mark duplicates when style/grammar linters are present.
+              (defun +spell-inhibit-duplicate-detection-maybe-h ()
+                "Don't mark duplicates when style/grammar linters are present.
 e.g. proselint and langtool."
-        (and (or (and (bound-and-true-p flycheck-mode)
-                      (executable-find "proselint"))
-                 (featurep 'langtool))
-             (setq-local flyspell-mark-duplications-flag nil))))
+                (and (or (and (bound-and-true-p flycheck-mode)
+                              (executable-find "proselint"))
+                         (featurep 'langtool))
+                     (setq-local flyspell-mark-duplications-flag nil))))
+    (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
+  (let* ((rlt ad-return-value)
+         (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\|example\\|quote\\)")
+         (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\|example\\|quote\\)")
+         (case-fold-search t)
+         b e)
+    (when ad-return-value
+      (save-excursion
+        (setq b (re-search-backward begin-regexp nil t))
+        (if b (setq e (re-search-forward end-regexp nil t))))
+      (if (and b e (< (point) e)) (setq rlt nil)))
+    (setq ad-return-value rlt)))
     )
 
+(defun mdrp/english-dict ()
+  "Change dictionary to english."
+  (interactive)
+  (setq ispell-local-dictionary "english")
+  (flyspell-mode 1)
+  (flyspell-buffer))
+
+(defun mdrp/french-dict ()
+  "Change dictionary to french."
+  (interactive)
+  (setq ispell-local-dictionary "french")
+  (flyspell-mode 1)
+  (flyspell-buffer))
 
 (use-package flyspell-correct
   :commands flyspell-correct-previous
