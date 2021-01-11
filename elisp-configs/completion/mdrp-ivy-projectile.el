@@ -63,7 +63,6 @@
   ;; need to load it as early as possible. Some packages (like `ivy-prescient')
   ;; require this.
   (require 'counsel nil t)
-
   (setq ivy-height 17
         ivy-wrap t
         ivy-fixed-height-minibuffer t
@@ -226,6 +225,14 @@
   (add-hook 'counsel-grep-post-action-hook #'recenter)
 
   ;; Make `counsel-compile' projectile-aware
+  (defun mdrp/just-use-current-directory ()
+    "Just return the directory of the current file or default-directory."
+    (let ((bf (buffer-file-name (current-buffer))))
+      (if bf
+          (file-name-directory bf)
+        default-directory)))
+
+  (add-to-list 'counsel-compile-root-functions #'mdrp/just-use-current-directory)
   (add-to-list 'counsel-compile-root-functions #'projectile-project-root)
   (use-package savehist
     ;; Persist `counsel-compile' history

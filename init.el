@@ -121,6 +121,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; Package Management
 (require 'mdrp-packages)
 
+(require 'mdrp-secrets)
+
 ;; Global Functionalities
 (require 'mdrp-global-config)
 
@@ -180,6 +182,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-highlight)
 
 (require 'mdrp-ace-window)
+
+(require 'mdrp-spotify)
+
+(require 'mdrp-visual-fill)
 
 ;;;; Completion
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))

@@ -49,7 +49,7 @@
     "C-c C-d" "web/dom"
     "C-c C-e" "web/element"
     "C-c C-t" "web/tags")
-  (which-key-setup-side-window-right-bottom)
+  (which-key-setup-side-window-bottom)
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
         which-key-idle-delay 0.5)
