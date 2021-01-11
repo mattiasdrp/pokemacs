@@ -34,9 +34,20 @@
 
 (use-package counsel-spotify
   :after ivy
+  :init
+  (define-prefix-command 'mdrp-spotify-map nil "Spotify-")
   :custom
-  (counsel-spotify-client-id (get-secrets-config-value 'counsel-spotify-client-id))
-  (counsel-spotify-client-secret (get-secrets-config-value 'counsel-spotify-client-secret))
+  (counsel-spotify-client-id (get-secrets-config-value 'spotify-client-id))
+  (counsel-spotify-client-secret (get-secrets-config-value 'spotify-client-secret))
+  :bind-keymap ("s-x" . mdrp-spotify-map)
+  :bind (
+         (:map mdrp-spotify-map
+               ("q" . counsel-spotify-previous)
+               ("s" . counsel-spotify-stop)
+               ("d" . counsel-spotify-next)
+               ("z" . counsel-spotify-play)
+         )
+         )
   )
 
 (provide 'mdrp-spotify)

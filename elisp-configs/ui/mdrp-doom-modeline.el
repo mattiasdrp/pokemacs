@@ -34,12 +34,13 @@
   :custom
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
   (doom-modeline-height 25)
-  (doom-modeline-buffer-file-name 'truncate-all)
+  (doom-modeline-buffer-file-name-style 'truncate-all)
   (doom-modeline-icon t)
   (doom-modeline-minor-modes t)
   (doom-modeline-checker-simple-format nil)
   (doom-modeline-env-version t)
   (doom-modeline-github t)
+  (doom-modeline-env-version t)
   :config
   (set-face-attribute 'mode-line nil :family "Fira Code" :height 140)
   (set-face-attribute 'mode-line-inactive nil :family "Fira Code" :height 140)

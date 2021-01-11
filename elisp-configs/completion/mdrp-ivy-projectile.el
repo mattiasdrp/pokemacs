@@ -63,10 +63,6 @@
   ;; need to load it as early as possible. Some packages (like `ivy-prescient')
   ;; require this.
   (require 'counsel nil t)
-  (defun ivy-update-candidates (cands)
-    (ivy--insert-minibuffer
-     (ivy--format
-      (setq ivy--all-candidates cands))))
   (setq ivy-height 17
         ivy-wrap t
         ivy-fixed-height-minibuffer t
