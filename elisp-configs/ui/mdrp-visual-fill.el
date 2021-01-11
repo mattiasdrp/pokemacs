@@ -1,4 +1,4 @@
-;;; mdrp-doom-modeline.el --- -*- lexical-binding: t -*-
+;;; mdrp-visual-fill.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 mdrp and contributors.
 
@@ -23,29 +23,19 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <http://www.gnu.visual-fill/licenses/>.
 
 ;;; Commentary:
 
 ;;; Code:
 
-(use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
+(use-package visual-fill-column
   :custom
-  (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
-  (doom-modeline-height 25)
-  (doom-modeline-buffer-file-name-style 'truncate-all)
-  (doom-modeline-icon t)
-  (doom-modeline-minor-modes t)
-  (doom-modeline-checker-simple-format nil)
-  (doom-modeline-env-version t)
-  (doom-modeline-github t)
-  (doom-modeline-env-version t)
-  :config
-  (set-face-attribute 'mode-line nil :family "Fira Code" :height 140)
-  (set-face-attribute 'mode-line-inactive nil :family "Fira Code" :height 140)
+  (visual-fill-column-width 100)
+  (visual-fill-column-center-text t)
+  :hook ((org-mode text-mode) . visual-fill-column-mode)
   )
 
-(provide 'mdrp-doom-modeline)
+(provide 'mdrp-visual-fill)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-doom-modeline.el ends here
+;;; mdrp-visual-fill.el ends here

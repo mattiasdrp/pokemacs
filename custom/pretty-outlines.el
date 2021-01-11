@@ -34,7 +34,7 @@ list, just like for org-bullets.")
 (defvar pretty-outlines-ellipsis
   ;; (if pretty-outlines-all-the-icons?
   ;;     ""
-  " ▾"
+  '(" ▾")
 
   "An implementation of `org-ellipsis' for outlines, provide a string.")
 

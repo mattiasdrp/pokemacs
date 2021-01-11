@@ -1,6 +1,7 @@
-;;; mdrp-conf-mode.el --- -*- lexical-binding: t -*-
+;;; mdrp-secrets.el --- -*- lexical-binding: t -*-
 ;;
-;; Description: Initialize Conf-Mode
+;; Filename: init-const.el
+;; Description: Initialize Secrets
 ;; Author: mdrp
 ;; Copyright (C) 2020 mdrp
 ;; Version: 1.0
@@ -10,7 +11,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; This initializes conf-mode
+;; This initializes secrets
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -31,18 +32,14 @@
 ;;
 ;;; Code:
 
-(use-package conf-mode
-  :ensure nil
-  :mode (
-         ("/\\.merlin\\'" . conf-mode)
-         ("_oasis\\'" . conf-mode)
-         ("_tags\\'" . conf-mode)
-         ("^dune$" . conf-mode)
-         ("^dune-project$" . conf-mode)
-         ("_log\\'" . conf-mode)
-         )
+(use-package json
+  :config
+  (defun get-secrets-config-value (key)
+    "Return the value of the json file secrets for key"
+    (cdr (assoc key (json-read-file "~/.secrets/secrets.json")))
+    )
   )
 
-(provide 'mdrp-conf-mode)
+(provide 'mdrp-secrets)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-conf-mode.el ends here
+;;; mdrp-secrets.el ends here

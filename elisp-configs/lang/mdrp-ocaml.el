@@ -36,6 +36,22 @@
   ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
   ;; harmless if `prettify-symbols-mode' isn't active
   ;; (setq tuareg-prettify-symbols-full t)
+  (defun opam-shell-command-to-string (command)
+    "Similar to shell-command-to-string, but returns nil unless the process
+  returned 0, and ignores stderr (shell-command-to-string ignores return value)"
+    (let* ((return-value 0)
+           (return-string
+            (with-output-to-string
+              (setq return-value
+                    (with-current-buffer standard-output
+                      (process-file shell-file-name nil '(t nil) nil
+                                    shell-command-switch command))))))
+      (if (= return-value 0) return-string nil)))
+  (defvar opam-share
+    (let ((reply (opam-shell-command-to-string "opam config var share --safe")))
+      (when reply (substring reply 0 -1))))
+
+  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
 
   ;; Use opam to set environment
   (setq tuareg-opam-insinuate t)
@@ -94,16 +110,13 @@
    )
   )
 
-(use-package opam-user-setup
-  :after tuareg
+(use-package dune-minor
   :load-path "custom/"
-  :config (ignore "Loaded 'flycheck-popup")
-  )
+  :hook (tuareg-mode . dune-minor-mode))
 
-;; (use-package utop
-;;   :after tuareg
-;;   :config
-;;   (utop-minor-mode 1))
+;; (use-package ocamlformat
+;;   :hook (before-save . ocamlformat-before-save)
+;;   )
 
 (use-package merlin
   :hook ((tuareg-mode . merlin-mode)
@@ -113,6 +126,7 @@
   (merlin-completion-with-doc t)
   :config
   (add-to-list 'company-backends 'merlin-company-backend)
+  (message "merlin")
 )
 
 (use-package flycheck-ocaml
@@ -144,7 +158,7 @@
       (ocp-setup-indent))))
 
 (use-package dune-mode
-  :mode ("dune" "dune-project")
+  :mode ("^dune$" "^dune-project$")
   )
 
 (provide 'mdrp-ocaml)

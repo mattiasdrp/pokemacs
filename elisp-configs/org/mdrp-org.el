@@ -265,14 +265,6 @@ Add this function to `org-mode-hook'."
    )
   )
 
-(use-package json
-  :config
-  (defun get-gcal-config-value (key)
-    "Return the value of the json file gcal_secrets for key"
-    (cdr (assoc key (json-read-file "~/.secrets/gcal-secrets.json")))
-    )
-  )
-
 ;; The request can be wrong depending on Google updates, evaluate this:
 ;; (concat org-gcal-auth-url
 ;;         "?client_id=" (url-hexify-string org-gcal-client-id)
@@ -281,12 +273,12 @@ Add this function to `org-mode-hook'."
 ;;         "&scope=" (url-hexify-string org-gcal-resource-url))
 (use-package org-gcal
   :custom
-  (org-gcal-client-id (get-gcal-config-value 'org-gcal-client-id))
-  (org-gcal-client-secret (get-gcal-config-value 'org-gcal-client-secret))
+  (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
+  (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
   (org-gcal-fetch-file-alist
    `(
-     (,(get-gcal-config-value 'calendar-company) . "~/org/calendar_company.org")
-     (,(get-gcal-config-value 'calendar-user) . "~/org/calendar_user.org")
+     (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
+     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")
      )
    )
   )
@@ -306,12 +298,6 @@ Add this function to `org-mode-hook'."
   ;; (org-agenda nil "a")
   ;; (setq org-agenda-log-mode 1)
   )
-
-(use-package visual-fill-column
-  :custom
-  (visual-fill-column-width 100)
-  (visual-fill-column-center-text t)
-  :hook (org-mode . visual-fill-column-mode))
 
 (provide 'mdrp-org)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
