@@ -299,12 +299,6 @@ Add this function to `org-mode-hook'."
   ;; (setq org-agenda-log-mode 1)
   )
 
-(use-package visual-fill-column
-  :custom
-  (visual-fill-column-width 100)
-  (visual-fill-column-center-text t)
-  :hook (org-mode . visual-fill-column-mode))
-
 (provide 'mdrp-org)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-org.el ends here

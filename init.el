@@ -185,6 +185,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-spotify)
 
+(require 'mdrp-visual-fill)
+
 ;;;; Completion
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
 
