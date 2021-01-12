@@ -150,10 +150,17 @@
 (use-package ocp-indent
   ;; must be careful to always defer this, it has autoloads that adds hooks
   ;; which we do not want if the executable can't be found
+  :init
+  (defcustom ocp-indent-before-save nil
+    "*Non nil means execute ocp-indent when saving a buffer."
+    :group 'ocp-indent
+    :type '(bool))
+  ;; :custom
+  ;; (ocp-indent-before-save t)
   :hook
   (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
   (tuareg-mode .
-               (lambda () (add-hook 'before-save-hook 'ocp-indent-buffer (merlin-mode) 'local)))
+               (lambda () (add-hook 'before-save-hook (if ocp-indent-before-save 'ocp-indent-buffer (merlin-mode) 'local))))
   :config
   (defun mdrp/ocaml-init-ocp-indent-h ()
     "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
@@ -165,6 +172,6 @@
   :mode ("^dune$" "^dune-project$")
   )
 
-  (provide 'mdrp-ocaml)
+(provide 'mdrp-ocaml)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-ocaml.el ends here
