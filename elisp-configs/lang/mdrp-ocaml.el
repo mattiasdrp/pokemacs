@@ -110,9 +110,9 @@
    )
   )
 
-(use-package dune-minor
-  :load-path "custom/"
-  :hook (tuareg-mode . dune-minor-mode))
+;; (use-package dune-minor
+;;   :load-path "custom/"
+;;   :hook (tuareg-mode . dune-minor-mode))
 
 ;; (use-package ocamlformat
 ;;   :hook (before-save . ocamlformat-before-save)
@@ -127,7 +127,7 @@
   :config
   (add-to-list 'company-backends 'merlin-company-backend)
   (message "merlin")
-)
+  )
 
 (use-package flycheck-ocaml
   :hook (merlin-mode . +ocaml-init-flycheck-h)
@@ -150,17 +150,21 @@
 (use-package ocp-indent
   ;; must be careful to always defer this, it has autoloads that adds hooks
   ;; which we do not want if the executable can't be found
-  :hook (tuareg-mode-local-vars . +ocaml-init-ocp-indent-h)
+  :hook
+  (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
+  (tuareg-mode .
+               (lambda () (add-hook 'before-save-hook 'ocp-indent-buffer (merlin-mode) 'local)))
   :config
-  (defun +ocaml-init-ocp-indent-h ()
+  (defun mdrp/ocaml-init-ocp-indent-h ()
     "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
     (when (executable-find "ocp-indent")
+      (message "ocp-indent")
       (ocp-setup-indent))))
 
 (use-package dune-mode
   :mode ("^dune$" "^dune-project$")
   )
 
-(provide 'mdrp-ocaml)
+  (provide 'mdrp-ocaml)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-ocaml.el ends here
