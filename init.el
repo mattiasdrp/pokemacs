@@ -169,6 +169,9 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;;;;; Themes, colors and other small things
 
+
+(require 'mdrp-ansi-color)
+
 (require 'mdrp-rainbow-mode)
 
 (require 'mdrp-rainbow-delimiters)

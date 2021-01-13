@@ -30,23 +30,12 @@
 ;;; Code:
 
 (use-package ansi-color
-  :ensure t
   :config
-  (progn 
-    (defun mdrp/ansi-colorize-buffer ()
-      (let ((buffer-read-only nil))
-        (ansi-color-apply-on-region (point-min) (point-max))))
-    (add-hook 'compilation-filter-hook 'mdrp/ansi-colorize-buffer)))
-
-
-
-
-;; rainbow mode:
-;;
-;; Display colors with a background corresponding to the color
-(use-package rainbow-mode
-  :init (rainbow-mode 1) ; globally at startup
-  :delight)
+  (defun mdrp/colorize-compilation-buffer ()
+    (let ((inhibit-read-only t))
+      (ansi-color-apply-on-region (point-min) (point-max))))
+  :hook (compilation-filter . mdrp/colorize-compilation-buffer)
+  )
 
 (provide 'mdrp-ansi-color)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
