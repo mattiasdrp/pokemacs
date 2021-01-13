@@ -110,9 +110,9 @@
    )
   )
 
-;; (use-package dune-minor
-;;   :load-path "custom/"
-;;   :hook (tuareg-mode . dune-minor-mode))
+(use-package dune-minor
+  :load-path "custom/"
+  :hook (tuareg-mode . dune-minor-mode))
 
 ;; (use-package ocamlformat
 ;;   :hook (before-save . ocamlformat-before-save)

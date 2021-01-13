@@ -29,6 +29,18 @@
 
 ;;; Code:
 
+(use-package ansi-color
+  :ensure t
+  :config
+  (progn 
+    (defun mdrp/ansi-colorize-buffer ()
+      (let ((buffer-read-only nil))
+        (ansi-color-apply-on-region (point-min) (point-max))))
+    (add-hook 'compilation-filter-hook 'mdrp/ansi-colorize-buffer)))
+
+
+
+
 ;; rainbow mode:
 ;;
 ;; Display colors with a background corresponding to the color
