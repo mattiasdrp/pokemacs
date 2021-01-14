@@ -165,7 +165,8 @@
 (save-place-mode 1)
 (show-paren-mode 1)
 ;; Replace selection on insert
-(delete-selection-mode 1)
+(delete-selection-mode t)
+(savehist-mode t)
 
 ;; So Long mitigates slowness due to extremely long lines.
 ;; Currently available in Emacs master branch *only*!

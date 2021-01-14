@@ -30,9 +30,8 @@
 ;;; Code:
 
 (use-package ws-butler
-  :config
-  (ws-butler-global-mode)
-)
+  :hook ((text-mode . ws-butler-mode)
+         (prog-mode . ws-butler-mode)))
 
 (provide 'mdrp-ws-butler)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
