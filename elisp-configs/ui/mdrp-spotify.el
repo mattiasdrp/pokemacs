@@ -43,7 +43,7 @@
   :bind (
          (:map mdrp-spotify-map
                ("q" . counsel-spotify-previous)
-               ("s" . counsel-spotify-stop)
+               ("s" . counsel-spotify-toggle-play-pause)
                ("d" . counsel-spotify-next)
                ("z" . counsel-spotify-play)
          )
