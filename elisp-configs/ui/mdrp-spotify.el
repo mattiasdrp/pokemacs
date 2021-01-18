@@ -42,10 +42,14 @@
   :bind-keymap ("s-x" . mdrp-spotify-map)
   :bind (
          (:map mdrp-spotify-map
-               ("q" . counsel-spotify-previous)
-               ("s" . counsel-spotify-toggle-play-pause)
-               ("d" . counsel-spotify-next)
-               ("z" . counsel-spotify-play)
+               ("q"       . counsel-spotify-previous)
+               ("<left>"  . counsel-spotify-previous)
+               ("s"       . counsel-spotify-toggle-play-pause)
+               ("<down>"  . counsel-spotify-toggle-play-pause)
+               ("d"       . counsel-spotify-next)
+               ("<right>" . counsel-spotify-next)
+               ("z"       . counsel-spotify-play)
+               ("<up>"    . counsel-spotify-play)
          )
          )
   )

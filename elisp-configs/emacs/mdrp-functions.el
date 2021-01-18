@@ -29,6 +29,16 @@
 
 ;;; Code:
 
+(defun mdrp/visual-fill-one-window ()
+  (global-visual-fill-column-mode -1)
+  (if (one-window-p)
+      (global-visual-fill-column-mode 1)
+    (global-visual-fill-column-mode -1)
+    )
+  )
+
+(add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
+
 ;; Custom comment function a bit more clever
 ;; https://www.emacswiki.org/emacs/CommentingCode
 (defun mdrp/comment-eclipse (&optional arg)

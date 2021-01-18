@@ -30,6 +30,7 @@
 ;;; Code:
 
 (use-package crux
+  :ensure t
   :init
   (define-prefix-command 'mdrp-crux-map nil "Crux-")
   :bind-keymap ("M-m" . mdrp-crux-map)
