@@ -31,7 +31,7 @@
 
 (defun mdrp/visual-fill-one-window ()
   (global-visual-fill-column-mode -1)
-  (if (one-window-p)
+  (if (window-full-width-p)
       (global-visual-fill-column-mode 1)
     (global-visual-fill-column-mode -1)
     )

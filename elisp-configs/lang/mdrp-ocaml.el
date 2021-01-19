@@ -114,9 +114,29 @@
   :load-path "custom/"
   :hook (tuareg-mode . dune-minor-mode))
 
-;; (use-package ocamlformat
-;;   :hook (before-save . ocamlformat-before-save)
-;;   )
+(use-package ocamlformat
+  :load-path
+  (lambda ()
+    (concat
+     ;; Never use "/" or "\" since this is not portable (opam-user-setup does this though)
+     ;; Always use file-name-as-directory since this will append the correct separator if needed
+     ;; (or use a package that does it well like https://github.com/rejeep/f.el
+     ;; This is the verbose and not package depending version:
+     (file-name-as-directory
+      ;; Couldn't find an option to remove the newline so a substring is needed
+      (substring (shell-command-to-string "opam config var share --switch=ocamlformat --safe") 0 -1))
+     (file-name-as-directory "emacs")
+     (file-name-as-directory "site-lisp")))
+  :custom
+  (ocamlformat-enable 'enable-outside-detected-project)
+  (ocamlformat-command
+   (concat
+    (file-name-as-directory
+     (substring (shell-command-to-string "opam config var bin --switch=ocamlformat --safe") 0 -1))
+    "ocamlformat"))
+  :hook
+  (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
+  )
 
 (use-package merlin
   :hook ((tuareg-mode . merlin-mode)
@@ -159,14 +179,17 @@
   ;; (ocp-indent-before-save t)
   :hook
   (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
-  (tuareg-mode .
-               (lambda () (add-hook 'before-save-hook (if ocp-indent-before-save 'ocp-indent-buffer (merlin-mode) 'local))))
   :config
   (defun mdrp/ocaml-init-ocp-indent-h ()
     "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
     (when (executable-find "ocp-indent")
-      (message "ocp-indent")
-      (ocp-setup-indent))))
+      (ocp-setup-indent)))
+  (if ocp-indent-before-save
+      (lambda () (add-hook 'tuareg-mode-hook
+                      (lambda ()
+                        (add-hook 'before-save-hook 'ocp-indent-buffer nil 'local))))
+    )
+  )
 
 (use-package dune-mode
   :mode ("^dune$" "^dune-project$")

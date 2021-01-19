@@ -66,8 +66,9 @@
   (org-src-tab-acts-natively t)
   (org-tag-persistent-alist
    '((:startgroup . nil)
-     ("Maison" . ?m)
+     ("Maison" . ?h)
      ("Boulot" . ?b)
+     ("Plaisir" . ?p)
      (:endgroup . nil)
      (:startgroup . nil)
      ("Irmin" . ?i)
