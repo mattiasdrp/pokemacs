@@ -246,6 +246,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-smt)
 
+(require 'mdrp-yaml)
+
 ;;;; Footer
 
 ;; End:
