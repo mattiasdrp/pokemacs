@@ -68,8 +68,16 @@
   (setq tuareg-electric-indent t)
 
   (tuareg-opam-update-env (tuareg-opam-current-compiler))
+  (defun update-opam-env (&rest _)
+    (when (derived-mode-p 'tuareg-mode)
+      (message "update")
+      (tuareg-opam-update-env nil)
+      )
+    )
+  (if (boundp 'window-buffer-change-functions)
+      (add-hook 'window-buffer-change-functions 'update-opam-env)
+    (add-hook 'post-command-hook 'update-opam-env))
   :hook
-  (tuareg-mode . (lambda () (tuareg-opam-update-env ())))
   (tuareg-mode .
                (lambda ()
                  ;; Commented symbols are actually prettier with ligatures or just ugly
