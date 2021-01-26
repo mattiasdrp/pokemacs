@@ -30,6 +30,16 @@
 ;;; Code:
 
 (use-package tuareg
+  :custom
+  (tuareg-other-file-alist
+   (quote
+    (("\\.mli\\'" (".ml" ".mll" ".mly"))
+     ("_intf.ml\\'" (".ml"))
+     ("\\.ml\\'" ("_intf.ml" ".mli"))
+     ("\\.mll\\'" (".mli"))
+     ("\\.mly\\'" (".mli"))
+     ("\\.eliomi\\'" (".eliom"))
+     ("\\.eliom\\'" (".eliomi")))))
   :config
   ;; tuareg-mode has the prettify symbols itself
   ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))
@@ -58,56 +68,57 @@
   (setq tuareg-electric-indent t)
 
   (tuareg-opam-update-env (tuareg-opam-current-compiler))
-  (add-hook
-   'tuareg-mode-hook
-   (lambda ()
-     ;; Commented symbols are actually prettier with ligatures or just ugly
-     (setq prettify-symbols-alist
-           '(
-             ("sqrt" . ?√)
-             ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
-             ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-             ;; ("+." . ?∔)        ;DOT PLUS (U+2214)
-             ;; ("-." . ?∸)        ;DOT MINUS (U+2238)
-             ;; ("*." . ?×)
-             ;; ("*." . ?•)   ; BULLET OPERATOR
-             ;; ("/." . ?÷)
-             ;; ("<-" . ?←)
-             ;; ("<=" . ?≤)
-             ;; (">=" . ?≥)
-             ("<>" . ?≠)
-             ;; ("==" . ?≡)
-             ;; ("!=" . ?≢)
-             ;; ("<=>" . ?⇔)
-             ;; ("infinity" . ?∞)
-             ;; Some greek letters for type parameters.
-             ("'a" . ?α)
-             ("'b" . ?β)
-             ("'c" . ?γ)
-             ("'d" . ?δ)
-             ("'e" . ?ε)
-             ("'f" . ?φ)
-             ("'i" . ?ι)
-             ("'k" . ?κ)
-             ("'m" . ?μ)
-             ("'n" . ?ν)
-             ("'o" . ?ω)
-             ("'p" . ?π)
-             ("'r" . ?ρ)
-             ("'s" . ?σ)
-             ("'t" . ?τ)
-             ("'x" . ?ξ)
-             ("fun" . ?λ)
-             ("not" . ?¬)
-             ;; ("[|" . ?〚)        ;; 〚
-             ;;  ("|]" . ?⟭)        ;; 〛
-             ;; ("->" . ?→)
-             (":=" . ?⇐)
-             ;; ("::" . ?∷))
-             )
-           )
-     )
-   )
+  :hook
+  (tuareg-mode . (lambda () (tuareg-opam-update-env ())))
+  (tuareg-mode .
+               (lambda ()
+                 ;; Commented symbols are actually prettier with ligatures or just ugly
+                 (setq prettify-symbols-alist
+                       '(
+                         ("sqrt" . ?√)
+                         ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+                         ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
+                         ;; ("+." . ?∔)        ;DOT PLUS (U+2214)
+                         ;; ("-." . ?∸)        ;DOT MINUS (U+2238)
+                         ;; ("*." . ?×)
+                         ;; ("*." . ?•)   ; BULLET OPERATOR
+                         ;; ("/." . ?÷)
+                         ;; ("<-" . ?←)
+                         ;; ("<=" . ?≤)
+                         ;; (">=" . ?≥)
+                         ("<>" . ?≠)
+                         ;; ("==" . ?≡)
+                         ;; ("!=" . ?≢)
+                         ;; ("<=>" . ?⇔)
+                         ;; ("infinity" . ?∞)
+                         ;; Some greek letters for type parameters.
+                         ("'a" . ?α)
+                         ("'b" . ?β)
+                         ("'c" . ?γ)
+                         ("'d" . ?δ)
+                         ("'e" . ?ε)
+                         ("'f" . ?φ)
+                         ("'i" . ?ι)
+                         ("'k" . ?κ)
+                         ("'m" . ?μ)
+                         ("'n" . ?ν)
+                         ("'o" . ?ω)
+                         ("'p" . ?π)
+                         ("'r" . ?ρ)
+                         ("'s" . ?σ)
+                         ("'t" . ?τ)
+                         ("'x" . ?ξ)
+                         ("fun" . ?λ)
+                         ("not" . ?¬)
+                         ;; ("[|" . ?〚)        ;; 〚
+                         ;;  ("|]" . ?⟭)        ;; 〛
+                         ;; ("->" . ?→)
+                         (":=" . ?⇐)
+                         ;; ("::" . ?∷))
+                         )
+                       )
+                 )
+               )
   )
 
 (use-package dune-minor
