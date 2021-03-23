@@ -46,7 +46,7 @@
   )
 
 (use-package auctex-latexmk
-  :after auctex
+  :after tex-site
   :config
   (auctex-latexmk-setup)
   (setq auctex-latexmk-inherit-TeX-PDF-mode t)
