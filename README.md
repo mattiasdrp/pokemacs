@@ -63,6 +63,7 @@
 ### Install all the packages
 
  - `M-x package-install-selected-packages`
+ - Grab some coffee
 
 If this command fails:
 
