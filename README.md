@@ -58,6 +58,7 @@
 ### Once emacs is installed:
 
  - `M-x package-install` <kbd>RET</kbd> `no-littering`
+ - Restart emacs
 
 ### Install all the packages
 
