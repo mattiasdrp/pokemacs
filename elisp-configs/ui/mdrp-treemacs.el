@@ -82,7 +82,6 @@
        (treemacs-git-mode 'deferred))
       (`(t . _)
        (treemacs-git-mode 'simple)))
-    (message "treemacs")
     )
   :hook (after-startup . treemacs)
   :bind
