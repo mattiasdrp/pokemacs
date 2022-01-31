@@ -70,7 +70,6 @@
   (tuareg-opam-update-env (tuareg-opam-current-compiler))
   (defun update-opam-env (&rest _)
     (when (derived-mode-p 'tuareg-mode)
-      (message "update")
       (tuareg-opam-update-env nil)
       )
     )
@@ -166,7 +165,6 @@
   (merlin-completion-with-doc t)
   :config
   (add-to-list 'company-backends 'merlin-company-backend)
-  (message "merlin")
   )
 
 (use-package flycheck-ocaml
