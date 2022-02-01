@@ -238,6 +238,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-ocaml)
 
+(require 'mdrp-fsharp)
+
 (require 'mdrp-md-pandoc)
 
 (require 'mdrp-web-modes)
@@ -245,6 +247,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-lsp)
 
 (require 'mdrp-smt)
+
+(require 'mdrp-usuba)
 
 ;;;; Footer
 

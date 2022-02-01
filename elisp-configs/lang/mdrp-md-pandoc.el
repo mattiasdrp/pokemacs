@@ -32,7 +32,12 @@
 (use-package markdown-mode
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'"       . markdown-mode)
-         ("\\.markdown\\'" . gfm-mode)))
+         ("\\.markdown\\'" . gfm-mode))
+  :init
+  (setq markdown-command "markdown")
+  (setq markdown-open-command "retext")
+  :hook ((gfm-mode . (lambda ()
+                       (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))))
 
 (use-package pandoc-mode
   :hook ((markdown-mode . pandoc-mode)
