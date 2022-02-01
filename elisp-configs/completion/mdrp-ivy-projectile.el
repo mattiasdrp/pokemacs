@@ -237,7 +237,6 @@
   (use-package savehist
     ;; Persist `counsel-compile' history
     :config
-    (message "savehist")
     (add-to-list 'savehist-additional-variables 'counsel-compile-history)
     (add-to-list 'savehist-additional-variables 'compile-history))
 

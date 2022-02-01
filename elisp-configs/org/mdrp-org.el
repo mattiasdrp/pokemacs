@@ -157,21 +157,21 @@ Add this function to `org-mode-hook'."
               ))
   (custom-theme-set-faces
    'user
-   '(org-block                 ((t (:inherit fixed-pitch))))
+   '(org-block ((t (:inherit fixed-pitch))))
    '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-property-value        ((t (:inherit fixed-pitch))) t)
-   '(org-special-keyword       ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-tag                   ((t (:inherit (shadow fixed-pitch) :weight bold))))
-   '(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
-   `(org-level-1               ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
-   `(org-level-2               ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
-   `(org-level-3               ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
-   `(org-level-4               ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
-   `(org-level-5               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   `(org-level-6               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   `(org-level-7               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   `(org-level-8               ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   `(org-document-title ((t (:inherit variable-pitch :height 2 :weight bold :underline nil)))))
+   '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+   '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
+   '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+   '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
+   '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
+   '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
   ;; (let ((re "\\}\\(+\\|-\\) "))
   ;;   (font-lock-add-keywords
   ;;     'org-mode
@@ -194,6 +194,7 @@ Add this function to `org-mode-hook'."
   ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
   ;;    )
+  )
   )
 
 (use-package ivy-bibtex

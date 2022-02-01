@@ -33,9 +33,11 @@
   :hook (
          (elm-mode . lsp-deferred)
          (rust-mode . lsp-deferred)
+         (fsharp-mode . lsp-deferred)
          (lsp-mode . lsp-enable-which-key-integration)
          )
   :custom
+  (lsp-log-io t)
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)

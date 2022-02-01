@@ -30,7 +30,6 @@
 ;;; Code:
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-(message "delete trailing whitespace")
 ;; On hold since I can't make it work for empty lines created by myself
 ;; (use-package ws-butler
 ;;   :hook ((text-mode . ws-butler-mode)
