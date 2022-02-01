@@ -250,6 +250,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-yaml)
 
+(if (file-exists-p "custom/usuba-mode.el")
+  (require 'mdrp-usuba)
+  )
+
 ;;;; Footer
 
 ;; End:

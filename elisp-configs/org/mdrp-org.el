@@ -273,17 +273,17 @@ Add this function to `org-mode-hook'."
 ;;         "&response_type=code"
 ;;         "&redirect_uri=" (url-hexify-string "urn:ietf:wg:oauth:2.0:oob")
 ;;         "&scope=" (url-hexify-string org-gcal-resource-url))
-(use-package org-gcal
-  :custom
-  (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
-  (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
-  (org-gcal-fetch-file-alist
-   `(
-     (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
-     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")
-     )
-   )
-  )
+;; (use-package org-gcal
+;;   :custom
+;;   (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
+;;   (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
+;;   (org-gcal-fetch-file-alist
+;;    `(
+;;      (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
+;;      (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")
+;;      )
+;;    )
+;;   )
 
 (use-package org-super-agenda
   :ensure t

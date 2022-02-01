@@ -11,7 +11,7 @@
 
 (require 'cl)
 (require 'dash)
-(require 'dash-functional)
+(require 'dash)
 (require 'outshine)
 (require 's)
 
@@ -97,7 +97,7 @@ These properties are applied to only the *bullet* part of the outline.")
 (defun pretty-outlines--build-rgx-composition-face-alist (codepoints)
   "Given CODEPOINTS construct keyword alist."
   (-map-indexed (-lambda (level bullet)
-                  (incf level)  ; Outlines enumerated 1..n
+                  (cl-incf level)  ; Outlines enumerated 1..n
                   (list (pretty-outlines--bullets-rgx-at-level level)
                         (pretty-outlines--glue-bullet          level bullet)
                         (pretty-outlines--level->face-props    level)))

@@ -3,7 +3,7 @@
 (require 'ivy)
 (require 'outshine)
 (require 'dash)
-(require 'dash-functional)
+(require 'dash)
 (require 's)
 
 ;; FIXME an outline not at the BOL is not an outline, but it breaks oi-jump
