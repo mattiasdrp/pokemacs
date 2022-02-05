@@ -123,35 +123,10 @@
 
 (use-package ocamlformat
   :hook
-  ;; (tuareg-mode . ocamlformat)
   (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
   :custom
   (ocamlformat-enable 'enable-outside-detected-project)
   (ocamlformat-show-errors 'none)
-  )
-
-(use-package ocp-indent
-  ;; must be careful to always defer this, it has autoloads that adds hooks
-  ;; which we do not want if the executable can't be found
-  :init
-  (defcustom ocp-indent-before-save nil
-    "*Non nil means execute ocp-indent when saving a buffer."
-    :group 'ocp-indent
-    :type '(bool))
-  ;; :custom
-  ;; (ocp-indent-before-save t)
-  :hook
-  (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
-  :config
-  (defun mdrp/ocaml-init-ocp-indent-h ()
-    "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
-    (when (executable-find "ocp-indent")
-      (ocp-setup-indent)))
-  (if ocp-indent-before-save
-      (lambda () (add-hook 'tuareg-mode-hook
-                      (lambda ()
-                        (add-hook 'before-save-hook 'ocp-indent-buffer nil 'local))))
-    )
   )
 
 (use-package merlin
