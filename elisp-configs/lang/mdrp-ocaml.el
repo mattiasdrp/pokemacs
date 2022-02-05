@@ -30,17 +30,17 @@
 ;;; Code:
 
 (use-package tuareg
-  :mode "\\.ml[ilp]?"
-  ;; :custom
-  ;; (tuareg-other-file-alist
-  ;;  (quote
-  ;;   (("\\.mli\\'" (".ml" ".mll" ".mly"))
-  ;;    ;; ("_intf.ml\\'" (".ml"))
-  ;;    ;; ("\\.ml\\'" ("_intf.ml" ".mli"))
-  ;;    ("\\.mll\\'" (".mli"))
-  ;;    ("\\.mly\\'" (".mli"))
-  ;;    ("\\.eliomi\\'" (".eliom"))
-  ;;    ("\\.eliom\\'" (".eliomi")))))
+  :mode ("\\.ml\\'" . tuareg-mode)
+  :custom
+  (tuareg-other-file-alist
+   (quote
+    (("\\.mli\\'" (".ml" ".mll" ".mly"))
+     ;; ("_intf.ml\\'" (".ml"))
+     ;; ("\\.ml\\'" ("_intf.ml" ".mli"))
+     ("\\.mll\\'" (".mli"))
+     ("\\.mly\\'" (".mli"))
+     ("\\.eliomi\\'" (".eliom"))
+     ("\\.eliom\\'" (".eliomi")))))
   :config
   ;; tuareg-mode has the prettify symbols itself
   ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))
@@ -86,19 +86,7 @@
                          ("sqrt" . ?√)
                          ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
                          ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-                         ;; ("+." . ?∔)        ;DOT PLUS (U+2214)
-                         ;; ("-." . ?∸)        ;DOT MINUS (U+2238)
-                         ;; ("*." . ?×)
-                         ;; ("*." . ?•)   ; BULLET OPERATOR
-                         ;; ("/." . ?÷)
-                         ;; ("<-" . ?←)
-                         ;; ("<=" . ?≤)
-                         ;; (">=" . ?≥)
                          ("<>" . ?≠)
-                         ;; ("==" . ?≡)
-                         ;; ("!=" . ?≢)
-                         ;; ("<=>" . ?⇔)
-                         ;; ("infinity" . ?∞)
                          ;; Some greek letters for type parameters.
                          ("'a" . ?α)
                          ("'b" . ?β)
@@ -118,11 +106,7 @@
                          ("'x" . ?ξ)
                          ("fun" . ?λ)
                          ("not" . ?¬)
-                         ;; ("[|" . ?〚)        ;; 〚
-                         ;;  ("|]" . ?⟭)        ;; 〛
-                         ;; ("->" . ?→)
                          (":=" . ?⇐)
-                         ;; ("::" . ?∷))
                          )
                        )
                  )
@@ -130,7 +114,7 @@
   )
 
 (use-package tuareg-menhir
-  :mode ("\\.mly" . tuareg-menhir-mode)
+  :mode ("\\.mly'" . tuareg-menhir-mode)
   )
 
 (use-package dune-minor
@@ -138,12 +122,36 @@
   :hook (tuareg-mode . dune-minor-mode))
 
 (use-package ocamlformat
-  :hook (tuareg-mode . ocamlformat-mode)
+  :hook
+  ;; (tuareg-mode . ocamlformat)
+  (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
   :custom
   (ocamlformat-enable 'enable-outside-detected-project)
   (ocamlformat-show-errors 'none)
+  )
+
+(use-package ocp-indent
+  ;; must be careful to always defer this, it has autoloads that adds hooks
+  ;; which we do not want if the executable can't be found
+  :init
+  (defcustom ocp-indent-before-save nil
+    "*Non nil means execute ocp-indent when saving a buffer."
+    :group 'ocp-indent
+    :type '(bool))
+  ;; :custom
+  ;; (ocp-indent-before-save t)
   :hook
-  (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
+  (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
+  :config
+  (defun mdrp/ocaml-init-ocp-indent-h ()
+    "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
+    (when (executable-find "ocp-indent")
+      (ocp-setup-indent)))
+  (if ocp-indent-before-save
+      (lambda () (add-hook 'tuareg-mode-hook
+                      (lambda ()
+                        (add-hook 'before-save-hook 'ocp-indent-buffer nil 'local))))
+    )
   )
 
 (use-package merlin
