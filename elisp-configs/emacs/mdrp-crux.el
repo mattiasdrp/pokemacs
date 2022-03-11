@@ -3,7 +3,7 @@
 ;; Copyright (c) 2020-2020 mdrp and contributors.
 
 ;; Author: mdrp
-;; Maintainer: mdrp <https://github.com/MonsieurPi>
+;; Maintainer: mdrp <https://github.com/mattiasdrp>
 ;; Version: 1.0
 ;; Licence: GPL2+
 ;; Keywords: convenience, configuration

@@ -34,7 +34,7 @@
 
 ;; UserInfo
 (setq user-full-name "mdrp")
-(setq user-mail-address "https://github.com/MonsieurPi")
+(setq user-mail-address "https://github.com/mattiasdrp")
 ;; -UserInfo
 
 ;; Consts
