@@ -30,6 +30,16 @@
 ;;; Code:
 
 (use-package fsharp-mode
+  :init
+  (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet"))
+  (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet/tools"))
+  (setenv "PATH"
+          (concat
+           (concat (getenv "HOME") "/.dotnet")
+           ":"
+           (concat (getenv "HOME") "/.dotnet/tools")
+           ":"
+           (getenv "PATH")))
   :defer t
   :ensure t)
 

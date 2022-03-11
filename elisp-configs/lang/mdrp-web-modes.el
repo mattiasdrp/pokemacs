@@ -45,7 +45,11 @@
          ("\\.json\\'" . json-mode))
   :bind (
          (:map json-mode-map
-               ("C-c <tab>"               . json-mode-beautify)
+               ("C-c <tab>"  . json-mode-beautify)
+               ("<tab>"      . hs-toggle-hiding)
+               ("C-c C-a"    . hs-show-all)
+               ("C-c C-t"    . hs-hide-all)
+               ("C-c C-l"    . hs-hide-level)
                )
          )
   :config

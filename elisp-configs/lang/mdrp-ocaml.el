@@ -35,8 +35,8 @@
   (tuareg-other-file-alist
    (quote
     (("\\.mli\\'" (".ml" ".mll" ".mly"))
-     ;; ("_intf.ml\\'" (".ml"))
-     ;; ("\\.ml\\'" ("_intf.ml" ".mli"))
+     ("_intf.ml\\'" (".ml"))
+     ("\\.ml\\'" (".mli" "_intf.ml"))
      ("\\.mll\\'" (".mli"))
      ("\\.mly\\'" (".mli"))
      ("\\.eliomi\\'" (".eliom"))

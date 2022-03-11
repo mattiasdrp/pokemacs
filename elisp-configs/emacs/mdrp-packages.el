@@ -31,7 +31,6 @@
 
 (require 'package)
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
                          ("elpa" . "http://elpa.gnu.org/packages/")))
 (package-initialize)
 

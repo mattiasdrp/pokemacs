@@ -105,7 +105,9 @@
                ("M-j"                     . org-goto)
                )
          )
+
   :config
+  (setq org-image-actual-width nil)
   (define-prefix-command 'mdrp-org-map nil "Org-")
   (defun org-mode-<>-syntax-fix (start end)
     "Change syntax of characters ?< and ?> to symbol within source code blocks."
@@ -226,6 +228,10 @@ Add this function to `org-mode-hook'."
   ;; :custom
   ;; (org-bullets-bullet-list '("" "" "" "" "" "" ""))
 )
+
+(use-package org-inline-pdf
+  :hook (org-mode . org-inline-pdf-mode)
+  )
 
 (use-package calfw
   :config
