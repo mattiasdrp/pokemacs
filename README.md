@@ -5,10 +5,10 @@
  - Your version of emacs should be at least 27.1
  - For this you need to clone [the emacs repository](https://github.com/emacs-mirror/emacs) and either checkout the `emacs.27.1` (or higher) branch or compile from the `main` branch.
  - I tend to forget what dependencies are needed by emacs so here is the command I usually invoke before configuring and compiling emacs:
-   - `sudo apt install autoconf make gcc libgtk-3-dev libxpm-dev libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev pkg-config texinfo`
+   - `sudo apt install autoconf make gcc libgtk-3-dev libxpm-dev libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev pkg-config texinfo libgccjit-11-dev`
    - (`pkg-config` may not be needed but I got strange behaviours when not installing it)
  - If you feel confident and better than me at installing emacs from scratch, don't hesitate to tell me where I'm wrong, I always love to learn (and I'm pretty bad at understanding Unix systems, dependencies and things like this)
- - Once `./autogen.sh` and `./configure` tell you you can make, `make -j 4` then `sudo make install`
+ - Once `./autogen.sh` and `./configure --with-native-compilation --with-x-toolkit=no --with-xpm=ifavailable --with-jpeg=ifavailable --with-png=ifavailable --with-gif=ifavailable --with-tiff=ifavailable` tell you you can make, `make -j $(nproc)` then `sudo make install`
 
 ### For ligatures, all-the-icons and pretty things:
 
@@ -20,7 +20,7 @@
 ### Rest
 
 
- - ripgrep (for rg. Can be installed through cargo or apt)
+ - ripgrep (for rg. Can be installed through cargo or `sudo apt install ripgrep`)
  - Install aspell
  ```zsh
  sudo apt install aspell aspell-fr aspell-en
@@ -52,7 +52,7 @@
         ```
    - 
        ```zsh
-       cargo +nightly install racer
+       rustup component add rustc-dev --toolchain=nightly
        ```
    
 ### Once emacs is installed:
