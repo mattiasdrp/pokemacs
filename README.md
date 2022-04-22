@@ -52,7 +52,7 @@
         ```
    - 
        ```zsh
-       cargo +nightly install racer
+       rustup component add rustc-dev --toolchain=nightly
        ```
    
 ### Once emacs is installed:
