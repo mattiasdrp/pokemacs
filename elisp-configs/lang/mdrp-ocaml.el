@@ -122,6 +122,7 @@
   :hook (tuareg-mode . dune-minor-mode))
 
 (use-package ocamlformat
+  :defer t
   :hook
   (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
   :custom
