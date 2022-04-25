@@ -29,8 +29,37 @@
 
 ;;; Code:
 
+;; tuareg-mode has the prettify symbols itself
+;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))
+;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
+;; harmless if `prettify-symbols-mode' isn't active
+;; (setq tuareg-prettify-symbols-full t)
+(defun opam-shell-command-to-string (command)
+  "Similar to shell-command-to-string, but returns nil unless the process
+  returned 0, and ignores stderr (shell-command-to-string ignores return value)"
+  (let* ((return-value 0)
+         (return-string
+          (with-output-to-string
+            (setq return-value
+                  (with-current-buffer standard-output
+                    (process-file shell-file-name nil '(t nil) nil
+                                  shell-command-switch command))))))
+    (if (= return-value 0) return-string nil)))
+
+(defun load-path-opam (&rest _)
+  (let ((opam-share
+         (let ((reply (opam-shell-command-to-string "opam var share --safe")))
+           (when reply (substring reply 0 -1)))))
+    (message opam-share)
+    (let ((path (concat opam-share "/emacs/site-lisp")))
+      (message "Path is %s" path)
+      path
+    )
+  ))
+
 (use-package tuareg
   :mode ("\\.ml\\'" . tuareg-mode)
+  :load-path (lambda () (load-path-opam))
   :custom
   (tuareg-other-file-alist
    (quote
@@ -42,28 +71,6 @@
      ("\\.eliomi\\'" (".eliom"))
      ("\\.eliom\\'" (".eliomi")))))
   :config
-  ;; tuareg-mode has the prettify symbols itself
-  ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))
-  ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
-  ;; harmless if `prettify-symbols-mode' isn't active
-  ;; (setq tuareg-prettify-symbols-full t)
-  (defun opam-shell-command-to-string (command)
-    "Similar to shell-command-to-string, but returns nil unless the process
-  returned 0, and ignores stderr (shell-command-to-string ignores return value)"
-    (let* ((return-value 0)
-           (return-string
-            (with-output-to-string
-              (setq return-value
-                    (with-current-buffer standard-output
-                      (process-file shell-file-name nil '(t nil) nil
-                                    shell-command-switch command))))))
-      (if (= return-value 0) return-string nil)))
-  (defvar opam-share
-    (let ((reply (opam-shell-command-to-string "opam config var share --safe")))
-      (when reply (substring reply 0 -1))))
-
-  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
-
   ;; Use opam to set environment
   (setq tuareg-opam-insinuate t)
   (setq tuareg-electric-indent t)
@@ -74,9 +81,33 @@
       (tuareg-opam-update-env nil)
       )
     )
+
+  (defun update-load-path-opam (&rest _)
+    (when (derived-mode-p 'tuareg-mode)
+      (let ((opam-share
+             (let ((reply (opam-shell-command-to-string "opam var share --safe")))
+               (when reply (substring reply 0 -1)))))
+        (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+      )
+      )
+    )
+
   (if (boundp 'window-buffer-change-functions)
-      (add-hook 'window-buffer-change-functions 'update-opam-env)
-    (add-hook 'post-command-hook 'update-opam-env))
+      (progn
+        (add-hook 'window-buffer-change-functions 'update-opam-env)
+        (add-hook 'window-buffer-change-functions 'update-load-path-opam)
+        )
+    (progn
+      (add-hook 'post-command-hook 'update-opam-env)
+      (add-hook 'post-command-hook 'update-load-path-opam)
+      ))
+  (progn
+    (dolist (local-path load-path)
+      (message local-path)
+      )
+    (message "-----------")
+    )
+
   :hook
   (tuareg-mode .
                (lambda ()
@@ -113,6 +144,15 @@
                )
   )
 
+(use-package ocamlformat
+  :after tuareg
+  :hook
+  (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
+  :custom
+  (ocamlformat-enable 'enable-outside-detected-project)
+  (ocamlformat-show-errors 'none)
+  )
+
 (use-package tuareg-menhir
   :mode ("\\.mly'" . tuareg-menhir-mode)
   )
@@ -120,15 +160,6 @@
 (use-package dune-minor
   :load-path "custom/"
   :hook (tuareg-mode . dune-minor-mode))
-
-(use-package ocamlformat
-  :defer t
-  :hook
-  (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
-  :custom
-  (ocamlformat-enable 'enable-outside-detected-project)
-  (ocamlformat-show-errors 'none)
-  )
 
 (use-package merlin
   :hook ((tuareg-mode . merlin-mode)
