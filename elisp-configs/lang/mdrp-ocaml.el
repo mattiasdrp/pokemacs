@@ -62,14 +62,13 @@
   :load-path (lambda () (load-path-opam))
   :custom
   (tuareg-other-file-alist
-   (quote
-    (("\\.mli\\'" (".ml" ".mll" ".mly"))
-     ("_intf.ml\\'" (".ml"))
-     ("\\.ml\\'" (".mli" "_intf.ml"))
-     ("\\.mll\\'" (".mli"))
-     ("\\.mly\\'" (".mli"))
-     ("\\.eliomi\\'" (".eliom"))
-     ("\\.eliom\\'" (".eliomi")))))
+  '(("\\.\\(?:pp\\.\\)?mli\\'" (".ml" ".mll" ".mly" ".pp.ml"))
+    ("_intf\\.ml\\'" (".ml"))
+    ("\\.\\(?:pp\\.\\)?ml\\'" (".mli" "_intf.ml"))
+    ("\\.mll\\'" (".mli"))
+    ("\\.mly\\'" (".mli"))
+    ("\\.eliomi\\'" (".eliom"))
+    ("\\.eliom\\'" (".eliomi"))))
   :config
   ;; Use opam to set environment
   (setq tuareg-opam-insinuate t)
@@ -101,12 +100,6 @@
       (add-hook 'post-command-hook 'update-opam-env)
       (add-hook 'post-command-hook 'update-load-path-opam)
       ))
-  (progn
-    (dolist (local-path load-path)
-      (message local-path)
-      )
-    (message "-----------")
-    )
 
   :hook
   (tuareg-mode .
@@ -168,8 +161,7 @@
   (merlin-error-after-save nil)
   (merlin-completion-with-doc t)
   :config
-  (add-to-list 'company-backends 'merlin-company-backend)
-  )
+  (add-to-list 'company-backends 'merlin-company-backend))
 
 (use-package flycheck-ocaml
   :hook (merlin-mode . +ocaml-init-flycheck-h)

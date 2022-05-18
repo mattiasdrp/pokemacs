@@ -46,6 +46,11 @@
                                    "Juin" "Juillet" "Août" "Septembre"
                                    "Octobre" "Novembre" "Décembre"])
   :custom
+  ;; Babel
+  (org-confirm-babel-evaluate nil)
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
+  ;; Rest
   (org-agenda-files `(,org-directory))
   (org-ellipsis " ▾")
   (org-footnote-auto-adjust t)
@@ -143,6 +148,7 @@ Add this function to `org-mode-hook'."
    '((rust . t)
      (ocaml . t)
      (latex . t)
+     (shell . t)
      ))
   (add-hook 'org-mode-hook
             (lambda ()

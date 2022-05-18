@@ -54,9 +54,9 @@
 
 (require 'dune-process)
 
-(defgroup dune nil
+(defgroup dune-cc nil
   "Dune group."
-  :prefix "dune-"
+  :prefix "dune-cc-"
   :group 'tools)
 
 (defvar dune-minor-mode-command-map
@@ -69,22 +69,22 @@
   "Keymap for Dune mode commands after prefix.")
 (fset 'dune-minor-mode-command-map dune-minor-mode-command-map)
 
-(defvar dune-mode-map
+(defvar dune-minor-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-c") 'dune-minor-mode-command-map)
     map)
   "Keymap for Dune mode.")
 
-(defvar dune-minor-mode nil)
+;; (defvar dune-minor-mode nil)
 
 ;;;###autoload
 (define-minor-mode dune-minor-mode
   "Dune minor mode. Used to hold keybindings for dune-mode.
 
 \\{dune-minor-mode-command-map}"
-  nil
-  " dune"
-  dune-mode-map)
+  :init-value nil
+  :lighter " dune-cc"
+  :keymap dune-minor-mode-map)
 
 (provide 'dune-minor)
 ;;; dune-minor.el ends here

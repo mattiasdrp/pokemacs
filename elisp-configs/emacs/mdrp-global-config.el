@@ -97,7 +97,7 @@
  initial-scratch-message ""
  select-enable-clipboard t
  font-lock-global-modes t
- auto-revert-mode t
+ global-auto-revert-mode t
  indent-tabs-mode nil
  inhibit-startup-screen t
  initial-major-mode 'text-mode
