@@ -34,6 +34,8 @@
 
 ;; Get rid of the cl is deprecated warning
 (setq byte-compile-warnings '(cl-functions))
+(setq user-init-file (or load-file-name (buffer-file-name)))
+(setq user-emacs-directory (file-name-directory user-init-file))
 
 (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))

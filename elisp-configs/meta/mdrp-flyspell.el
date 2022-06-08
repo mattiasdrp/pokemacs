@@ -32,6 +32,7 @@
 (use-package flyspell
     :ensure t
     :hook (
+           (
            (org-mode-hook
             markdown-mode-hook
             TeX-mode-hook
@@ -39,6 +40,7 @@
             mu4e-compose-mode-hook
             message-mode-hook
             git-commit-mode-hook) . flyspell-mode)
+           (prog-mode . flyspell-prog-mode))
 
     :config
     (provide 'ispell) ; forcibly load ispell configs
