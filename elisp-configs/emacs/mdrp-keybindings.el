@@ -42,6 +42,7 @@
 
 (general-unbind
   "C-o"
+  "C-f"
   "C-z"
   "C-x C-z"
   "M-z"

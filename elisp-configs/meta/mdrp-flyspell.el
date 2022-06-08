@@ -30,68 +30,106 @@
 ;;; Code:
 
 (use-package flyspell
-    :ensure t
-    :hook (
-           (
-           (org-mode-hook
-            markdown-mode-hook
-            TeX-mode-hook
-            rst-mode-hook
-            mu4e-compose-mode-hook
-            message-mode-hook
-            git-commit-mode-hook) . flyspell-mode)
-           (prog-mode . flyspell-prog-mode))
+  :init
 
-    :config
-    (provide 'ispell) ; forcibly load ispell configs
+  (defun mdrp/english-dict ()
+    "Change dictionary to english."
+    (interactive)
+    (setq ispell-local-dictionary "english")
+    (flyspell-mode 1)
+    (flyspell-buffer))
 
-    (setq flyspell-issue-welcome-flag nil
-          ;; Significantly speeds up flyspell, which would otherwise print
-          ;; messages for every word when checking the entire buffer
-          flyspell-issue-message-flag nil)
+  (defun mdrp/french-dict ()
+    "Change dictionary to french."
+    (interactive)
+    (setq ispell-local-dictionary "french")
+    (flyspell-mode 1)
+    (flyspell-buffer))
 
-    (add-hook 'flyspell-mode-hook
-              (defun +spell-inhibit-duplicate-detection-maybe-h ()
-                "Don't mark duplicates when style/grammar linters are present.
+  (defun mdrp/flyspell-on-for-buffer-type ()
+    "Enable Flyspell appropriately for the major mode of the current buffer.
+Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
+and comments get checked.  All other buffers get `flyspell-mode' to check
+all text.  If flyspell is already enabled, does nothing."
+    (interactive)
+    (if (not (symbol-value flyspell-mode)) ; if not already on
+	(progn
+	  (if (derived-mode-p 'prog-mode)
+	      (progn
+	        (message "Flyspell on (code)")
+	        (flyspell-prog-mode))
+	    ;; else
+	    (progn
+	      (message "Flyspell on (text)")
+	      (flyspell-mode 1)))
+	  )
+      (flyspell-buffer)))
+
+  (defun mdrp/flyspell-toggle ()
+    "Turn Flyspell on if it is off, or off if it is on.  When turning on,
+it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
+    (interactive)
+    (if (symbol-value flyspell-mode)
+	(progn ; flyspell is on, turn it off
+	  (message "Flyspell off")
+	  (flyspell-mode -1))
+                                        ; else - flyspell is off, turn it on
+      (mdrp/flyspell-on-for-buffer-type)))
+
+  :ensure t
+  :hook (find-file . mdrp/flyspell-on-for-buffer-type)
+  :bind-keymap ("M-f" . mdrp-flyspell-map)
+  ("C-f" . mdrp-flyspell-map)
+  :bind (
+         (:map mdrp-flyspell-map
+               ("t" . mdrp/flyspell-toggle)
+               ("f" . mdrp/french-dict)
+               ("e" . mdrp/english-dict)
+               )
+         )
+  :config
+  (provide 'ispell) ; forcibly load ispell configs
+  (define-prefix-command 'mdrp-flyspell-map nil "Flyspell-")
+
+  (setq flyspell-issue-welcome-flag nil
+        ;; Significantly speeds up flyspell, which would otherwise print
+        ;; messages for every word when checking the entire buffer
+        flyspell-issue-message-flag nil)
+
+  (add-hook 'flyspell-mode-hook
+            (defun +spell-inhibit-duplicate-detection-maybe-h ()
+              "Don't mark duplicates when style/grammar linters are present.
 e.g. proselint and langtool."
-                (and (or (and (bound-and-true-p flycheck-mode)
-                              (executable-find "proselint"))
-                         (featurep 'langtool))
-                     (setq-local flyspell-mark-duplications-flag nil))))
-    (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
-  (let* ((rlt ad-return-value)
-         (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\|example\\|quote\\)")
-         (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\|example\\|quote\\)")
-         (case-fold-search t)
-         b e)
-    (when ad-return-value
-      (save-excursion
-        (setq b (re-search-backward begin-regexp nil t))
-        (if b (setq e (re-search-forward end-regexp nil t))))
-      (if (and b e (< (point) e)) (setq rlt nil)))
-    (setq ad-return-value rlt)))
-    )
-
-(defun mdrp/english-dict ()
-  "Change dictionary to english."
-  (interactive)
-  (setq ispell-local-dictionary "english")
-  (flyspell-mode 1)
-  (flyspell-buffer))
-
-(defun mdrp/french-dict ()
-  "Change dictionary to french."
-  (interactive)
-  (setq ispell-local-dictionary "french")
-  (flyspell-mode 1)
-  (flyspell-buffer))
+              (and (or (and (bound-and-true-p flycheck-mode)
+                            (executable-find "proselint"))
+                       (featurep 'langtool))
+                   (setq-local flyspell-mark-duplications-flag nil))))
+  (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
+    (let* ((rlt ad-return-value)
+           (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\|example\\|quote\\)")
+           (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\|example\\|quote\\)")
+           (case-fold-search t)
+           b e)
+      (when ad-return-value
+        (save-excursion
+          (setq b (re-search-backward begin-regexp nil t))
+          (if b (setq e (re-search-forward end-regexp nil t))))
+        (if (and b e (< (point) e)) (setq rlt nil)))
+      (setq ad-return-value rlt)))
+  )
 
 (use-package flyspell-correct
+  :after flyspell
   :commands flyspell-correct-previous
+  :bind (
+         (:map mdrp-flyspell-map
+               ("C-f" . flyspell-correct-wrapper)
+               ))
   :config
+  (message "correct")
   (require 'flyspell-correct-ivy)
   (require 'flyspell-correct-popup)
-  (setq flyspell-popup-correct-delay 0.8)
+  (setq flyspell-popup-correct-delay 0.1)
   (define-key popup-menu-keymap [escape] #'keyboard-quit))
 
 
