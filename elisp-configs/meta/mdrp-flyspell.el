@@ -120,18 +120,25 @@ e.g. proselint and langtool."
 
 (use-package flyspell-correct
   :after flyspell
-  :commands flyspell-correct-previous
+  :general
+  (popup-menu-keymap
+   "<return>" 'popup-select)
   :bind (
          (:map mdrp-flyspell-map
                ("C-f" . flyspell-correct-wrapper)
                ))
-  :config
-  (message "correct")
-  (require 'flyspell-correct-ivy)
-  (require 'flyspell-correct-popup)
-  (setq flyspell-popup-correct-delay 0.1)
-  (define-key popup-menu-keymap [escape] #'keyboard-quit))
+  )
 
+(use-package flyspell-correct-ivy
+  :after (flyspell-correct)
+  :init
+  (setq flyspell-correct-interface #'flyspell-correct-ivy))
+
+(use-package flyspell-correct-popup
+  :after (flyspell-correct-ivy)
+  :config
+  (define-key popup-menu-keymap [escape] #'keyboard-quit)
+  )
 
 (provide 'mdrp-flyspell)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
