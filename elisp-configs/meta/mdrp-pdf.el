@@ -40,11 +40,19 @@
   (setq pdf-view-use-scaling t
         pdf-view-use-imagemagick nil)
 
-  (add-hook 'pdf-view-mode-hook (lambda () (nlinum-mode 0)))
+  :hook
+  (pdf-view-mode . (lambda () (nlinum-mode 0)))
 )
 
 (use-package saveplace-pdf-view
   :after pdf-view)
+
+;; (use-package image-roll
+;;   :load-path "custom/image-roll/"
+;;   :after pdf-tools
+;;   :hook
+;;   (pdf-view-mode . (lambda () (progn (message "image roll") (pdf-view-roll-minor-mode))))
+;;   )
 
 (provide 'mdrp-pdf)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

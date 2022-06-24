@@ -45,6 +45,15 @@
         calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
                                    "Juin" "Juillet" "Août" "Septembre"
                                    "Octobre" "Novembre" "Décembre"])
+
+  (defun mdrp/org-compile-latex-and-update-other-buffer ()
+    "Has as a premise that it's run from an org-mode buffer and the
+   other buffer already has the PDF open"
+    (interactive)
+    (org-latex-export-to-pdf)
+    (mdrp/update-other-buffer)
+    )
+
   :custom
   ;; Babel
   (org-confirm-babel-evaluate nil)
@@ -101,6 +110,7 @@
    )
   :bind-keymap ("M-o" . mdrp-org-map)
   :bind (
+         ("C-x C-p" . mdrp/org-compile-latex-and-update-other-buffer)
          (:map mdrp-org-map
                ("l"                       . org-store-link)
                ("a"                       . org-agenda)
@@ -112,6 +122,8 @@
          )
 
   :config
+  (customize-set-value 'org-latex-with-hyperref nil)
+  (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
   (setq org-image-actual-width nil)
   (define-prefix-command 'mdrp-org-map nil "Org-")
   (defun org-mode-<>-syntax-fix (start end)
@@ -311,6 +323,12 @@ Add this function to `org-mode-hook'."
   (org-super-agenda-mode)
   ;; (org-agenda nil "a")
   ;; (setq org-agenda-log-mode 1)
+  )
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autolinks t)
   )
 
 (provide 'mdrp-org)

@@ -29,23 +29,11 @@
 
 ;;; Code:
 
+
+
 (use-package flyspell
+  :load-path "custom/"
   :init
-
-  (defun mdrp/english-dict ()
-    "Change dictionary to english."
-    (interactive)
-    (setq ispell-local-dictionary "english")
-    (flyspell-mode 1)
-    (flyspell-buffer))
-
-  (defun mdrp/french-dict ()
-    "Change dictionary to french."
-    (interactive)
-    (setq ispell-local-dictionary "french")
-    (flyspell-mode 1)
-    (flyspell-buffer))
-
   (defun mdrp/flyspell-on-for-buffer-type ()
     "Enable Flyspell appropriately for the major mode of the current buffer.
 Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
@@ -53,17 +41,39 @@ and comments get checked.  All other buffers get `flyspell-mode' to check
 all text.  If flyspell is already enabled, does nothing."
     (interactive)
     (if (not (symbol-value flyspell-mode)) ; if not already on
-	(progn
-	  (if (derived-mode-p 'prog-mode)
-	      (progn
-	        (message "Flyspell on (code)")
-	        (flyspell-prog-mode))
-	    ;; else
+          (if (derived-mode-p 'pdf-view-mode)
+	      (message "Flyspell off (pdf-view)")
 	    (progn
-	      (message "Flyspell on (text)")
-	      (flyspell-mode 1)))
-	  )
-      (flyspell-buffer)))
+              (if (derived-mode-p 'prog-mode)
+	          (progn
+	            (message "Flyspell on (code)")
+	            (flyspell-prog-mode))
+	        ;; else
+	        (progn
+	          (message "Flyspell on (text)")
+	          (flyspell-mode 1)
+                  )
+                )
+              (flyspell-buffer)
+              )
+	    )
+      )
+    )
+
+  (defun mdrp/english-dict ()
+    "Change dictionary to english."
+    (interactive)
+    (setq ispell-local-dictionary "english")
+    (mdrp/flyspell-on-for-buffer-type)
+    (flyspell-buffer))
+
+  (defun mdrp/french-dict ()
+    "Change dictionary to french."
+    (interactive)
+    (setq ispell-local-dictionary "french")
+    (mdrp/flyspell-on-for-buffer-type)
+    (flyspell-mode 1)
+    (flyspell-buffer))
 
   (defun mdrp/flyspell-toggle ()
     "Turn Flyspell on if it is off, or off if it is on.  When turning on,
@@ -73,11 +83,12 @@ it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
 	(progn ; flyspell is on, turn it off
 	  (message "Flyspell off")
 	  (flyspell-mode -1))
-                                        ; else - flyspell is off, turn it on
+      ;; else - flyspell is off, turn it on
       (mdrp/flyspell-on-for-buffer-type)))
 
   :ensure t
   :hook (find-file . mdrp/flyspell-on-for-buffer-type)
+
   :bind-keymap ("M-f" . mdrp-flyspell-map)
   ("C-f" . mdrp-flyspell-map)
   :bind (
