@@ -25,7 +25,14 @@
  ```zsh
  sudo apt install aspell aspell-fr aspell-en
  ```
- 
+
+#### OCaml
+
+- You need to have ocamlformat and ocaml-lsp-server installed in your switch
+    ```zsh
+    opam install ocamlformat ocaml-lsp-server -y
+    ```
+
 #### Rust
  - RLS:
    - install [rustup](http://rustup.rs/)
@@ -41,20 +48,20 @@
    rustup component add rls rust-analysis rust-src
    ```
  - Racer:
- 
+
    -
        ```zsh
        rustup toolchain add nightly
        ```
-   - 
+   -
         ```zsh
         rustup component add rust-src
         ```
-   - 
+   -
        ```zsh
        rustup component add rustc-dev --toolchain=nightly
        ```
-   
+
 ### Once emacs is installed:
 
  - `M-x package-install` <kbd>RET</kbd> `no-littering`
@@ -78,7 +85,7 @@ If this command fails:
 ### External files
 
  - I have a directory **`~/org`** that contains 4 files:
- 
+
         org
         ├── agenda.org
         ├── calendar_company.org
@@ -94,7 +101,7 @@ If this command fails:
             "calendar-company": "my_company_calendar_id",
             "calendar-user": "my_user_calendar_id"
         }
-        
+
     - Thanks to [-jz-](https://www.reddit.com/user/-jz-/) for [this thread](https://www.reddit.com/r/emacs/comments/d1ehpy/security_tip_if_you_push_initel_to_a_public_repo/)
 
 Restart emacs and everything should work
