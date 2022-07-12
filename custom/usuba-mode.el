@@ -42,6 +42,7 @@
   (set (make-local-variable 'font-lock-defaults) '(usuba-font-lock-keywords))
   (setq major-mode 'usuba-mode)
   (setq mode-name "usuba")
+  (set (make-local-variable 'comment-start) "#")
   (usuba-prettify-symbols)
   (run-hooks 'usuba-mode-hook))
 

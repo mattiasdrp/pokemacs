@@ -252,8 +252,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-yaml)
 
-(if (file-exists-p "custom/usuba-mode.el")
-  (require 'mdrp-usuba)
+(if (file-exists-p (concat user-emacs-directory "/custom/usuba-mode.el"))
+    (require 'mdrp-usuba)
   )
 
 ;;;; Footer
