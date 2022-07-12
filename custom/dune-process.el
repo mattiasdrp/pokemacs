@@ -231,12 +231,22 @@ if the CMD is expected to open and external application."
     cmd))
 
 ;;;###autoload
-(defun dune-process-build ()
+(defun dune-process-build (name)
   "Run the Dune build command.
 With the prefix argument, modify the command's invocation.
 Dune: Compile the current project."
-  (interactive)
-  (dune-process--start "Build" dune-process--command-build))
+  (interactive "sBuild name: ")
+  (dune-process--start (concat "Build " name)
+                        (concat dune-process--command-build " " name)))
+
+;;;###autoload
+(defun dune-process-exec-name (name)
+  "Run the dune run <name> command.
+With the prefix argument, modify the command's invocation.
+Dune: Build and execute a specific binary"
+  (interactive "sBinary name: ")
+  (dune-process--start (concat "Run " name)
+                        (concat dune-process--command-exec " " name)))
 
 ;;;###autoload
 (defun dune-process-clean ()
@@ -287,15 +297,6 @@ Dune: Create a new dune project."
                 (string= "test" kind))
            (find-file (format "%s/test/dune" name)))
           ))))))
-
-;;;###autoload
-(defun dune-process-exec-name (name)
-  "Run the dune run <name> command.
-With the prefix argument, modify the command's invocation.
-Dune: Build and execute a specific binary"
-  (interactive "sBinary name: ")
-  (dune-process--start (concat "Run " name)
-                        (concat dune-process--command-exec " " name)))
 
 (define-key dune-process-mode-map (kbd "n") 'forward-button)
 (define-key dune-process-mode-map (kbd "p") 'backward-button)

@@ -31,10 +31,11 @@
 
 (use-package lsp-mode
   :hook (
+         (tuareg-mode . lsp-deferred)
+         (caml-mode . lsp-deferred)
          (elm-mode . lsp-deferred)
          (rust-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
-         (lsp-mode . lsp-enable-which-key-integration)
          )
   :custom
   (lsp-log-io t)
@@ -47,8 +48,21 @@
   :commands lsp
   :config
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
-
+  (lsp-enable-which-key-integration t)
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     '("opam" "exec" "--" "ocamllsp"))
+    :major-modes '(caml-mode tuareg-mode)
+    :server-id 'ocamllsp))
   :bind
+  (("C-c l n" . flycheck-next-error)
+   ("C-c l d" . lsp-find-definition)
+   ("C-c l r" . lsp-find-references)
+   ("C-c l h" . lsp-describe-thing-at-point)
+   ("C-c l i" . lsp-find-implementation)
+   ("C-c l R" . lsp-rename)
+   ("C-c l o" . my-lsp-fix-buffer))
   )
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
@@ -56,12 +70,18 @@
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-position 'at-point)
-  (lsp-ui-doc-header t)                           ;; Whether or not to enable the header which displays the symbol string.
-  (lsp-ui-doc-include-signature t)                ;; Whether or not to include the object signature/type in the frame.
-  (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
-  (lsp-ui-sideline-enable nil)                    ;; Whether or not to enable lsp-ui-sideline
-  ;; (lsp-ui-sideline-ignore-duplicate t)            ;; Ignore duplicates when there is a same symbol with same contents
-  ;; (lsp-ui-sideline-show-code-actions nil)         ;; Whether to show code actions in sideline.
+  ;; Whether or not to enable the header which displays the symbol string.
+  (lsp-ui-doc-header t)
+  ;; Whether or not to include the object signature/type in the frame.
+  (lsp-ui-doc-include-signature t)
+  ;; Border color of the frame
+  (lsp-ui-doc-border (face-foreground 'default))
+  ;; Whether or not to enable lsp-ui-sideline
+  (lsp-ui-sideline-enable nil)
+  ;; Ignore duplicates when there is a same symbol with same contents
+  ;; (lsp-ui-sideline-ignore-duplicate t)
+  ;; Whether to show code actions in sideline.
+  ;; (lsp-ui-sideline-show-code-actions nil)
   :bind
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
