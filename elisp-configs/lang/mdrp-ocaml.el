@@ -139,8 +139,6 @@
 
 (use-package ocamlformat
   :after tuareg
-  :hook
-  (tuareg-mode . (lambda () (add-hook 'before-save-hook 'ocamlformat-before-save nil 'local)))
   :custom
   (ocamlformat-enable 'enable-outside-detected-project)
   (ocamlformat-show-errors 'none)
@@ -153,33 +151,6 @@
 (use-package dune-minor
   :load-path "custom/"
   :hook (tuareg-mode . dune-minor-mode))
-
-(use-package merlin
-  :hook ((tuareg-mode . merlin-mode)
-         (merlin-mode . company-mode))
-  :custom
-  (merlin-error-after-save nil)
-  (merlin-completion-with-doc t)
-  :config
-  (add-to-list 'company-backends 'merlin-company-backend))
-
-(use-package flycheck-ocaml
-  :hook (merlin-mode . +ocaml-init-flycheck-h)
-  :config
-  (defun +ocaml-init-flycheck-h ()
-    "Activate `flycheck-ocaml`"
-    ;; Enable Flycheck checker
-    (flycheck-ocaml-setup)))
-
-(use-package merlin-eldoc
-  :hook (merlin-mode . merlin-eldoc-setup)
-  :custom
-  (eldoc-echo-area-use-multiline-p t) ; use multiple lines when necessary
-  (merlin-eldoc-max-lines 8)          ; but not more than 8)
-  )
-
-(use-package merlin-imenu
-  :hook (merlin-mode . merlin-use-merlin-imenu))
 
 (use-package dune-mode
   :mode ("^dune$" "^dune-project$")
