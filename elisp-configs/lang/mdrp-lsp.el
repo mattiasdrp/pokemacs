@@ -60,7 +60,8 @@
    ("C-c l d" . lsp-find-definition)
    ("C-c l r" . lsp-find-references)
    ("C-c C-t" . lsp-describe-thing-at-point)
-   ("C-c C-l" . lsp-find-implementation)
+   ("C-c C-l" . lsp-find-definition)
+   ("C-c &"   . pop-global-mark)
    ("C-c l R" . lsp-rename)
    ("C-c l o" . my-lsp-fix-buffer))
   )
@@ -104,7 +105,7 @@
 (use-package lsp-rust
   :custom
   (lsp-rust-server 'rust-analyzer)
-)
+  )
 
 (provide 'mdrp-lsp)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
