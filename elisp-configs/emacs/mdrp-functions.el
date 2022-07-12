@@ -147,6 +147,12 @@ See `sort-regexp-fields'."
   (interactive)
   (insert (format-time-string "%Y.%m.%d %H:%M")))
 
+(defun mdrp/update-other-buffer ()
+  (interactive)
+  (other-window 1)
+  (revert-buffer nil t)
+  (other-window -1))
+
 ;;; FROM DOOM EMACS
 
 (defun mdrp/enlist (exp)
