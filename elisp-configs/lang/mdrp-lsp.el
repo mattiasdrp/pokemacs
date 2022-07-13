@@ -42,6 +42,7 @@
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)
+  (lsp-lens-enable nil)
   (lsp-completion-provider :capf)
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
@@ -70,11 +71,13 @@
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :custom
+  (lsp-ui-doc-delay 0.9)
   (lsp-ui-doc-position 'at-point)
   ;; Whether or not to enable the header which displays the symbol string.
   (lsp-ui-doc-header t)
   ;; Whether or not to include the object signature/type in the frame.
   (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-show-with-cursor t)
   ;; Border color of the frame
   (lsp-ui-doc-border (face-foreground 'default))
   ;; Whether or not to enable lsp-ui-sideline

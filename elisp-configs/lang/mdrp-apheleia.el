@@ -36,8 +36,10 @@
   (caml-mode . apheleia-mode)
   (tuareg-mode . apheleia-mode)
   :config
+  ;; add ocamlformat to apheleia-formatters
   (setf (alist-get 'ocamlformat apheleia-formatters)
         '("opam" "exec" "--" "ocamlformat" "--impl" "-"))
+  ;; add ocamlformat to tuareg-mode in the apheleia mode alist
   (setf (alist-get 'tuareg-mode apheleia-mode-alist)
         '(ocamlformat))
 )
