@@ -140,13 +140,6 @@
                )
   )
 
-(use-package ocamlformat
-  :after tuareg
-  :custom
-  (ocamlformat-enable 'enable-outside-detected-project)
-  (ocamlformat-show-errors 'none)
-  )
-
 (use-package tuareg-menhir
   :mode ("\\.mly'" . tuareg-menhir-mode)
   )
