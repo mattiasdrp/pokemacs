@@ -77,7 +77,8 @@
   (lsp-ui-doc-header t)
   ;; Whether or not to include the object signature/type in the frame.
   (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-show-with-cursor t)
+  (lsp-ui-doc-show-with-cursor nil)
+  (lsp-ui-doc-show-with-mouse nil)
   ;; Border color of the frame
   (lsp-ui-doc-border (face-foreground 'default))
   ;; Whether or not to enable lsp-ui-sideline
@@ -87,6 +88,7 @@
   ;; Whether to show code actions in sideline.
   ;; (lsp-ui-sideline-show-code-actions nil)
   :bind
+  ("C-M-d" . lsp-ui-doc-show)
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
         ([remap xref-find-references] . lsp-ui-peek-find-references)
