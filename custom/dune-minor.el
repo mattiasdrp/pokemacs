@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2021  mattiasdrp
 
-;; Author: Mattias <mattias@tarides.com>
+;; Author: Mattias <5543639+mattiasdrp@users.noreply.github.com>
 ;; Version  : 0.1.0
 ;; Keywords: tools
 ;; Package-Requires: ((emacs "24.3"))
