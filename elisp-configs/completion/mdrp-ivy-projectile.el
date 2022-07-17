@@ -234,6 +234,7 @@
 
   (add-to-list 'counsel-compile-root-functions #'mdrp/just-use-current-directory)
   (add-to-list 'counsel-compile-root-functions #'projectile-project-root)
+
   (use-package savehist
     ;; Persist `counsel-compile' history
     :config

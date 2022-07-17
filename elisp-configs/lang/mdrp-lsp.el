@@ -39,13 +39,18 @@
          )
   :custom
   (lsp-log-io t)
-  (lsp-headerline-breadcrumb-enable nil)
+  ;; (lsp-headerline-breadcrumb-enable nil)
+
+  (lsp-headerline-breadcrumb-enable t)
+  (lsp-headerline-breadcrumb-segments '(project file symbols))
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)
   (lsp-lens-enable nil)
+  (lsp-diagnostics-provider :capf)
   (lsp-completion-provider :capf)
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
+  (lsp-disabled-clients '((python-mode . pyls)))
   :commands lsp
   :config
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
@@ -56,14 +61,24 @@
                      '("opam" "exec" "--" "ocamllsp"))
     :major-modes '(caml-mode tuareg-mode)
     :server-id 'ocamllsp))
+  :bind-keymap ("M-l" . lsp-command-map)
   :bind
-  (("C-c l n" . flycheck-next-error)
-   ("C-c l d" . lsp-find-definition)
-   ("C-c l r" . lsp-find-references)
+  (:map lsp-command-map
+        ("d" . lsp-find-definition)
+        ("r" . lsp-find-references)
+        ("n" . lsp-ui-find-next-references)
+        ("p" . lsp-ui-find-prev-references)
+        ("i" . counsel-imenu)
+        ("R" . lsp-rename)
+        ("tr" . lsp-treemacs-references)
+        ("ts" . lsp-treemacs-symbols)
+        ("te" . lsp-treemacs-error-list)
+        )
+  (
+   ("C-c n" . flycheck-next-error)
    ("C-c C-t" . lsp-describe-thing-at-point)
    ("C-c C-l" . lsp-find-definition)
    ("C-c &"   . pop-global-mark)
-   ("C-c l R" . lsp-rename)
    ("C-c l o" . my-lsp-fix-buffer))
   )
 

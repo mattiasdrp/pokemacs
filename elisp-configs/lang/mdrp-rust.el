@@ -65,7 +65,7 @@
           (if (wholeLineIsCmt-p c)
               (my-uncomment-current-line c)
             (my-comment-current-line c)
-            )) )))
+            )))))
 
   (defun wholeLineIsCmt-p (c)
     (save-excursion
