@@ -46,7 +46,6 @@
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)
   (lsp-lens-enable nil)
-  (lsp-diagnostics-provider :capf)
   (lsp-completion-provider :capf)
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
