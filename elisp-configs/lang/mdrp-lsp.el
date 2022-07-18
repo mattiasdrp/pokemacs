@@ -64,22 +64,22 @@
   :bind-keymap ("M-l" . lsp-command-map)
   :bind
   (:map lsp-command-map
-        ("d" . lsp-find-definition)
         ("r" . lsp-find-references)
-        ("n" . lsp-ui-find-next-references)
-        ("p" . lsp-ui-find-prev-references)
+        ("n" . lsp-ui-find-next-reference)
+        ("p" . lsp-ui-find-prev-reference)
         ("i" . counsel-imenu)
         ("R" . lsp-rename)
         ("tr" . lsp-treemacs-references)
         ("ts" . lsp-treemacs-symbols)
         ("te" . lsp-treemacs-error-list)
+        ("f" . my-lsp-fix-buffer)
         )
   (
    ("C-c n" . flycheck-next-error)
    ("C-c C-t" . lsp-describe-thing-at-point)
    ("C-c C-l" . lsp-find-definition)
    ("C-c &"   . pop-global-mark)
-   ("C-c l o" . my-lsp-fix-buffer))
+)
   )
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
