@@ -29,14 +29,6 @@
 
 ;;; Code:
 
-;; Integration with the debug server
-(use-package dap-mode
-  :ensure t
-  :defer t
-  :after lsp-mode
-  :config
-  (dap-auto-configure-mode))
-
 ;; Built-in Python utilities
 (use-package python
   :ensure t

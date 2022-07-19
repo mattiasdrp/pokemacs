@@ -226,6 +226,12 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-pdf)
 
+(require 'mdrp-dap)
+
+(require 'mdrp-lsp)
+
+(require 'mdrp-apheleia)
+
 ;;;; ORG MODE
 
 (update-to-load-path (expand-file-name "elisp-configs/org" user-emacs-directory))
@@ -249,10 +255,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-md-pandoc)
 
 (require 'mdrp-web-modes)
-
-(require 'mdrp-lsp)
-
-(require 'mdrp-apheleia)
 
 (require 'mdrp-smt)
 

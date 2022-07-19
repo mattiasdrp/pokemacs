@@ -65,36 +65,38 @@
 ### Python
 
    - Install dependencies
-   ```zsh
-   sudo apt-get install make build-essential libssl-dev zlib1g-dev \
-   libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-   libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-   ```
+      ```zsh
+      sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+      libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+      libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+      ```
 
    - Install pyenv
-   ```zsh
-   curl https://pyenv.run | $SHELL
-   ```
+       ```zsh
+       curl https://pyenv.run | $SHELL
+       ```
+
+   - Setup shell env for pyenv: https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
 
    - Install python
-   ```zsh
-   pyenv install 3.10.5
-   ```
+     ```zsh
+     pyenv install 3.10.5
+     ```
 
    - Install nvm
-   ```zsh
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
-   ```
+     ```zsh
+     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
+     ```
 
    - Upgrade pip
-   ```zsh
-   python -m pip install --upgrade pip
-   ```
+     ```zsh
+     python -m pip install --upgrade pip
+     ```
 
-    - Install pyright
-   ```zsh
-   pip install pyright black isort yapf
-   ```
+   - Install pyright and other needed packages
+     ```zsh
+     pip install pyright black isort yapf
+     ```
 
 
 ### Once emacs is installed:
