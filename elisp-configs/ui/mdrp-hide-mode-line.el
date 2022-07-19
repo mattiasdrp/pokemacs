@@ -1,4 +1,4 @@
-;;; mdrp-apheleia.el --- -*- lexical-binding: t -*-
+;;; mdrp-hide-mode-line.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 mdrp and contributors.
 
@@ -29,19 +29,16 @@
 
 ;;; Code:
 
-(use-package apheleia
-  :ensure t
-  :hook
-  (tuareg-mode . apheleia-mode)
-  (caml-mode . apheleia-mode)
-  (python-mode . apheleia-mode)
-  :config
-  (setf (alist-get 'isort apheleia-formatters)
-      '("isort" "--stdout" "-"))
-  (setf (alist-get 'python-mode apheleia-mode-alist)
-        '(isort black))
-)
+;; Hide the modeline for inferior python processes
+(use-package inferior-python-mode
+  :ensure nil
+  :hook (inferior-python-mode . hide-mode-line-mode))
 
-(provide 'mdrp-apheleia)
+;; Required to hide the modeline
+(use-package hide-mode-line
+  :ensure t
+  :defer t)
+
+(provide 'mdrp-hide-mode-line)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-apheleia.el ends here
+;;; mdrp-hide-mode-line.el ends here

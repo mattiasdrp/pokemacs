@@ -157,16 +157,17 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (update-to-load-path (expand-file-name "elisp-configs/ui" user-emacs-directory))
 
-;; (require 'mdrp-tab-bar)
-
 ;; The bar below with some infos
 (require 'mdrp-doom-modeline)
+
+(require 'mdrp-hide-mode-line)
 
 (require 'mdrp-minions)
 
 ;; Navigating through any file
 (require 'mdrp-outline)
 
+;; ligatures
 (require 'mdrp-ligatures)
 
 ;;;;; Themes, colors and other small things
@@ -210,7 +211,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-flycheck)
 
-(require 'mdrp-dumb-jump)               ; Jumps to definition
+;; Jumps to definition
+(require 'mdrp-dumb-jump)
 
 (require 'mdrp-hideshow)
 
@@ -237,6 +239,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-latex)
 
 (require 'mdrp-rust)
+
+(require 'mdrp-python)
 
 (require 'mdrp-ocaml)
 

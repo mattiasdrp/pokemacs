@@ -36,7 +36,7 @@
          (elm-mode . lsp-deferred)
          (rust-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
-         )
+         (python-mode . lsp-deferred))
   :custom
   (lsp-log-io t)
   ;; (lsp-headerline-breadcrumb-enable nil)
@@ -104,6 +104,7 @@
   ;; (lsp-ui-sideline-show-code-actions nil)
   :bind
   ("C-M-d" . lsp-ui-doc-show)
+  ("C-c i" . lsp-ui-imenu)
   (:map lsp-ui-mode-map
         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
         ([remap xref-find-references] . lsp-ui-peek-find-references)

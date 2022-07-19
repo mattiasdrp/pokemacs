@@ -62,6 +62,41 @@
        rustup component add rustc-dev --toolchain=nightly
        ```
 
+### Python
+
+   - Install dependencies
+   ```zsh
+   sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+   libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+   libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+   ```
+
+   - Install pyenv
+   ```zsh
+   curl https://pyenv.run | $SHELL
+   ```
+
+   - Install python
+   ```zsh
+   pyenv install 3.10.5
+   ```
+
+   - Install nvm
+   ```zsh
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
+   ```
+
+   - Upgrade pip
+   ```zsh
+   python -m pip install --upgrade pip
+   ```
+
+    - Install pyright
+   ```zsh
+   pip install pyright black isort yapf
+   ```
+
+
 ### Once emacs is installed:
 
  - `M-x package-install` <kbd>RET</kbd> `no-littering`
