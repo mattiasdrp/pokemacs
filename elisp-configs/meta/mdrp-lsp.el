@@ -50,8 +50,36 @@
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
   (lsp-disabled-clients '((python-mode . pyls)))
+
   :commands lsp
+
   :config
+  (defvar mdrp/type-map
+    (let ((keymap (make-sparse-keymap)))
+      (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
+      keymap)
+    "The local map to navigate type enclosing.")
+
+  (defun mdrp/set-type-map (&rest r)
+    (set-transient-map mdrp/type-map)
+    )
+
+  (advice-add 'lsp-describe-thing-at-point :after #'mdrp/set-type-map)
+
+  (defun mdrp/lsp-get-type-and-kill ()
+    (interactive)
+    (let ((contents (-some->> (lsp--text-document-position-params)
+                    (lsp--make-request "textDocument/hover")
+                    (lsp--send-request)
+                    (lsp:hover-contents))))
+      (let ((contents (and contents
+                    (lsp--render-on-hover-content
+                     contents
+                     nil))))
+        (message "Copied %s to kill-ring" contents)
+        (kill-new contents)
+        )))
+
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
   (lsp-enable-which-key-integration t)
   (lsp-register-client
@@ -75,8 +103,9 @@
         ("f" . my-lsp-fix-buffer)
         )
   :bind (
-   ("C-c n" . flycheck-next-error)
+   ("C-c n"   . flycheck-next-error)
    ("C-c C-t" . lsp-describe-thing-at-point)
+   ("C-c C-w" . mdrp/lsp-get-type-and-kill)
    ("C-c C-l" . lsp-find-definition)
    ("C-c &"   . pop-global-mark)
    )

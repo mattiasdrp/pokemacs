@@ -71,6 +71,7 @@
     ("\\.eliom\\'" (".eliomi"))))
   :bind (:map tuareg-mode-map
               ("C-c C-t" . nil)
+              ("C-c C-w" . nil)
               ("C-c C-l" . nil))
   :config
   ;; Use opam to set environment
