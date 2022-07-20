@@ -86,9 +86,6 @@
   ;; While using the server mode in GUI, should set the value explicitly.
   (doom-modeline-icon t)
 
-  ;; Whether display the icon for `major-mode'. It respects `doom-modeline-icon'.
-  (doom-modeline-major-mode-icon t)
-
   ;; Whether display the colorful icon for `major-mode'.
   ;; It respects `all-the-icons-color-icons'.
   (doom-modeline-major-mode-color-icon t)
@@ -103,26 +100,11 @@
   ;; Whether to use unicode as a fallback (instead of ASCII) when not using icons.
   (doom-modeline-unicode-fallback t)
 
-  ;; Whether display the buffer name.
-  (doom-modeline-buffer-name t)
-
-  ;; Whether display the minor modes in the mode-line.
-  (doom-modeline-minor-modes t)
-
-  ;; If non-nil, a word count will be added to the selection-info modeline segment.
-  (doom-modeline-enable-word-count t)
-
   ;; Major modes in which to display word count continuously.
   ;; Also applies to any derived modes. Respects `doom-modeline-enable-word-count'.
   ;; If it brings the sluggish issue, disable `doom-modeline-enable-word-count' or
   ;; remove the modes from `doom-modeline-continuous-word-count-modes'.
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
-
-  ;; Whether display the buffer encoding.
-  (doom-modeline-buffer-encoding t)
-
-  ;; Whether display the indentation information.
-  (doom-modeline-indent-info nil)
 
   ;; If non-nil, only display one number for checker information if applicable.
   (doom-modeline-checker-simple-format nil)
@@ -133,35 +115,11 @@
   ;; The maximum displayed length of the branch name of version control.
   (doom-modeline-vcs-max-length 12)
 
-  ;; Whether display the workspace name. Non-nil to display in the mode-line.
-  (doom-modeline-workspace-name t)
-
-  ;; Whether display the perspective name. Non-nil to display in the mode-line.
-  (doom-modeline-persp-name t)
-
-  ;; If non nil the default perspective name is displayed in the mode-line.
-  (doom-modeline-display-default-persp-name nil)
-
-  ;; If non nil the perspective name is displayed alongside a folder icon.
-  (doom-modeline-persp-icon t)
-
-  ;; Whether display the `lsp' state. Non-nil to display in the mode-line.
-  (doom-modeline-lsp t)
-
   ;; Whether display the GitHub notifications. It requires `ghub' package.
   (doom-modeline-github t)
 
   ;; The interval of checking GitHub.
   (doom-modeline-github-interval (* 30 60))
-
-  ;; Whether display the modal state icon.
-  ;; Including `evil', `overwrite', `god', `ryo' and `xah-fly-keys', etc.
-  (doom-modeline-modal-icon t)
-
-  ;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
-  (doom-modeline-mu4e nil)
-  ;; also enable the start of mu4e-alert
-  ;; (mu4e-alert-enable-mode-line-display)
 
   ;; Whether display the environment version.
   (doom-modeline-env-version t)
@@ -191,12 +149,12 @@
   ;; Define your custom doom-modeline
 
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
-    '(bar matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
-    '(misc-info minor-modes input-method buffer-encoding major-mode process vcs checker))
+    '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
+    '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
   (doom-modeline-def-modeline 'mdrp/lsp-line
-    '(bar matches follow lsp remote-host buffer-position word-count parrot selection-info)
-    '(misc-info minor-modes input-method buffer-encoding major-mode process vcs checker))
+    '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
+    '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
   ;; Add to `doom-modeline-mode-hook` or other hooks
   (defun mdrp/setup-no-lsp-doom-modeline ()

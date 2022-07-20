@@ -32,6 +32,7 @@
 (use-package magit
   :ensure t
   :config
+  (setq auth-sources '("~/.authinfo"))
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
   :bind-keymap
