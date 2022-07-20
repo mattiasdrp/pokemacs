@@ -36,12 +36,14 @@
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
   :bind-keymap
-  ("M-v"                   . magit-mode-map)
-  :bind (:map magit-mode-map
-              ("g"                       . magit-status)
-              ("G"                       . git-messenger:popup-message)
-              ("M-g"                     . magit-dispatch)
-              )
+  ("M-v"                 . magit-mode-map)
+  :bind
+  ("M-n"                 . smerge-vc-next-conflict)
+  (:map magit-mode-map
+        ("g"             . magit-status)
+        ("G"             . git-messenger:popup-message)
+        ("M-g"           . magit-dispatch)
+        )
   )
 
 (use-package git-commit
