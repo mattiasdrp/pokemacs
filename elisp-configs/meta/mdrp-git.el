@@ -31,6 +31,9 @@
 
 (use-package magit
   :ensure t
+  :config
+  (setq magit-auto-revert-mode t)
+  (setq magit-auto-revert-immediately t)
   :bind-keymap
   ("M-v"                   . magit-mode-map)
   :bind (:map magit-mode-map

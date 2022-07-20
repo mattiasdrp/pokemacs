@@ -37,7 +37,8 @@
 ;; Required to hide the modeline
 (use-package hide-mode-line
   :ensure t
-  :defer t)
+  :defer t
+)
 
 (provide 'mdrp-hide-mode-line)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

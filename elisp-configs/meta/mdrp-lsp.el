@@ -42,7 +42,9 @@
   ;; (lsp-headerline-breadcrumb-enable nil)
 
   (lsp-headerline-breadcrumb-enable t)
-  (lsp-headerline-breadcrumb-segments '(project file symbols))
+  (lsp-headerline-breadcrumb-segments '(project path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-modeline-code-actions-segments '(count icon name))
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)
   (lsp-lens-enable nil)
@@ -50,7 +52,6 @@
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
   (lsp-disabled-clients '((python-mode . pyls)))
-
   :commands lsp
 
   :config

@@ -85,11 +85,13 @@
 ;; SmallConfigs
 ;; Move the backup fies to user-emacs-directory/.backup
 
-;; Don't Lock Files
 (setq-default
+ ;; Don't Lock Files
  create-lockfiles nil
- compilation-always-kill t ; kill compilation process before starting another
- compilation-ask-about-save nil ; save all buffers on `compile'
+ ;; kill compilation process before starting another
+ compilation-always-kill t
+ ;; save all buffers on `compile'
+ compilation-ask-about-save nil
  compilation-context-lines 2
  compilation-error-screen-columns nil
  compilation-scroll-output nil
@@ -97,7 +99,6 @@
  initial-scratch-message ""
  select-enable-clipboard t
  font-lock-global-modes t
- global-auto-revert-mode t
  indent-tabs-mode nil
  inhibit-startup-screen t
  initial-major-mode 'text-mode
@@ -159,7 +160,10 @@
 
 ;;; GLOBAL MODES
 
-(global-prettify-symbols-mode 1)
+(setq global-prettify-symbols-mode t)
+(setq global-auto-revert-mode t)
+(setq auto-revert-mode t)
+
 (setq prettify-symbols-unprettify-at-point 1)
 ;; When buffer is closed, saves the cursor location
 (save-place-mode 1)
@@ -185,6 +189,13 @@
 ;; (setq compilation-directory-matcher '("\\(?:Entering\\|Leavin\\(g\\)\\|\\) directory [`']\\(.+\\)'$" (2 . 1)))
 ;; (setq compilation-directory-matcher '("\\(?:on entre dans le\\|on quitte l\\(e\\)\\|\\) répertoire « \\(.+\\) »$" (2 . 1)))
 ;; (setq compilation-page-delimiter "\\(?:on entre dans le\\|on quitte l\\(e\\)\\|\\) répertoire « \\(.+\\) »$")
+(global-anzu-mode +1)
+(anzu-mode +1)
+
+(global-set-key [remap query-replace] 'anzu-query-replace)
+(global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
+(define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+(define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
 
 (provide 'mdrp-global-config)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
