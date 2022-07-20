@@ -108,7 +108,7 @@
      ("Difficile" . (:foreground "OrangeRed" :weight bold))
      )
    )
-  :bind-keymap ("M-o" . mdrp-org-map)
+  :bind-keymap ("C-M-o" . mdrp-org-map)
   :bind (
          ("C-x C-p" . mdrp/org-compile-latex-and-update-other-buffer)
          (:map mdrp-org-map
