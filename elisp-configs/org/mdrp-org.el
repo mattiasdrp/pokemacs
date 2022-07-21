@@ -122,6 +122,19 @@
          )
 
   :config
+  (defun transform-square-brackets-to-round-ones(string-to-transform)
+    "Transforms [ into ( and ] into ), other chars left unchanged."
+    (concat
+     (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+    )
+
+  (setq org-capture-templates
+        `(
+	  ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+	  ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+          ))
   (customize-set-value 'org-latex-with-hyperref nil)
   (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
   (setq org-image-actual-width nil)
