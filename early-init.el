@@ -42,6 +42,9 @@
 (setq gc-cons-threshold 100000000)
 ;; -DeferGC
 
+;; Increase data read from process
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+
 ;; UnsetPES
 (setq package-enable-at-startup nil)
 ;; -UnsetPES

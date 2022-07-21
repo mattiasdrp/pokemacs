@@ -38,9 +38,8 @@
          (fsharp-mode . lsp-deferred)
          (python-mode . lsp-deferred))
   :custom
-  (lsp-log-io t)
+  (lsp-log-io nil)
   ;; (lsp-headerline-breadcrumb-enable nil)
-
   (lsp-headerline-breadcrumb-enable t)
   (lsp-headerline-breadcrumb-segments '(project path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-enable-symbol-numbers nil)

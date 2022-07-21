@@ -107,6 +107,7 @@
 ;;; SET VARIABLES
 
 (setq
+ native-comp-deferred-compilation t
  org-directory "~/org/"
  line-move-visual t
  next-error-highlight t
