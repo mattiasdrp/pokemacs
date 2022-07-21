@@ -226,9 +226,9 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-pdf)
 
-(require 'mdrp-dap)
-
 (require 'mdrp-lsp)
+
+;; (require 'mdrp-dap)
 
 (require 'mdrp-apheleia)
 
