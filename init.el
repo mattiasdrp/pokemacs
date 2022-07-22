@@ -151,6 +151,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;;- KEYBINDINGS
 
+(require 'mdrp-restart-emacs)
+
 (require 'mdrp-whitespace)
 
 ;;;; UI
@@ -172,7 +174,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;;;;; Themes, colors and other small things
 
-
 (require 'mdrp-ansi-color)
 
 (require 'mdrp-rainbow-mode)
@@ -192,6 +193,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-spotify)
 
 (require 'mdrp-visual-fill)
+
+(require 'mdrp-pulsar)
+
+(require 'mdrp-keycast)
 
 ;;;; Completion
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
@@ -227,6 +232,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-pdf)
 
 (require 'mdrp-lsp)
+
+(require 'mdrp-hl-todo)
 
 ;; (require 'mdrp-dap)
 

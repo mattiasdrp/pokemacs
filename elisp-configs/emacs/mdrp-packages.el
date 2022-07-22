@@ -67,6 +67,15 @@
 
 (setq use-package-verbose t)
 
+(use-package auto-package-update
+  :custom
+  (auto-package-update-show-preview t)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-delete-old-version t)
+  :config
+  (auto-package-update-maybe)
+)
+
 (provide 'mdrp-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-packages.el ends here

@@ -48,6 +48,21 @@
         )
   )
 
+(use-package magit-todos
+  :ensure t
+  :config
+  (setq magit-todos-keywords-list '("MYTODO"))
+  :hook
+  (magit-mode . magit-todos-mode))
+
+(use-package diff-hl
+  :custom
+  (global-diff-hl-mode 1)
+  :hook
+  (magit-post-refresh . diff-hl-magit-post-refresh)
+  (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+  )
+
 (use-package git-commit
   :hook (git-commit-mode . mdrp/english-dict))
 
@@ -55,6 +70,10 @@
   :config
   (setq git-messenger:show-detail t
         git-messenger:use-magit-popup t))
+
+(use-package git-timemachine
+  :ensure t
+  )
 
 (use-package gitignore-mode
   :mode (("/\\.gitignore\\'"      . gitignore-mode)
