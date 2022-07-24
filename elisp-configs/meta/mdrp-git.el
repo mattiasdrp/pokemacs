@@ -51,7 +51,7 @@
 (use-package magit-todos
   :ensure t
   :config
-  (setq magit-todos-keywords-list '("MYTODO"))
+  (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
   :hook
   (magit-mode . magit-todos-mode))
 

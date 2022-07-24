@@ -39,11 +39,10 @@
          (python-mode . lsp-deferred))
   :custom
   (lsp-log-io nil)
-  ;; (lsp-headerline-breadcrumb-enable nil)
   (lsp-headerline-breadcrumb-enable t)
   (lsp-headerline-breadcrumb-segments '(project path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
-  (lsp-modeline-code-actions-segments '(count icon name))
+  (lsp-modeline-code-actions-enable nil)
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)
   (lsp-lens-enable nil)
@@ -54,6 +53,18 @@
   :commands lsp
 
   :config
+
+  (defcustom lsp-cut-signature nil
+    "If non-nil, signatures returned on hover will not be split on newline"
+    :group 'lsp-mode
+    :type 'boolean)
+
+  (cl-defgeneric lsp-clients-extract-signature-on-hover (contents _server-id)
+    "Extract a representative line from CONTENTS, to show in the echo area."
+    (if lsp-cut-signature
+        (car (s-lines (s-trim (lsp--render-element contents))))
+      (s-replace "\n" " " (s-trim (lsp--render-element contents)))))
+
   (defvar mdrp/type-map
     (let ((keymap (make-sparse-keymap)))
       (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
