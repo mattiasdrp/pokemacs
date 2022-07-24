@@ -54,16 +54,34 @@
 
   :config
 
-  (defcustom lsp-cut-signature nil
-    "If non-nil, signatures returned on hover will not be split on newline"
-    :group 'lsp-mode
-    :type 'boolean)
+  ;; Temporary solution until https://github.com/emacs-lsp/lsp-mode/pull/3637 is merged
+  (defcustom lsp-cut-signature 'space
+    "If non-nil, signatures returned on hover will not be split on newline."
+    :group 'lsp-ocaml
+    :type '(choice (symbol :tag "Default behaviour" 'cut)
+                   (symbol :tag "Display all the lines with spaces" 'space)))
 
-  (cl-defgeneric lsp-clients-extract-signature-on-hover (contents _server-id)
-    "Extract a representative line from CONTENTS, to show in the echo area."
-    (if lsp-cut-signature
-        (car (s-lines (s-trim (lsp--render-element contents))))
-      (s-replace "\n" " " (s-trim (lsp--render-element contents)))))
+  (cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql ocamllsp)) &optional storable)
+    "Extract a representative line from OCaml's CONTENTS, to show in the echo area.
+This function splits the content between the signature
+and the documentation to display the signature
+and truncate it if it's too wide.
+The STORABLE argument is used if you want to use this
+function to get the type and, for example, kill and yank it."
+    (let ((type (s-trim (lsp--render-element (lsp-make-marked-string
+                                              :language "ocaml"
+                                              :value (car (s-split "---" (lsp--render-element contents))))))))
+      (if (equal nil storable)
+          (if (eq lsp-cut-signature 'cut)
+              (car (s-lines type))
+            ;; else lsp-cut-signature is 'space
+            (let ((ntype (s-replace "\n" " " type)))
+              (if (>= (length ntype) (frame-width))
+                  (concat (substring ntype 0 (- (frame-width) 4)) "...")
+                ntype)))
+        type)))
+
+  ;;- end of temporary solution
 
   (defvar mdrp/type-map
     (let ((keymap (make-sparse-keymap)))
@@ -80,16 +98,27 @@
   (defun mdrp/lsp-get-type-and-kill ()
     (interactive)
     (let ((contents (-some->> (lsp--text-document-position-params)
-                    (lsp--make-request "textDocument/hover")
-                    (lsp--send-request)
-                    (lsp:hover-contents))))
+                      (lsp--make-request "textDocument/hover")
+                      (lsp--send-request)
+                      (lsp:hover-contents))))
       (let ((contents (and contents
-                    (lsp--render-on-hover-content
-                     contents
-                     nil))))
-        (message "Copied %s to kill-ring" contents)
-        (kill-new contents)
-        )))
+                           (lsp--render-on-hover-content
+                            contents
+                            t))))
+        (let ((contents
+               (pcase (lsp-workspaces)
+                 (`(,workspace)
+                  (lsp-clients-extract-signature-on-hover
+                   contents
+                   (lsp--workspace-server-id workspace)
+                   t))
+                 (lsp-clients-extract-signature-on-hover
+                  contents
+                  nil)
+                 )))
+          (message "Copied %s to kill-ring" contents)
+          (kill-new contents)
+          ))))
 
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
   (lsp-enable-which-key-integration t)
@@ -114,12 +143,12 @@
         ("f" . my-lsp-fix-buffer)
         )
   :bind (
-   ("C-c n"   . flycheck-next-error)
-   ("C-c C-t" . lsp-describe-thing-at-point)
-   ("C-c C-w" . mdrp/lsp-get-type-and-kill)
-   ("C-c C-l" . lsp-find-definition)
-   ("C-c &"   . pop-global-mark)
-   )
+         ("C-c n"   . flycheck-next-error)
+         ("C-c C-t" . lsp-describe-thing-at-point)
+         ("C-c C-w" . mdrp/lsp-get-type-and-kill)
+         ("C-c C-l" . lsp-find-definition)
+         ("C-c &"   . pop-global-mark)
+         )
   )
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
