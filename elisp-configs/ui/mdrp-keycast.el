@@ -5,7 +5,7 @@
 ;; Author: mdrp
 ;; Maintainer: mdrp <https://github.com/mattiasdrp>
 ;; Version: 1.0
-;; Licence: GPL2+
+;; Licence: MIT
 ;; Keywords: convenience, configuration
 
 ;;; License:
