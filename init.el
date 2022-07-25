@@ -235,7 +235,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-hl-todo)
 
-;; (require 'mdrp-dap)
+(require 'mdrp-tree-sitter)
 
 (require 'mdrp-apheleia)
 
