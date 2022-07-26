@@ -76,6 +76,7 @@
   )
 
 (use-package gitignore-mode
+  :ensure nil
   :mode (("/\\.gitignore\\'"      . gitignore-mode)
          ("/info/exclude\\'"      . gitignore-mode)
          ("/git/ignore\\'"        . gitignore-mode)))

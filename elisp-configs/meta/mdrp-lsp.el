@@ -193,6 +193,7 @@ function to get the type and, for example, kill and yank it."
   )
 
 (use-package lsp-rust
+  :ensure nil ;; already present in lsp
   :custom
   (lsp-rust-server 'rust-analyzer)
   )

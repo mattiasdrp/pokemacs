@@ -46,6 +46,7 @@
   )
 
 (use-package auctex-latexmk
+  :load-path "custom/auctex-latexmk"
   :after tex-site
   :config
   (auctex-latexmk-setup)
@@ -53,6 +54,7 @@
   )
 
 (use-package LaTeX-math-mode
+  :ensure nil ;; part of tex-site
   :hook auctex
   )
 

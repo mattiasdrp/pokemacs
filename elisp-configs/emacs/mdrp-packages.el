@@ -43,6 +43,9 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+(unless (package-installed-p 'no-littering)
+  (package-install 'no-littering))
+
 (eval-and-compile
   (setq use-package-expand-minimally t)
   (setq use-package-compute-statistics t)
@@ -52,6 +55,8 @@
   (require 'use-package)
   (require 'bind-key)
   )
+
+(setq use-package-always-ensure t)
 
 ;; (require 'use-package-ensure)
 ;; (setq use-package-always-ensure t)

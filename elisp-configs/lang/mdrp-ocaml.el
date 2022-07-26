@@ -142,6 +142,7 @@
   )
 
 (use-package tuareg-menhir
+  :ensure nil ;; already present in tuareg
   :mode ("\\.mly'" . tuareg-menhir-mode)
   )
 
@@ -150,6 +151,7 @@
   :hook (tuareg-mode . dune-minor-mode))
 
 (use-package dune-mode
+  :ensure nil ;; already present in tuareg
   :mode ("^dune$" "^dune-project$")
   )
 

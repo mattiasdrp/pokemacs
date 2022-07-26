@@ -32,9 +32,11 @@
 ;; All the icons:
 ;;
 ;; M-x all-the-icons-insert-* will allow to directly insert a unicode symbol
-(use-package all-the-icons)
+(use-package all-the-icons
+  :ensure t)
 
 (use-package all-the-icons-dired
+  :ensure t
   :hook (dired-mode . all-the-icons-dired-mode)
   )
 

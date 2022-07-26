@@ -29,7 +29,10 @@
 
 ;;; Code:
 
+(use-package tree-sitter-langs)
+
 (use-package tree-sitter-mode
+  :ensure tree-sitter
   :hook
   (tuareg-mode . tree-sitter-mode)
   (tree-sitter-mode . (lambda () (hs-minor-mode -1)))

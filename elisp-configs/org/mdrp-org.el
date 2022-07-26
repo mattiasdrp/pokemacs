@@ -31,6 +31,8 @@
 
 (require 'org-protocol)
 
+(use-package ob-rust)
+
 (use-package org
   :ensure t
   ;; :hook (org-mode . variable-pitch-mode)
@@ -245,7 +247,8 @@ Add this function to `org-mode-hook'."
 
 
 
-(use-package org-tempo ;; part of org-mode
+(use-package org-tempo
+  :ensure nil ;; part of org-mode
   :after (org)
   :config
   (add-to-list 'org-structure-template-alist '("smt" . "src smt-lib"))

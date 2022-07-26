@@ -56,10 +56,8 @@
         company-show-numbers ''left
         company-tooltip-align-annotations t
         company-require-match 'never
-        company-quickhelp-delay 0
         company-tooltip-align-annotations t
         )
-  (company-quickhelp-mode 1)
   (add-to-list 'company-backends 'company-capf)
   (global-company-mode 1)
   :bind
@@ -167,6 +165,9 @@
   :ensure t
   :bind (:map company-active-map
               ("M-h" . company-quickhelp-manual-begin))
+  :custom
+  (company-quickhelp-delay 0)
+  (company-quickhelp-mode 1)
   )
 
 (provide 'mdrp-company)

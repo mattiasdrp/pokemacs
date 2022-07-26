@@ -78,7 +78,6 @@
 
   )
 
-
 (use-package ivy-rich
   :after ivy
   :config
@@ -144,7 +143,6 @@
   (ivy-rich-mode +1)
   )
 
-
 (use-package all-the-icons-ivy
   :after ivy
   :config
@@ -161,8 +159,10 @@
              counsel-projectile-find-dir)))
       (all-the-icons-ivy-setup))))
 
+(use-package all-the-icons-ivy-rich
+  :after ivy-rich)
+
 (use-package counsel
-  :defer t
   :bind (
          ([remap apropos]                  . counsel-apropos)
          ([remap bookmark-jump]            . counsel-bookmark)
@@ -236,6 +236,7 @@
   (add-to-list 'counsel-compile-root-functions #'projectile-project-root)
 
   (use-package savehist
+    :after counsel
     ;; Persist `counsel-compile' history
     :config
     (add-to-list 'savehist-additional-variables 'counsel-compile-history)
@@ -291,9 +292,19 @@
              (forward-line 1))
            (nreverse files)))))))
 
+(use-package projectile
+  :bind
+  ("M-p" . projectile-command-map)
+  :custom
+  (projectile-completion-system 'ivy)
+  :init
+  (projectile-mode 1)
+  ;; :config
+  ;; (add-to-list 'projectile-globally-ignored-directories "node_modules")
+  )
 
 (use-package counsel-projectile
-  :defer t
+  :after counsel projectile
   :bind (
          ([remap projectile-find-dir]         . counsel-projectile-find-dir)
          ([remap projectile-switch-to-buffer] . counsel-projectile-switch-to-buffer)
@@ -307,11 +318,9 @@
 
   (setq counsel-projectile-sort-files t))
 
-
 (use-package wgrep
   :commands wgrep-change-to-wgrep-mode
   :config (setq wgrep-auto-save-buffer t))
-
 
 (use-package ivy-posframe
   :config
@@ -339,6 +348,7 @@
   :after ivy)
 
 (use-package ivy-prescient
+  :after counsel
   :hook (ivy-prescient-mode . prescient-persist-mode)
   :commands +ivy-prescient-non-fuzzy
   :init
@@ -348,10 +358,10 @@
   (ivy-prescient-mode)
   (setq ivy-prescient-sort-commands
         '(:not swiper swiper-isearch ivy-switch-buffer
-          lsp-ivy-workspace-symbol ivy-resume ivy--restore-session
-          counsel-grep counsel-git-grep counsel-rg counsel-ag
-          counsel-ack counsel-fzf counsel-pt counsel-imenu
-          counsel-yank-pop counsel-recentf counsel-buffer-or-recentf)
+               lsp-ivy-workspace-symbol ivy-resume ivy--restore-session
+               counsel-grep counsel-git-grep counsel-rg counsel-ag
+               counsel-ack counsel-fzf counsel-pt counsel-imenu
+               counsel-yank-pop counsel-recentf counsel-buffer-or-recentf)
         ivy-prescient-retain-classic-highlighting t)
   (defun +ivy-prescient-non-fuzzy (str)
     (let ((prescient-filter-method '(literal regexp)))
@@ -367,6 +377,7 @@
 (setq amx-save-file (expand-file-name "amx-items" user-emacs-directory))  ; used by `counsel-M-x'
 
 (use-package helpful
+  :after counsel
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -377,17 +388,6 @@
          ([remap describe-key] . helpful-key)
          ("C-c C-d" . helpful-at-point)
          )
-  )
-
-(use-package projectile
-  :bind
-  ("M-p" . projectile-command-map)
-  :custom
-  (projectile-completion-system 'ivy)
-  :init
-  (projectile-mode 1)
-  ;; :config
-  ;; (add-to-list 'projectile-globally-ignored-directories "node_modules")
   )
 
 (provide 'mdrp-ivy-projectile)
