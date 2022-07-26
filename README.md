@@ -9,43 +9,45 @@
    - (`pkg-config` may not be needed but I got strange behaviours when not installing it)
  - If you feel confident and better than me at installing emacs from scratch, don't hesitate to tell me where I'm wrong, I always love to learn (and I'm pretty bad at understanding Unix systems, dependencies and things like this)
  - Once
- ```zsh
- ./autogen.sh
- ```
- and
-  ```zsh
- ./configure --with-native-compilation --with-x-toolkit=no --with-xpm=ifavailable --with-jpeg=ifavailable --with-json=ifavailable --with-png=ifavailable --with-gif=ifavailable --with-tiff=ifavailable
- ```
- tell you you can make,
- ```zsh
- make -j $(nproc)
- ```
- then
- ```zsh
- sudo make install
- ```
+    ```zsh
+    ./autogen.sh
+    ```
+   and
+     ```zsh
+    ./configure --with-native-compilation --with-x-toolkit=no --with-xpm=ifavailable --with-jpeg=ifavailable --with-json=ifavailable --with-png=ifavailable --with-gif=ifavailable --with-tiff=ifavailable
+    ```
+   tell you you can make,
+    ```zsh
+    make -j $(nproc)
+    ```
+   then
+    ```zsh
+       sudo make install
+    ```
 
 
 ### For ligatures, all-the-icons and pretty things:
 
  - Install fonts
- ```zsh
- sudo apt install fonts-firacode fonts-material-design-icons-iconfont
- ```
+    ```zsh
+    sudo apt install fonts-firacode fonts-material-design-icons-iconfont
+    ```
 
 ### Rest
 
 #### LSP
 
  - In your shell config file:
- ```zsh
- export LSP_USE_PLISTS=true
- ```
+    ```zsh
+    export LSP_USE_PLISTS=true
+    ```
+ 
  - ripgrep (for rg. Can be installed through cargo or `sudo apt install ripgrep`)
+ 
  - Install aspell
- ```zsh
- sudo apt install aspell aspell-fr aspell-en
- ```
+    ```zsh
+    sudo apt install aspell aspell-fr aspell-en
+    ```
 
 #### OCaml
 
@@ -57,67 +59,64 @@
 #### Rust
  - RLS:
    - install [rustup](http://rustup.rs/)
-   ```zsh
-   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-   ```
+      ```zsh
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      ```
    - Update
-   ```zsh
-   rustup update
-   ```
+      ```zsh
+      rustup update
+      ```
    - Install components
-   ```zsh
-   rustup component add rls rust-analysis rust-src
-   ```
+      ```zsh
+      rustup component add rls rust-analysis rust-src
+      ```
  - Racer:
 
-   -
-   ```zsh
-   rustup toolchain add nightly
-   ```
-   -
-   ```zsh
-   rustup component add rust-src
-   ```
-   -
-   ```zsh
-   rustup component add rustc-dev --toolchain=nightly
-   ```
+      ```zsh
+      rustup toolchain add nightly
+      ```
+      ```zsh
+      rustup component add rust-src
+      ```
+      ```zsh
+      rustup component add rustc-dev --toolchain=nightly
+      ```
 
 ### Python
 
    - Install dependencies
-   ```zsh
-   sudo apt-get install make build-essential libssl-dev zlib1g-dev \
-       libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-       libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+      ```zsh
+      sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+          libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+          libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
       ```
 
    - Install pyenv
-   ```zsh
-   curl https://pyenv.run | $SHELL
-   ```
+      ```zsh
+      curl https://pyenv.run | $SHELL
+      ```
 
    - Setup shell env for pyenv: https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
 
    - Install python
-   ```zsh
-   pyenv install 3.10.5
-   ```
+      ```zsh
+      pyenv install 3.10.5
+      ```
 
    - Install nvm
-   ```zsh
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
-   ```
+      ```zsh
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
+      ```
 
    - Upgrade pip
-   ```zsh
-   python -m pip install --upgrade pip
-   ```
+      ```zsh
+      python -m pip install --upgrade pip
+      ```
 
    - Install pyright and other needed packages
-   ```zsh
-   pip install pyright black isort yapf
-   ```
+      ```zsh
+      pip install pyright black isort yapf
+      ```
 
 
 ### Once emacs is installed:
