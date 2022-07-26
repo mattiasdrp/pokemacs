@@ -5,8 +5,15 @@
  - Your version of emacs should be at least 27.1
  - For this you need to clone [the emacs repository](https://github.com/emacs-mirror/emacs) and either checkout the `emacs.27.1` (or higher) branch or compile from the `main` branch.
  - I tend to forget what dependencies are needed by emacs so here is the command I usually invoke before configuring and compiling emacs:
-   - `sudo apt install autoconf make gcc libgtk-3-dev libxpm-dev libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev pkg-config texinfo libgccjit-11-dev`
-   - (`pkg-config` may not be needed but I got strange behaviours when not installing it)
+   - 
+      ```zsh
+      sudo apt install -y autoconf make gcc texinfo libgtk-3-dev libxpm-dev \
+        libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev \
+        libjansson-dev libharfbuzz-dev libharfbuzz-bin imagemagick libmagickwand-dev libgccjit-10-dev libgccjit0 gcc-10 libjansson4 libjansson-dev xaw3dg-dev texinfo libx11-dev
+      ```
+      ```zsh
+      export CC="gcc-10"
+      ```
  - If you feel confident and better than me at installing emacs from scratch, don't hesitate to tell me where I'm wrong, I always love to learn (and I'm pretty bad at understanding Unix systems, dependencies and things like this)
  - Once
     ```zsh
@@ -14,7 +21,9 @@
     ```
    and
      ```zsh
-    ./configure --with-native-compilation --with-x-toolkit=no --with-xpm=ifavailable --with-jpeg=ifavailable --with-json=ifavailable --with-png=ifavailable --with-gif=ifavailable --with-tiff=ifavailable
+    ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --with-compress-install \
+      --with-threads --with-included-regex --with-x-toolkit=lucid --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls \
+      --with-xft --with-xml2 --with-mailutils
     ```
    tell you you can make,
     ```zsh
@@ -22,7 +31,7 @@
     ```
    then
     ```zsh
-       sudo make install
+    sudo make install
     ```
 
 
