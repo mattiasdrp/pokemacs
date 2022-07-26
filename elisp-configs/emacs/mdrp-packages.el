@@ -74,7 +74,102 @@
   (auto-package-update-delete-old-version t)
   :config
   (auto-package-update-maybe)
-)
+  )
+
+(defgroup mdrp-packages nil
+  "Pokemacs packages."
+  :group 'package
+  :tag "Packages options group")
+
+(defcustom use-spotify nil
+  "If non-nil, uses the spotify packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-latex nil
+  "If non-nil, uses the LaTeX packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-org nil
+  "If non-nil, uses the Org packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-smt nil
+  "If non-nil, uses the SMT packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-rust nil
+  "If non-nil, uses the rust packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-ocaml t
+  "If non-nil, uses the OCaml packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-reason t
+  "If non-nil, uses the Reason packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-usuba nil
+  "If non-nil, uses the Usuba packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-python nil
+  "If non-nil, uses the Python packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-fsharp nil
+  "If non-nil, uses the F# packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-web nil
+  "If non-nil, uses the web packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-markdown t
+  "If non-nil, uses the markdown packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-company t
+  "If non-nil, uses the company packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-treemacs t
+  "If non-nil, uses the treemacs packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-god nil
+  "If non-nil, uses the god (mode) packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-rainbow nil
+  "If non-nil, uses the rainbow packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-visual-fill nil
+  "If non-nil, fill the frame when there's only one"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-vertical-split nil
+  "If non-nil, split window vertically when possible"
+  :group 'mdrp-packages
+  :type 'boolean)
 
 (provide 'mdrp-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

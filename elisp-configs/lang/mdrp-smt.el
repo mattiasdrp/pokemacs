@@ -29,8 +29,10 @@
 
 ;;; Code:
 
-(use-package z3-mode
-  :mode "\\.smt2")
+(when use-smt
+  (use-package z3-mode
+    :mode "\\.smt2")
+  )
 
 (provide 'mdrp-smt)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

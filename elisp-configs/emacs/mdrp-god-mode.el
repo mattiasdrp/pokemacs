@@ -31,32 +31,34 @@
 ;;
 ;;; Code:
 
-(use-package god-mode
-  :init
-  (setq god-mode-enable-function-key-translation nil)
-  :config
-  (defun my-god-mode-update-modeline ()
-    (cond (god-local-mode (progn
-                            (set-face-background 'mode-line "#e9e2cb")
-                            (set-face-foreground 'mode-line "black")
-                            (set-face-background 'mode-line-inactive "#e9e2cb")
-                            (set-face-foreground 'mode-line-inactive "black")
-                            ))
-          (t (progn
-               (set-face-background 'mode-line "#0a2832")
-               (set-face-foreground 'mode-line "white")
-               (set-face-background 'mode-line-inactive "#0a2832")
-               (set-face-foreground 'mode-line-inactive "white")
-               ))))
-  (add-hook 'god-mode-enabled-hook #'my-god-mode-update-modeline)
-  (add-hook 'god-mode-disabled-hook #'my-god-mode-update-modeline)
-  (setq god-exempt-major-modes nil)
-  (setq god-exempt-predicates nil)
-  :bind (
-         ("<escape>"                . god-mode-all)
-         ("²"                       . god-mode-all)
-         ("C-²"                     . god-mode-all)
-         )
+(when use-god
+  (use-package god-mode
+    :init
+    (setq god-mode-enable-function-key-translation nil)
+    :config
+    (defun my-god-mode-update-modeline ()
+      (cond (god-local-mode (progn
+                              (set-face-background 'mode-line "#e9e2cb")
+                              (set-face-foreground 'mode-line "black")
+                              (set-face-background 'mode-line-inactive "#e9e2cb")
+                              (set-face-foreground 'mode-line-inactive "black")
+                              ))
+            (t (progn
+                 (set-face-background 'mode-line "#0a2832")
+                 (set-face-foreground 'mode-line "white")
+                 (set-face-background 'mode-line-inactive "#0a2832")
+                 (set-face-foreground 'mode-line-inactive "white")
+                 ))))
+    (add-hook 'god-mode-enabled-hook #'my-god-mode-update-modeline)
+    (add-hook 'god-mode-disabled-hook #'my-god-mode-update-modeline)
+    (setq god-exempt-major-modes nil)
+    (setq god-exempt-predicates nil)
+    :bind (
+           ("<escape>"                . god-mode-all)
+           ("²"                       . god-mode-all)
+           ("C-²"                     . god-mode-all)
+           )
+    )
   )
 
 (provide 'mdrp-god-mode)

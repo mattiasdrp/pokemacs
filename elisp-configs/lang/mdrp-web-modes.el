@@ -29,31 +29,16 @@
 
 ;;; Code:
 
-(use-package web-mode
-  :init
-  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+(when use-web
+  (use-package web-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+    )
+
+  (use-package css-mode
+    :ensure nil
+    :mode "\\.css\\'")
   )
-
-(use-package css-mode
-  :ensure nil
-  :mode "\\.css\\'")
-
-(use-package json-mode
-  :mode (("\\.bowerrc$"     . json-mode)
-         ("\\.jshintrc$"    . json-mode)
-         ("\\.json_schema$" . json-mode)
-         ("\\.json\\'" . json-mode))
-  :bind (
-         (:map json-mode-map
-               ("C-c <tab>"  . json-mode-beautify)
-               ("<tab>"      . hs-toggle-hiding)
-               ("C-c C-a"    . hs-show-all)
-               ("C-c C-t"    . hs-hide-all)
-               ("C-c C-l"    . hs-hide-level)
-               )
-         )
-  :config
-  (make-local-variable 'js-indent-level))
 
 (provide 'mdrp-web-modes)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

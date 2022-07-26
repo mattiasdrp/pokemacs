@@ -29,31 +29,33 @@
 
 ;;; Code:
 
-(use-package tex-site
-  :ensure auctex
-  :mode ("\\.tex\\'" . latex-mode)
-  :config
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (turn-on-reftex)
-  (setq reftex-plug-into-AUCTeX t)
-  (reftex-isearch-minor-mode)
-  (setq TeX-PDF-mode t)
-  (setq TeX-source-correlate-method 'synctex)
-  (setq TeX-source-correlate-start-server t)
-  )
+(when use-latex
+  (use-package tex-site
+    :ensure auctex
+    :mode ("\\.tex\\'" . latex-mode)
+    :config
+    (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+    (setq TeX-auto-save t)
+    (setq TeX-parse-self t)
+    (setq-default TeX-master nil)
+    (turn-on-reftex)
+    (setq reftex-plug-into-AUCTeX t)
+    (reftex-isearch-minor-mode)
+    (setq TeX-PDF-mode t)
+    (setq TeX-source-correlate-method 'synctex)
+    (setq TeX-source-correlate-start-server t)
+    )
 
-(use-package auctex-latexmk
-  :after tex-site
-  :config
-  (auctex-latexmk-setup)
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-  )
+  (use-package auctex-latexmk
+    :after tex-site
+    :config
+    (auctex-latexmk-setup)
+    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+    )
 
-(use-package LaTeX-math-mode
-  :hook auctex
+  (use-package LaTeX-math-mode
+    :hook auctex
+    )
   )
 
 (provide 'mdrp-latex)

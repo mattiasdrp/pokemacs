@@ -31,6 +31,16 @@
 ;;
 ;;; Code:
 
+(use-package hide-region
+  :load-path "custom/"
+  :commands (hide-region-hide hide-region-unhide)
+  :bind
+  ("C-M-<return>"            . hide-region-unhide)
+  :custom
+  (hide-region-before-string "@[...")
+  (hide-region-after-string "]@")
+  )
+
 (use-package selected
   :hook (after-init . selected-global-mode)
   :bind (:map selected-keymap
@@ -50,6 +60,7 @@
               ("C-s r"                   . reverse-region)
               ("C-s s"                   . sort-lines)
               ("C-s w"                   . mdrp/sort-words)
+              ("C-<return>"              . hide-region-hide)
               )
   )
 

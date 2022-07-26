@@ -249,6 +249,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (update-to-load-path (expand-file-name "elisp-configs/lang" user-emacs-directory))
 
+(require 'mdrp-json)
+
 (require 'mdrp-latex)
 
 (require 'mdrp-rust)

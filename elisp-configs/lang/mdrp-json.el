@@ -1,4 +1,4 @@
-;;; mdrp-visual-fill.el --- -*- lexical-binding: t -*-
+;;; mdrp-json.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2020-2020 mdrp and contributors.
 
@@ -23,33 +23,29 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.visual-fill/licenses/>.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;;; Code:
 
-(when use-visual-fill
+(use-package json-mode
+  :mode (("\\.bowerrc$"     . json-mode)
+         ("\\.jshintrc$"    . json-mode)
+         ("\\.json_schema$" . json-mode)
+         ("\\.json\\'" . json-mode))
+  :bind (
+         (:map json-mode-map
+               ("C-c <tab>"  . json-mode-beautify)
+               ("<tab>"      . hs-toggle-hiding)
+               ("C-c C-a"    . hs-show-all)
+               ("C-c C-t"    . hs-hide-all)
+               ("C-c C-l"    . hs-hide-level)
+               )
+         )
+  :config
+  (make-local-variable 'js-indent-level))
 
-  (use-package visual-fill-column
-    :custom
-    (visual-fill-column-width 100)
-    (visual-fill-column-center-text t)
-    :config
-
-    (defun mdrp/visual-fill-one-window ()
-      (global-visual-fill-column-mode -1)
-      (if (window-full-width-p)
-          (global-visual-fill-column-mode 1)
-        (global-visual-fill-column-mode -1)
-        )
-      )
-
-    (add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
-    :hook ((org-mode text-mode) . visual-fill-column-mode)
-    )
-  )
-
-(provide 'mdrp-visual-fill)
+(provide 'mdrp-json)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-visual-fill.el ends here
+;;; mdrp-json.el ends here

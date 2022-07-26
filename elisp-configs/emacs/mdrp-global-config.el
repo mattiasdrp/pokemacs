@@ -121,11 +121,9 @@
  comment-style 'indent
  ansi-color-names-vector ["#424242" "#EF9A9A" "#C5E1A5" "#FFEE58" "#64B5F6" "#E1BEE7" "#80DEEA" "#E0E0E0"]
  enable-recursive-minibuffers t
- electric-indent-mode t
  scroll-bar-mode nil
  sentence-end-double-space nil
  show-paren-delay 0
- show-paren-style 'expression
  tool-bar-mode nil
  truncate-lines nil
  visible-bell t
@@ -161,9 +159,13 @@
 
 ;;; GLOBAL MODES
 
-(setq global-prettify-symbols-mode t)
-(setq global-auto-revert-mode t)
-(setq auto-revert-mode t)
+(when use-vertical-split
+  (setq split-window-preferred-function #'mdrp/split-window-sensibly))
+
+(global-prettify-symbols-mode t)
+(prettify-symbols-mode)
+(global-auto-revert-mode t)
+(auto-revert-mode t)
 
 (setq prettify-symbols-unprettify-at-point 1)
 ;; When buffer is closed, saves the cursor location

@@ -29,10 +29,7 @@
 
 ;;; Code:
 
-
-
 (use-package flyspell
-  :load-path "custom/"
   :init
   (defun mdrp/flyspell-on-for-buffer-type ()
     "Enable Flyspell appropriately for the major mode of the current buffer.

@@ -32,26 +32,29 @@
 ;;
 ;;; Code:
 
-(use-package counsel-spotify
-  :after ivy
-  :init
-  (define-prefix-command 'mdrp-spotify-map nil "Spotify-")
-  :custom
-  (counsel-spotify-client-id (get-secrets-config-value 'spotify-client-id))
-  (counsel-spotify-client-secret (get-secrets-config-value 'spotify-client-secret))
-  :bind-keymap ("s-x" . mdrp-spotify-map)
-  :bind (
-         (:map mdrp-spotify-map
-               ("q"       . counsel-spotify-previous)
-               ("<left>"  . counsel-spotify-previous)
-               ("s"       . counsel-spotify-toggle-play-pause)
-               ("<down>"  . counsel-spotify-toggle-play-pause)
-               ("d"       . counsel-spotify-next)
-               ("<right>" . counsel-spotify-next)
-               ("z"       . counsel-spotify-play)
-               ("<up>"    . counsel-spotify-play)
-         )
-         )
+(when use-spotify
+
+  (use-package counsel-spotify
+    :after ivy
+    :init
+    (define-prefix-command 'mdrp-spotify-map nil "Spotify-")
+    :custom
+    (counsel-spotify-client-id (get-secrets-config-value 'spotify-client-id))
+    (counsel-spotify-client-secret (get-secrets-config-value 'spotify-client-secret))
+    :bind-keymap ("s-x" . mdrp-spotify-map)
+    :bind (
+           (:map mdrp-spotify-map
+                 ("q"       . counsel-spotify-previous)
+                 ("<left>"  . counsel-spotify-previous)
+                 ("s"       . counsel-spotify-toggle-play-pause)
+                 ("<down>"  . counsel-spotify-toggle-play-pause)
+                 ("d"       . counsel-spotify-next)
+                 ("<right>" . counsel-spotify-next)
+                 ("z"       . counsel-spotify-play)
+                 ("<up>"    . counsel-spotify-play)
+                 )
+           )
+    )
   )
 
 (provide 'mdrp-spotify)

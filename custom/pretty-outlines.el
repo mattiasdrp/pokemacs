@@ -11,7 +11,6 @@
 
 (require 'cl)
 (require 'dash)
-(require 'dash)
 (require 'outshine)
 (require 's)
 

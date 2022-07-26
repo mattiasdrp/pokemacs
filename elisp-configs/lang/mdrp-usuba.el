@@ -29,9 +29,11 @@
 
 ;;; Code:
 
-(use-package usuba-mode
-  :load-path "custom/"
-  :mode "\\.ua")
+(when use-usuba
+  (use-package usuba-mode
+    :load-path "custom/"
+    :mode "\\.ua")
+  )
 
 (provide 'mdrp-usuba)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

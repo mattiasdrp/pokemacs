@@ -38,12 +38,6 @@
   ;; Must be set before loading doom-modeline.
   (setq doom-modeline-support-imenu t)
   :custom
-  ;; How tall the mode-line should be. It's only respected in GUI.
-  ;; If the actual char height is larger, it respects the actual height.
-  (doom-modeline-height 25)
-
-  ;; How wide the mode-line bar should be. It's only respected in GUI.
-  (doom-modeline-bar-width 4)
 
   ;; Whether to use hud instead of default bar. It's only respected in GUI.
   (doom-modeline-hud nil)
@@ -144,8 +138,6 @@
 
 
   :config
-  (set-face-attribute 'mode-line nil :family "Fira Code" :height 140)
-  (set-face-attribute 'mode-line-inactive nil :family "Fira Code" :height 140)
   ;; Define your custom doom-modeline
 
   (doom-modeline-def-modeline 'mdrp/no-lsp-line

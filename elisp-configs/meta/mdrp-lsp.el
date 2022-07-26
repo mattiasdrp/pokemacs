@@ -61,7 +61,7 @@
     :type '(choice (symbol :tag "Default behaviour" 'cut)
                    (symbol :tag "Display all the lines with spaces" 'space)))
 
-  (cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql ocamllsp)) &optional storable)
+  (cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql ocaml-lsp-server)) &optional storable)
     "Extract a representative line from OCaml's CONTENTS, to show in the echo area.
 This function splits the content between the signature
 and the documentation to display the signature
@@ -108,18 +108,21 @@ function to get the type and, for example, kill and yank it."
         (let ((contents
                (pcase (lsp-workspaces)
                  (`(,workspace)
-                  (lsp-clients-extract-signature-on-hover
-                   contents
-                   (lsp--workspace-server-id workspace)
-                   t))
-                 (lsp-clients-extract-signature-on-hover
-                  contents
-                  nil)
+                  (progn
+                    (message "-------- workspace %S" (lsp--workspace-server-id workspace))
+                    (lsp-clients-extract-signature-on-hover
+                     contents
+                     (lsp--workspace-server-id workspace)
+                     t)))
+                  (progn
+                    (message "-------- no workspace")
+                    (lsp-clients-extract-signature-on-hover
+                     contents
+                     nil))
                  )))
           (message "Copied %s to kill-ring" contents)
           (kill-new contents)
           ))))
-
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
   (lsp-enable-which-key-integration t)
   (lsp-register-client
@@ -128,6 +131,7 @@ function to get the type and, for example, kill and yank it."
                      '("opam" "exec" "--" "ocamllsp"))
     :major-modes '(caml-mode tuareg-mode)
     :server-id 'ocamllsp))
+  (message "------ lsp loaded")
   :bind-keymap ("M-l" . lsp-command-map)
   :bind
   (:map lsp-command-map
