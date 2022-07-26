@@ -29,37 +29,8 @@
 
 ;;; Code:
 
-;; tuareg-mode has the prettify symbols itself
-;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))
-;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
-;; harmless if `prettify-symbols-mode' isn't active
-;; (setq tuareg-prettify-symbols-full t)
-(defun opam-shell-command-to-string (command)
-  "Similar to shell-command-to-string, but returns nil unless the process
-  returned 0, and ignores stderr (shell-command-to-string ignores return value)"
-  (let* ((return-value 0)
-         (return-string
-          (with-output-to-string
-            (setq return-value
-                  (with-current-buffer standard-output
-                    (process-file shell-file-name nil '(t nil) nil
-                                  shell-command-switch command))))))
-    (if (= return-value 0) return-string nil)))
-
-(defun load-path-opam (&rest _)
-  (let ((opam-share
-         (let ((reply (opam-shell-command-to-string "opam var share --safe")))
-           (when reply (substring reply 0 -1)))))
-    (message opam-share)
-    (let ((path (concat opam-share "/emacs/site-lisp")))
-      (message "Path is %s" path)
-      path
-    )
-  ))
-
 (use-package tuareg
   :mode ("\\.ml\\'" . tuareg-mode)
-  :load-path (lambda () (load-path-opam))
   :custom
   (tuareg-other-file-alist
   '(("\\.\\(?:pp\\.\\)?mli\\'" (".ml" ".mll" ".mly" ".pp.ml"))
@@ -94,7 +65,7 @@
       )
       )
     )
-
+  (message "------ tuareg")
   (if (boundp 'window-buffer-change-functions)
       (progn
         (add-hook 'window-buffer-change-functions 'update-opam-env)

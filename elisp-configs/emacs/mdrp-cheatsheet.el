@@ -29,10 +29,7 @@
 
 ;;; Code:
 
-(use-package cheatsheet
-  :custom
-  :defer t
-  )
+(use-package cheatsheet)
 
 (provide 'mdrp-cheatsheet)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

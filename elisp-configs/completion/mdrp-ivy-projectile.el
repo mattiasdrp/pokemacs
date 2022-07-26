@@ -62,7 +62,7 @@
   ;; Counsel changes a lot of ivy's state at startup; to control for that, we
   ;; need to load it as early as possible. Some packages (like `ivy-prescient')
   ;; require this.
-  (require 'counsel nil t)
+  (use-package counsel :ensure t)
   (setq ivy-height 17
         ivy-wrap t
         ivy-fixed-height-minibuffer t
@@ -75,7 +75,6 @@
         ivy-on-del-error-function #'ignore
         ;; enable ability to select prompt (alternative to `ivy-immediate-done')
         ivy-use-selectable-prompt t)
-
   )
 
 (use-package ivy-rich

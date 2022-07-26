@@ -198,6 +198,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-keycast)
 
+(require 'mdrp-cheatsheet)
+
 ;;;; Completion
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
 
