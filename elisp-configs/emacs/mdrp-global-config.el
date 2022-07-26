@@ -37,7 +37,8 @@
 ;;       url-history-file (expand-file-name "url/history" user-emacs-directory))
 
 ;; Please oh please emacs, stop creating files everywhere, just put them in one place
-(require 'no-littering)
+(use-package no-littering
+  :ensure t)
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "backups/") t)))
 
@@ -192,6 +193,8 @@
 ;; (setq compilation-directory-matcher '("\\(?:Entering\\|Leavin\\(g\\)\\|\\) directory [`']\\(.+\\)'$" (2 . 1)))
 ;; (setq compilation-directory-matcher '("\\(?:on entre dans le\\|on quitte l\\(e\\)\\|\\) répertoire « \\(.+\\) »$" (2 . 1)))
 ;; (setq compilation-page-delimiter "\\(?:on entre dans le\\|on quitte l\\(e\\)\\|\\) répertoire « \\(.+\\) »$")
+(use-package anzu
+  :ensure t)
 (global-anzu-mode +1)
 (anzu-mode +1)
 

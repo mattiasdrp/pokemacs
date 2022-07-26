@@ -68,12 +68,11 @@
 (setq use-package-verbose t)
 
 (use-package auto-package-update
+  :ensure t
   :custom
   (auto-package-update-show-preview t)
   (auto-package-update-prompt-before-update t)
   (auto-package-update-delete-old-version t)
-  :config
-  (auto-package-update-maybe)
   )
 
 (defgroup mdrp-packages nil

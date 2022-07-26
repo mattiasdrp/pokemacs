@@ -50,7 +50,8 @@
  '(use-vertical-split nil)
  '(use-visual-fill t)
  '(use-web t)
- )
+ '(warning-suppress-log-types '((comp) (comp)))
+ '(warning-suppress-types '((comp))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
