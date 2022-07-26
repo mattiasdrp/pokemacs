@@ -108,17 +108,13 @@ function to get the type and, for example, kill and yank it."
         (let ((contents
                (pcase (lsp-workspaces)
                  (`(,workspace)
-                  (progn
-                    (message "-------- workspace %S" (lsp--workspace-server-id workspace))
                     (lsp-clients-extract-signature-on-hover
                      contents
                      (lsp--workspace-server-id workspace)
-                     t)))
-                  (progn
-                    (message "-------- no workspace")
+                     t))
                     (lsp-clients-extract-signature-on-hover
                      contents
-                     nil))
+                     nil)
                  )))
           (message "Copied %s to kill-ring" contents)
           (kill-new contents)
@@ -130,7 +126,7 @@ function to get the type and, for example, kill and yank it."
     :new-connection (lsp-stdio-connection
                      '("opam" "exec" "--" "ocamllsp"))
     :major-modes '(caml-mode tuareg-mode)
-    :server-id 'ocamllsp))
+    :server-id 'ocaml-lsp-server))
   (message "------ lsp loaded")
   :bind-keymap ("M-l" . lsp-command-map)
   :bind

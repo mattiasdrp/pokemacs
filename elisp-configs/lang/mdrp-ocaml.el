@@ -57,6 +57,19 @@
     )
   ))
 
+
+(defun mdrp/dune-watch (exe)
+  ;; Will call dune build -w EXE on an async process
+  (interactive "sBuild name: ")
+  (let ((buffer (generate-new-buffer "Dune watch")))
+
+    (projectile-run-async-shell-command-in-root (concat "dune build -w " exe) buffer)
+    ;; Make this process non blocking for killing
+    (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
+    (display-buffer buffer '((display-buffer-below-selected display-buffer-at-bottom)
+                             (inhibit-same-window . t)
+                             (window-height . 0.2)))))
+
 (use-package tuareg
   :mode ("\\.ml\\'" . tuareg-mode)
   :load-path (lambda () (load-path-opam))
@@ -72,7 +85,9 @@
   :bind (:map tuareg-mode-map
               ("C-c C-t" . nil)
               ("C-c C-w" . nil)
-              ("C-c C-l" . nil))
+              ("C-c C-l" . nil)
+              ("C-c w"   . mdrp/dune-watch)
+              )
   :config
   ;; Use opam to set environment
   (setq tuareg-opam-insinuate t)
