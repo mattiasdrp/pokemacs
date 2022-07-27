@@ -62,16 +62,6 @@
   (company-quickhelp-mode 1)
   (add-to-list 'company-backends 'company-capf)
   (global-company-mode 1)
-  :bind
-  (:map company-mode-map
-        ([remap indent-for-tab-command] . company-indent-or-complete-common)
-        )
-  (:map company-active-map
-        ;; ("<tab>"                          . company-complete)
-        ;; ("TAB"                          . company-complete)
-        ;; ("RET"                          . nil)
-        ;; ("<return>"                     . nil)
-        )
   )
 
 (use-package company-math

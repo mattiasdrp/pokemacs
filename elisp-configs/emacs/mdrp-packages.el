@@ -165,11 +165,6 @@
   :group 'mdrp-packages
   :type 'boolean)
 
-(defcustom use-vertical-split nil
-  "If non-nil, split window vertically when possible"
-  :group 'mdrp-packages
-  :type 'boolean)
-
 (provide 'mdrp-packages)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-packages.el ends here

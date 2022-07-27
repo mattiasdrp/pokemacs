@@ -235,12 +235,6 @@
   (add-to-list 'counsel-compile-root-functions #'mdrp/just-use-current-directory)
   (add-to-list 'counsel-compile-root-functions #'projectile-project-root)
 
-  (use-package savehist
-    ;; Persist `counsel-compile' history
-    :config
-    (add-to-list 'savehist-additional-variables 'counsel-compile-history)
-    (add-to-list 'savehist-additional-variables 'compile-history))
-
   ;; `counsel-imenu' -- no sorting for imenu. Sort it by appearance in page.
   (add-to-list 'ivy-sort-functions-alist '(counsel-imenu))
 

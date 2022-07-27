@@ -135,7 +135,7 @@ function to get the type and, for example, kill and yank it."
         ("r" . lsp-find-references)
         ("n" . lsp-ui-find-next-reference)
         ("p" . lsp-ui-find-prev-reference)
-        ("i" . counsel-imenu)
+        ("i" . counsel-semantic-or-imenu)
         ("R" . lsp-rename)
         ("tr" . lsp-treemacs-references)
         ("ts" . lsp-treemacs-symbols)

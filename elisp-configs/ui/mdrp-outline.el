@@ -30,7 +30,6 @@
 ;;; Code:
 
 (use-package outline
-  :hook ((prog-mode . outline-minor-mode))
   :config
   (define-prefix-command 'cm-map nil "Outline-")
   (set-display-table-slot standard-display-table

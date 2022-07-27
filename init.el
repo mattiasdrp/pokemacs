@@ -128,6 +128,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;; Global Functionalities
 (require 'mdrp-global-config)
 
+(require 'mdrp-savehist)
+
+(require 'mdrp-easy-kill)
+
 (require 'mdrp-ws-butler)
 
 ;; Global functions
@@ -152,6 +156,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 ;;- KEYBINDINGS
 
 (require 'mdrp-restart-emacs)
+
+(require 'mdrp-save-desktop)
 
 (require 'mdrp-whitespace)
 
@@ -235,6 +241,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-hl-todo)
 
+(require 'mdrp-tree-sitter)
+
 ;; (require 'mdrp-dap)
 
 (require 'mdrp-apheleia)
@@ -268,6 +276,10 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (require 'mdrp-smt)
 
 (require 'mdrp-yaml)
+
+(require 'mdrp-elisp)
+
+(require 'mdrp-makefile)
 
 (if (file-exists-p (concat user-emacs-directory "/custom/usuba-mode.el"))
     (require 'mdrp-usuba)

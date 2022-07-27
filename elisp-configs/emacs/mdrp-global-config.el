@@ -160,14 +160,10 @@
 
 ;;; GLOBAL MODES
 
-(when use-vertical-split
-  (setq split-window-preferred-function #'mdrp/split-window-sensibly))
-
 (global-prettify-symbols-mode t)
 (prettify-symbols-mode)
 (global-auto-revert-mode t)
 (auto-revert-mode t)
-
 (setq prettify-symbols-unprettify-at-point 1)
 ;; When buffer is closed, saves the cursor location
 (save-place-mode 1)

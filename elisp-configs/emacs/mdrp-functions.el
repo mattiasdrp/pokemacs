@@ -29,18 +29,6 @@
 
 ;;; Code:
 
-;; Split window vertically when possible instead of horizontally
-(defun mdrp/split-window-sensibly (&optional window)
-  "replacement `split-window-sensibly' function which prefers vertical splits"
-  (interactive)
-  (let ((window (or window (selected-window))))
-    (or (and (window-splittable-p window t)
-             (with-selected-window window
-               (split-window-right)))
-        (and (window-splittable-p window)
-             (with-selected-window window
-               (split-window-below))))))
-
 ;; Custom comment function a bit more clever
 ;; https://www.emacswiki.org/emacs/CommentingCode
 (defun mdrp/comment-eclipse (&optional arg)

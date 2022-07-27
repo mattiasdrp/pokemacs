@@ -48,7 +48,8 @@
      ((executable-find "python2")
       (setq python-shell-interpreter "python2"))
      (t
-      (setq python-shell-interpreter "python"))))
+      (setq python-shell-interpreter "python")))
+    :hook (python-mode . semantic-mode))
 
   ;; Required to easily switch virtual envs
   ;; via the menu bar or with `pyvenv-workon`
