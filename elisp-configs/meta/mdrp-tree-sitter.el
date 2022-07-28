@@ -41,16 +41,8 @@
   ;; (python-mode . tree-sitter-mode)
 )
 
-(use-package tree-sitter-fold
-  :load-path "custom/tree-sitter-fold/"
-  )
-
-;; (use-package ts-fold
-;;   :load-path "custom/ts-fold/"
-;;   )
-
-;; (use-package ts-fold-indicators
-;;   :load-path "custom/ts-fold/"
+;; (use-package tree-sitter-fold
+;;   :load-path "custom/tree-sitter-fold/"
 ;;   )
 
 (provide 'mdrp-tree-sitter)
