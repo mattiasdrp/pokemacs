@@ -380,8 +380,6 @@
   (projectile-completion-system 'ivy)
   :init
   (projectile-mode 1)
-  ;; :config
-  ;; (add-to-list 'projectile-globally-ignored-directories "node_modules")
   )
 
 (provide 'mdrp-ivy-projectile)
