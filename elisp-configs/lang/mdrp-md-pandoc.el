@@ -34,10 +34,15 @@
          ("\\.md\\'"       . markdown-mode)
          ("\\.markdown\\'" . gfm-mode))
   :init
+  (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
   (setq markdown-command "markdown")
   (setq markdown-open-command "retext")
-  :hook ((gfm-mode . (lambda ()
-                       (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))))
+  :hook (gfm-mode . (lambda ()
+                      (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
+  )
+
+(use-package markdown-toc
+  :ensure t)
 
 (use-package pandoc-mode
   :hook ((markdown-mode . pandoc-mode)

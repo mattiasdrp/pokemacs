@@ -36,17 +36,7 @@
   :ensure t
   :config
   (global-tree-sitter-mode)
-  ;; :hook
-  ;; (tuareg-mode . tree-sitter-mode)
-  ;; (python-mode . tree-sitter-mode)
-)
-
-;; (use-package tree-sitter-fold
-;;   :load-path "custom/tree-sitter-fold/"
-;;   :hook
-;;   (tuareg-mode . tree-sitter-fold-mode)
-;;   (python-mode . tree-sitter-fold-mode)
-;;   )
+  )
 
 (use-package ts-fold
   :load-path "custom/ts-fold/"

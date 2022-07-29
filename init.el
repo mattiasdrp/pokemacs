@@ -157,7 +157,7 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-restart-emacs)
 
-(require 'mdrp-save-desktop)
+;; (require 'mdrp-save-desktop)
 
 (require 'mdrp-whitespace)
 
