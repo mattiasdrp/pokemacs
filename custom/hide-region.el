@@ -139,6 +139,9 @@ This string is not really placed in the text, it is just shown in the overlay."
 (defvar-local hide-region-overlays nil
   "Variable to store the regions we put an overlay on.")
 
+(defvar-local hide-region-pin-overlays nil
+  "Variable to store the regions we put an overlay on.")
+
 (defvar-local hide-region-show-flag nil
   "Indicates whether regions will be shown or hidden when toggled.
 
@@ -181,6 +184,44 @@ method when you have selected some text you want to hide."
 
     ;; return the overlay
     new-overlay))
+
+(defvar-local pinned-buffer nil
+  "Variable to store the buffer that contains the pinned region.")
+
+(defun hide-region-unpin ()
+  "Unpin the current region"
+  (interactive)
+  (when pinned-buffer
+    (let ((window (get-buffer-window pinned-buffer 'visible)))
+      (setq-local pinned-buffer nil)
+      (quit-window t window))))
+
+(defun hide-region-pin ()
+  "Pin the current region to the top.
+
+Add an overlay to the current region (from `mark' to `point') making it
+invisable, then add to the \"ring\" in `hide-region-overlays'.  Use this
+method when you have selected some text you want to hide."
+  (interactive)
+  (when (use-region-p)
+    (let* ((regionp (buffer-substring (mark) (point)))
+           (buffer (get-buffer-create "tmp.ml"))
+           (mode major-mode))
+      (with-current-buffer buffer
+        (funcall mode)
+        (hide-mode-line-mode)
+        (goto-char (window-end))
+        (insert regionp)
+        (goto-char 0))
+      (setq-local pinned-buffer buffer)
+      (setq-local window-min-height 1)
+      ;; Make this process non blocking for killing
+      ;; (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
+      (display-buffer-in-direction buffer '((direction . above)
+                                            (inhibit-same-window . t)
+                                            (window-height . fit-window-to-buffer)
+                                            ))
+      )))
 
 (defun hide-region-unhide ()
   "Unhide the last region hidden.

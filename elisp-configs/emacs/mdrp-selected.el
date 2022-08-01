@@ -33,9 +33,10 @@
 
 (use-package hide-region
   :load-path "custom/"
-  :commands (hide-region-hide hide-region-unhide)
-  :bind
-  ("C-M-<return>"            . hide-region-unhide)
+  :commands (hide-region-hide hide-region-unhide hide-region-pin)
+  :general
+  ("C-M-p"                   '(hide-region-unpin :which-key "Unpin the currently pinned region"))
+  ("C-M-<return>"            '(hide-region-unhide :which-key "unhide the last hidden region"))
   :custom
   (hide-region-before-string "@[...")
   (hide-region-after-string "]@")
@@ -43,26 +44,29 @@
 
 (use-package selected
   :hook (after-init . selected-global-mode)
-  :bind (:map selected-keymap
-              ("C-?"                     . hydra-selected/body)
-              ("<"                       . mc/mark-previous-like-this)
-              (">"                       . mc/mark-next-like-this)
-              ("C-<"                     . mc/unmark-previous-like-this)
-              ("C->"                     . mc/unmark-next-like-this)
-              ("M-<"                     . mc/skip-to-previous-like-this)
-              ("M->"                     . mc/skip-to-next-like-this)
-              ("C-c >"                   . mc/edit-lines)
-              ("M-r c"                   . capitalize-region)
-              ("M-r l"                   . downcase-region)
-              ("M-r u"                   . upcase-region)
-              ("C-f"                     . fill-region)
-              ("C-q"                     . selected-off)
-              ("C-s r"                   . reverse-region)
-              ("C-s s"                   . sort-lines)
-              ("C-s w"                   . mdrp/sort-words)
-              ("C-<return>"              . hide-region-hide)
-              )
-  )
+  :general
+  (:keymaps 'selected-keymap
+            "C-?"                     'hydra-selected/body
+            "<"                       'mc/mark-previous-like-this
+            ">"                       'mc/mark-next-like-this
+            "C-<"                     'mc/unmark-previous-like-this
+            "C->"                     'mc/unmark-next-like-this
+            "M-<"                     'mc/skip-to-previous-like-this
+            "M->"                     'mc/skip-to-next-like-this
+            "C-c >"                   'mc/edit-lines
+            "M-r c"                   'capitalize-region
+            "M-r l"                   'downcase-region
+            "M-r u"                   'upcase-region
+            "C-f"                     'fill-region
+            "C-q"                     'selected-off
+            "C-s r"                   'reverse-region
+            "C-s s"                   'sort-lines
+            "C-s w"                   'mdrp/sort-words
+            "C-<return>"              'hide-region-hide
+            "C-p"                     '(hide-region-pin
+                                        :which-key "Pins the selected region on top of the current window"
+
+                                        )))
 
 (provide 'mdrp-selected)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
