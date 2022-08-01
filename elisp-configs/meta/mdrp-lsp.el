@@ -108,13 +108,13 @@ function to get the type and, for example, kill and yank it."
         (let ((contents
                (pcase (lsp-workspaces)
                  (`(,workspace)
-                    (lsp-clients-extract-signature-on-hover
-                     contents
-                     (lsp--workspace-server-id workspace)
-                     t))
-                    (lsp-clients-extract-signature-on-hover
-                     contents
-                     nil)
+                  (lsp-clients-extract-signature-on-hover
+                   contents
+                   (lsp--workspace-server-id workspace)
+                   t))
+                 (lsp-clients-extract-signature-on-hover
+                  contents
+                  nil)
                  )))
           (message "Copied %s to kill-ring" contents)
           (kill-new contents)
@@ -127,28 +127,25 @@ function to get the type and, for example, kill and yank it."
                      '("opam" "exec" "--" "ocamllsp"))
     :major-modes '(caml-mode tuareg-mode)
     :server-id 'ocaml-lsp-server))
-  (message "------ lsp loaded")
-  :bind-keymap ("M-l" . lsp-command-map)
-  :bind
-  (:map lsp-command-map
-        ("d" . lsp-find-definition)
-        ("r" . lsp-find-references)
-        ("n" . lsp-ui-find-next-reference)
-        ("p" . lsp-ui-find-prev-reference)
-        ("i" . counsel-semantic-or-imenu)
-        ("R" . lsp-rename)
-        ("tr" . lsp-treemacs-references)
-        ("ts" . lsp-treemacs-symbols)
-        ("te" . lsp-treemacs-error-list)
-        ("f" . my-lsp-fix-buffer)
-        )
-  :bind (
-         ("C-c n"   . flycheck-next-error)
-         ("C-c C-t" . lsp-describe-thing-at-point)
-         ("C-c C-w" . mdrp/lsp-get-type-and-kill)
-         ("C-c C-l" . lsp-find-definition)
-         ("C-c &"   . pop-global-mark)
-         )
+  :general
+  ("M-l" 'lsp-command-map)
+  ("C-c n"   'flycheck-next-error)
+  ("C-c C-t" 'lsp-describe-thing-at-point)
+  ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
+  ("C-c C-l" 'lsp-find-definition)
+  ("C-c &"   'pop-global-mark)
+  (:keymaps 'lsp-command-map
+            "d"  'lsp-find-definition
+            "r"  'lsp-find-references
+            "n"  'lsp-ui-find-next-reference
+            "p"  'lsp-ui-find-prev-reference
+            "i"  'counsel-semantic-or-imenu
+            "R"  'lsp-rename
+            "tr" 'lsp-treemacs-references
+            "ts" 'lsp-treemacs-symbols
+            "te" 'lsp-treemacs-error-list
+            "f"  'my-lsp-fix-buffer
+            )
   )
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
@@ -171,16 +168,16 @@ function to get the type and, for example, kill and yank it."
   ;; (lsp-ui-sideline-ignore-duplicate t)
   ;; Whether to show code actions in sideline.
   ;; (lsp-ui-sideline-show-code-actions nil)
-  :bind
-  ("C-M-d" . lsp-ui-doc-show)
-  ("C-c i" . lsp-ui-imenu)
-  (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references] . lsp-ui-peek-find-references)
+  :general
+  ("C-M-d" 'lsp-ui-doc-show)
+  ("C-c i" 'lsp-ui-imenu)
+  (:keymaps 'lsp-ui-mode-map
+            [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+            [remap xref-find-references] 'lsp-ui-peek-find-references
         )
-  (:map lsp-command-map
-        ("u f" . lsp-ui-doc-focus-frame)
-        ("u i" . lsp-ui-imenu)
+  (:keymaps 'lsp-command-map
+        "u f" 'lsp-ui-doc-focus-frame
+        "u i" 'lsp-ui-imenu
         )
   )
 

@@ -57,12 +57,19 @@
     )
   ))
 
+(defun mdrp/erase-and-fill-buffer (buffer)
+  "Blahblah BUFFER."
+  (with-current-buffer buffer
+    (erase-buffer)
+    (insert "Dune watch buffer")
+    ))
 
 (defun mdrp/dune-watch (exe)
-  ;; Will call dune build -w EXE on an async process
+  "Will call dune build -w EXE on an async process."
   (interactive "sBuild name: ")
-  (let ((buffer (generate-new-buffer "Dune watch")))
-
+  (let ((buffer (get-buffer-create "Dune watch")))
+    (add-hook 'before-save-hook (lambda () (mdrp/erase-and-fill-buffer buffer)))
+    (with-current-buffer buffer (compilation-minor-mode t))
     (projectile-run-async-shell-command-in-root (concat "dune build -w " exe) buffer)
     ;; Make this process non blocking for killing
     (set-process-query-on-exit-flag (get-buffer-process buffer) nil)

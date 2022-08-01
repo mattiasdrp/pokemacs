@@ -155,10 +155,6 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 ;;- KEYBINDINGS
 
-(require 'mdrp-restart-emacs)
-
-;; (require 'mdrp-save-desktop)
-
 (require 'mdrp-whitespace)
 
 ;;;; UI

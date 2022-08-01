@@ -46,6 +46,9 @@
   (python-mode . ts-fold-mode)
   )
 
+(use-package fringe-helper
+  :ensure t)
+
 (use-package ts-fold-indicators
   :load-path "custom/ts-fold/"
   :config

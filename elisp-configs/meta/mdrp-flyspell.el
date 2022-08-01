@@ -84,17 +84,14 @@ it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
 
   :ensure t
   :hook (find-file . mdrp/flyspell-on-for-buffer-type)
-
-  :bind-keymap
-  ("M-f" . mdrp-flyspell-map)
-  ("C-f" . mdrp-flyspell-map)
-  :bind (
-         (:map mdrp-flyspell-map
-               ("t" . mdrp/flyspell-toggle)
-               ("f" . mdrp/french-dict)
-               ("e" . mdrp/english-dict)
-               )
-         )
+  :general
+  (:keymaps 'mdrp-flyspell-map
+            :prefix "M-f"
+            :prefix "C-f"
+            "t" '(mdrp/flyspell-toggle :which-key "toggle flyspell mode and decides to put it in prog or text mode")
+            "f" '(mdrp/french-dict :which-key "load the french dictionary")
+            "e" '(mdrp/english-dict :which-key "load the english dictionary")
+            )
   :config
   (provide 'ispell) ; forcibly load ispell configs
   (define-prefix-command 'mdrp-flyspell-map nil "Flyspell-")
@@ -129,13 +126,11 @@ e.g. proselint and langtool."
 (use-package flyspell-correct
   :after flyspell
   :general
-  (popup-menu-keymap
-   "<return>" 'popup-select)
-  :bind (
-         (:map mdrp-flyspell-map
-               ("C-f" . flyspell-correct-wrapper)
-               ))
-  )
+  (:keymaps 'popup-menu-keymap
+            "<return>" 'popup-select)
+  (:keymaps 'mdrp-flyspell-map
+            "C-f" 'flyspell-correct-wrapper
+            ))
 
 (use-package flyspell-correct-ivy
   :after (flyspell-correct)
