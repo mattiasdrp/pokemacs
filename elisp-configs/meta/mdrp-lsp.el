@@ -35,6 +35,7 @@
          (caml-mode . lsp-deferred)
          (elm-mode . lsp-deferred)
          (rust-mode . lsp-deferred)
+         (kotlin-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (python-mode . lsp-deferred))
   :custom
@@ -53,7 +54,6 @@
   :commands lsp
 
   :config
-
   ;; Temporary solution until https://github.com/emacs-lsp/lsp-mode/pull/3637 is merged
   (defcustom lsp-cut-signature 'space
     "If non-nil, signatures returned on hover will not be split on newline."

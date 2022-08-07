@@ -29,6 +29,9 @@
 
 ;;; Code:
 
+(use-package better-jumper
+  :ensure t)
+
 (use-package ivy
   :init
   (ivy-mode 1)

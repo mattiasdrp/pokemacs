@@ -35,6 +35,8 @@
   (tuareg-mode . apheleia-mode)
   (caml-mode . apheleia-mode)
   (python-mode . apheleia-mode)
+  (fsharp-mode . apheleia-mode)
+  (kotlin-mode . apheleia-mode)
   :config
   (setf (alist-get 'isort apheleia-formatters)
       '("isort" "--stdout" "-"))

@@ -130,6 +130,11 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-kotlin nil
+  "If non-nil, uses the Kotlin packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-web nil
   "If non-nil, uses the web packages"
   :group 'mdrp-packages

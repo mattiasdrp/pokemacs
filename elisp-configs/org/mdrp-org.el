@@ -244,8 +244,6 @@ Add this function to `org-mode-hook'."
     (org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
     )
 
-
-
   (use-package org-tempo ;; part of org-mode
     :after (org)
     :config
