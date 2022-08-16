@@ -157,6 +157,8 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 
 (require 'mdrp-whitespace)
 
+(require 'mdrp-vertico)
+
 ;;;; UI
 
 (update-to-load-path (expand-file-name "elisp-configs/ui" user-emacs-directory))
@@ -204,13 +206,14 @@ If you experience freezing, decrease this.  If you experience stuttering, increa
 (update-to-load-path (expand-file-name "elisp-configs/completion" user-emacs-directory))
 
 ;; Minibuffer completion
-(require 'mdrp-ivy-projectile)
 
 (require 'mdrp-company)
 
 ;;;; META PROGRAMMING:
 
 (update-to-load-path (expand-file-name "elisp-configs/meta" user-emacs-directory))
+
+(require 'mdrp-projectile)
 
 (require 'mdrp-separedit)
 

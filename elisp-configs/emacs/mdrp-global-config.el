@@ -121,7 +121,6 @@
  column-number-mode t
  comment-style 'indent
  ansi-color-names-vector ["#424242" "#EF9A9A" "#C5E1A5" "#FFEE58" "#64B5F6" "#E1BEE7" "#80DEEA" "#E0E0E0"]
- enable-recursive-minibuffers t
  scroll-bar-mode nil
  sentence-end-double-space nil
  show-paren-delay 0

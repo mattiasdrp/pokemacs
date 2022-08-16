@@ -376,15 +376,6 @@
          )
   )
 
-(use-package projectile
-  :bind
-  ("M-p" . projectile-command-map)
-  :custom
-  (projectile-completion-system 'ivy)
-  :init
-  (projectile-mode 1)
-  )
-
 (provide 'mdrp-ivy-projectile)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; mdrp-ivy-projectile.el ends here
