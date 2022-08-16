@@ -41,7 +41,6 @@
   (company-minimum-prefix-length 1)
   (company-idle-delay 0)
   :general
-  ("<tab>" 'company-indent-or-complete-common)
   (:keymaps 'company-active-map
             "<tab>" 'company-complete-selection)
   :config

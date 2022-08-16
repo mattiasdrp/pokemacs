@@ -56,6 +56,7 @@
 ;;; Remappings
 
 (general-define-key
+ [remap indent-for-tab-command]       'company-indent-or-complete-common
  [remap kill-buffer]                  'kill-this-buffer
  [remap ispell-word]                  'flyspell-correct-at-point
  )

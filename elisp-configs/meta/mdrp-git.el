@@ -38,9 +38,11 @@
   :bind-keymap
   ("M-v"                 . magit-mode-map)
   :bind
-  ("M-n"                 . smerge-vc-next-conflict)
-  ("M-m"                 . smerge-keep-mine)
-  ("M-o"                 . smerge-keep-other)
+  (:map smerge-mode-map
+        ("M-n"                 . smerge-vc-next-conflict)
+        ("M-m"                 . smerge-keep-mine)
+        ("M-o"                 . smerge-keep-other)
+        )
   (:map magit-mode-map
         ("g"             . magit-status)
         ("G"             . git-messenger:popup-message)

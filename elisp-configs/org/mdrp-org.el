@@ -109,7 +109,7 @@
        ("Difficile" . (:foreground "OrangeRed" :weight bold))
        )
      )
-    :bind-keymap ("C-M-o" . mdrp-org-map)
+    :bind-keymap ("M-o" . mdrp-org-map)
     :bind (
            ("C-x C-p" . mdrp/org-compile-latex-and-update-other-buffer)
            (:map mdrp-org-map
@@ -123,6 +123,7 @@
            )
 
     :config
+    (define-prefix-command 'mdrp-org-map nil "Org-")
     (defun transform-square-brackets-to-round-ones(string-to-transform)
       "Transforms [ into ( and ] into ), other chars left unchanged."
       (concat
@@ -139,7 +140,6 @@
     (customize-set-value 'org-latex-with-hyperref nil)
     (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
     (setq org-image-actual-width nil)
-    (define-prefix-command 'mdrp-org-map nil "Org-")
     (defun org-mode-<>-syntax-fix (start end)
       "Change syntax of characters ?< and ?> to symbol within source code blocks."
       (let ((case-fold-search t))
@@ -245,7 +245,7 @@ Add this function to `org-mode-hook'."
     )
 
   (use-package org-tempo ;; part of org-mode
-    :after (org)
+    :after org
     :config
     (add-to-list 'org-structure-template-alist '("smt" . "src smt-lib"))
     (add-to-list 'org-structure-template-alist '("oc" . "src ocaml"))
@@ -342,6 +342,41 @@ Add this function to `org-mode-hook'."
     :config
     (setq org-appear-autolinks t)
     )
+
+  (use-package org-roam
+    :ensure t
+    :after org
+    :custom
+    (org-roam-directory (file-truename "~/org/org-roam"))
+    :bind (
+           (:map mdrp-org-map
+                 ("r" . org-roam-buffer-toggle)
+                 ("f" . org-roam-node-find)
+                 ("g" . org-roam-graph)
+                 ("i" . org-roam-node-insert)
+                 ("c" . org-roam-capture)
+                 ;; Dailies
+                 ("j" . org-roam-dailies-capture-today))
+           )
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-roam-db-autosync-mode)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol))
+
+;;   (use-package! org-roam-ui
+;;     :after org-roam ;; or :after org
+;; ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;; ;;         a hookable mode anymore, you're advised to pick something yourself
+;; ;;         if you don't care about startup time, use
+;;     :hook (org-mode . org-roam-ui-mode)
+;;     :config
+;;     (setq org-roam-ui-sync-theme t
+;;           org-roam-ui-follow t
+;;           org-roam-ui-update-on-save t
+;;           org-roam-ui-open-on-start t))
+
   )
 
 (provide 'mdrp-org)

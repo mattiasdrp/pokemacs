@@ -1,0 +1,202 @@
+#+title: Pokemacs literate config file
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
+
+* Install
+
+** Emacs
+
+ - Your version of emacs should be at least 27.1
+
+*** I usually do it in two different ways
+
+**** From sources
+
+- For this you need to clone [[https://github.com/emacs-mirror/emacs][the emacs repository]] and either checkout the ~emacs.27.1~ (or higher) branch or compile from the ~main~ branch.
+- I tend to forget what dependencies are needed by emacs so here is the command I usually invoke before configuring and compiling emacs:
+
+  #+begin_src sh
+    sudo apt install -y autoconf make gcc texinfo libgtk-3-dev libxpm-dev \
+         libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev \
+      libjansson-dev libharfbuzz-dev libharfbuzz-bin imagemagick libmagickwand-dev libgccjit-10-dev libgccjit0 gcc-10 libjansson4 libjansson-dev xaw3dg-dev texinfo libx11-dev
+  #+end_src
+
+  #+begin_src sh
+    export CC="gcc-10"
+  #+end_src
+
+- If you feel confident and better than me at installing emacs from scratch, don't hesitate to tell me where I'm wrong, I always love to learn
+- Once
+  #+begin_src sh
+    ./autogen.sh
+  #+end_src
+
+and
+  #+begin_src sh
+    ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --with-compress-install \
+      --with-threads --with-included-regex --with-x-toolkit=lucid --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls \
+      --with-xft --with-xml2 --with-mailutils
+  #+end_src
+
+  tell you you can make,
+  #+begin_src sh
+    make -j $(nproc)
+  #+end_src
+
+  then
+
+  #+begin_src sh
+    sudo make install
+  #+end_src
+
+**** With guix
+
+- I just follow [[https://systemcrafters.net/craft-your-system-with-guix/installing-the-package-manager/][this link]]
+
+** For ligatures, all-the-icons and pretty things:
+
+- Install fonts
+  #+begin_src sh
+    sudo apt install fonts-firacode fonts-material-design-icons-iconfont
+  #+end_src
+
+** Rest
+
+*** LSP
+
+- In your shell config file:
+  #+begin_src sh
+    export LSP_USE_PLISTS=true
+  #+end_src
+
+- ripgrep (for rg. Can be installed through cargo or ~sudo apt install ripgrep~)
+
+- Install aspell
+  #+begin_src sh
+    sudo apt install aspell aspell-fr aspell-en
+  #+end_src
+
+*** OCaml
+
+- You need to have ocamlformat and ocaml-lsp-server installed in your switch
+  #+begin_src sh
+    opam install ocamlformat ocaml-lsp-server -y
+  #+end_src
+
+*** Rust
+
+- RLS:
+  - install [rustup](http://rustup.rs/)
+    #+begin_src sh
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    #+end_src
+  - Update
+    #+begin_src sh
+      rustup update
+    #+end_src
+  - Install components
+    #+begin_src sh
+      rustup component add rls rust-analysis rust-src
+    #+end_src
+- Racer:
+  #+begin_src sh
+    rustup toolchain add nightly
+  #+end_src
+
+  #+begin_src sh
+    rustup component add rust-src
+  #+end_src
+
+  #+begin_src sh
+    rustup component add rustc-dev --toolchain=nightly
+  #+end_src
+
+** Python
+
+- Install dependencies
+  #+begin_src sh
+    sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+        libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+  #+end_src
+
+- Install pyenv
+  #+begin_src sh
+    curl https://pyenv.run | $SHELL
+  #+end_src
+
+- Setup shell env for pyenv: https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
+
+  - Install python
+    #+begin_src sh
+      pyenv install 3.10.5
+    #+end_src
+
+  - Install nvm
+    #+begin_src sh
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
+    #+end_src
+
+  - Upgrade pip
+    #+begin_src sh
+      python -m pip install --upgrade pip
+    #+end_src
+
+  - Install pyright and other needed packages
+    #+begin_src sh
+      pip install pyright black isort yapf
+    #+end_src
+
+
+** Once emacs is installed:
+
+- ~M-x package-install~ <kbd>RET</kbd> ~no-littering~
+- Restart emacs
+
+** Install all the packages
+
+- ~M-x package-install-selected-packages~
+- Grab some coffee
+
+If this command fails:
+
+- ~M-x package-refresh-contents~
+- ~M-x package-install-selected-packages~
+
+** Configure packages
+
+- ~M-x all-the-icons-install-fonts~
+- ~M-x pdf-tools-install~
+
+** External files
+
+- I have a directory ~​~/org~ that contains 4 files:
+
+#+BEGIN_SRC
+  org
+  ├── agenda.org
+  ├── calendar​_company.org
+  ├── calendar​_user.org
+  └── orgzly.org
+#+END_SRC
+
+- This repository is synchronised on all my devices with [[https://syncthing.net/][Syncthing]] but the directory is checked entirely by org so you can put the files you want in it
+- I don't like having things everywhere. That's why I configured org-gcal to synchronise with my company's Google Calendar. For this I needed a secret key that I can't realistically put in a public repository. This key is located in ~~/.secrets/gcal-secrets.json~
+
+#+BEGIN_SRC json
+  {
+      "org-gcal-client-id": "my_id.apps.googleusercontent.com",
+      "org-gcal-client-secret": "my_secret_key",
+      "calendar-company": "my_company_calendar_id",
+      "calendar-user": "my_user_calendar_id"
+  }
+#+END_SRC
+
+- Thanks to [[https://www.reddit.com/user/-jz-/][-jz-]]for [[https://www.reddit.com/r/emacs/comments/d1ehpy/security_tip_if_you_push_initel_to_a_public_repo/][this thread]]
+
+Restart emacs and everything should work
+
+* Big Thanks
+
+- [[https://github.com/daviwil][daviwil]] for his [[https://github.com/daviwil/emacs-from-scratch][emacs from scratch]] serie
+- [[https://github.com/hlissner][hlissner]] for [[https://github.com/hlissner/doom-emacs/][doom-emacs]]
+- Many other that I stupidly didn't store for small config tricks, bug fixes etc that I found on StackOverflow, Reddit, GitHub, personal blogs etc
