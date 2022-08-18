@@ -1,13 +1,38 @@
 #+title: Pokemacs literate config file
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
-* Install
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :ignore (this)
+:END:
+
+:CONTENTS:
+- [[#system][System]]
+  - [[#emacs][Emacs]]
+    - [[#building][Building]]
+      - [[#from-sources][From sources]]
+      - [[#with-guix][With guix]]
+  - [[#languages][Languages]]
+    - [[#lsp][LSP]]
+    - [[#flyspell][Flyspell]]
+    - [[#ocaml][OCaml]]
+    - [[#rust][Rust]]
+    - [[#python][Python]]
+  - [[#once-emacs-is-installed][Once emacs is installed:]]
+  - [[#install-all-the-packages][Install all the packages]]
+  - [[#configure-packages][Configure packages]]
+  - [[#external-files][External files]]
+- [[#emacs-config][Emacs config]]
+- [[#big-thanks][Big Thanks]]
+:END:
+
+* System
 
 ** Emacs
 
  - Your version of emacs should be at least 27.1
 
-*** I usually do it in two different ways
+*** Building
 
 **** From sources
 
@@ -30,7 +55,7 @@
     ./autogen.sh
   #+end_src
 
-and
+  and
   #+begin_src sh
     ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --with-compress-install \
       --with-threads --with-included-regex --with-x-toolkit=lucid --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls \
@@ -52,14 +77,7 @@ and
 
 - I just follow [[https://systemcrafters.net/craft-your-system-with-guix/installing-the-package-manager/][this link]]
 
-** For ligatures, all-the-icons and pretty things:
-
-- Install fonts
-  #+begin_src sh
-    sudo apt install fonts-firacode fonts-material-design-icons-iconfont
-  #+end_src
-
-** Rest
+** Languages
 
 *** LSP
 
@@ -68,24 +86,25 @@ and
     export LSP_USE_PLISTS=true
   #+end_src
 
-- ripgrep (for rg. Can be installed through cargo or ~sudo apt install ripgrep~)
+*** Flyspell
 
-- Install aspell
+- ~aspell~ will be installed the first time you start emacs but you'll still need to install the dictionaries you want to use. In my case this will be:
+
   #+begin_src sh
-    sudo apt install aspell aspell-fr aspell-en
+    sudo apt install aspell-fr aspell-en
   #+end_src
 
 *** OCaml
 
-- You need to have ocamlformat and ocaml-lsp-server installed in your switch
+- You need to have ~ocamlformat~ and ~ocaml-lsp-server~ installed in your switch
   #+begin_src sh
     opam install ocamlformat ocaml-lsp-server -y
   #+end_src
 
 *** Rust
 
-- RLS:
-  - install [rustup](http://rustup.rs/)
+- RLS
+  - install [[http://rustup.rs/][rustup]]
     #+begin_src sh
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     #+end_src
@@ -97,20 +116,8 @@ and
     #+begin_src sh
       rustup component add rls rust-analysis rust-src
     #+end_src
-- Racer:
-  #+begin_src sh
-    rustup toolchain add nightly
-  #+end_src
 
-  #+begin_src sh
-    rustup component add rust-src
-  #+end_src
-
-  #+begin_src sh
-    rustup component add rustc-dev --toolchain=nightly
-  #+end_src
-
-** Python
+*** Python
 
 - Install dependencies
   #+begin_src sh
@@ -126,50 +133,40 @@ and
 
 - Setup shell env for pyenv: https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv
 
-  - Install python
-    #+begin_src sh
-      pyenv install 3.10.5
-    #+end_src
+- Install python
+  #+begin_src sh
+    pyenv install 3.10.5
+  #+end_src
 
-  - Install nvm
-    #+begin_src sh
-      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
-    #+end_src
+- Install nvm
+  #+begin_src sh
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | $SHELL
+  #+end_src
 
-  - Upgrade pip
-    #+begin_src sh
-      python -m pip install --upgrade pip
-    #+end_src
+- Upgrade pip
+  #+begin_src sh
+    python -m pip install --upgrade pip
+  #+end_src
 
-  - Install pyright and other needed packages
-    #+begin_src sh
-      pip install pyright black isort yapf
-    #+end_src
-
+- Install pyright and other needed packages
+  #+begin_src sh
+    pip install pyright black isort yapf
+  #+end_src
 
 ** Once emacs is installed:
 
-- ~M-x package-install~ <kbd>RET</kbd> ~no-littering~
-- Restart emacs
-
-** Install all the packages
-
-- ~M-x package-install-selected-packages~
-- Grab some coffee
-
-If this command fails:
-
-- ~M-x package-refresh-contents~
-- ~M-x package-install-selected-packages~
+Just start emacs and let it install all the packages and dependencies.
 
 ** Configure packages
+
+After everything is installed you need to run these two commands just once.
 
 - ~M-x all-the-icons-install-fonts~
 - ~M-x pdf-tools-install~
 
 ** External files
 
-- I have a directory ~​~/org~ that contains 4 files:
+- I have a ~​~/org~ directory that contains 4 files:
 
 #+BEGIN_SRC
   org
@@ -195,8 +192,23 @@ If this command fails:
 
 Restart emacs and everything should work
 
+* Emacs config
+
+The emacs config is written as literate programming in [[file:init.org][init.org]] and this file generates the [[file:init.el][init.el]] file (that should never be touched). If you want to try things you can edit [[file:init.org][init.org]] and when you've finished just hit ~C-c C-v t~ (~org-babel-tangle~).
+
 * Big Thanks
 
 - [[https://github.com/daviwil][daviwil]] for his [[https://github.com/daviwil/emacs-from-scratch][emacs from scratch]] serie
 - [[https://github.com/hlissner][hlissner]] for [[https://github.com/hlissner/doom-emacs/][doom-emacs]]
 - Many other that I stupidly didn't store for small config tricks, bug fixes etc that I found on StackOverflow, Reddit, GitHub, personal blogs etc
+- Thanks to [[https://github.com/coquera][@coquera]] for forcing me to create a README, this was one big example of procrastination
+- Thanks to [[https://github.com/thriim][@thriim]] for the thorough testing
+- Thanks to [[https://github.com/remyzorg][@remyzorg]] for being unable to choose
+
+* Todos
+
+ - [X] Rewrite this README in org
+ - [X] Maybe try this "literate" programming thing
+ - [ ] I experimented with `emacs-daemon` and `emacsclient` but not enough to make it viable
+ - [ ] Complete this TODO list
+ - [ ] Add all the remaining thanks

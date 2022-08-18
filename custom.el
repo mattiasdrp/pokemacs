@@ -1,10 +1,10 @@
 ;;; package --- Customization for emacs
 ;;; Commentary:
-;;; Global customization should be made with M-x customize-variable/face
-;;; so everything can be found in this file
+;; Global customization should be made with M-x customize-variable/face
+;; so everything can be found in this file
 ;;;
-;;; If there is any question about what these variables/faces do just
-;;; M-x customize-variable/face <ret> name_of_the_variable/face and see the doc
+;; If there is any question about what these variables/faces do just
+;; M-x customize-variable/face <ret> name_of_the_variable/face and see the doc
 ;;; Code:
 
 (custom-set-variables
@@ -15,42 +15,49 @@
  '(auth-source-save-behavior nil)
  '(describe-char-unidata-list
    '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
- '(electric-indent-mode t)
- '(org-export-backends '(ascii html icalendar latex md odt pandoc))
- '(package-selected-packages
-   '(counsel-spotify cheatsheet keycast git-timemachine pulsar auto-package-update restart-emacs diff-hl magit-todos lsp-docker hide-mode-line async ghub anzu command-log-mode python-mode yapfify pyvenv lsp-pyright pyenv-mode dap-mode apheleia org-pdftools org-appear xr org-inline-pdf pandoc ox-gfm markdown-preview-mode dune-format abbrev ace-window all-the-icons all-the-icons-dired all-the-icons-ivy all-the-icons-ivy-rich amx auctex auctex-latexmk auto-complete auto-complete-auctex calfw calfw-org caml-debug caml-mode cargo cdlatex company-auctex company-box company-math company-prescient company-quickhelp company-racer company-web counsel counsel-projectile crux cubicle-mode dash dash-functional delight dictionary diminish discover-my-major doom-modeline doom-themes dumb-jump dune dune-mode elm-mode flycheck flycheck-inline flycheck-rust flyspell-correct flyspell-correct-ivy flyspell-correct-popup fsharp-mode general git-commit git-messenger gitignore-mode god-mode helpful highlight-indent-guides ivy-avy ivy-bibtex ivy-posframe ivy-prescient ivy-rich json-mode LaTeX-math-mode lsp-ivy lsp-mode lsp-treemacs lsp-ui magit merlin-mode minions multiple-cursors nlinum no-littering ob-rust org-bullets org-make-toc org-plus-contrib org-present org-protocol org-ref org-super-agenda outline-minor-faces outshine ox-pandoc pandoc-mode pdf-tools php-mode pretty-outlines projectile quick-peek racer rainbow-delimiters rainbow-mode ripgrep rotate run-ocaml rust-mode saveplace-pdf-view selected separedit smex sort-words tex-site toml-mode treemacs treemacs-all-the-icons treemacs-icons-dired treemacs-magit treemacs-projectile undo-tree unfill use-package use-package-ensure-system-package utop visual-fill-column vlf web-mode wgrep which-key why3-mode ws-butler yaml-mode yasnippet z3-mode zzz-to-char))
-
- ;; Doom modeline config
  '(doom-modeline-bar-width 4)
  '(doom-modeline-height 25)
- ;;- Doom modeline config
-
- ;; Choose between:
- ;;  - 'parenthesis:  show the matching paren
- ;;  - 'expression: show the entire expression enclosed by the paren
- ;;  - 'mixed: show the matching paren if it is visible, and the expression otherwise
+ '(electric-indent-mode t)
+ '(hl-todo-keyword-faces
+   '(("MDRPTODO" . "red")
+     ("HOLD" . "#d0bf8f")
+     ("TODO" . "#cc9393")
+     ("NEXT" . "#dca3a3")
+     ("THEM" . "#dc8cc3")
+     ("PROG" . "#7cb8bb")
+     ("OKAY" . "#7cb8bb")
+     ("DONT" . "#5f7f5f")
+     ("FAIL" . "#8c5353")
+     ("DONE" . "#afd8af")
+     ("NOTE" . "#d0bf8f")
+     ("KLUDGE" . "#d0bf8f")
+     ("HACK" . "#d0bf8f")
+     ("TEMP" . "#d0bf8f")
+     ("FIXME" . "#cc9393")
+     ("XXXX*" . "#cc9393")))
+ '(org-export-backends '(ascii html icalendar latex md odt pandoc))
+ '(package-selected-packages
+   '(yasnippet lsp-ui tuareg web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode toml-mode tree-sitter-langs tree-sitter org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(show-paren-style 'expression)
-
- ;; Enable or disable functionalities
  '(use-company t)
  '(use-fsharp t)
  '(use-god nil)
+ '(use-kotlin t)
  '(use-latex nil)
+ '(use-magit-todos t)
  '(use-markdown t)
+ '(use-maximize t)
  '(use-ocaml t)
  '(use-org t)
+ '(use-pandoc t)
  '(use-python t)
  '(use-rainbow t)
- '(use-reason nil)
+ '(use-reason t)
  '(use-rust t)
- '(use-smt t)
  '(use-spotify nil)
  '(use-treemacs t)
- '(use-usuba nil)
- '(use-vertical-split nil)
  '(use-visual-fill t)
  '(use-web t)
- '(warning-suppress-log-types '((comp) (comp)))
  '(warning-suppress-types '((comp))))
 
 (custom-set-faces
