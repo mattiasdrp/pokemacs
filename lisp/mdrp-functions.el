@@ -1,29 +1,14 @@
 ;;; mdrp-functions.el --- -*- lexical-binding: t -*-
 
-;; Copyright (c) 2020-2020 mdrp and contributors.
+;; Copyright (c) 2022 mattiasdrp and contributors.
 
-;; Author: mdrp
-;; Maintainer: mdrp <https://github.com/mattiasdrp>
+;; Author: mattiasdrp
+;; Maintainer: mattiasdrp <https://github.com/mattiasdrp>
+;; Created: 17 august 2022
 ;; Version: 1.0
-;; Licence: GPL2+
-;; Keywords: convenience, configuration
-
-;;; License:
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 2 of the License, or
-;; (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; Licence: MIT
+;; Keywords: emacs, init, convenience, configuration
+;; URL: https://github.com/mattiasdrp/pokemacs
 
 ;;; Commentary:
 
@@ -180,79 +165,6 @@ DOCSTRING and BODY are as in `defun'.
        (dolist (targets (list ,@(nreverse where-alist)))
          (dolist (target (cdr targets))
            (advice-add target (car targets) #',symbol))))))
-
-;;;###autoload
-(defun +ivy-display-at-frame-center-near-bottom-fn (str)
-  "TODO"
-  (ivy-posframe--display str #'+ivy-poshandler-frame-center-near-bottom-fn))
-
-;;;###autoload
-(defun +ivy-poshandler-frame-center-near-bottom-fn (info)
-  "TODO"
-  (let ((parent-frame (plist-get info :parent-frame))
-        (pos (posframe-poshandler-frame-center info)))
-    (cons (car pos)
-          (truncate (/ (frame-pixel-height parent-frame) 2)))))
-
-;;;###autoload
-(defun +ivy-rich-buffer-icon (candidate)
-  "Display the icon for CANDIDATE buffer."
-  ;; NOTE This is inspired by `all-the-icons-ivy-buffer-transformer', minus the
-  ;; buffer name and extra padding as those are handled by `ivy-rich'.
-  (propertize "\t" 'display
-              (if-let* ((buffer (get-buffer candidate))
-                        (mode (buffer-local-value 'major-mode buffer)))
-                  (or
-                   (all-the-icons-ivy--icon-for-mode mode)
-                   (all-the-icons-ivy--icon-for-mode (get mode 'derived-mode-parent))
-                   (funcall
-                    all-the-icons-ivy-family-fallback-for-buffer
-                    all-the-icons-ivy-name-fallback-for-buffer))
-                (all-the-icons-icon-for-file candidate))))
-;;
-
-;;;###autoload
-(defun +ivy-rich-describe-variable-transformer (cand)
-  "Previews the value of the variable in the minibuffer"
-  (let* ((sym (intern cand))
-         (val (and (boundp sym) (symbol-value sym)))
-         (print-level 3))
-    (replace-regexp-in-string
-     "[\n\t\^[\^M\^@\^G]" " "
-     (cond ((booleanp val)
-            (propertize (format "%s" val) 'face
-                        (if (null val)
-                            'font-lock-comment-face
-                          'success)))
-           ((symbolp val)
-            (propertize (format "'%s" val)
-                        'face 'highlight-quoted-symbol))
-           ((keymapp val)
-            (propertize "<keymap>" 'face 'font-lock-constant-face))
-           ((listp val)
-            (prin1-to-string val))
-           ((stringp val)
-            (propertize (format "%S" val) 'face 'font-lock-string-face))
-           ((numberp val)
-            (propertize (format "%s" val) 'face 'highlight-numbers-number))
-           ((format "%s" val)))
-     t)))
-
-;;;###autoload
-(defun +ivy/compile ()
-  "Execute a compile command from the current buffer's directory."
-  (interactive)
-  (counsel-compile default-directory))
-
-;;;###autoload
-(defun +ivy/project-compile ()
-  "Execute a compile command from the current project's root."
-  (interactive)
-  (counsel-compile (projectile-project-root)))
-
-;;;###autoload
-(defun +ivy-yas-prompt-fn (prompt choices &optional display-fn)
-  (yas-completing-prompt prompt choices display-fn #'ivy-completing-read))
 
 (provide 'mdrp-functions)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

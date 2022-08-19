@@ -1,3 +1,6 @@
 [submodule "custom/ts-fold"]
-	path = custom/ts-fold
+	path = lisp/ts-fold
+	url = git@github.com:jcs-elpa/ts-fold.git
+[submodule "lisp/ts-fold"]
+	path = lisp/ts-fold
 	url = git@github.com:jcs-elpa/ts-fold.git

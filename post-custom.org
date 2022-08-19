@@ -1,0 +1,144 @@
+#+title: Emacs Early Init
+#+author: mattiasdrp
+#+date: <2022-08-17 Wed>
+#+language: en_US
+#+property: header-args :results silent :exports code :tangle yes
+
+#+keywords: Emacs
+
+Literate configuration for [[file:post-custom.el][post-custom.el]].
+
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :ignore this
+:END:
+
+:CONTENTS:
+- [[#header][Header]]
+- [[#keybindings][Keybindings]]
+  - [[#unbinding][Unbinding]]
+    - [[#globally][Globally]]
+    - [[#locally-to-a-keymap][Locally to a keymap]]
+  - [[#binding][Binding]]
+    - [[#globally][Globally]]
+    - [[#locally][Locally]]
+- [[#end][End]]
+:END:
+
+* Header
+:PROPERTIES:
+:CUSTOM_ID: header
+:END:
+
+#+begin_src emacs-lisp
+  ;;; post-custom.el --- Emacs customization -*- lexical-binding: t -*-
+
+  ;; Copyright (c) 2022 mattiasdrp and contributors.
+
+  ;; Author: mattiasdrp
+  ;; Maintainer: mattiasdrp <https://github.com/mattiasdrp>
+  ;; Created: 17 august 2022
+  ;; Version: 1.0
+  ;; Licence: MIT
+  ;; Keywords: emacs, init, convenience, configuration
+  ;; URL: https://github.com/mattiasdrp/pokemacs
+
+    ;;; Commentary:
+  ;; This file will be loaded when emacs has finished initializing everything
+  ;; and allows to override some bindings and behaviours that are not
+  ;; controlled by custom.el
+
+  ;;; Code:
+
+#+end_src
+
+* Keybindings
+:PROPERTIES:
+:CUSTOM_ID: keybindings
+:END:
+
+** Unbinding
+:PROPERTIES:
+:CUSTOM_ID: unbinding
+:END:
+
+You can unbind anything you want.
+
+*** Globally
+:PROPERTIES:
+:CUSTOM_ID: globally
+:END:
+
+#+begin_src emacs-lisp
+  (general-unbind
+    ;; "C-o"
+    )
+#+end_src
+
+*** Locally to a keymap
+:PROPERTIES:
+:CUSTOM_ID: locally-to-a-keymap
+:END:
+
+(notice the quote before the name of the map)
+
+#+begin_src emacs-lisp
+  (general-unbind
+    :keymaps 'tuareg-mode-map
+    "C-c TAB"
+    )
+#+end_src
+
+** Binding
+:PROPERTIES:
+:CUSTOM_ID: binding
+:END:
+
+You can bind anything you want.
+
+*** Globally
+:PROPERTIES:
+:CUSTOM_ID: globally
+:END:
+
+#+begin_src emacs-lisp
+  (general-define-key
+   "C-x 1"                 'delete-other-windows
+   )
+#+end_src
+
+Grouped under a prefix, allowing to define multiple keybindings under the same prefix without having to rewrite the prefix.
+
+#+begin_src emacs-lisp
+  (general-define-key
+   :prefix "M-z"
+   "w"                       'mdrp/resize-window-width
+   "h"                       'mdrp/resize-window-height)
+#+end_src
+
+*** Locally
+:PROPERTIES:
+:CUSTOM_ID: locally
+:END:
+
+(notice the quote before the name of the map)
+
+#+begin_src emacs-lisp
+  (general-define-key
+   :keymaps 'tuareg-mode-map
+   "C-x M-1"                 'delete-other-windows
+   )
+#+end_src
+
+You can obviously combine ~:keymaps~ and ~:prefix~
+
+* End
+:PROPERTIES:
+:CUSTOM_ID: end
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'post-custom)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;; post-custom.el ends here
+#+end_src
