@@ -121,6 +121,11 @@
 :group 'mdrp-packages
 :type 'boolean)
 
+(defcustom doom-theme 'doom-one
+"Theme to load"
+:group 'mdrp-packages
+:type 'symbol)
+
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
 
@@ -210,7 +215,7 @@
  ;; TODO: Move this to ?
  native-comp-deferred-compilation t
  ;; Ask before killing emacs
- '(confirm-kill-emacs 'y-or-n-p)
+ confirm-kill-emacs 'y-or-n-p
  ;; TODO: Move this to org
  org-directory "~/org/"
  ;; Move point by visual lines
@@ -1426,7 +1431,7 @@ e.g. proselint and langtool."
   :ensure t
   :config
   ;; Global settings (defaults)
-  (load-theme 'doom-one t)
+  (load-theme doom-theme t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)

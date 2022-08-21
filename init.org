@@ -334,6 +334,12 @@ This is a list of custom variables that allow to enable/disable features. If you
   "If non-nil, maximize emacs at startup"
   :group 'mdrp-packages
   :type 'boolean)
+
+  (defcustom doom-theme 'doom-one
+  "Theme to load"
+  :group 'mdrp-packages
+  :type 'symbol)
+
 #+end_src
 
 ** Set useful variables
@@ -501,7 +507,7 @@ If you experience stuttering, increase this.
    ;; TODO: Move this to ?
    native-comp-deferred-compilation t
    ;; Ask before killing emacs
-   '(confirm-kill-emacs 'y-or-n-p)
+   confirm-kill-emacs 'y-or-n-p
    ;; TODO: Move this to org
    org-directory "~/org/"
    ;; Move point by visual lines
@@ -2474,7 +2480,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
     :ensure t
     :config
     ;; Global settings (defaults)
-    (load-theme 'doom-one t)
+    (load-theme doom-theme t)
 
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
