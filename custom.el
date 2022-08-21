@@ -19,6 +19,8 @@
    '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
  '(doom-modeline-bar-width 4)
  '(doom-modeline-height 25)
+ '(doom-themes-enable-bold t)
+ '(doom-themes-enable-italic t)
  '(electric-indent-mode t)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")

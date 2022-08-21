@@ -209,6 +209,8 @@
 (setq
  ;; TODO: Move this to ?
  native-comp-deferred-compilation t
+ ;; Ask before killing emacs
+ '(confirm-kill-emacs 'y-or-n-p)
  ;; TODO: Move this to org
  org-directory "~/org/"
  ;; Move point by visual lines
@@ -1068,7 +1070,6 @@ e.g. proselint and langtool."
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package vertico-multiform
-  ;; :disabled
   :after vertico
   :ensure nil
   :custom
@@ -1078,6 +1079,7 @@ e.g. proselint and langtool."
   :config
   (setq vertico-multiform-commands
         '((consult-imenu buffer)
+          (consult-line buffer)
           (execute-extended-command posframe mouse)))
 
   (setq vertico-multiform-categories
@@ -1422,10 +1424,6 @@ e.g. proselint and langtool."
 
 (use-package doom-themes
   :ensure t
-  :custom
-  (doom-themes-enable-bold t)    ; if nil, bold is universally disabled
-  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
-
   :config
   ;; Global settings (defaults)
   (load-theme 'doom-one t)
@@ -2502,6 +2500,19 @@ function to get the type and, for example, kill and yank it."
                            ("not" . ?¬)
                            (":=" . ?⇐)
                            ))))))
+
+(when use-ocaml
+  (use-package ocp-indent
+    ;; must be careful to always defer this, it has autoloads that adds hooks
+    ;; which we do not want if the executable can't be found
+    :hook
+    (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
+    :config
+    (defun mdrp/ocaml-init-ocp-indent-h ()
+      "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
+      (when (executable-find "ocp-indent")
+        (ocp-setup-indent)))
+    ))
 
 (when use-ocaml
   (use-package tuareg-menhir
