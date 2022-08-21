@@ -1899,14 +1899,14 @@ By completion two things are intended:
 - text completion (be it for programs or simple text, see [[#company][Company]])
 - minibuffer and command completions (emacs related, see [[#vertico][Vertico]] and friends below)
 
-** [[https://github.com/minad/vertico][Vertico]]
+** [[https://kristofferbalintona.me/posts/202202211546/][Vertico]]
 :PROPERTIES:
 :CUSTOM_ID: vertico
 :END:
 
 Vertico works with the default completion system instead of reimplementing a whole system allowing better flexibility and package binding.
 
-*** Main mode
+*** [[https://github.com/minad/vertico][Main mode]]
 :PROPERTIES:
 :CUSTOM_ID: main-mode
 :END:
@@ -1988,16 +1988,21 @@ This extension allows to choose the way each minibuffer will be displayed.
                                      (window-width . 0.3)))
     :config
     (setq vertico-multiform-commands
-          '((consult-line buffer)
-            (consult-imenu buffer)
-            (execute-extended-command reverse mouse)))
+          '((consult-imenu buffer)
+            (consult-line buffer)
+            (execute-extended-command posframe mouse)))
 
     (setq vertico-multiform-categories
-          '((file reverse mouse)
-            (imenu buffer)
+          '((imenu buffer)
             (symbol (vertico-sort-function . vertico-sort-alpha))
-            (t reverse mouse)))
+            (t posframe)
+            ))
     (vertico-multiform-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package vertico-posframe
+    :ensure t)
 #+end_src
 
 ** [[https://github.com/minad/consult/][Consult]]

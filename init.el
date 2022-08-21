@@ -1068,6 +1068,7 @@ e.g. proselint and langtool."
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package vertico-multiform
+  ;; :disabled
   :after vertico
   :ensure nil
   :custom
@@ -1076,16 +1077,18 @@ e.g. proselint and langtool."
                                    (window-width . 0.3)))
   :config
   (setq vertico-multiform-commands
-        '((consult-line buffer)
-          (consult-imenu buffer)
-          (execute-extended-command reverse mouse)))
+        '((consult-imenu buffer)
+          (execute-extended-command posframe mouse)))
 
   (setq vertico-multiform-categories
-        '((file reverse mouse)
-          (imenu buffer)
+        '((imenu buffer)
           (symbol (vertico-sort-function . vertico-sort-alpha))
-          (t reverse mouse)))
+          (t posframe)
+          ))
   (vertico-multiform-mode))
+
+(use-package vertico-posframe
+  :ensure t)
 
 (use-package consult
   :ensure t
