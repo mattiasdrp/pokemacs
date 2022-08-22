@@ -407,13 +407,8 @@ debian, and derivatives). On most it's 'fd'.")
   (global-ligature-mode t))
 
 (use-package ansi-color
-  ;; Old Config
-  ;; :config
-  ;; (defun mdrp/colorize-compilation-buffer ()
-  ;;   (let ((inhibit-read-only t))
-  ;;     (ansi-color-apply-on-region (point-min) (point-max))))
-  ;; :hook (compilation-filter . mdrp/colorize-compilation-buffer)
-  :hook (compilation-filter . ansi-color-process-output)
+  :hook
+  (shell-mode . ansi-color-for-comint-mode-on)
   )
 
 (use-package general

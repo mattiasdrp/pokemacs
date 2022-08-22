@@ -907,13 +907,8 @@ Other all-the-icons related packages:
 
 #+begin_src emacs-lisp
   (use-package ansi-color
-    ;; Old Config
-    ;; :config
-    ;; (defun mdrp/colorize-compilation-buffer ()
-    ;;   (let ((inhibit-read-only t))
-    ;;     (ansi-color-apply-on-region (point-min) (point-max))))
-    ;; :hook (compilation-filter . mdrp/colorize-compilation-buffer)
-    :hook (compilation-filter . ansi-color-process-output)
+    :hook
+    (shell-mode . ansi-color-for-comint-mode-on)
     )
 #+end_src
 
