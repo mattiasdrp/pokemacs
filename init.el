@@ -2504,6 +2504,7 @@ function to get the type and, for example, kill and yank it."
   (use-package ocp-indent
     ;; must be careful to always defer this, it has autoloads that adds hooks
     ;; which we do not want if the executable can't be found
+    :ensure t
     :hook
     (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
     :config
