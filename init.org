@@ -250,8 +250,8 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'mdrp-packages
     :type 'boolean)
 
-  (defcustom use-org nil
-    "If non-nil, uses the Org packages"
+  (defcustom use-org-roam nil
+    "If non-nil, uses Org roam"
     :group 'mdrp-packages
     :type 'boolean)
 
@@ -317,11 +317,6 @@ This is a list of custom variables that allow to enable/disable features. If you
 
   (defcustom use-god nil
     "If non-nil, uses the god (mode) packages"
-    :group 'mdrp-packages
-    :type 'boolean)
-
-  (defcustom use-rainbow nil
-    "If non-nil, uses the rainbow packages"
     :group 'mdrp-packages
     :type 'boolean)
 
@@ -508,8 +503,6 @@ If you experience stuttering, increase this.
    native-comp-deferred-compilation t
    ;; Ask before killing emacs
    confirm-kill-emacs 'y-or-n-p
-   ;; TODO: Move this to org
-   org-directory "~/org/"
    ;; Move point by visual lines
    line-move-visual t
    ;; Highlight the location of the next-error in the source buffer
@@ -2889,6 +2882,7 @@ Org mode is, well, org mode.
       )
 
     :custom
+    (org-directory "~/org/")
     ;; Babel
     (org-confirm-babel-evaluate nil)
     (org-src-fontify-natively t)
@@ -3280,26 +3274,27 @@ Like unprettify at point but for org invisible elements (links etc)
 The next package I need to use fully, just starting right now.
 
 #+begin_src emacs-lisp
-  (use-package org-roam
-    :ensure t
-    :after org
-    :custom
-    (org-roam-directory (file-truename "~/org/org-roam"))
-    :general
-    (:keymaps 'mdrp-org-map
-              "r" 'org-roam-buffer-toggle
-              "f" 'org-roam-node-find
-              "g" 'org-roam-graph
-              "i" 'org-roam-node-insert
-              "c" 'org-roam-capture
-                 ;; Dailies
-              "j" 'org-roam-dailies-capture-today)
-    :config
-    ;; If you're using a vertical completion framework, you might want a more informative completion interface
-    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    (org-roam-db-autosync-mode)
-    ;; If using org-roam-protocol
-    (require 'org-roam-protocol))
+  (when use-org-roam
+    (use-package org-roam
+      :ensure t
+      :after org
+      :custom
+      (org-roam-directory (file-truename "~/org/org-roam"))
+      :general
+      (:keymaps 'mdrp-org-map
+                "r" 'org-roam-buffer-toggle
+                "f" 'org-roam-node-find
+                "g" 'org-roam-graph
+                "i" 'org-roam-node-insert
+                "c" 'org-roam-capture
+                ;; Dailies
+                "j" 'org-roam-dailies-capture-today)
+      :config
+      ;; If you're using a vertical completion framework, you might want a more informative completion interface
+      (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+      (org-roam-db-autosync-mode)
+      ;; If using org-roam-protocol
+      (require 'org-roam-protocol)))
 #+end_src
 
 ** [[https://github.com/alphapapa/org-make-toc][Org make toc]]

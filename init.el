@@ -36,8 +36,8 @@
   :group 'mdrp-packages
   :type 'boolean)
 
-(defcustom use-org nil
-  "If non-nil, uses the Org packages"
+(defcustom use-org-roam nil
+  "If non-nil, uses Org roam"
   :group 'mdrp-packages
   :type 'boolean)
 
@@ -103,11 +103,6 @@
 
 (defcustom use-god nil
   "If non-nil, uses the god (mode) packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-rainbow nil
-  "If non-nil, uses the rainbow packages"
   :group 'mdrp-packages
   :type 'boolean)
 
@@ -216,8 +211,6 @@
  native-comp-deferred-compilation t
  ;; Ask before killing emacs
  confirm-kill-emacs 'y-or-n-p
- ;; TODO: Move this to org
- org-directory "~/org/"
  ;; Move point by visual lines
  line-move-visual t
  ;; Highlight the location of the next-error in the source buffer
@@ -1724,6 +1717,7 @@ e.g. proselint and langtool."
     )
 
   :custom
+  (org-directory "~/org/")
   ;; Babel
   (org-confirm-babel-evaluate nil)
   (org-src-fontify-natively t)
@@ -2023,26 +2017,27 @@ e.g. proselint and langtool."
   (setq org-appear-autolinks t)
   )
 
-(use-package org-roam
-  :ensure t
-  :after org
-  :custom
-  (org-roam-directory (file-truename "~/org/org-roam"))
-  :general
-  (:keymaps 'mdrp-org-map
-            "r" 'org-roam-buffer-toggle
-            "f" 'org-roam-node-find
-            "g" 'org-roam-graph
-            "i" 'org-roam-node-insert
-            "c" 'org-roam-capture
-               ;; Dailies
-            "j" 'org-roam-dailies-capture-today)
-  :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+(when use-org-roam
+  (use-package org-roam
+    :ensure t
+    :after org
+    :custom
+    (org-roam-directory (file-truename "~/org/org-roam"))
+    :general
+    (:keymaps 'mdrp-org-map
+              "r" 'org-roam-buffer-toggle
+              "f" 'org-roam-node-find
+              "g" 'org-roam-graph
+              "i" 'org-roam-node-insert
+              "c" 'org-roam-capture
+              ;; Dailies
+              "j" 'org-roam-dailies-capture-today)
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-roam-db-autosync-mode)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol)))
 
 (use-package org-make-toc
   :ensure t
