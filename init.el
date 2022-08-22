@@ -1567,10 +1567,10 @@ e.g. proselint and langtool."
 
   :config
   ;; Define your custom doom-modeline
-  (setq doom-modeline-fn-alist
-    (--map
-     (cons (remove-pos-from-symbol (car it)) (cdr it))
-     doom-modeline-fn-alist))
+  ;; (setq doom-modeline-fn-alist
+  ;;   (--map
+  ;;    (cons (remove-pos-from-symbol (car it)) (cdr it))
+  ;;    doom-modeline-fn-alist))
 
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
     '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
@@ -2378,7 +2378,7 @@ function to get the type and, for example, kill and yank it."
 ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
 ;; harmless if `prettify-symbols-mode' isn't active
 ;; (setq tuareg-prettify-symbols-full t)
-(defun opam-shell-command-to-string (command)
+(defun mdrp/opam-shell-command-to-string (command)
   "Similar to shell-command-to-string, but returns nil unless the process
   returned 0, and ignores stderr (shell-command-to-string ignores return value)"
   (let* ((return-value 0)
@@ -2390,9 +2390,9 @@ function to get the type and, for example, kill and yank it."
                                   shell-command-switch command))))))
     (if (= return-value 0) return-string nil)))
 
-(defun load-path-opam (&rest _)
+(defun mdrp/load-path-opam (&rest _)
   (let ((opam-share
-         (let ((reply (opam-shell-command-to-string "opam var share --safe")))
+         (let ((reply (mdrp/opam-shell-command-to-string "opam var share --safe")))
            (when reply (substring reply 0 -1)))))
     (message opam-share)
     (let ((path (concat opam-share "/emacs/site-lisp")))
@@ -2426,7 +2426,10 @@ function to get the type and, for example, kill and yank it."
   (use-package tuareg
     :ensure t
     :mode ("\\.ml\\'" . tuareg-mode)
-    :load-path (lambda () (load-path-opam))
+    ;; The following line can be used instead of :ensure t to load
+    ;; the tuareg.el file installed with tuareg when running opam install tuareg
+    ;; I'm not really sure that it's useful.
+    ;; :load-path (lambda () (mdrp/load-path-opam))
     :custom
     (tuareg-other-file-alist
      '(("\\.\\(?:pp\\.\\)?mli\\'" (".ml" ".mll" ".mly" ".pp.ml"))
@@ -2436,28 +2439,29 @@ function to get the type and, for example, kill and yank it."
        ("\\.mly\\'" (".mli"))
        ("\\.eliomi\\'" (".eliom"))
        ("\\.eliom\\'" (".eliomi"))))
-    :bind (:map tuareg-mode-map
-                ("C-c C-t" . nil)
-                ("C-c C-w" . nil)
-                ("C-c C-l" . nil)
-                ("C-c w"   . mdrp/dune-watch)
-                )
+    :general
+    (:keymaps 'tuareg-mode-map
+              "C-c C-t" nil
+              "C-c C-w" nil
+              "C-c C-l" nil
+              "C-c w"   'mdrp/dune-watch
+              )
     :config
     ;; Use opam to set environment
     (setq tuareg-opam-insinuate t)
     (setq tuareg-electric-indent t)
 
     (tuareg-opam-update-env (tuareg-opam-current-compiler))
-    (defun update-opam-env (&rest _)
+    (defun mdrp/update-opam-env (&rest _)
       (when (derived-mode-p 'tuareg-mode)
         (tuareg-opam-update-env nil)
         )
       )
 
-    (defun update-load-path-opam (&rest _)
+    (defun mdrp/update-load-path-opam (&rest _)
       (when (derived-mode-p 'tuareg-mode)
         (let ((opam-share
-               (let ((reply (opam-shell-command-to-string "opam var share --safe")))
+               (let ((reply (mdrp/opam-shell-command-to-string "opam var share --safe")))
                  (when reply (substring reply 0 -1)))))
           (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
           )
@@ -2466,12 +2470,12 @@ function to get the type and, for example, kill and yank it."
 
     (if (boundp 'window-buffer-change-functions)
         (progn
-          (add-hook 'window-buffer-change-functions 'update-opam-env)
-          (add-hook 'window-buffer-change-functions 'update-load-path-opam)
+          (add-hook 'window-buffer-change-functions 'mdrp/update-opam-env)
+          (add-hook 'window-buffer-change-functions 'mdrp/update-load-path-opam)
           )
       (progn
-        (add-hook 'post-command-hook 'update-opam-env)
-        (add-hook 'post-command-hook 'update-load-path-opam)
+        (add-hook 'post-command-hook 'mdrp/update-opam-env)
+        (add-hook 'post-command-hook 'mdrp/update-load-path-opam)
         ))
 
     :hook

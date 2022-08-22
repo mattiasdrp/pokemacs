@@ -13,6 +13,7 @@
       - [[#from-sources][From sources]]
       - [[#with-guix][With guix]]
   - [[#languages][Languages]]
+    - [[#ts-fold][Ts-fold]]
     - [[#lsp][LSP]]
     - [[#flyspell][Flyspell]]
     - [[#ocaml][OCaml]]
@@ -98,6 +99,17 @@
 :CUSTOM_ID: languages
 :END:
 
+*** Ts-fold
+:PROPERTIES:
+:CUSTOM_ID: ts-fold
+:END:
+
+You need to initialise the ~ts-fold~ submodule until it is available on Melpa.
+
+#+begin_src sh
+  git submodule init && git submodule update
+#+end_src
+
 *** LSP
 :PROPERTIES:
 :CUSTOM_ID: lsp
@@ -134,7 +146,7 @@
 :CUSTOM_ID: rust
 :END:
 
-- RLS
+- [[https://blog.rust-lang.org/2022/07/01/RLS-deprecation.html][Rust Analyzer]]
   - install [[http://rustup.rs/][rustup]]
     #+begin_src sh
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -145,7 +157,7 @@
     #+end_src
   - Install components
     #+begin_src sh
-      rustup component add rls rust-analysis rust-src
+      rustup component add rust-analysis rust-src
     #+end_src
 
 *** Python
