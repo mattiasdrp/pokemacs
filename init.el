@@ -822,6 +822,14 @@ e.g. proselint and langtool."
   ("C-c a" 'mc/mark-all-like-this)
   )
 
+(use-package hide-region
+  :load-path "lisp/"
+  )
+
+(use-package hide-mode-line
+  :ensure t
+  )
+
 (use-package whitespace
   :ensure nil
   :hook

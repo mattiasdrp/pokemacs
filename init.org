@@ -1484,6 +1484,18 @@ Allows to have multiple cursors. There are a lot of functions provided by this m
     )
 #+end_src
 
+** Hide region
+
+#+begin_src emacs-lisp
+  (use-package hide-region
+    :load-path "lisp/"
+    )
+
+  (use-package hide-mode-line
+    :ensure t
+    )
+#+end_src
+
 ** [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace]]
 :PROPERTIES:
 :CUSTOM_ID: whitespace
