@@ -927,8 +927,8 @@ e.g. proselint and langtool."
   (setq magit-auto-revert-immediately t)
   :general
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
+  ("M-n"                 'smerge-vc-next-conflict)
   (:keymaps 'smerge-mode-map
-            "M-n"                 'smerge-vc-next-conflict
             "M-m"                 'smerge-keep-mine
             "M-o"                 'smerge-keep-other
             )
