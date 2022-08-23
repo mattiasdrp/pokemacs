@@ -492,15 +492,11 @@ If you experience stuttering, increase this.
    indent-tabs-mode nil
    ;; I know emacs, I really don't need the startup-screen
    inhibit-startup-screen t
-   ;; Major mode used for the scratch buffer
-   initial-major-mode 'text-mode
    )
 #+end_src
 
 #+begin_src emacs-lisp
   (setq
-   ;; TODO: Move this to ?
-   native-comp-deferred-compilation t
    ;; Ask before killing emacs
    confirm-kill-emacs 'y-or-n-p
    ;; Move point by visual lines
@@ -987,7 +983,6 @@ Other all-the-icons related packages:
      "M-K"                     (lambda () (interactive) (mdrp/resize-window nil -5))
      ;; Custom comment overwriting comment-dwim key binding
      "M-;"                     'mdrp/comment-eclipse
-     "M-n"                     'forward-paragraph
      "M-p"                     'backward-paragraph
      "M-<f1>"                  'kill-this-buffer
      "M-Q"                     'unfill-paragraph

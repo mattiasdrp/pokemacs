@@ -207,8 +207,6 @@
  )
 
 (setq
- ;; TODO: Move this to ?
- native-comp-deferred-compilation t
  ;; Ask before killing emacs
  confirm-kill-emacs 'y-or-n-p
  ;; Move point by visual lines
@@ -475,7 +473,6 @@ debian, and derivatives). On most it's 'fd'.")
    "M-K"                     (lambda () (interactive) (mdrp/resize-window nil -5))
    ;; Custom comment overwriting comment-dwim key binding
    "M-;"                     'mdrp/comment-eclipse
-   "M-n"                     'forward-paragraph
    "M-p"                     'backward-paragraph
    "M-<f1>"                  'kill-this-buffer
    "M-Q"                     'unfill-paragraph
