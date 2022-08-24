@@ -202,8 +202,6 @@
  indent-tabs-mode nil
  ;; I know emacs, I really don't need the startup-screen
  inhibit-startup-screen t
- ;; Major mode used for the scratch buffer
- initial-major-mode 'text-mode
  )
 
 (setq
@@ -339,8 +337,10 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package savehist
   :init (savehist-mode t)
-  ;; Persist `counsel-compile' and 'compile' history
+  ;; Remember recently opened files
+  (recentf-mode t)
   :config
+  ;; Persist 'compile' history
   (add-to-list 'savehist-additional-variables 'compile-history))
 
 (when (and (eq system-type 'gnu/linux)
@@ -766,6 +766,7 @@ e.g. proselint and langtool."
 
 (use-package highlight-symbol
   :ensure t
+  :init (highlight-symbol-mode)
   :general
   ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
   ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
@@ -856,6 +857,7 @@ e.g. proselint and langtool."
   (python-mode . apheleia-mode)
   (fsharp-mode . apheleia-mode)
   (kotlin-mode . apheleia-mode)
+  (rustic-mode . apheleia-mode)
   :config
   (setf (alist-get 'isort apheleia-formatters)
       '("isort" "--stdout" "-"))
@@ -1021,7 +1023,7 @@ e.g. proselint and langtool."
       )
 
     (add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
-    :hook ((org-mode text-mode) . visual-fill-column-mode)
+    :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
     ))
 
 (use-package vertico
@@ -2049,8 +2051,8 @@ e.g. proselint and langtool."
          (tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
          (elm-mode . lsp-deferred)
-         (rust-mode . lsp-deferred)
-         (toml-mode . lsp-deferred)
+         (rustic-mode . lsp-deferred)
+         (conf-toml-mode . lsp-deferred)
          (kotlin-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (python-mode . lsp-deferred))
@@ -2217,13 +2219,18 @@ function to get the type and, for example, kill and yank it."
 
 (use-package tree-sitter
   :ensure t
+  :defer t
+  :hook
+  (tree-sitter-after-on . tree-sitter-hl-mode)
   :config
-  (global-tree-sitter-mode)
-  )
+  (use-package tree-sitter-langs :ensure t)
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t)
+  ;; and this highlights the entire sub tree in your code
+  (setq tree-sitter-debug-highlight-jump-region t)
+  (global-tree-sitter-mode))
 
 ;; This package needs to be loaded to use language parsers
-(use-package tree-sitter-langs
-  :ensure t)
 
 (use-package ts-fold
   :load-path "lisp/ts-fold/"
@@ -2231,6 +2238,7 @@ function to get the type and, for example, kill and yank it."
   (tuareg-mode . ts-fold-mode)
   (c++-mode    . ts-fold-mode)
   (python-mode . ts-fold-mode)
+  (rustic-mode . ts-fold-mode)
   )
 
 (use-package ts-fold-indicators
@@ -2244,14 +2252,15 @@ function to get the type and, for example, kill and yank it."
 
 (use-package conf-mode
   :ensure nil
+  :ensure-system-package (taplo . "cargo install taplo-cli")
   :mode (
          ("/\\.merlin\\'" . conf-mode)
          ("_tags\\'" . conf-mode)
          ("^dune$" . conf-mode)
          ("^dune-project$" . conf-mode)
          ("_log\\'" . conf-mode)
-         )
-  )
+         ("\\.toml\\'" . conf-toml-mode)
+         ))
 
 (use-package json-mode
   :mode (("\\.bowerrc$"     . json-mode)
@@ -2275,12 +2284,6 @@ function to get the type and, for example, kill and yank it."
     "Return the value of the json file secrets for key"
     (cdr (assoc key (json-read-file "~/.secrets/secrets.json")))
     )
-  )
-
-(use-package toml-mode
-  :ensure t
-  :mode ("\\.toml\\'" . toml-mode)
-  :ensure-system-package (taplo . "cargo install taplo-cli")
   )
 
 (use-package dune-mode
@@ -2597,8 +2600,7 @@ function to get the type and, for example, kill and yank it."
           lsp-pyright-auto-import-completions t
           lsp-pyright-use-library-code-for-types t
           lsp-pyright-venv-path "~/miniconda3/envs")
-    :hook ((python-mode . (lambda ()
-                            (require 'lsp-pyright) (lsp-deferred))))))
+    ))
 
 (when use-reason
   (defun shell-cmd (cmd)
@@ -2639,22 +2641,31 @@ function to get the type and, for example, kill and yank it."
   (use-package rustic
     :ensure t
     :mode "\\.rs'"
+    ;; :hook
+    ;; (rustic-mode-local-vars . tree-sitter 'append)
     ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
     :general
     (:keymaps 'rust-mode-map
               "C-c l" 'flycheck-list-errors
               "C-c s" 'lsp-rust-analyzer-status
-              "C-M-;" 'rust-doc-comment-dwim-following
-              "C-M-," 'rust-doc-comment-dwim-enclosing
+              "C-M-;" 'mdrp/rust-doc-comment-dwim-following
+              "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing
               )
     :config
+    ;; Conflicts with (and is redundant with) ligatures
+    (setq rust-prettify-symbols-alist nil)
+    ;; Allign to `.`
+    (setq rustic-indent-method-chain t)
+    ;; Let apheleia handle reformatting
+    (setq rustic-babel-format-src-block nil)
+    (setq rustic-format-trigger nil)
     ;; uncomment for less flashiness
     ;; (setq lsp-eldoc-hook nil)
     ;; (setq lsp-enable-symbol-highlighting nil)
     ;; (setq lsp-signature-auto-activate nil)
     ;; (defun my/rust-mode-outline-regexp-setup ()
     ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
-    (defun rust-doc-comment-dwim (c)
+    (defun mdrp/rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
       (interactive)
 
@@ -2668,28 +2679,28 @@ function to get the type and, for example, kill and yank it."
               (setq p1 (region-beginning) p2 (region-end))
               (goto-char p1)
               (if (wholeLineIsCmt-p c)
-                  (my-uncomment-region p1 p2 c)
-                (my-comment-region p1 p2 c)
+                  (mdrp/uncomment-region p1 p2 c)
+                (mdrp/comment-region p1 p2 c)
                 ))
           (progn
             (if (wholeLineIsCmt-p c)
-                (my-uncomment-current-line c)
-              (my-comment-current-line c)
+                (mdrp/uncomment-current-line c)
+              (mdrp/comment-current-line c)
               )))))
 
-    (defun wholeLineIsCmt-p (c)
+    (defun mdrp/wholeLineIsCmt-p (c)
       (save-excursion
         (beginning-of-line 1)
         (looking-at (concat "[ \t]*//" c))
         ))
 
-    (defun my-comment-current-line (c)
+    (defun mdrp/comment-current-line (c)
       (interactive)
       (beginning-of-line 1)
       (insert (concat "//" c))
       )
 
-    (defun my-uncomment-current-line (c)
+    (defun mdrp/uncomment-current-line (c)
       "Remove “//c” (if any) in the beginning of current line."
       (interactive)
       (when (wholeLineIsCmt-p c)
@@ -2698,44 +2709,35 @@ function to get the type and, for example, kill and yank it."
         (delete-backward-char 4)
         ))
 
-    (defun my-comment-region (p1 p2 c)
+    (defun mdrp/comment-region (p1 p2 c)
       "Add “//c” to the beginning of each line of selected text."
       (interactive "r")
       (let ((deactivate-mark nil))
         (save-excursion
           (goto-char p2)
           (while (>= (point) p1)
-            (my-comment-current-line c)
+            (mdrp/comment-current-line c)
             (previous-line)
             ))))
 
-    (defun my-uncomment-region (p1 p2 c)
+    (defun mdrp/uncomment-region (p1 p2 c)
       "Remove “//c” (if any) in the beginning of each line of selected text."
       (interactive "r")
       (let ((deactivate-mark nil))
         (save-excursion
           (goto-char p2)
           (while (>= (point) p1)
-            (my-uncomment-current-line c)
+            (mdrp/uncomment-current-line c)
             (previous-line) )) ))
 
-    (defun rust-doc-comment-dwim-following ()
+    (defun mdrp/rust-doc-comment-dwim-following ()
       (interactive)
-      (rust-doc-comment-dwim "/ "))
-    (defun rust-doc-comment-dwim-enclosing ()
+      (mdrp/rust-doc-comment-dwim "/ "))
+
+    (defun mdrp/rust-doc-comment-dwim-enclosing ()
       (interactive)
-      (rust-doc-comment-dwim "! "))
+      (mdrp/rust-doc-comment-dwim "! "))
     ))
-
-(when use-rust
-  (use-package cargo
-    :ensure t
-    :hook (rust-mode . cargo-minor-mode)))
-
-(when use-rust
-  (use-package flycheck-rust
-    :ensure t
-    :hook (rust-mode . flycheck-rust-setup)))
 
 (when use-web
   (use-package web-mode
