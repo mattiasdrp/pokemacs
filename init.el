@@ -1113,9 +1113,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config
   ;; Sort directories before files
   (defun sort-characters (characters)
-    (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "Z" x)) symbols))
-           (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "Z" x)) symbols))))
-
+    (sort characters (lambda (name1 name2) (< (char-from-name name1) (char-from-name name2)))))
 
   ;; Sort directories before files
   (defun sort-directories-first (files)
@@ -1127,7 +1125,7 @@ debian, and derivatives). On most it's 'fd'.")
           (consult-line buffer)
           (execute-extended-command posframe mouse)
           (find-file (vertico-sort-function . sort-directories-first))
-          (insert-char (vertico-sort-function . vertico-sort-alpha))
+          (insert-char (vertico-sort-function . sort-characters))
           (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
 
   (setq vertico-multiform-categories
