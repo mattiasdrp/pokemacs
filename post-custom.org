@@ -70,9 +70,9 @@ You can unbind anything you want.
 :END:
 
 #+begin_src emacs-lisp
-  (general-unbind
-    ;; "C-o"
-    )
+  ;; (general-unbind
+  ;;   "C-o"
+  ;;   )
 #+end_src
 
 *** Locally to a keymap
@@ -83,10 +83,10 @@ You can unbind anything you want.
 (notice the quote before the name of the map)
 
 #+begin_src emacs-lisp
-  (general-unbind
-    :keymaps 'tuareg-mode-map
-    "C-c TAB"
-    )
+  ;; (general-unbind
+  ;;   :keymaps 'tuareg-mode-map
+  ;;   "C-c TAB"
+  ;;   )
 #+end_src
 
 ** Binding
@@ -102,18 +102,18 @@ You can bind anything you want.
 :END:
 
 #+begin_src emacs-lisp
-  (general-define-key
-   "C-x 1"                 'delete-other-windows
-   )
+  ;; (general-define-key
+  ;;  "C-x 1"                 'delete-other-windows
+  ;;  )
 #+end_src
 
 Grouped under a prefix, allowing to define multiple keybindings under the same prefix without having to rewrite the prefix.
 
 #+begin_src emacs-lisp
-  (general-define-key
-   :prefix "M-z"
-   "w"                       'mdrp/resize-window-width
-   "h"                       'mdrp/resize-window-height)
+  ;; (general-define-key
+  ;;  :prefix "M-z"
+  ;;  "w"                       'mdrp/resize-window-width
+  ;;  "h"                       'mdrp/resize-window-height)
 #+end_src
 
 *** Locally
@@ -124,10 +124,10 @@ Grouped under a prefix, allowing to define multiple keybindings under the same p
 (notice the quote before the name of the map)
 
 #+begin_src emacs-lisp
-  (general-define-key
-   :keymaps 'tuareg-mode-map
-   "C-x M-1"                 'delete-other-windows
-   )
+  ;; (general-define-key
+  ;;  :keymaps 'tuareg-mode-map
+  ;;  "C-x M-1"                 'delete-other-windows
+  ;;  )
 #+end_src
 
 You can obviously combine ~:keymaps~ and ~:prefix~

@@ -17,23 +17,28 @@
 
 ;;; Code:
 
-(general-unbind
-  ;; "C-o"
-  )
+;; (general-unbind
+;;   "C-o"
+;;   )
 
-(general-unbind
-  :keymaps 'tuareg-mode-map
-  "C-c TAB"
-  )
+;; (general-unbind
+;;   :keymaps 'tuareg-mode-map
+;;   "C-c TAB"
+;;   )
 
-(general-define-key
- "C-x 1"                 'delete-other-windows
- )
+;; (general-define-key
+;;  "C-x 1"                 'delete-other-windows
+;;  )
 
-(general-define-key
- :keymaps 'tuareg-mode-map
- "C-x M-1"                 'delete-other-windows
- )
+;; (general-define-key
+;;  :prefix "M-z"
+;;  "w"                       'mdrp/resize-window-width
+;;  "h"                       'mdrp/resize-window-height)
+
+;; (general-define-key
+;;  :keymaps 'tuareg-mode-map
+;;  "C-x M-1"                 'delete-other-windows
+;;  )
 
 (provide 'post-custom)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

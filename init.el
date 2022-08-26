@@ -1300,6 +1300,12 @@ e.g. proselint and langtool."
   :init
   (marginalia-mode))
 
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1)
+  )
+
 (use-package company
   :ensure t
   :hook ((prog-mode . company-mode)
@@ -1329,6 +1335,7 @@ e.g. proselint and langtool."
         company-tooltip-align-annotations t
         )
   (add-to-list 'company-backends 'company-capf)
+  (add-to-list 'company-backends 'company-yasnippet)
   (global-company-mode 1)
   )
 
@@ -1913,15 +1920,6 @@ e.g. proselint and langtool."
   (org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
   )
 
-(use-package org-tempo ;; part of org-mode
-  :ensure nil
-  :after org
-  :config
-  (add-to-list 'org-structure-template-alist '("smt" . "src smt-lib"))
-  (add-to-list 'org-structure-template-alist '("oc" . "src ocaml"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  )
-
 (use-package org-bullets
   :ensure t
   :after org
@@ -2084,7 +2082,7 @@ e.g. proselint and langtool."
   :commands lsp
 
   :config
-  (use-package yasnippet :ensure t)
+  (use-package iedit :ensure t)
   ;; Temporary solution until https://github.com/emacs-lsp/lsp-mode/pull/3637 is merged
   (defcustom lsp-cut-signature 'space
     "If non-nil, signatures returned on hover will not be split on newline."
@@ -2504,8 +2502,8 @@ function to get the type and, for example, kill and yank it."
                            ("'t" . ?τ)
                            ("'x" . ?ξ)
                            ("fun" . ?λ)
-                           ("not" . ?¬)
-                           (":=" . ?⇐)
+                           ("not" . ?￢)
+                           (":=" . ?⟸)
                            ))))))
 
 (when use-ocaml
