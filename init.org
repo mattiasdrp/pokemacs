@@ -1987,6 +1987,15 @@ Vertico works with the default completion system instead of reimplementing a who
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     (vertico-cycle t)
     :config
+    ;; (setq vertico-sort-function 'vertico-sort-alpha)
+    ;; Use `consult-completion-in-region' if Vertico is enabled.
+    ;; Otherwise use the default `completion--in-region' function.
+    (setq completion-in-region-function
+          (lambda (&rest args)
+            (apply (if vertico-mode
+                       #'consult-completion-in-region
+                     #'completion--in-region)
+                   args)))
     ;; Prefix the current candidate with “» ”. From
     ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
     (advice-add #'vertico--format-candidate :around
@@ -1996,8 +2005,8 @@ Vertico works with the default completion system instead of reimplementing a who
                    (if (= vertico--index index)
                        (propertize "⮕ " 'face 'vertico-current)
                      "  ")
-                   cand)))
-    )
+                   cand))))
+
 #+end_src
 
 *** Vertico directory
@@ -2043,22 +2052,34 @@ This extension allows to choose the way each minibuffer will be displayed.
                                      (side . right)
                                      (window-width . 0.3)))
     :config
+    (use-package vertico-posframe :ensure t)
+
+
+    ;; Sort directories before files
+    (defun sort-characters (characters)
+      (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "Z" x)) symbols))
+             (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "Z" x)) symbols))))
+
+
+    ;; Sort directories before files
+    (defun sort-directories-first (files)
+      (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))
+             (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))))
+
     (setq vertico-multiform-commands
           '((consult-imenu buffer)
             (consult-line buffer)
-            (execute-extended-command posframe mouse)))
+            (execute-extended-command posframe mouse)
+            (find-file (vertico-sort-function . sort-directories-first))
+            (insert-char (vertico-sort-function . vertico-sort-alpha))
+            (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
 
     (setq vertico-multiform-categories
           '((imenu buffer)
-            (symbol (vertico-sort-function . vertico-sort-alpha))
-            (t posframe)
-            ))
-    (vertico-multiform-mode))
-#+end_src
+            ;; (file (vertico-sort-function . sort-directories-first))
+            (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
 
-#+begin_src emacs-lisp
-  (use-package vertico-posframe
-    :ensure t)
+    (vertico-multiform-mode))
 #+end_src
 
 ** [[https://github.com/minad/consult/][Consult]]
@@ -2246,6 +2267,35 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 
+** [[https://github.com/minad/corfu][Corfu]]
+
+#+begin_src emacs-lisp
+  (use-package corfu
+    :ensure t
+    :custom
+    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    ;; (corfu-auto t)                 ;; Enable auto completion
+    ;; (corfu-separator ?\s)          ;; Orderless field separator
+    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+    ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+    ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+    ;; Enable Corfu only for certain modes.
+    ;; :hook ((prog-mode . corfu-mode)
+    ;;        (shell-mode . corfu-mode)
+    ;;        (eshell-mode . corfu-mode))
+
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since Dabbrev can be used globally (M-/).
+    ;; See also `corfu-excluded-modes'.
+    :init
+    (global-corfu-mode))
+#+end_src
+
 ** Emacs configuration for minibuffers and completion
 :PROPERTIES:
 :CUSTOM_ID: emacs-configuration-for-minibuffers-and-completion
@@ -2255,6 +2305,8 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
   (use-package emacs
     :ensure t
     :init
+    ;; TAB cycle if there are only few candidates
+    (setq completion-cycle-threshold 3)
     ;; Add prompt indicator to `completing-read-multiple'.
     ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
     (defun crm-indicator (args)
@@ -2292,7 +2344,48 @@ Better completions in minibuffers
     :ensure t
     :custom
     (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
     (completion-category-overrides '((file (styles basic partial-completion)))))
+#+end_src
+
+** [[https://github.com/minad/cape][Cape]]
+
+#+begin_src emacs-lisp
+  (use-package cape
+    :ensure t
+    ;; Bind dedicated completion commands
+    ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+    ;; :bind (("C-c p p" . completion-at-point) ;; capf
+    ;;        ("C-c p t" . complete-tag)        ;; etags
+    ;;        ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+    ;;        ("C-c p h" . cape-history)
+    ;;        ("C-c p f" . cape-file)
+    ;;        ("C-c p k" . cape-keyword)
+    ;;        ("C-c p s" . cape-symbol)
+    ;;        ("C-c p a" . cape-abbrev)
+    ;;        ("C-c p i" . cape-ispell)
+    ;;        ("C-c p l" . cape-line)
+    ;;        ("C-c p w" . cape-dict)
+    ;;        ("C-c p \\" . cape-tex)
+    ;;        ("C-c p _" . cape-tex)
+    ;;        ("C-c p ^" . cape-tex)
+    ;;        ("C-c p &" . cape-sgml)
+    ;;        ("C-c p r" . cape-rfc1345))
+    :init
+    ;; Add `completion-at-point-functions', used by `completion-at-point'.
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    ;;(add-to-list 'completion-at-point-functions #'cape-history)
+    ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+    ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+    ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+    ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+    ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+    ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+    ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+    ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+    ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  )
 #+end_src
 
 ** [[https://github.com/emacs-straight/marginalia][Marginalia]]
@@ -2605,141 +2698,144 @@ Read the comments in the code if you want to understand its configuration.
 Some customization is available from [[file:custom.el][custom.el]], mainly ~doom-modeline-bar-width~ and ~doom-modeline-height~.
 
 #+begin_src emacs-lisp
-  (use-package doom-modeline
-    :ensure t
-    :init
-    ;; If non-nil, cause imenu to see `doom-modeline' declarations.
-    ;; This is done by adjusting `lisp-imenu-generic-expression' to
-    ;; include support for finding `doom-modeline-def-*' forms.
-    ;; Must be set before loading doom-modeline.
-    (setq doom-modeline-support-imenu t)
-    :custom
+  '(use-package doom-modeline
+     :ensure t
+     :init
+     ;; If non-nil, cause imenu to see `doom-modeline' declarations.
+     ;; This is done by adjusting `lisp-imenu-generic-expression' to
+     ;; include support for finding `doom-modeline-def-*' forms.
+     ;; Must be set before loading doom-modeline.
+     (setq doom-modeline-support-imenu t)
+     :custom
 
-    ;; Whether to use hud instead of default bar. It's only respected in GUI.
-    (doom-modeline-hud nil)
+     ;; Whether to use hud instead of default bar. It's only respected in GUI.
+     (doom-modeline-hud nil)
 
-    ;; The limit of the window width.
-    ;; If `window-width' is smaller than the limit, some information won't be
-    ;; displayed. It can be an integer or a float number. `nil' means no limit."
-    (doom-modeline-window-width-limit 85)
+     ;; The limit of the window width.
+     ;; If `window-width' is smaller than the limit, some information won't be
+     ;; displayed. It can be an integer or a float number. `nil' means no limit."
+     (doom-modeline-window-width-limit 85)
 
-    ;; How to detect the project root.
-    ;; nil means to use `default-directory'.
-    ;; The project management packages have some issues on detecting project root.
-    ;; e.g. `projectile' doesn't handle symlink folders well, while `project' is unable
-    ;; to hanle sub-projects.
-    ;; You can specify one if you encounter the issue.
-    (doom-modeline-project-detection 'projectile)
+     ;; How to detect the project root.
+     ;; nil means to use `default-directory'.
+     ;; The project management packages have some issues on detecting project root.
+     ;; e.g. `projectile' doesn't handle symlink folders well, while `project' is unable
+     ;; to hanle sub-projects.
+     ;; You can specify one if you encounter the issue.
+     (doom-modeline-project-detection 'projectile)
 
-    ;; Determines the style used by `doom-modeline-buffer-file-name'.
-    ;;
-    ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
-    ;;   auto => emacs/l/comint.el (in a project) or comint.el
-    ;;   truncate-upto-project => ~/P/F/emacs/lisp/comint.el
-    ;;   truncate-from-project => ~/Projects/FOSS/emacs/l/comint.el
-    ;;   truncate-with-project => emacs/l/comint.el
-    ;;   truncate-except-project => ~/P/F/emacs/l/comint.el
-    ;;   truncate-upto-root => ~/P/F/e/lisp/comint.el
-    ;;   truncate-all => ~/P/F/e/l/comint.el
-    ;;   truncate-nil => ~/Projects/FOSS/emacs/lisp/comint.el
-    ;;   relative-from-project => emacs/lisp/comint.el
-    ;;   relative-to-project => lisp/comint.el
-    ;;   file-name => comint.el
-    ;;   buffer-name => comint.el<2> (uniquify buffer name)
-    ;;
-    ;; If you are experiencing the laggy issue, especially while editing remote files
-    ;; with tramp, please try `file-name' style.
-    ;; Please refer to https://github.com/bbatsov/projectile/issues/657.
-    (doom-modeline-buffer-file-name-style 'truncate-all)
+     ;; Determines the style used by `doom-modeline-buffer-file-name'.
+     ;;
+     ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
+     ;;   auto => emacs/l/comint.el (in a project) or comint.el
+     ;;   truncate-upto-project => ~/P/F/emacs/lisp/comint.el
+     ;;   truncate-from-project => ~/Projects/FOSS/emacs/l/comint.el
+     ;;   truncate-with-project => emacs/l/comint.el
+     ;;   truncate-except-project => ~/P/F/emacs/l/comint.el
+     ;;   truncate-upto-root => ~/P/F/e/lisp/comint.el
+     ;;   truncate-all => ~/P/F/e/l/comint.el
+     ;;   truncate-nil => ~/Projects/FOSS/emacs/lisp/comint.el
+     ;;   relative-from-project => emacs/lisp/comint.el
+     ;;   relative-to-project => lisp/comint.el
+     ;;   file-name => comint.el
+     ;;   buffer-name => comint.el<2> (uniquify buffer name)
+     ;;
+     ;; If you are experiencing the laggy issue, especially while editing remote files
+     ;; with tramp, please try `file-name' style.
+     ;; Please refer to https://github.com/bbatsov/projectile/issues/657.
+     (doom-modeline-buffer-file-name-style 'truncate-all)
 
-    ;; Whether display icons in the mode-line.
-    ;; While using the server mode in GUI, should set the value explicitly.
-    (doom-modeline-icon t)
+     ;; Whether display icons in the mode-line.
+     ;; While using the server mode in GUI, should set the value explicitly.
+     (doom-modeline-icon t)
 
-    ;; Whether display the colorful icon for `major-mode'.
-    ;; It respects `all-the-icons-color-icons'.
-    (doom-modeline-major-mode-color-icon t)
+     ;; Whether display the colorful icon for `major-mode'.
+     ;; It respects `all-the-icons-color-icons'.
+     (doom-modeline-major-mode-color-icon t)
 
-    ;; Whether display the icon for the buffer state. It respects `doom-modeline-icon'.
-    (doom-modeline-buffer-state-icon t)
+     ;; Whether display the icon for the buffer state. It respects `doom-modeline-icon'.
+     (doom-modeline-buffer-state-icon t)
 
-    ;; Whether display the modification icon for the buffer.
-    ;; It respects `doom-modeline-icon' and `doom-modeline-buffer-state-icon'.
-    (doom-modeline-buffer-modification-icon t)
+     ;; Whether display the modification icon for the buffer.
+     ;; It respects `doom-modeline-icon' and `doom-modeline-buffer-state-icon'.
+     (doom-modeline-buffer-modification-icon t)
 
-    ;; Whether to use unicode as a fallback (instead of ASCII) when not using icons.
-    (doom-modeline-unicode-fallback t)
+     ;; Whether to use unicode as a fallback (instead of ASCII) when not using icons.
+     (doom-modeline-unicode-fallback t)
 
-    ;; Major modes in which to display word count continuously.
-    ;; Also applies to any derived modes. Respects `doom-modeline-enable-word-count'.
-    ;; If it brings the sluggish issue, disable `doom-modeline-enable-word-count' or
-    ;; remove the modes from `doom-modeline-continuous-word-count-modes'.
-    (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
+     ;; Major modes in which to display word count continuously.
+     ;; Also applies to any derived modes. Respects `doom-modeline-enable-word-count'.
+     ;; If it brings the sluggish issue, disable `doom-modeline-enable-word-count' or
+     ;; remove the modes from `doom-modeline-continuous-word-count-modes'.
+     (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
 
-    ;; If non-nil, only display one number for checker information if applicable.
-    (doom-modeline-checker-simple-format nil)
+     ;; If non-nil, only display one number for checker information if applicable.
+     (doom-modeline-checker-simple-format nil)
 
-    ;; The maximum number displayed for notifications.
-    (doom-modeline-number-limit 99)
+     ;; The maximum number displayed for notifications.
+     (doom-modeline-number-limit 99)
 
-    ;; The maximum displayed length of the branch name of version control.
-    (doom-modeline-vcs-max-length 12)
+     ;; The maximum displayed length of the branch name of version control.
+     (doom-modeline-vcs-max-length 12)
 
-    ;; Whether display the GitHub notifications. It requires `ghub' package.
-    (doom-modeline-github t)
+     ;; Whether display the GitHub notifications. It requires `ghub' package.
+     (doom-modeline-github t)
 
-    ;; The interval of checking GitHub.
-    (doom-modeline-github-interval 30)
+     ;; The interval of checking GitHub.
+     (doom-modeline-github-interval 30)
 
-    ;; Whether display the environment version.
-    (doom-modeline-env-version t)
-    ;; Or for individual languages
-    (doom-modeline-env-enable-python t)
-    (doom-modeline-env-enable-ruby t)
-    (doom-modeline-env-enable-perl t)
-    (doom-modeline-env-enable-go t)
-    (doom-modeline-env-enable-elixir t)
-    (doom-modeline-env-enable-rust t)
+     ;; Whether display the environment version.
+     (doom-modeline-env-version t)
+     ;; Or for individual languages
+     (doom-modeline-env-enable-python t)
+     (doom-modeline-env-enable-ruby t)
+     (doom-modeline-env-enable-perl t)
+     (doom-modeline-env-enable-go t)
+     (doom-modeline-env-enable-elixir t)
+     (doom-modeline-env-enable-rust t)
 
-    ;; Change the executables to use for the language version string
-    (doom-modeline-env-python-executable "python") ; or `python-shell-interpreter'
-    (doom-modeline-env-ruby-executable "ruby")
-    (doom-modeline-env-perl-executable "perl")
-    (doom-modeline-env-go-executable "go")
-    (doom-modeline-env-elixir-executable "iex")
-    (doom-modeline-env-rust-executable "rustc")
+     ;; Change the executables to use for the language version string
+     (doom-modeline-env-python-executable "python") ; or `python-shell-interpreter'
+     (doom-modeline-env-ruby-executable "ruby")
+     (doom-modeline-env-perl-executable "perl")
+     (doom-modeline-env-go-executable "go")
+     (doom-modeline-env-elixir-executable "iex")
+     (doom-modeline-env-rust-executable "rustc")
 
-    ;; What to display as the version while a new one is being loaded
-    (doom-modeline-env-load-string "...")
+     ;; What to display as the version while a new one is being loaded
+     (doom-modeline-env-load-string "...")
 
 
-    :config
-    ;; Define your custom doom-modeline
-    ;; (setq doom-modeline-fn-alist
-    ;;   (--map
-    ;;    (cons (remove-pos-from-symbol (car it)) (cdr it))
-    ;;    doom-modeline-fn-alist))
+     :config
+     ;; Define your custom doom-modeline
+     ;; (setq doom-modeline-fn-alist
+     ;;       (if (functionp 'remove-pos-from-symbol)
+     ;;           (--map
+     ;;            (cons (remove-pos-from-symbol (car it)) (cdr it))
+     ;;            doom-modeline-fn-alist)
+     ;;         doom-modeline-fn-alist))
 
-    (doom-modeline-def-modeline 'mdrp/no-lsp-line
-      '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-      '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+     (doom-modeline-def-modeline 'mdrp/no-lsp-line
+       '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
+       '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
-    (doom-modeline-def-modeline 'mdrp/lsp-line
-      '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-      '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+     (doom-modeline-def-modeline 'mdrp/lsp-line
+       '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
+       '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
-    ;; Add to `doom-modeline-mode-hook` or other hooks
-    (defun mdrp/setup-no-lsp-doom-modeline ()
-      (message "doom no lsp modeline change")
-      (doom-modeline-set-modeline 'mdrp/no-lsp-line 'default))
+     ;; Add to `doom-modeline-mode-hook` or other hooks
+     (defun mdrp/setup-no-lsp-doom-modeline ()
+       (message "doom no lsp modeline change")
+       (doom-modeline-set-modeline 'mdrp/no-lsp-line 'default))
 
-    (defun mdrp/setup-lsp-doom-modeline ()
-      (message "doom lsp modeline change")
-      (doom-modeline-set-modeline 'mdrp/lsp-line nil))
+     (defun mdrp/setup-lsp-doom-modeline ()
+       (message "doom lsp modeline change")
+       (doom-modeline-set-modeline 'mdrp/lsp-line nil))
 
-    (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
-    (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
-    (doom-modeline-mode))
+     (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
+     (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
+     (message "doom modeline loaded")
+     (doom-modeline-mode))
 #+end_src
 
 *** [[https://github.com/tarsius/minions][Minions]]
