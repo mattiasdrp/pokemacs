@@ -112,14 +112,19 @@
   :type 'boolean)
 
 (defcustom use-maximize nil
-"If non-nil, maximize emacs at startup"
-:group 'mdrp-packages
-:type 'boolean)
+  "If non-nil, maximize emacs at startup"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom org-agenda-start nil
+  "Theme to load"
+  :group 'mdrp-packages
+  :type 'boolean)
 
 (defcustom doom-theme 'doom-one
-"Theme to load"
-:group 'mdrp-packages
-:type 'symbol)
+  "Theme to load"
+  :group 'mdrp-packages
+  :type 'symbol)
 
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
@@ -530,7 +535,7 @@ debian, and derivatives). On most it's 'fd'.")
   (which-key-setup-side-window-bottom)
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
-        which-key-idle-delay 0.5)
+        which-key-idle-delay 0.1)
   :custom
   (which-key-separator " ")
   (which-key-prefix-prefix "+")
@@ -649,9 +654,9 @@ debian, and derivatives). On most it's 'fd'.")
   :init
   (defun mdrp/flyspell-on-for-buffer-type ()
     "Enable Flyspell appropriately for the major mode of the current buffer.
-Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
-and comments get checked.  All other buffers get `flyspell-mode' to check
-all text.  If flyspell is already enabled, does nothing."
+  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
+  and comments get checked.  All other buffers get `flyspell-mode' to check
+  all text.  If flyspell is already enabled, does nothing."
     (interactive)
     (if (not (symbol-value flyspell-mode)) ; if not already on
         (if (derived-mode-p 'pdf-view-mode)
@@ -694,7 +699,7 @@ all text.  If flyspell is already enabled, does nothing."
 
   (defun mdrp/flyspell-toggle ()
     "Turn Flyspell on if it is off, or off if it is on.  When turning on,
-it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
+  it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
     (interactive)
     (if (symbol-value flyspell-mode)
         (progn ; flyspell is on, turn it off
@@ -708,6 +713,8 @@ it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
   :general
   ("M-f" 'mdrp-flyspell-map)
   ("C-f" 'mdrp-flyspell-map)
+  (:keymaps 'flyspell-mode-map
+            "C-;" nil)
   (:keymaps 'mdrp-flyspell-map
             "t" '(mdrp/flyspell-toggle :which-key "toggle flyspell mode and decides to put it in prog or text mode")
             "f" '(mdrp/french-dict :which-key "load the french dictionary")
@@ -733,7 +740,7 @@ it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
   (add-hook 'flyspell-mode-hook
             (defun +spell-inhibit-duplicate-detection-maybe-h ()
               "Don't mark duplicates when style/grammar linters are present.
-e.g. proselint and langtool."
+  e.g. proselint and langtool."
               (and (or (and (bound-and-true-p flycheck-mode)
                             (executable-find "proselint"))
                        (featurep 'langtool))
@@ -852,12 +859,12 @@ e.g. proselint and langtool."
 (use-package apheleia
   :ensure t
   :hook
-  (tuareg-mode . apheleia-mode)
-  (caml-mode . apheleia-mode)
-  (python-mode . apheleia-mode)
-  (fsharp-mode . apheleia-mode)
-  (kotlin-mode . apheleia-mode)
-  (rustic-mode . apheleia-mode)
+  (tuareg-mode  . apheleia-mode)
+  (caml-mode    . apheleia-mode)
+  (python-mode  . apheleia-mode)
+  (fsharp-mode  . apheleia-mode)
+  (kotlin-mode  . apheleia-mode)
+  (rustic-mode  . apheleia-mode)
   :config
   (setf (alist-get 'isort apheleia-formatters)
       '("isort" "--stdout" "-"))
@@ -888,6 +895,25 @@ e.g. proselint and langtool."
 (use-package flycheck
   :ensure t
   :hook ((prog-mode markdown-mode) . flycheck-mode)
+  )
+
+(use-package quick-peek
+  :ensure t
+  )
+
+(use-package flycheck-inline
+  :ensure t
+  :after quick-peek
+  :hook (flycheck-mode . flycheck-inline-mode)
+  :config
+  (setq flycheck-inline-display-function
+        (lambda (msg pos err)
+          (let* ((ov (quick-peek-overlay-ensure-at pos))
+                 (contents (quick-peek-overlay-contents ov)))
+            (setf (quick-peek-overlay-contents ov)
+                  (concat contents (when contents "\n") msg))
+            (quick-peek-update ov)))
+        flycheck-inline-clear-function #'quick-peek-hide)
   )
 
 (use-package hideshow
@@ -1080,6 +1106,8 @@ e.g. proselint and langtool."
   (setq vertico-multiform-commands
         '((consult-imenu buffer)
           (consult-line buffer)
+          (lsp-rename posframe)
+          (isearch-forward posframe)
           (execute-extended-command posframe mouse)))
 
   (setq vertico-multiform-categories
@@ -1217,7 +1245,7 @@ e.g. proselint and langtool."
   :ensure t
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
-  ("C-;" 'embark-dwim)         ;; good alternative: M-.
+  ("C-:" 'embark-dwim)         ;; good alternative: M-.
   ("C-h B" 'embark-bindings)   ;; alternative for `describe-bindings'
   :init
   ;; Optionally replace the key help with a completing-read interface
@@ -1299,6 +1327,12 @@ e.g. proselint and langtool."
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
   :init
   (marginalia-mode))
+
+(use-package iedit
+  :ensure t
+  :general
+  (:keymaps 'lsp-mode-map
+            "C-;" nil))
 
 (use-package yasnippet
   :ensure t
@@ -1936,6 +1970,7 @@ e.g. proselint and langtool."
 (use-package calfw
   :ensure t
   :config
+  (setq cfw:org-overwrite-default-keybinding t)
   (setq cfw:fchar-junction ?╋
         cfw:fchar-vertical-line ?┃
         cfw:fchar-horizontal-line ?━
@@ -1949,8 +1984,9 @@ e.g. proselint and langtool."
 (use-package calfw-org
   :ensure t
   :after calfw
-  :config
+  :init
   (define-prefix-command 'mdrp-calfw-map nil "Cal-")
+  :config
   (defun cfw:org-capture-day ()
     (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
       (let ((pos (cfw:cursor-to-nearest-date)))
@@ -1967,6 +2003,8 @@ e.g. proselint and langtool."
             "c" 'cfw:open-calendar-buffer
             "o" 'cfw:open-org-calendar
             )
+  (:keymaps 'cfw:calendar-mode-map
+            "RET" 'cfw:org-open-agenda-day)
   :custom
   (cfw:org-capture-template
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
@@ -1999,15 +2037,14 @@ e.g. proselint and langtool."
   :config
   (setq org-super-agenda-groups
         '(;; Each group has an implicit Boolean OR operator between its selectors.
-          (:name "ASDSD"  ; Optionally specify section name
+          (:name "Rendez-vous"  ; Optionally specify section name
                  :time-grid t  ; Items that appear on the time grid
                  )
           ;; After the last group, the agenda will display items that didn't
           ;; match any of these groups, with the default order position of 99
           ))
   (org-super-agenda-mode)
-  ;; (org-agenda nil "a")
-  ;; (setq org-agenda-log-mode 1)
+  (when org-agenda-start (org-agenda nil "a"))
   )
 
 (use-package org-appear
@@ -2082,7 +2119,6 @@ e.g. proselint and langtool."
   :commands lsp
 
   :config
-  (use-package iedit :ensure t)
   ;; Temporary solution until https://github.com/emacs-lsp/lsp-mode/pull/3637 is merged
   (defcustom lsp-cut-signature 'space
     "If non-nil, signatures returned on hover will not be split on newline."
@@ -2215,20 +2251,21 @@ function to get the type and, for example, kill and yank it."
   :after lsp
   )
 
-(use-package tree-sitter
-  :ensure t
-  :defer t
-  :hook
-  (tree-sitter-after-on . tree-sitter-hl-mode)
-  :config
-  (use-package tree-sitter-langs :ensure t)
-  ;; This makes every node a link to a section of code
-  (setq tree-sitter-debug-jump-buttons t)
-  ;; and this highlights the entire sub tree in your code
-  (setq tree-sitter-debug-highlight-jump-region t)
-  (global-tree-sitter-mode))
+(use-package tree-sitter-langs :ensure t)
 
-;; This package needs to be loaded to use language parsers
+(use-package tree-sitter
+    :ensure t
+    :defer t
+    :hook
+    (tree-sitter-after-on . tree-sitter-hl-mode)
+    :config
+    ;; This makes every node a link to a section of code
+    (setq tree-sitter-debug-jump-buttons t)
+    ;; and this highlights the entire sub tree in your code
+    (setq tree-sitter-debug-highlight-jump-region t)
+    (global-tree-sitter-mode))
+
+  ;; This package needs to be loaded to use language parsers
 
 (use-package ts-fold
   :load-path "lisp/ts-fold/"
@@ -2254,13 +2291,12 @@ function to get the type and, for example, kill and yank it."
   :mode (
          ("/\\.merlin\\'" . conf-mode)
          ("_tags\\'" . conf-mode)
-         ("^dune$" . conf-mode)
-         ("^dune-project$" . conf-mode)
          ("_log\\'" . conf-mode)
          ("\\.toml\\'" . conf-toml-mode)
          ))
 
 (use-package json-mode
+  :ensure nil
   :mode (("\\.bowerrc$"     . json-mode)
          ("\\.jshintrc$"    . json-mode)
          ("\\.json_schema$" . json-mode)
@@ -2284,11 +2320,31 @@ function to get the type and, for example, kill and yank it."
     )
   )
 
-(use-package dune-mode
+(use-package dune
+  :ensure t
   :mode ("^dune$" "^dune-project$")
-  )
+  :init
+  (define-prefix-command 'mdrp-dune-map nil "Dune-")
+  :general
+  ("M-d" mdrp-dune-map)
+  (:keymaps 'mdrp-dune-map
+            "C-c" 'compile
+            "l" 'dune-insert-library-form
+            "e" 'dune-insert-executable-form
+            "x" 'dune-insert-executables-form
+            "r" 'dune-insert-rule-form
+            "p" 'dune-insert-ocamllex-form
+            "y" 'dune-insert-ocamlyacc-form
+            "m" 'dune-insert-menhir-form
+            "a" 'dune-insert-alias-form
+            "i" 'dune-insert-install-form
+            "c" 'dune-insert-copyfiles-form
+            "t" 'dune-insert-tests-form
+            "v" 'dune-insert-env-form
+            "d" 'dune-insert-ignored-subdirs-form))
 
 (use-package make-mode
+  :ensure nil
   :hook (make-mode . semantic-mode)
   )
 
@@ -2538,7 +2594,6 @@ function to get the type and, for example, kill and yank it."
   ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
   (setq pdf-view-use-scaling t
         pdf-view-use-imagemagick nil)
-
   :hook
   (pdf-view-mode . (lambda () (nlinum-mode 0))))
 
@@ -2548,29 +2603,25 @@ function to get the type and, for example, kill and yank it."
 
 (when use-python
   (use-package python
-  :ensure t
-  :config
-  ;; Remove guess indent python message
-  (setq python-indent-guess-indent-offset-verbose nil)
-  ;; Use IPython when available or fall back to regular Python
-  (cond
-   ((executable-find "ipython")
-    (progn
-      (setq python-shell-buffer-name "IPython")
-      (setq python-shell-interpreter "ipython")
-      (setq python-shell-interpreter-args "-i --simple-prompt")))
-   ((executable-find "python3")
-    (setq python-shell-interpreter "python3"))
-   ((executable-find "python2")
-    (setq python-shell-interpreter "python2"))
-   (t
-    (setq python-shell-interpreter "python")))
-  :hook (python-mode . semantic-mode)))
+    :ensure t
+    :config
+    ;; Remove guess indent python message
+    (setq python-indent-guess-indent-offset-verbose nil)
+    ;; Use IPython when available or fall back to regular Python
+    (cond
+     ((executable-find "ipython")
+      (progn
+        (setq python-shell-buffer-name "IPython")
+        (setq python-shell-interpreter "ipython")
+        (setq python-shell-interpreter-args "-i --simple-prompt")))
+     ((executable-find "python3")
+      (setq python-shell-interpreter "python3"))
+     ((executable-find "python2")
+      (setq python-shell-interpreter "python2"))
+     (t
+      (setq python-shell-interpreter "python")))
+    :hook (python-mode . semantic-mode)))
 
-;; Required to easily switch virtual envs
-;; via the menu bar or with `pyvenv-workon`
-;; Setting the `WORKON_HOME` environment variable points
-;; at where the envs are located. I use miniconda.
 (when use-python
   (use-package pyvenv
     :ensure t
@@ -2585,8 +2636,6 @@ function to get the type and, for example, kill and yank it."
                                             (pyvenv-restart-python)))
     :hook (python-mode . pyvenv-mode)))
 
-;; Language server for Python
-;; Read the docs for the different variables set in the config.
 (when use-python
   (use-package lsp-pyright
     :ensure t
@@ -2748,7 +2797,7 @@ function to get the type and, for example, kill and yank it."
     :ensure nil
     :mode "\\.css\\'"))
 
-(use-package counsel-spotify
+(use-package consult-spotify
   :disabled
   :after ivy
   :init

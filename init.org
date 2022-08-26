@@ -71,6 +71,7 @@ Literate configuration for init.el.
   - [[#hydra][Hydra]]
   - [[#keycast][Keycast]]
   - [[#multiple-cursors][Multiple cursors]]
+  - [[#hide-region][Hide region]]
   - [[#whitespace][Whitespace]]
 - [[#prog-mode-utilities][Prog mode utilities]]
   - [[#disabled-highlight-indent-guides][DISABLED: Highlight indent guides]]
@@ -78,6 +79,9 @@ Literate configuration for init.el.
   - [[#dap][DAP]]
   - [[#dumb-jump][Dumb jump]]
   - [[#flycheck][Flycheck]]
+    - [[#main-mode][Main mode]]
+    - [[#quick-peek][Quick Peek]]
+    - [[#flycheck-inline][Flycheck inline]]
   - [[#hideshow][Hideshow]]
   - [[#projectile][Projectile]]
   - [[#separedit][Separedit]]
@@ -106,6 +110,7 @@ Literate configuration for init.el.
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
   - [[#orderless][Orderless]]
   - [[#marginalia][Marginalia]]
+  - [[#yasnippet][Yasnippet]]
   - [[#company][Company]]
     - [[#company-math][Company math]]
     - [[#company-web][Company web]]
@@ -129,7 +134,6 @@ Literate configuration for init.el.
   - [[#pulsar][Pulsar]]
 - [[#org-mode][Org mode]]
   - [[#org-ref][Org ref]]
-  - [[#org-tempo][Org tempo]]
   - [[#org-bullets][Org bullets]]
   - [[#org-inline-pdf][Org inline pdf]]
   - [[#calfw][Calfw]]
@@ -149,7 +153,6 @@ Literate configuration for init.el.
   - [[#dataconfig-formats][Data/Config formats]]
     - [[#conf-mode][Conf mode]]
     - [[#json][Json]]
-    - [[#toml][TOML]]
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
   - [[#elisp][Elisp]]
@@ -173,8 +176,6 @@ Literate configuration for init.el.
     - [[#lsp-pyright][Lsp pyright]]
   - [[#reason][Reason]]
   - [[#rust][Rust]]
-    - [[#cargo][Cargo]]
-    - [[#flycheck-for-rust][Flycheck for Rust]]
   - [[#web-modes][Web modes]]
     - [[#main-mode][Main mode]]
     - [[#css-mode][CSS mode]]
@@ -326,14 +327,19 @@ This is a list of custom variables that allow to enable/disable features. If you
     :type 'boolean)
 
   (defcustom use-maximize nil
-  "If non-nil, maximize emacs at startup"
-  :group 'mdrp-packages
-  :type 'boolean)
+    "If non-nil, maximize emacs at startup"
+    :group 'mdrp-packages
+    :type 'boolean)
+
+  (defcustom org-agenda-start nil
+    "Theme to load"
+    :group 'mdrp-packages
+    :type 'boolean)
 
   (defcustom doom-theme 'doom-one
-  "Theme to load"
-  :group 'mdrp-packages
-  :type 'symbol)
+    "Theme to load"
+    :group 'mdrp-packages
+    :type 'symbol)
 
 #+end_src
 
@@ -1053,7 +1059,7 @@ Useful packages that allows to see the possible keys after starting a combinatio
     (which-key-setup-side-window-bottom)
     (setq which-key-sort-order 'which-key-key-order-alpha
           which-key-side-window-max-width 0.33
-          which-key-idle-delay 0.5)
+          which-key-idle-delay 0.1)
     :custom
     (which-key-separator " ")
     (which-key-prefix-prefix "+")
@@ -1144,9 +1150,9 @@ This part will load packages that are useful for emacs and are not specific to m
 When I have the time
 
 #+begin_src emacs-lisp
-(use-package cheatsheet
-  :defer t
-  )
+  (use-package cheatsheet
+    :defer t
+    )
 #+end_src
 
 ** [[https://github.com/bbatsov/crux][Crux]]
@@ -1254,9 +1260,9 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
     :init
     (defun mdrp/flyspell-on-for-buffer-type ()
       "Enable Flyspell appropriately for the major mode of the current buffer.
-  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
-  and comments get checked.  All other buffers get `flyspell-mode' to check
-  all text.  If flyspell is already enabled, does nothing."
+    Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
+    and comments get checked.  All other buffers get `flyspell-mode' to check
+    all text.  If flyspell is already enabled, does nothing."
       (interactive)
       (if (not (symbol-value flyspell-mode)) ; if not already on
           (if (derived-mode-p 'pdf-view-mode)
@@ -1299,7 +1305,7 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
 
     (defun mdrp/flyspell-toggle ()
       "Turn Flyspell on if it is off, or off if it is on.  When turning on,
-  it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
+    it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
       (interactive)
       (if (symbol-value flyspell-mode)
           (progn ; flyspell is on, turn it off
@@ -1313,6 +1319,8 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
     :general
     ("M-f" 'mdrp-flyspell-map)
     ("C-f" 'mdrp-flyspell-map)
+    (:keymaps 'flyspell-mode-map
+              "C-;" nil)
     (:keymaps 'mdrp-flyspell-map
               "t" '(mdrp/flyspell-toggle :which-key "toggle flyspell mode and decides to put it in prog or text mode")
               "f" '(mdrp/french-dict :which-key "load the french dictionary")
@@ -1338,7 +1346,7 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
     (add-hook 'flyspell-mode-hook
               (defun +spell-inhibit-duplicate-detection-maybe-h ()
                 "Don't mark duplicates when style/grammar linters are present.
-  e.g. proselint and langtool."
+    e.g. proselint and langtool."
                 (and (or (and (bound-and-true-p flycheck-mode)
                               (executable-find "proselint"))
                          (featurep 'langtool))
@@ -1382,8 +1390,8 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
 Helper functions for emacs fringe bitmaps that are used by some packages used in the following configuration file.
 
 #+begin_src emacs-lisp
-(use-package fringe-helper
-  :ensure t)
+  (use-package fringe-helper
+    :ensure t)
 #+end_src
 
 ** [[https://github.com/nschum/highlight-symbol.el][Highlight symbol]]
@@ -1483,6 +1491,9 @@ Allows to have multiple cursors. There are a lot of functions provided by this m
 #+end_src
 
 ** Hide region
+:PROPERTIES:
+:CUSTOM_ID: hide-region
+:END:
 
 #+begin_src emacs-lisp
   (use-package hide-region
@@ -1549,12 +1560,12 @@ Asynchronous code formatting after saving files.
   (use-package apheleia
     :ensure t
     :hook
-    (tuareg-mode . apheleia-mode)
-    (caml-mode . apheleia-mode)
-    (python-mode . apheleia-mode)
-    (fsharp-mode . apheleia-mode)
-    (kotlin-mode . apheleia-mode)
-    (rustic-mode . apheleia-mode)
+    (tuareg-mode  . apheleia-mode)
+    (caml-mode    . apheleia-mode)
+    (python-mode  . apheleia-mode)
+    (fsharp-mode  . apheleia-mode)
+    (kotlin-mode  . apheleia-mode)
+    (rustic-mode  . apheleia-mode)
     :config
     (setf (alist-get 'isort apheleia-formatters)
         '("isort" "--stdout" "-"))
@@ -1606,6 +1617,11 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
 
 On the fly syntax checking. One of the greatest package there is for making programming easier.
 
+*** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode
+:END:
+
 #+begin_src emacs-lisp
   (use-package flycheck
     :ensure t
@@ -1613,6 +1629,39 @@ On the fly syntax checking. One of the greatest package there is for making prog
     )
 #+end_src
 
+*** [[https://github.com/cpitclaudel/quick-peek][Quick Peek]]
+:PROPERTIES:
+:CUSTOM_ID: quick-peek
+:END:
+
+#+BEGIN_SRC elisp
+  (use-package quick-peek
+    :ensure t
+    )
+#+END_SRC
+
+*** [[https://github.com/flycheck/flycheck-inline][Flycheck inline]]
+:PROPERTIES:
+:CUSTOM_ID: flycheck-inline
+:END:
+
+#+BEGIN_SRC elisp
+  (use-package flycheck-inline
+    :ensure t
+    :after quick-peek
+    :hook (flycheck-mode . flycheck-inline-mode)
+    :config
+    (setq flycheck-inline-display-function
+          (lambda (msg pos err)
+            (let* ((ov (quick-peek-overlay-ensure-at pos))
+                   (contents (quick-peek-overlay-contents ov)))
+              (setf (quick-peek-overlay-contents ov)
+                    (concat contents (when contents "\n") msg))
+              (quick-peek-update ov)))
+          flycheck-inline-clear-function #'quick-peek-hide)
+    )
+
+#+END_SRC
 ** [[https://www.emacswiki.org/emacs/HideShow][Hideshow]]
 :PROPERTIES:
 :CUSTOM_ID: hideshow
@@ -2152,7 +2201,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     :ensure t
     :general
     ("C-." 'embark-act)          ;; pick some comfortable binding
-    ("C-;" 'embark-dwim)         ;; good alternative: M-.
+    ("C-:" 'embark-dwim)         ;; good alternative: M-.
     ("C-h B" 'embark-bindings)   ;; alternative for `describe-bindings'
     :init
     ;; Optionally replace the key help with a completing-read interface
@@ -2263,7 +2312,20 @@ Useful informations added in the minibuffer options
     (marginalia-mode))
 #+end_src
 
+** Iedit
+
+#+BEGIN_SRC elisp
+  (use-package iedit
+    :ensure t
+    :general
+    (:keymaps 'lsp-mode-map
+              "C-;" nil))
+#+END_SRC
+
 ** [[https://github.com/joaotavora/yasnippet][Yasnippet]]
+:PROPERTIES:
+:CUSTOM_ID: yasnippet
+:END:
 
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -3146,6 +3208,7 @@ Calendar view in emacs buffer.
   (use-package calfw
     :ensure t
     :config
+    (setq cfw:org-overwrite-default-keybinding t)
     (setq cfw:fchar-junction ?╋
           cfw:fchar-vertical-line ?┃
           cfw:fchar-horizontal-line ?━
@@ -3168,8 +3231,9 @@ This package allows to see the org calendar and adds a capture template for sche
   (use-package calfw-org
     :ensure t
     :after calfw
-    :config
+    :init
     (define-prefix-command 'mdrp-calfw-map nil "Cal-")
+    :config
     (defun cfw:org-capture-day ()
       (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
         (let ((pos (cfw:cursor-to-nearest-date)))
@@ -3186,6 +3250,8 @@ This package allows to see the org calendar and adds a capture template for sche
               "c" 'cfw:open-calendar-buffer
               "o" 'cfw:open-org-calendar
               )
+    (:keymaps 'cfw:calendar-mode-map
+              "RET" 'cfw:org-open-agenda-day)
     :custom
     (cfw:org-capture-template
      `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
@@ -3237,15 +3303,14 @@ Better agenda view for ~org-agenda~
     :config
     (setq org-super-agenda-groups
           '(;; Each group has an implicit Boolean OR operator between its selectors.
-            (:name "ASDSD"  ; Optionally specify section name
+            (:name "Rendez-vous"  ; Optionally specify section name
                    :time-grid t  ; Items that appear on the time grid
                    )
             ;; After the last group, the agenda will display items that didn't
             ;; match any of these groups, with the default order position of 99
             ))
     (org-super-agenda-mode)
-    ;; (org-agenda nil "a")
-    ;; (setq org-agenda-log-mode 1)
+    (when org-agenda-start (org-agenda nil "a"))
     )
 #+end_src
 
@@ -3361,7 +3426,6 @@ Minor mode acting as a client between a language server protocol and emacs.
     :commands lsp
 
     :config
-    (use-package iedit :ensure t)
     ;; Temporary solution until https://github.com/emacs-lsp/lsp-mode/pull/3637 is merged
     (defcustom lsp-cut-signature 'space
       "If non-nil, signatures returned on hover will not be split on newline."
@@ -3518,20 +3582,21 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 
 # TODO: Use tree-sitter for syntax highlighting instead of font-lock-mode
 #+begin_src emacs-lisp
-  (use-package tree-sitter
-    :ensure t
-    :defer t
-    :hook
-    (tree-sitter-after-on . tree-sitter-hl-mode)
-    :config
-    (use-package tree-sitter-langs :ensure t)
-    ;; This makes every node a link to a section of code
-    (setq tree-sitter-debug-jump-buttons t)
-    ;; and this highlights the entire sub tree in your code
-    (setq tree-sitter-debug-highlight-jump-region t)
-    (global-tree-sitter-mode))
+  (use-package tree-sitter-langs :ensure t)
 
-  ;; This package needs to be loaded to use language parsers
+  (use-package tree-sitter
+      :ensure t
+      :defer t
+      :hook
+      (tree-sitter-after-on . tree-sitter-hl-mode)
+      :config
+      ;; This makes every node a link to a section of code
+      (setq tree-sitter-debug-jump-buttons t)
+      ;; and this highlights the entire sub tree in your code
+      (setq tree-sitter-debug-highlight-jump-region t)
+      (global-tree-sitter-mode))
+
+    ;; This package needs to be loaded to use language parsers
 #+end_src
 
 ** Tree sitter folding
@@ -3589,8 +3654,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
     :mode (
            ("/\\.merlin\\'" . conf-mode)
            ("_tags\\'" . conf-mode)
-           ("^dune$" . conf-mode)
-           ("^dune-project$" . conf-mode)
            ("_log\\'" . conf-mode)
            ("\\.toml\\'" . conf-toml-mode)
            ))
@@ -3603,6 +3666,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package json-mode
+    :ensure nil
     :mode (("\\.bowerrc$"     . json-mode)
            ("\\.jshintrc$"    . json-mode)
            ("\\.json_schema$" . json-mode)
@@ -3637,9 +3701,28 @@ Library for parsing and generating JSON
 :END:
 
 #+begin_src emacs-lisp
-  (use-package dune-mode
+  (use-package dune
+    :ensure t
     :mode ("^dune$" "^dune-project$")
-    )
+    :init
+    (define-prefix-command 'mdrp-dune-map nil "Dune-")
+    :general
+    ("M-d" mdrp-dune-map)
+    (:keymaps 'mdrp-dune-map
+              "C-c" 'compile
+              "l" 'dune-insert-library-form
+              "e" 'dune-insert-executable-form
+              "x" 'dune-insert-executables-form
+              "r" 'dune-insert-rule-form
+              "p" 'dune-insert-ocamllex-form
+              "y" 'dune-insert-ocamlyacc-form
+              "m" 'dune-insert-menhir-form
+              "a" 'dune-insert-alias-form
+              "i" 'dune-insert-install-form
+              "c" 'dune-insert-copyfiles-form
+              "t" 'dune-insert-tests-form
+              "v" 'dune-insert-env-form
+              "d" 'dune-insert-ignored-subdirs-form))
 #+end_src
 
 *** Makefile
@@ -3648,9 +3731,10 @@ Library for parsing and generating JSON
 :END:
 
 #+begin_src emacs-lisp
-(use-package make-mode
-  :hook (make-mode . semantic-mode)
-  )
+  (use-package make-mode
+    :ensure nil
+    :hook (make-mode . semantic-mode)
+    )
 #+end_src
 
 ** Elisp
@@ -3659,9 +3743,9 @@ Library for parsing and generating JSON
 :END:
 
 #+begin_src emacs-lisp
-(use-package elisp-mode
-  :hook (elisp-mode . semantic-mode)
-  )
+  (use-package elisp-mode
+    :hook (elisp-mode . semantic-mode)
+    )
 #+end_src
 
 ** [[https://github.com/fsharp/emacs-fsharp-mode][Fsharp]]
@@ -3990,17 +4074,16 @@ Special tuareg mode when editing ~mly~ files.
 In order to use this package you need to run ~M-x pdf-tools-install~ the first time your configuration is loaded.
 
 #+begin_src emacs-lisp
-(use-package pdf-tools
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  :magic ("%PDF" . pdf-view-mode)
-  :config
-  (setq-default pdf-view-display-size 'fit-page)
-  ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
-  (setq pdf-view-use-scaling t
-        pdf-view-use-imagemagick nil)
-
-  :hook
-  (pdf-view-mode . (lambda () (nlinum-mode 0))))
+  (use-package pdf-tools
+    :mode ("\\.pdf\\'" . pdf-view-mode)
+    :magic ("%PDF" . pdf-view-mode)
+    :config
+    (setq-default pdf-view-display-size 'fit-page)
+    ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
+    (setq pdf-view-use-scaling t
+          pdf-view-use-imagemagick nil)
+    :hook
+    (pdf-view-mode . (lambda () (nlinum-mode 0))))
 #+end_src
 
 *** [[https://github.com/nicolaisingh/saveplace-pdf-view][Saveplace in pdf]]
@@ -4027,36 +4110,35 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 #+begin_src emacs-lisp
   (when use-python
     (use-package python
-    :ensure t
-    :config
-    ;; Remove guess indent python message
-    (setq python-indent-guess-indent-offset-verbose nil)
-    ;; Use IPython when available or fall back to regular Python
-    (cond
-     ((executable-find "ipython")
-      (progn
-        (setq python-shell-buffer-name "IPython")
-        (setq python-shell-interpreter "ipython")
-        (setq python-shell-interpreter-args "-i --simple-prompt")))
-     ((executable-find "python3")
-      (setq python-shell-interpreter "python3"))
-     ((executable-find "python2")
-      (setq python-shell-interpreter "python2"))
-     (t
-      (setq python-shell-interpreter "python")))
-    :hook (python-mode . semantic-mode)))
+      :ensure t
+      :config
+      ;; Remove guess indent python message
+      (setq python-indent-guess-indent-offset-verbose nil)
+      ;; Use IPython when available or fall back to regular Python
+      (cond
+       ((executable-find "ipython")
+        (progn
+          (setq python-shell-buffer-name "IPython")
+          (setq python-shell-interpreter "ipython")
+          (setq python-shell-interpreter-args "-i --simple-prompt")))
+       ((executable-find "python3")
+        (setq python-shell-interpreter "python3"))
+       ((executable-find "python2")
+        (setq python-shell-interpreter "python2"))
+       (t
+        (setq python-shell-interpreter "python")))
+      :hook (python-mode . semantic-mode)))
 #+end_src
 
 *** [[https://github.com/jorgenschaefer/pyvenv][Pyvenv]]
 :PROPERTIES:
 :CUSTOM_ID: pyvenv
 :END:
+Required to easily switch virtual envs via the menu bar or with ~pyvenv-workon~
+
+Setting the ~WORKON_HOME~ environment variable points at where the envs are located.
 
 #+begin_src emacs-lisp
-  ;; Required to easily switch virtual envs
-  ;; via the menu bar or with `pyvenv-workon`
-  ;; Setting the `WORKON_HOME` environment variable points
-  ;; at where the envs are located. I use miniconda.
   (when use-python
     (use-package pyvenv
       :ensure t
@@ -4077,9 +4159,11 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 :CUSTOM_ID: lsp-pyright
 :END:
 
+Language server for Python
+
+Read the docs for the different variables set in the config.
+
 #+begin_src emacs-lisp
-  ;; Language server for Python
-  ;; Read the docs for the different variables set in the config.
   (when use-python
     (use-package lsp-pyright
       :ensure t
@@ -4288,7 +4372,7 @@ Some people use this, not my responsibility.
 :END:
 
 #+begin_src emacs-lisp
-  (use-package counsel-spotify
+  (use-package consult-spotify
     :disabled
     :after ivy
     :init
