@@ -1071,6 +1071,15 @@ debian, and derivatives). On most it's 'fd'.")
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (vertico-cycle t)
   :config
+  ;; (setq vertico-sort-function 'vertico-sort-alpha)
+  ;; Use `consult-completion-in-region' if Vertico is enabled.
+  ;; Otherwise use the default `completion--in-region' function.
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
   ;; Prefix the current candidate with “» ”. From
   ;; https://github.com/minad/vertico/wiki#prefix-current-candidate-with-arrow
   (advice-add #'vertico--format-candidate :around
@@ -1080,8 +1089,7 @@ debian, and derivatives). On most it's 'fd'.")
                  (if (= vertico--index index)
                      (propertize "⮕ " 'face 'vertico-current)
                    "  ")
-                 cand)))
-  )
+                 cand))))
 
 (use-package vertico-directory
   :after vertico
@@ -1103,18 +1111,28 @@ debian, and derivatives). On most it's 'fd'.")
                                    (side . right)
                                    (window-width . 0.3)))
   :config
+  ;; Sort directories before files
+  (defun sort-characters (characters)
+    (sort characters (lambda (name1 name2) (< (char-from-name name1) (char-from-name name2)))))
+
+  ;; Sort directories before files
+  (defun sort-directories-first (files)
+    (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))
+           (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))))
+
   (setq vertico-multiform-commands
         '((consult-imenu buffer)
           (consult-line buffer)
-          (lsp-rename posframe)
-          (isearch-forward posframe)
-          (execute-extended-command posframe mouse)))
+          (execute-extended-command posframe mouse)
+          (find-file (vertico-sort-function . sort-directories-first))
+          (insert-char (vertico-sort-function . sort-characters))
+          (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
 
   (setq vertico-multiform-categories
         '((imenu buffer)
-          (symbol (vertico-sort-function . vertico-sort-alpha))
-          (t posframe)
-          ))
+          (file (vertico-sort-function . sort-directories-first))
+          (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
+
   (vertico-multiform-mode))
 
 (use-package vertico-posframe
@@ -1287,9 +1305,36 @@ debian, and derivatives). On most it's 'fd'.")
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+(use-package corfu
+  :ensure t
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  :init
+  (global-corfu-mode))
+
 (use-package emacs
   :ensure t
   :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
@@ -1318,7 +1363,44 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :custom
   (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion)))))
+
+(use-package cape
+  :ensure t
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  ;; :bind (("C-c p p" . completion-at-point) ;; capf
+  ;;        ("C-c p t" . complete-tag)        ;; etags
+  ;;        ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ("C-c p k" . cape-keyword)
+  ;;        ("C-c p s" . cape-symbol)
+  ;;        ("C-c p a" . cape-abbrev)
+  ;;        ("C-c p i" . cape-ispell)
+  ;;        ("C-c p l" . cape-line)
+  ;;        ("C-c p w" . cape-dict)
+  ;;        ("C-c p \\" . cape-tex)
+  ;;        ("C-c p _" . cape-tex)
+  ;;        ("C-c p ^" . cape-tex)
+  ;;        ("C-c p &" . cape-sgml)
+  ;;        ("C-c p r" . cape-rfc1345))
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+)
 
 (use-package marginalia
   :after vertico
@@ -1602,19 +1684,22 @@ debian, and derivatives). On most it's 'fd'.")
 
 
   :config
-  ;; Define your custom doom-modeline
-  ;; (setq doom-modeline-fn-alist
-  ;;   (--map
-  ;;    (cons (remove-pos-from-symbol (car it)) (cdr it))
-  ;;    doom-modeline-fn-alist))
+  ;; TEMP: Emacs 29 adds position to symbols.
+  (setq doom-modeline-fn-alist
+        (if (functionp 'remove-pos-from-symbol)
+            (--map
+             (cons (remove-pos-from-symbol (car it)) (cdr it))
+             doom-modeline-fn-alist)
+          doom-modeline-fn-alist))
 
+  ;; Define your custom doom-modeline
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
-    '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-    '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                              '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
+                              '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
   (doom-modeline-def-modeline 'mdrp/lsp-line
-    '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-    '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                              '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
+                              '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
   ;; Add to `doom-modeline-mode-hook` or other hooks
   (defun mdrp/setup-no-lsp-doom-modeline ()
@@ -1627,6 +1712,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
   (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
+  (message "doom modeline loaded")
   (doom-modeline-mode))
 
 (use-package minions
