@@ -257,14 +257,12 @@
 
 (show-paren-mode 1)
 
-;; Display line numbers in the fringe
 (global-display-line-numbers-mode 1)
-;; Save the place of the cursor when exiting the buffer
+
 (save-place-mode 1)
-;; Replace selection when writing
+
 (delete-selection-mode t)
-;; So Long mitigates slowness due to extremely long lines.
-;; Currently available in Emacs master branch *only*!
+
 (when (fboundp 'global-so-long-mode)
   (global-so-long-mode))
 
@@ -944,6 +942,11 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package treemacs
   :ensure t)
+
+(use-package fontify-face
+  :ensure t
+  :hook (font-lock-mode . fontify-face-mode)
+  )
 
 (use-package magit
   :ensure t

@@ -597,18 +597,24 @@ Since this is highly user dependent (I see you @thriim), the variable ~show-pare
 :CUSTOM_ID: other-useful-global-modes
 :END:
 
-#+begin_src emacs-lisp
-  ;; Display line numbers in the fringe
-  (global-display-line-numbers-mode 1)
-  ;; Save the place of the cursor when exiting the buffer
-  (save-place-mode 1)
-  ;; Replace selection when writing
-  (delete-selection-mode t)
-  ;; So Long mitigates slowness due to extremely long lines.
-  ;; Currently available in Emacs master branch *only*!
-  (when (fboundp 'global-so-long-mode)
-    (global-so-long-mode))
-#+end_src
+- Display line numbers in the fringe
+  #+begin_src emacs-lisp
+    (global-display-line-numbers-mode 1)
+  #+end_src
+- Save the place of the cursor when exiting the buffer
+  #+begin_src emacs-lisp
+    (save-place-mode 1)
+  #+end_src
+- Replace selection when writing
+  #+begin_src emacs-lisp
+    (delete-selection-mode t)
+  #+end_src
+- So Long mitigates slowness due to extremely long lines.
+/Currently available in Emacs master branch only!/
+  #+begin_src emacs-lisp
+    (when (fboundp 'global-so-long-mode)
+      (global-so-long-mode))
+  #+end_src
 
 ** Add some files to text-mode
 :PROPERTIES:
@@ -1662,6 +1668,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
     )
 
 #+END_SRC
+
 ** [[https://www.emacswiki.org/emacs/HideShow][Hideshow]]
 :PROPERTIES:
 :CUSTOM_ID: hideshow
@@ -1721,6 +1728,19 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
 #+begin_src emacs-lisp
   (use-package treemacs
     :ensure t)
+#+end_src
+
+** Font lock
+
+*** [[https://github.com/Fuco1/fontify-face][Fontify face]]
+
+Allows to see immediately how a face will look
+
+#+begin_src emacs-lisp
+  (use-package fontify-face
+    :ensure t
+    :hook (font-lock-mode . fontify-face-mode)
+    )
 #+end_src
 
 * Git
