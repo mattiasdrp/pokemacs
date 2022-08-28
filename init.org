@@ -1379,6 +1379,7 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
 
 #+begin_src emacs-lisp
   (use-package flyspell-correct
+    :ensure t
     :after flyspell
     :general
     (:keymaps 'popup-menu-keymap

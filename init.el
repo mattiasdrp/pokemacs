@@ -758,6 +758,7 @@ debian, and derivatives). On most it's 'fd'.")
   )
 
 (use-package flyspell-correct
+  :ensure t
   :after flyspell
   :general
   (:keymaps 'popup-menu-keymap
