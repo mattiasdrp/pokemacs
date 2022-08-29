@@ -54,6 +54,7 @@ Literate configuration for init.el.
     - [[#all-the-icons-completion][All the icons completion]]
   - [[#ligatures][Ligatures]]
   - [[#ansi-color][Ansi color]]
+  - [[#kurecolor][Kurecolor]]
 - [[#keybindings][Keybindings]]
   - [[#general][General]]
   - [[#which-key][Which-key]]
@@ -943,6 +944,13 @@ Other all-the-icons related packages:
     (shell-mode . ansi-color-for-comint-mode-on)
     )
 #+end_src
+
+** [[https://github.com/emacsfodder/kurecolor][Kurecolor]]
+
+#+BEGIN_SRC elisp
+  (use-package kurecolor
+    :ensure t)
+#+END_SRC
 
 * Keybindings
 :PROPERTIES:
