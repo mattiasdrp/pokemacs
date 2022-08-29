@@ -56,6 +56,7 @@
  '(use-org-roam t)
  '(use-pandoc t)
  '(use-python t)
+ '(use-rainbow t)
  '(use-reason t)
  '(use-rust t)
  '(use-spotify nil)

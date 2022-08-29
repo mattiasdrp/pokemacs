@@ -256,6 +256,11 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'mdrp-packages
     :type 'boolean)
 
+  (defcustom use-rainbow nil
+    "If non-nil, don't be @thriim"
+    :group 'mdrp-packages
+    :type 'boolean)
+
   (defcustom use-latex nil
     "If non-nil, uses the LaTeX packages"
     :group 'mdrp-packages
@@ -1302,7 +1307,6 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
               )
             )
         )
-      (flyspell-buffer)
       )
 
     (defun mdrp/change-dict (lang)
@@ -1512,14 +1516,18 @@ Allows to have multiple cursors. There are a lot of functions provided by this m
     )
 #+end_src
 
-** Hide region
+** TODO Hide region
 :PROPERTIES:
 :CUSTOM_ID: hide-region
 :END:
 
+TODO: hide-region-unpin doesn't work when changing buffer.
+
 #+begin_src emacs-lisp
   (use-package hide-region
     :load-path "lisp/"
+    :general
+    ("C-c r u" 'hide-region-unpin)
     )
 
   (use-package hide-mode-line
@@ -2097,27 +2105,27 @@ This extension allows to choose the way each minibuffer will be displayed.
 TODO: Test all the possible minibuffers and customize them as I'd like them to be
 
 #+begin_src emacs-lisp
-  (use-package vertico-multiform
-    :after vertico
-    :ensure nil
-    :custom
-    (vertico-buffer-display-action '(display-buffer-in-side-window
-                                     (side . right)
-                                     (window-width . 0.3)))
-    :config
-    ;; Sort directories before files
-    (defun sort-characters (characters)
-      (sort characters (lambda (name1 name2) (< (char-from-name name1) (char-from-name name2)))))
+    (use-package vertico-multiform
+      :after vertico
+      :ensure nil
+      :custom
+      (vertico-buffer-display-action '(display-buffer-in-side-window
+                                       (side . right)
+                                       (window-width . 0.3)))
+      :config
+      ;; Sort directories before files
+      (defun sort-characters (characters)
+        (sort characters (lambda (name1 name2) (< (char-from-name name1) (char-from-name name2)))))
 
-    ;; Sort directories before files
-    (defun sort-directories-first (files)
-      (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))
-             (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))))
+      ;; Sort directories before files
+      (defun sort-directories-first (files)
+        (nconc (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))
+               (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))))
 
-    (vertico-multiform-mode))
+      (vertico-multiform-mode))
 
-  (use-package vertico-posframe
-    :ensure t)
+    (use-package vertico-posframe
+      :ensure t)
 #+end_src
 
 ** [[https://github.com/minad/consult/][Consult]]
@@ -3037,7 +3045,7 @@ Display colors with a background corresponding to the color
 #+begin_src emacs-lisp
   (use-package rainbow-mode
     :ensure t
-    :hook (help-mode prog-mode text-mode)
+    :hook (help-mode prog-mode text-mode org-mode)
     )
 #+end_src
 
@@ -3049,9 +3057,10 @@ Display colors with a background corresponding to the color
 Different colours for different depths of parentheses, brackets etc
 
 #+begin_src emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :hook (prog-mode . rainbow-delimiters-mode))
+  (if use-rainbow
+      (use-package rainbow-delimiters
+        :ensure t
+        :hook (prog-mode . rainbow-delimiters-mode)))
 #+end_src
 
 ** [[https://github.com/protesilaos/pulsar][Pulsar]]
@@ -4156,8 +4165,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       (defun mdrp/update-opam-env (&rest _)
         (when (derived-mode-p 'tuareg-mode)
           (tuareg-opam-update-env nil)
-          )
-        )
+          ))
 
       (defun mdrp/update-load-path-opam (&rest _)
         (when (derived-mode-p 'tuareg-mode)
@@ -4166,8 +4174,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
                    (when reply (substring reply 0 -1)))))
             (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
             )
-          )
-        )
+          ))
 
       (if (boundp 'window-buffer-change-functions)
           (progn

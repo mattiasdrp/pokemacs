@@ -31,6 +31,11 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-rainbow nil
+  "If non-nil, don't be @thriim"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-latex nil
   "If non-nil, uses the LaTeX packages"
   :group 'mdrp-packages
@@ -675,7 +680,6 @@ debian, and derivatives). On most it's 'fd'.")
             )
           )
       )
-    (flyspell-buffer)
     )
 
   (defun mdrp/change-dict (lang)
@@ -830,6 +834,8 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hide-region
   :load-path "lisp/"
+  :general
+  ("C-c r u" 'hide-region-unpin)
   )
 
 (use-package hide-mode-line
@@ -1127,8 +1133,8 @@ debian, and derivatives). On most it's 'fd'.")
 
   ;; Sort directories before files
   (defun sort-directories-first (files)
-    (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))
-           (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))))
+    (nconc (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))
+           (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))))
 
   (vertico-multiform-mode))
 
@@ -1788,12 +1794,13 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package rainbow-mode
   :ensure t
-  :hook (help-mode prog-mode text-mode)
+  :hook (help-mode prog-mode text-mode org-mode)
   )
 
-(use-package rainbow-delimiters
-  :ensure t
-  :hook (prog-mode . rainbow-delimiters-mode))
+(if use-rainbow
+    (use-package rainbow-delimiters
+      :ensure t
+      :hook (prog-mode . rainbow-delimiters-mode)))
 
 (use-package pulsar
   :ensure t
@@ -2608,8 +2615,7 @@ function to get the type and, for example, kill and yank it."
     (defun mdrp/update-opam-env (&rest _)
       (when (derived-mode-p 'tuareg-mode)
         (tuareg-opam-update-env nil)
-        )
-      )
+        ))
 
     (defun mdrp/update-load-path-opam (&rest _)
       (when (derived-mode-p 'tuareg-mode)
@@ -2618,8 +2624,7 @@ function to get the type and, for example, kill and yank it."
                  (when reply (substring reply 0 -1)))))
           (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
           )
-        )
-      )
+        ))
 
     (if (boundp 'window-buffer-change-functions)
         (progn
