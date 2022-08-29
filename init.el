@@ -304,12 +304,7 @@
   )
 
 (use-package no-littering
-  :ensure t
-  :config
-  (when (fboundp 'startup-redirect-eln-cache)
-    (startup-redirect-eln-cache
-     (convert-standard-filename
-      (expand-file-name  "var/eln-cache/" user-emacs-directory)))))
+  :ensure t)
 
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "backups/") t)))
@@ -1699,14 +1694,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 
   :config
-  ;; TEMP: Emacs 29 adds position to symbols.
-  (setq doom-modeline-fn-alist
-        (if (functionp 'remove-pos-from-symbol)
-            (--map
-             (cons (remove-pos-from-symbol (car it)) (cdr it))
-             doom-modeline-fn-alist)
-          doom-modeline-fn-alist))
-
   ;; Define your custom doom-modeline
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
                               '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
@@ -1715,6 +1702,14 @@ debian, and derivatives). On most it's 'fd'.")
   (doom-modeline-def-modeline 'mdrp/lsp-line
                               '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
                               '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+
+  ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
+  (setq doom-modeline-fn-alist
+        (unless (version< emacs-version "29")
+          (--map
+           (cons (remove-pos-from-symbol (car it)) (cdr it))
+           doom-modeline-fn-alist)
+        doom-modeline-fn-alist))
 
   ;; Add to `doom-modeline-mode-hook` or other hooks
   (defun mdrp/setup-no-lsp-doom-modeline ()
