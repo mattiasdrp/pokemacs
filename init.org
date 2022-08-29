@@ -51,6 +51,7 @@ Literate configuration for init.el.
 - [[#fonts-and-character-encoding][Fonts and character encoding]]
   - [[#set-environment-to-utf-8][Set Environment to UTF-8]]
   - [[#all-the-icons-and-material-icons-for-specific-range][All the icons and material icons for specific range]]
+    - [[#all-the-icons-completion][All the icons completion]]
   - [[#ligatures][Ligatures]]
   - [[#ansi-color][Ansi color]]
 - [[#keybindings][Keybindings]]
@@ -82,10 +83,13 @@ Literate configuration for init.el.
     - [[#main-mode][Main mode]]
     - [[#quick-peek][Quick Peek]]
     - [[#flycheck-inline][Flycheck inline]]
+    - [[#consult-flycheck][Consult flycheck]]
   - [[#hideshow][Hideshow]]
   - [[#projectile][Projectile]]
   - [[#separedit][Separedit]]
   - [[#treemacs][Treemacs]]
+  - [[#font-lock][Font lock]]
+    - [[#fontify-face][Fontify face]]
 - [[#git][Git]]
   - [[#magit][Magit]]
   - [[#magit-todos][Magit todos]]
@@ -107,16 +111,21 @@ Literate configuration for init.el.
     - [[#vertico-multiform][Vertico multiform]]
   - [[#consult][Consult]]
   - [[#embark][Embark]]
+  - [[#corfu][Corfu]]
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
   - [[#orderless][Orderless]]
+  - [[#cape][Cape]]
   - [[#marginalia][Marginalia]]
+  - [[#iedit][Iedit]]
   - [[#yasnippet][Yasnippet]]
+    - [[#consult-yasnippet][Consult Yasnippet]]
   - [[#company][Company]]
+  - [[#consult-company][Consult Company]]
+  - [[#company-quickhelp][Company Quickhelp]]
     - [[#company-math][Company math]]
     - [[#company-web][Company web]]
     - [[#company-box][Company box]]
     - [[#company-prescient][Company prescient]]
-    - [[#company-quickhelp][Company quickhelp]]
 - [[#gui][GUI]]
   - [[#themes-etc][Themes etc]]
     - [[#doom-theme][Doom theme]]
@@ -147,6 +156,7 @@ Literate configuration for init.el.
   - [[#main-mode][Main mode]]
   - [[#lsp-ui][Lsp ui]]
   - [[#lsp-treemacs][Lsp treemacs]]
+  - [[#consult-lsp][Consult lsp]]
 - [[#tree-sitter][Tree sitter]]
   - [[#tree-sitter-folding][Tree sitter folding]]
 - [[#programming-languages][Programming languages]]
@@ -466,7 +476,7 @@ If you experience stuttering, increase this.
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
-** Default values
+** TODO Default values
 :PROPERTIES:
 :CUSTOM_ID: default-values
 :END:
@@ -526,7 +536,7 @@ If you experience stuttering, increase this.
    comment-style 'indent
    ;; I don't need scroll bars
    scroll-bar-mode nil
-   ;; TODO/ Not sure why I'm using it
+   ;; TODO: Not sure why I'm using it
    sentence-end-double-space nil
    ;; Long lines will span on a continuation line (makes the whole line visible)
    truncate-lines nil
@@ -709,7 +719,12 @@ Stop creating files everywhere and put them all in a single place
 
 #+begin_src emacs-lisp
   (use-package no-littering
-    :ensure t)
+    :ensure t
+    :config
+    (when (fboundp 'startup-redirect-eln-cache)
+      (startup-redirect-eln-cache
+       (convert-standard-filename
+        (expand-file-name  "var/eln-cache/" user-emacs-directory)))))
 #+end_src
 
 And by the way, put the backup files in the same directory to prevent polluting the my project directories
@@ -801,7 +816,9 @@ We're not saving the minibuffer history but compile history too
     (recentf-mode t)
     :config
     ;; Persist 'compile' history
-    (add-to-list 'savehist-additional-variables 'compile-history))
+    (add-to-list 'savehist-additional-variables 'compile-history)
+    (add-to-list 'recentf-exclude no-littering-var-directory)
+    (add-to-list 'recentf-exclude no-littering-etc-directory))
 #+end_src
 
 * WSL Specific
@@ -868,6 +885,11 @@ Other all-the-icons related packages:
     :hook (dired-mode . all-the-icons-dired-mode)
     )
 #+end_src
+
+*** [[https://github.com/iyefrat/all-the-icons-completion][All the icons completion]]
+:PROPERTIES:
+:CUSTOM_ID: all-the-icons-completion
+:END:
 
 #+begin_src emacs-lisp
   (use-package all-the-icons-completion
@@ -1038,8 +1060,6 @@ Other all-the-icons related packages:
 :PROPERTIES:
 :CUSTOM_ID: which-key
 :END:
-
-# TODO: Move major mode key based replacements to the major modes
 
 Useful packages that allows to see the possible keys after starting a combination of keys.
 
@@ -1632,8 +1652,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 #+begin_src emacs-lisp
   (use-package flycheck
     :ensure t
-    :hook ((prog-mode markdown-mode) . flycheck-mode)
-    )
+    :hook ((prog-mode markdown-mode) . flycheck-mode))
 #+end_src
 
 *** [[https://github.com/cpitclaudel/quick-peek][Quick Peek]]
@@ -1668,6 +1687,18 @@ On the fly syntax checking. One of the greatest package there is for making prog
           flycheck-inline-clear-function #'quick-peek-hide)
     )
 
+#+END_SRC
+
+*** [[https://github.com/minad/consult-flycheck][Consult flycheck]]
+:PROPERTIES:
+:CUSTOM_ID: consult-flycheck
+:END:
+
+#+BEGIN_SRC elisp
+  (use-package consult-flycheck
+    :ensure t
+    :general
+    ("C-c l" 'consult-flycheck))
 #+END_SRC
 
 ** [[https://www.emacswiki.org/emacs/HideShow][Hideshow]]
@@ -1732,8 +1763,14 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
 #+end_src
 
 ** Font lock
+:PROPERTIES:
+:CUSTOM_ID: font-lock
+:END:
 
 *** [[https://github.com/Fuco1/fontify-face][Fontify face]]
+:PROPERTIES:
+:CUSTOM_ID: fontify-face
+:END:
 
 Allows to see immediately how a face will look
 
@@ -1800,10 +1837,10 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
 Customize ~hl-todo-keyword-faces~ to choose the keywords you want to highlights (an example is already available in [[file:custom.el][custom.el]])
 
 #+begin_src emacs-lisp
-(use-package hl-todo
-  :ensure t
-  :config
-  (global-hl-todo-mode 1))
+  (use-package hl-todo
+    :ensure t
+    :config
+    (global-hl-todo-mode 1))
 #+end_src
 
 ** [[https://github.com/dgutov/diff-hl][Diff hl]]
@@ -1851,14 +1888,14 @@ Show the commit at point to see what happened here. Invoke with ~M-v G~.
           git-messenger:use-magit-popup t))
 #+end_src
 
-** [[https://github.com/emacsmirror/git-timemachine][Git timemachine]]
+** TODO [[https://github.com/emacsmirror/git-timemachine][Git timemachine]]
 :PROPERTIES:
 :CUSTOM_ID: git-timemachine
 :END:
 
 Go back in time with ~M-v <left>~ then travel through commits with ~p~, ~n~ and other commands listed in the package documentation.
 
-# TODO: Display possible commands when git-timemachine starts
+TODO: Display possible commands when git-timemachine starts
 
 #+begin_src emacs-lisp
   (use-package git-timemachine
@@ -2055,14 +2092,14 @@ Useful keybindings are:
     :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
  #+end_src
 
-*** Vertico multiform
+*** TODO Vertico multiform
 :PROPERTIES:
 :CUSTOM_ID: vertico-multiform
 :END:
 
 This extension allows to choose the way each minibuffer will be displayed.
 
-# TODO: Test all the possible minibuffers and customize them as I'd like them to be
+TODO: Test all the possible minibuffers and customize them as I'd like them to be
 
 #+begin_src emacs-lisp
   (use-package vertico-multiform
@@ -2081,19 +2118,6 @@ This extension allows to choose the way each minibuffer will be displayed.
     (defun sort-directories-first (files)
       (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))
              (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))))
-
-    (setq vertico-multiform-commands
-          '((consult-imenu buffer)
-            (consult-line buffer)
-            (execute-extended-command posframe mouse)
-            (find-file (vertico-sort-function . sort-directories-first))
-            (insert-char (vertico-sort-function . sort-characters))
-            (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
-
-    (setq vertico-multiform-categories
-          '((imenu buffer)
-            (file (vertico-sort-function . sort-directories-first))
-            (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
 
     (vertico-multiform-mode))
 
@@ -2117,24 +2141,23 @@ This extension allows to choose the way each minibuffer will be displayed.
     ("C-c m" 'consult-mode-command)
     ("C-c k" 'consult-kmacro)
     ;; C-x bindings (ctl-x-map)
-    ("C-x M-:" 'consult-complex-command)     ;; orig. repeat-complex-command
-    ("C-x b" 'consult-buffer)                ;; orig. switch-to-buffer
-    ("C-x 4 b" 'consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-    ("C-x 5 b" 'consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-    ("C-x r b" 'consult-bookmark)            ;; orig. bookmark-jump
-    ("C-x p b" 'consult-project-buffer)      ;; orig. project-switch-to-buffer
+    ([remap repeat-complex-command] 'consult-complex-command)
+    ([remap switch-to-buffer] 'consult-buffer)
+    ([remap switch-to-buffer-other-window] 'consult-buffer-other-window)
+    ([remap switch-to-buffer-other-frame] 'consult-buffer-other-frame)
+    ([remap bookmark-jump] 'consult-bookmark)
+    ([remap project-switch-to-buffer] 'consult-project-buffer)
+    ([remap yank-pop] 'consult-yank-replace)
+    ([remap apropos-command] 'consult-apropos)
+    ([remap goto-line] 'consult-goto-line)
     ;; Custom M-# bindings for fast register access
     ("M-#" 'consult-register-load)
     ("M-'" 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
     ("C-M-#" 'consult-register)
     ;; Other custom bindings
-    ("M-y" 'consult-yank-from-kill-ring)                ;; orig. yank-pop
     ("<help> a" 'consult-apropos)            ;; orig. apropos-command
     ;; M-g bindings (goto-map)
     ("M-g e" 'consult-compile-error)
-    ("M-g f" 'consult-flycheck)               ;; Alternative: consult-flycheck
-    ("M-g g" 'consult-goto-line)             ;; orig. goto-line
-    ("M-g M-g" 'consult-goto-line)           ;; orig. goto-line
     ("M-g o" 'consult-outline)               ;; Alternative: consult-org-heading
     ("M-g m" 'consult-mark)
     ("M-g k" 'consult-global-mark)
@@ -2154,15 +2177,14 @@ This extension allows to choose the way each minibuffer will be displayed.
     ;; Isearch integration
     ("M-s e" 'consult-isearch-history)
     (:keymaps 'isearch-mode-map
-              "M-e" 'consult-isearch-history         ;; orig. isearch-edit-string
-              "M-s e" 'consult-isearch-history       ;; orig. isearch-edit-string
+              [remap isearch-edit-string] 'consult-isearch-history
               "M-s l" 'consult-line                  ;; needed by consult-line to detect isearch
               "M-s L" 'consult-line-multi            ;; needed by consult-line to detect isearch
               )
     ;; Minibuffer history
     (:keymaps 'minibuffer-local-map
-              "M-s" 'consult-history                 ;; orig. next-matching-history-element
-              "M-r" 'consult-history                ;; orig. previous-matching-history-element
+              [remap next-matching-history-element] 'consult-history
+              [remap prev-matching-history-element] 'consult-history
               )
 
     ;; Enable automatic preview at point in the *Completions* buffer. This is
@@ -2220,8 +2242,8 @@ This extension allows to choose the way each minibuffer will be displayed.
     ;;;; 1. project.el (the default)
     ;; (setq consult-project-function #'consult--default-project--function)
     ;;;; 2. projectile.el (projectile-project-root)
-    ;; (autoload 'projectile-project-root "projectile")
-    ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+    (autoload 'projectile-project-root "projectile")
+    (setq consult-project-function (lambda (_) (projectile-project-root)))
     ;;;; 3. vc.el (vc-root-dir)
     ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
     ;;;; 4. locate-dominating-file
@@ -2287,6 +2309,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+end_src
 
 ** [[https://github.com/minad/corfu][Corfu]]
+:PROPERTIES:
+:CUSTOM_ID: corfu
+:END:
 
 #+begin_src emacs-lisp
   (use-package corfu
@@ -2368,6 +2393,9 @@ Better completions in minibuffers
 #+end_src
 
 ** [[https://github.com/minad/cape][Cape]]
+:PROPERTIES:
+:CUSTOM_ID: cape
+:END:
 
 #+begin_src emacs-lisp
   (use-package cape
@@ -2424,7 +2452,10 @@ Useful informations added in the minibuffer options
     (marginalia-mode))
 #+end_src
 
-** Iedit
+** [[https://github.com/victorhge/iedit][Iedit]]
+:PROPERTIES:
+:CUSTOM_ID: iedit
+:END:
 
 #+BEGIN_SRC elisp
   (use-package iedit
@@ -2445,8 +2476,20 @@ Useful informations added in the minibuffer options
     :config
     (yas-global-mode 1)
     )
-
 #+end_src
+
+*** [[https://github.com/mohkale/consult-yasnippet][Consult Yasnippet]]
+:PROPERTIES:
+:CUSTOM_ID: consult-yasnippet
+:END:
+
+#+BEGIN_SRC elisp
+  (use-package consult-yasnippet
+    :ensure t
+    :general
+    ("C-<" 'consult-yasnippet))
+#+END_SRC
+
 ** [[https://github.com/company-mode/company-mode][Company]]
 :PROPERTIES:
 :CUSTOM_ID: company
@@ -2481,19 +2524,49 @@ Text completion framework.
           company-show-numbers ''left
           company-tooltip-align-annotations t
           company-require-match 'never
-          company-tooltip-align-annotations t
           )
-    (add-to-list 'company-backends 'company-capf)
-    (add-to-list 'company-backends 'company-yasnippet)
+    (add-to-list 'company-backends '(company-capf
+                                     company-yasnippet
+                                     company-files
+                                     company-dabbrev-code))
     (global-company-mode 1)
     )
 #+end_src
+
+** TODO [[https://github.com/mohkale/consult-company][Consult Company]]
+:PROPERTIES:
+:CUSTOM_ID: consult-company
+:END:
+
+Not satisfied currently.
+
+#+BEGIN_SRC elisp
+  (use-package consult-company
+    :disabled
+    :ensure t
+    :config
+    (define-key company-mode-map [remap completion-at-point] #'consult-company))
+    ;; :general
+    ;; ([remap completion-at-point] #'consult-company))
+
+#+END_SRC
+
+** [[https://github.com/company-mode/company-quickhelp][Company Quickhelp]]
+:PROPERTIES:
+:CUSTOM_ID: company-quickhelp
+:END:
+
+Display documentation for the current candidate.
 
 #+begin_src elisp
   (use-package company-quickhelp
     :ensure t
     :after company
     :hook (company-mode . company-quickhelp-mode)
+    :general
+    (:keymaps 'company-active-map
+              "C-c h" 'company-quickhelp-manual-begin
+              "M-h"   'company-quickhelp-manual-begin)
     :config
     (setq company-quickhelp-delay 0)
     (company-quickhelp-mode 1)
@@ -2625,22 +2698,6 @@ Better sorting of company candidates using prescient.
       :after company
       :config
       (company-prescient-mode 1))
-#+end_src
-
-*** [[https://github.com/radian-software/prescient.el][Company quickhelp]]
-:PROPERTIES:
-:CUSTOM_ID: company-quickhelp
-:END:
-
-Display documentation for the current candidate.
-
-#+begin_src emacs-lisp
-  (use-package company-quickhelp
-        :ensure t
-        :bind (:map company-active-map
-                    ("M-h" . company-quickhelp-manual-begin))
-        )
-
 #+end_src
 
 * GUI
@@ -2797,6 +2854,9 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
     ;; The maximum displayed length of the branch name of version control.
     (doom-modeline-vcs-max-length 12)
 
+    ;; Whether display the minions minor mode
+    (doom-modeline-minor-modes t)
+
     ;; Whether display the GitHub notifications. It requires `ghub' package.
     (doom-modeline-github t)
 
@@ -2868,7 +2928,6 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
 #+begin_src emacs-lisp
   (use-package minions
     :ensure t
-    :after (doom-modeline)
     :config (minions-mode)
     :custom
     (minions-mode-line-lighter "☰")
@@ -2930,7 +2989,7 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
   )
 #+end_src
 
-*** [[https://github.com/alphapapa/outshine][Outshine]]
+*** TODO [[https://github.com/alphapapa/outshine][Outshine]]
 :PROPERTIES:
 :CUSTOM_ID: outshine
 :END:
@@ -3523,7 +3582,7 @@ Minor mode acting as a client between a language server protocol and emacs.
     (lsp-keymap-prefix "M-l")
     (lsp-prefer-capf t)
     (lsp-lens-enable nil)
-    (lsp-completion-provider :capf)
+    (lsp-completion-provider :none)
     (lsp-completion-enable t)
     (lsp-enable-imenu t)
     (lsp-disabled-clients '((python-mode . pyls)))
@@ -3623,16 +3682,15 @@ Minor mode acting as a client between a language server protocol and emacs.
     ("C-c C-l" 'lsp-find-definition)
     ("C-c &"   'pop-global-mark)
     (:keymaps 'lsp-command-map
-              "d"  'lsp-find-definition
-              "r"  'lsp-find-references
-              "n"  'lsp-ui-find-next-reference
-              "p"  'lsp-ui-find-prev-reference
-              "i"  'counsel-semantic-or-imenu
-              "R"  'lsp-rename
-              "tr" 'lsp-treemacs-references
-              "ts" 'lsp-treemacs-symbols
-              "te" 'lsp-treemacs-error-list
-              "f"  'my-lsp-fix-buffer
+              "d"   'lsp-find-definition
+              "r"   'lsp-find-references
+              "n"   'lsp-ui-find-next-reference
+              "p"   'lsp-ui-find-prev-reference
+              "i"   'counsel-semantic-or-imenu
+              "R"   'lsp-rename
+              "f"   'consult-flycheck
+              "t r" 'lsp-treemacs-references
+              "t s" 'lsp-treemacs-symbols
               ))
 #+end_src
 
@@ -3689,14 +3747,28 @@ Minor mode acting as a client between a language server protocol and emacs.
     )
 #+end_src
 
-* [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][Tree sitter]]
+** TODO [[https://github.com/gagbo/consult-lsp][Consult lsp]]
+:PROPERTIES:
+:CUSTOM_ID: consult-lsp
+:END:
+
+TODO: Not working with OCaml
+
+#+BEGIN_SRC elisp
+  (use-package consult-lsp
+    :ensure t
+    :disabled)
+#+END_SRC
+
+* TODO [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][Tree sitter]]
 :PROPERTIES:
 :CUSTOM_ID: tree-sitter
 :END:
 
 Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP use incremental compilation to give useful informations about programs, tree-sitter use incremental parsing of current buffer to help with syntax highlighting, code folding etc.
 
-# TODO: Use tree-sitter for syntax highlighting instead of font-lock-mode
+TODO: Use tree-sitter for syntax highlighting instead of font-lock-mode
+
 #+begin_src emacs-lisp
   (use-package tree-sitter-langs :ensure t)
 
@@ -4056,6 +4128,9 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
   (when use-ocaml
     (use-package tuareg
       :ensure t
+      :ensure-system-package
+      (ocamllsp . "opam install ocaml-lsp-server")
+      (ocamlformat . "opam install ocamlformat")
       :mode ("\\.ml\\'" . tuareg-mode)
       ;; The following line can be used instead of :ensure t to load
       ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -4353,7 +4428,6 @@ Some people use this, not my responsibility.
       ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
       :general
       (:keymaps 'rust-mode-map
-                "C-c l" 'flycheck-list-errors
                 "C-c s" 'lsp-rust-analyzer-status
                 "C-M-;" 'mdrp/rust-doc-comment-dwim-following
                 "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing

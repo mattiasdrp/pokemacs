@@ -233,7 +233,7 @@
  comment-style 'indent
  ;; I don't need scroll bars
  scroll-bar-mode nil
- ;; TODO/ Not sure why I'm using it
+ ;; TODO: Not sure why I'm using it
  sentence-end-double-space nil
  ;; Long lines will span on a continuation line (makes the whole line visible)
  truncate-lines nil
@@ -304,7 +304,12 @@
   )
 
 (use-package no-littering
-  :ensure t)
+  :ensure t
+  :config
+  (when (fboundp 'startup-redirect-eln-cache)
+    (startup-redirect-eln-cache
+     (convert-standard-filename
+      (expand-file-name  "var/eln-cache/" user-emacs-directory)))))
 
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "backups/") t)))
@@ -344,7 +349,9 @@ debian, and derivatives). On most it's 'fd'.")
   (recentf-mode t)
   :config
   ;; Persist 'compile' history
-  (add-to-list 'savehist-additional-variables 'compile-history))
+  (add-to-list 'savehist-additional-variables 'compile-history)
+  (add-to-list 'recentf-exclude no-littering-var-directory)
+  (add-to-list 'recentf-exclude no-littering-etc-directory))
 
 (when (and (eq system-type 'gnu/linux)
            (string-match
@@ -893,8 +900,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package flycheck
   :ensure t
-  :hook ((prog-mode markdown-mode) . flycheck-mode)
-  )
+  :hook ((prog-mode markdown-mode) . flycheck-mode))
 
 (use-package quick-peek
   :ensure t
@@ -914,6 +920,11 @@ debian, and derivatives). On most it's 'fd'.")
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide)
   )
+
+(use-package consult-flycheck
+  :ensure t
+  :general
+  ("C-c l" 'consult-flycheck))
 
 (use-package hideshow
   :commands (hs-minor-mode
@@ -1124,19 +1135,6 @@ debian, and derivatives). On most it's 'fd'.")
     (nconc (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))
            (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))))
 
-  (setq vertico-multiform-commands
-        '((consult-imenu buffer)
-          (consult-line buffer)
-          (execute-extended-command posframe mouse)
-          (find-file (vertico-sort-function . sort-directories-first))
-          (insert-char (vertico-sort-function . sort-characters))
-          (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
-
-  (setq vertico-multiform-categories
-        '((imenu buffer)
-          (file (vertico-sort-function . sort-directories-first))
-          (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
-
   (vertico-multiform-mode))
 
 (use-package vertico-posframe
@@ -1152,24 +1150,23 @@ debian, and derivatives). On most it's 'fd'.")
   ("C-c m" 'consult-mode-command)
   ("C-c k" 'consult-kmacro)
   ;; C-x bindings (ctl-x-map)
-  ("C-x M-:" 'consult-complex-command)     ;; orig. repeat-complex-command
-  ("C-x b" 'consult-buffer)                ;; orig. switch-to-buffer
-  ("C-x 4 b" 'consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-  ("C-x 5 b" 'consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-  ("C-x r b" 'consult-bookmark)            ;; orig. bookmark-jump
-  ("C-x p b" 'consult-project-buffer)      ;; orig. project-switch-to-buffer
+  ([remap repeat-complex-command] 'consult-complex-command)
+  ([remap switch-to-buffer] 'consult-buffer)
+  ([remap switch-to-buffer-other-window] 'consult-buffer-other-window)
+  ([remap switch-to-buffer-other-frame] 'consult-buffer-other-frame)
+  ([remap bookmark-jump] 'consult-bookmark)
+  ([remap project-switch-to-buffer] 'consult-project-buffer)
+  ([remap yank-pop] 'consult-yank-replace)
+  ([remap apropos-command] 'consult-apropos)
+  ([remap goto-line] 'consult-goto-line)
   ;; Custom M-# bindings for fast register access
   ("M-#" 'consult-register-load)
   ("M-'" 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
   ("C-M-#" 'consult-register)
   ;; Other custom bindings
-  ("M-y" 'consult-yank-from-kill-ring)                ;; orig. yank-pop
   ("<help> a" 'consult-apropos)            ;; orig. apropos-command
   ;; M-g bindings (goto-map)
   ("M-g e" 'consult-compile-error)
-  ("M-g f" 'consult-flycheck)               ;; Alternative: consult-flycheck
-  ("M-g g" 'consult-goto-line)             ;; orig. goto-line
-  ("M-g M-g" 'consult-goto-line)           ;; orig. goto-line
   ("M-g o" 'consult-outline)               ;; Alternative: consult-org-heading
   ("M-g m" 'consult-mark)
   ("M-g k" 'consult-global-mark)
@@ -1189,15 +1186,14 @@ debian, and derivatives). On most it's 'fd'.")
   ;; Isearch integration
   ("M-s e" 'consult-isearch-history)
   (:keymaps 'isearch-mode-map
-            "M-e" 'consult-isearch-history         ;; orig. isearch-edit-string
-            "M-s e" 'consult-isearch-history       ;; orig. isearch-edit-string
+            [remap isearch-edit-string] 'consult-isearch-history
             "M-s l" 'consult-line                  ;; needed by consult-line to detect isearch
             "M-s L" 'consult-line-multi            ;; needed by consult-line to detect isearch
             )
   ;; Minibuffer history
   (:keymaps 'minibuffer-local-map
-            "M-s" 'consult-history                 ;; orig. next-matching-history-element
-            "M-r" 'consult-history                ;; orig. previous-matching-history-element
+            [remap next-matching-history-element] 'consult-history
+            [remap prev-matching-history-element] 'consult-history
             )
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
@@ -1255,8 +1251,8 @@ debian, and derivatives). On most it's 'fd'.")
   ;;;; 1. project.el (the default)
   ;; (setq consult-project-function #'consult--default-project--function)
   ;;;; 2. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  (autoload 'projectile-project-root "projectile")
+  (setq consult-project-function (lambda (_) (projectile-project-root)))
   ;;;; 3. vc.el (vc-root-dir)
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 4. locate-dominating-file
@@ -1426,6 +1422,11 @@ debian, and derivatives). On most it's 'fd'.")
   (yas-global-mode 1)
   )
 
+(use-package consult-yasnippet
+  :ensure t
+  :general
+  ("C-<" 'consult-yasnippet))
+
 (use-package company
   :ensure t
   :hook ((prog-mode . company-mode)
@@ -1452,17 +1453,30 @@ debian, and derivatives). On most it's 'fd'.")
         company-show-numbers ''left
         company-tooltip-align-annotations t
         company-require-match 'never
-        company-tooltip-align-annotations t
         )
-  (add-to-list 'company-backends 'company-capf)
-  (add-to-list 'company-backends 'company-yasnippet)
+  (add-to-list 'company-backends '(company-capf
+                                   company-yasnippet
+                                   company-files
+                                   company-dabbrev-code))
   (global-company-mode 1)
   )
+
+(use-package consult-company
+  :disabled
+  :ensure t
+  :config
+  (define-key company-mode-map [remap completion-at-point] #'consult-company))
+  ;; :general
+  ;; ([remap completion-at-point] #'consult-company))
 
 (use-package company-quickhelp
   :ensure t
   :after company
   :hook (company-mode . company-quickhelp-mode)
+  :general
+  (:keymaps 'company-active-map
+            "C-c h" 'company-quickhelp-manual-begin
+            "M-h"   'company-quickhelp-manual-begin)
   :config
   (setq company-quickhelp-delay 0)
   (company-quickhelp-mode 1)
@@ -1542,12 +1556,6 @@ debian, and derivatives). On most it's 'fd'.")
     :after company
     :config
     (company-prescient-mode 1))
-
-(use-package company-quickhelp
-      :ensure t
-      :bind (:map company-active-map
-                  ("M-h" . company-quickhelp-manual-begin))
-      )
 
 (use-package doom-themes
   :ensure t
@@ -1659,6 +1667,9 @@ debian, and derivatives). On most it's 'fd'.")
   ;; The maximum displayed length of the branch name of version control.
   (doom-modeline-vcs-max-length 12)
 
+  ;; Whether display the minions minor mode
+  (doom-modeline-minor-modes t)
+
   ;; Whether display the GitHub notifications. It requires `ghub' package.
   (doom-modeline-github t)
 
@@ -1721,7 +1732,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package minions
   :ensure t
-  :after (doom-modeline)
   :config (minions-mode)
   :custom
   (minions-mode-line-lighter "☰")
@@ -2190,7 +2200,7 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-keymap-prefix "M-l")
   (lsp-prefer-capf t)
   (lsp-lens-enable nil)
-  (lsp-completion-provider :capf)
+  (lsp-completion-provider :none)
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
   (lsp-disabled-clients '((python-mode . pyls)))
@@ -2290,16 +2300,15 @@ function to get the type and, for example, kill and yank it."
   ("C-c C-l" 'lsp-find-definition)
   ("C-c &"   'pop-global-mark)
   (:keymaps 'lsp-command-map
-            "d"  'lsp-find-definition
-            "r"  'lsp-find-references
-            "n"  'lsp-ui-find-next-reference
-            "p"  'lsp-ui-find-prev-reference
-            "i"  'counsel-semantic-or-imenu
-            "R"  'lsp-rename
-            "tr" 'lsp-treemacs-references
-            "ts" 'lsp-treemacs-symbols
-            "te" 'lsp-treemacs-error-list
-            "f"  'my-lsp-fix-buffer
+            "d"   'lsp-find-definition
+            "r"   'lsp-find-references
+            "n"   'lsp-ui-find-next-reference
+            "p"   'lsp-ui-find-prev-reference
+            "i"   'counsel-semantic-or-imenu
+            "R"   'lsp-rename
+            "f"   'consult-flycheck
+            "t r" 'lsp-treemacs-references
+            "t s" 'lsp-treemacs-symbols
             ))
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
@@ -2340,6 +2349,10 @@ function to get the type and, for example, kill and yank it."
   :ensure t
   :after lsp
   )
+
+(use-package consult-lsp
+  :ensure t
+  :disabled)
 
 (use-package tree-sitter-langs :ensure t)
 
@@ -2567,6 +2580,9 @@ function to get the type and, for example, kill and yank it."
 (when use-ocaml
   (use-package tuareg
     :ensure t
+    :ensure-system-package
+    (ocamllsp . "opam install ocaml-lsp-server")
+    (ocamlformat . "opam install ocamlformat")
     :mode ("\\.ml\\'" . tuareg-mode)
     ;; The following line can be used instead of :ensure t to load
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -2783,7 +2799,6 @@ function to get the type and, for example, kill and yank it."
     ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
     :general
     (:keymaps 'rust-mode-map
-              "C-c l" 'flycheck-list-errors
               "C-c s" 'lsp-rust-analyzer-status
               "C-M-;" 'mdrp/rust-doc-comment-dwim-following
               "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Module Definition
+# key: <mod
+# --
+
+module ${1:Name} = struct
+  $0
+end
