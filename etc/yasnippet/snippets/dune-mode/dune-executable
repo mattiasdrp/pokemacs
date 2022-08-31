@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: Dune executable
+# key: <dunexec
+# --
+
+(executables
+ (names ${1:name})
+ (public_names ${2:public-name})
+ (libraries $0))

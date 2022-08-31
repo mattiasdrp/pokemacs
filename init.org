@@ -159,6 +159,7 @@ Literate configuration for init.el.
   - [[#lsp-treemacs][Lsp treemacs]]
   - [[#consult-lsp][Consult lsp]]
 - [[#tree-sitter][Tree sitter]]
+  - [[#main-mode][Main mode]]
   - [[#tree-sitter-folding][Tree sitter folding]]
 - [[#programming-languages][Programming languages]]
   - [[#dataconfig-formats][Data/Config formats]]
@@ -2485,8 +2486,7 @@ Useful informations added in the minibuffer options
   (use-package yasnippet
     :ensure t
     :config
-    (yas-global-mode 1)
-    )
+    (yas-global-mode 1))
 #+end_src
 
 *** [[https://github.com/mohkale/consult-yasnippet][Consult Yasnippet]]
@@ -2522,26 +2522,27 @@ Text completion framework.
     :config
     (defun mdrp/disable-automatic-company ()
       (interactive)
-      (setq company-idle-delay nil)
-      )
+      (setq company-idle-delay nil))
+
     (defun mdrp/enable-automatic-company (i)
       (interactive "nIdle-delay: ")
-      (setq-local company-idle-delay i)
-      )
+      (setq-local company-idle-delay i))
+
     (defun add-pcomplete-to-capf ()
       (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+
     (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
+
     (setq company-minimum-prefix-length 1
           company-show-numbers ''left
           company-tooltip-align-annotations t
-          company-require-match 'never
-          )
+          company-require-match 'never)
+
     (add-to-list 'company-backends '(company-capf
                                      company-yasnippet
                                      company-files
                                      company-dabbrev-code))
-    (global-company-mode 1)
-    )
+    (global-company-mode 1))
 #+end_src
 
 ** TODO [[https://github.com/mohkale/consult-company][Consult Company]]
@@ -2553,10 +2554,12 @@ Not satisfied currently.
 
 #+BEGIN_SRC elisp
   (use-package consult-company
+    :load-path "lisp/consult-company/"
     :disabled
-    :ensure t
     :config
-    (define-key company-mode-map [remap completion-at-point] #'consult-company))
+    (defun company-complete-common ()
+      (interactive)
+      (consult-company)))
     ;; :general
     ;; ([remap completion-at-point] #'consult-company))
 
@@ -3141,7 +3144,7 @@ Org mode is, well, org mode.
 
     (defun mdrp/org-compile-latex-and-update-other-buffer ()
       "Has as a premise that it's run from an org-mode buffer and the
-       other buffer already has the PDF open"
+         other buffer already has the PDF open"
       (interactive)
       (org-latex-export-to-pdf)
       (mdrp/update-other-buffer)
@@ -3254,7 +3257,7 @@ Org mode is, well, org mode.
 
     (defun org-setup-<>-syntax-fix ()
       "Setup for characters ?< and ?> in source code blocks.
-    Add this function to `org-mode-hook'."
+      Add this function to `org-mode-hook'."
       (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
       (syntax-propertize (point-max)))
 
@@ -3692,7 +3695,7 @@ Minor mode acting as a client between a language server protocol and emacs.
     ("C-c C-t" 'lsp-describe-thing-at-point)
     ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
     ("C-c C-l" 'lsp-find-definition)
-    ("C-c &"   'pop-global-mark)
+    (:keymaps 'override "C-c &"   'pop-global-mark)
     (:keymaps 'lsp-command-map
               "d"   'lsp-find-definition
               "r"   'lsp-find-references
@@ -3781,22 +3784,24 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 
 TODO: Use tree-sitter for syntax highlighting instead of font-lock-mode
 
+** Main mode
+
 #+begin_src emacs-lisp
-  (use-package tree-sitter-langs :ensure t)
+  ;; This package needs to be loaded to use language parsers
+  (use-package tree-sitter-langs
+    :ensure t
+    )
 
   (use-package tree-sitter
-      :ensure t
-      :defer t
-      :hook
-      (tree-sitter-after-on . tree-sitter-hl-mode)
-      :config
-      ;; This makes every node a link to a section of code
-      (setq tree-sitter-debug-jump-buttons t)
-      ;; and this highlights the entire sub tree in your code
-      (setq tree-sitter-debug-highlight-jump-region t)
-      (global-tree-sitter-mode))
-
-    ;; This package needs to be loaded to use language parsers
+    :ensure t
+    :hook
+    (tree-sitter-after-on . tree-sitter-hl-mode)
+    :config
+    ;; This makes every node a link to a section of code
+    (setq tree-sitter-debug-jump-buttons t)
+    ;; and this highlights the entire sub tree in your code
+    (setq tree-sitter-debug-highlight-jump-region t)
+    (global-tree-sitter-mode))
 #+end_src
 
 ** Tree sitter folding

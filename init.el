@@ -419,6 +419,9 @@ debian, and derivatives). On most it's 'fd'.")
   (shell-mode . ansi-color-for-comint-mode-on)
   )
 
+(use-package kurecolor
+  :ensure t)
+
 (use-package general
   :demand t
   :ensure t
@@ -1420,8 +1423,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package yasnippet
   :ensure t
   :config
-  (yas-global-mode 1)
-  )
+  (yas-global-mode 1))
 
 (use-package consult-yasnippet
   :ensure t
@@ -1441,32 +1443,35 @@ debian, and derivatives). On most it's 'fd'.")
   :config
   (defun mdrp/disable-automatic-company ()
     (interactive)
-    (setq company-idle-delay nil)
-    )
+    (setq company-idle-delay nil))
+
   (defun mdrp/enable-automatic-company (i)
     (interactive "nIdle-delay: ")
-    (setq-local company-idle-delay i)
-    )
+    (setq-local company-idle-delay i))
+
   (defun add-pcomplete-to-capf ()
     (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
+
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
+
   (setq company-minimum-prefix-length 1
         company-show-numbers ''left
         company-tooltip-align-annotations t
-        company-require-match 'never
-        )
+        company-require-match 'never)
+
   (add-to-list 'company-backends '(company-capf
                                    company-yasnippet
                                    company-files
                                    company-dabbrev-code))
-  (global-company-mode 1)
-  )
+  (global-company-mode 1))
 
 (use-package consult-company
+  :load-path "lisp/consult-company/"
   :disabled
-  :ensure t
   :config
-  (define-key company-mode-map [remap completion-at-point] #'consult-company))
+  (defun company-complete-common ()
+    (interactive)
+    (consult-company)))
   ;; :general
   ;; ([remap completion-at-point] #'consult-company))
 
@@ -1855,7 +1860,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (defun mdrp/org-compile-latex-and-update-other-buffer ()
     "Has as a premise that it's run from an org-mode buffer and the
-     other buffer already has the PDF open"
+       other buffer already has the PDF open"
     (interactive)
     (org-latex-export-to-pdf)
     (mdrp/update-other-buffer)
@@ -1968,7 +1973,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (defun org-setup-<>-syntax-fix ()
     "Setup for characters ?< and ?> in source code blocks.
-  Add this function to `org-mode-hook'."
+    Add this function to `org-mode-hook'."
     (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
     (syntax-propertize (point-max)))
 
@@ -2300,7 +2305,7 @@ function to get the type and, for example, kill and yank it."
   ("C-c C-t" 'lsp-describe-thing-at-point)
   ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
   ("C-c C-l" 'lsp-find-definition)
-  ("C-c &"   'pop-global-mark)
+  (:keymaps 'override "C-c &"   'pop-global-mark)
   (:keymaps 'lsp-command-map
             "d"   'lsp-find-definition
             "r"   'lsp-find-references
@@ -2356,21 +2361,21 @@ function to get the type and, for example, kill and yank it."
   :ensure t
   :disabled)
 
-(use-package tree-sitter-langs :ensure t)
+;; This package needs to be loaded to use language parsers
+(use-package tree-sitter-langs
+  :ensure t
+  )
 
 (use-package tree-sitter
-    :ensure t
-    :defer t
-    :hook
-    (tree-sitter-after-on . tree-sitter-hl-mode)
-    :config
-    ;; This makes every node a link to a section of code
-    (setq tree-sitter-debug-jump-buttons t)
-    ;; and this highlights the entire sub tree in your code
-    (setq tree-sitter-debug-highlight-jump-region t)
-    (global-tree-sitter-mode))
-
-  ;; This package needs to be loaded to use language parsers
+  :ensure t
+  :hook
+  (tree-sitter-after-on . tree-sitter-hl-mode)
+  :config
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t)
+  ;; and this highlights the entire sub tree in your code
+  (setq tree-sitter-debug-highlight-jump-region t)
+  (global-tree-sitter-mode))
 
 (use-package ts-fold
   :load-path "lisp/ts-fold/"

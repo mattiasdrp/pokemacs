@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Module Signature
+# key: <modsig
+# --
+
+module ${1:Name} = sig
+  type t = $0
+end
