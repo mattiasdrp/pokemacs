@@ -262,7 +262,7 @@
 
 (show-paren-mode 1)
 
-(global-display-line-numbers-mode 1)
+;; (global-display-line-numbers-mode t)
 
 (save-place-mode 1)
 
@@ -600,6 +600,14 @@ debian, and derivatives). On most it's 'fd'.")
          ("²"                       'god-mode-all)
          ("C-²"                     'god-mode-all)
          )
+  )
+
+(use-package nlinum
+  :init
+  (global-nlinum-mode 1)
+  :ensure t
+  :config
+  (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
   )
 
 (use-package cheatsheet

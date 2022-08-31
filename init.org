@@ -61,6 +61,7 @@ Literate configuration for init.el.
   - [[#selected][Selected]]
   - [[#disabled-god-mode][DISABLED: God mode]]
 - [[#general-utilities][General Utilities]]
+  - [[#nlinum][Nlinum]]
   - [[#cheat-sheet][Cheat Sheet]]
   - [[#crux][Crux]]
   - [[#delete-block][Delete block]]
@@ -614,9 +615,9 @@ Since this is highly user dependent (I see you @thriim), the variable ~show-pare
 :CUSTOM_ID: other-useful-global-modes
 :END:
 
-- Display line numbers in the fringe
+- Display line numbers in the fringe (disabled for now because it messes with quick-peek)
   #+begin_src emacs-lisp
-    (global-display-line-numbers-mode 1)
+    ;; (global-display-line-numbers-mode t)
   #+end_src
 - Save the place of the cursor when exiting the buffer
   #+begin_src emacs-lisp
@@ -947,6 +948,9 @@ Other all-the-icons related packages:
 #+end_src
 
 ** [[https://github.com/emacsfodder/kurecolor][Kurecolor]]
+:PROPERTIES:
+:CUSTOM_ID: kurecolor
+:END:
 
 #+BEGIN_SRC elisp
   (use-package kurecolor
@@ -1176,6 +1180,21 @@ This mode allows to switch between a mode where modifier keys are not used (~C-k
 :END:
 
 This part will load packages that are useful for emacs and are not specific to modes (usually, better commands and buffer manipulations)
+
+** [[https://github.com/emacsmirror/nlinum/blob/master/nlinum.el][Nlinum]]
+:PROPERTIES:
+:CUSTOM_ID: nlinum
+:END:
+
+#+BEGIN_SRC elisp
+  (use-package nlinum
+    :init
+    (global-nlinum-mode 1)
+    :ensure t
+    :config
+    (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
+    )
+#+END_SRC
 
 ** [[https://github.com/mykyta-shyrin/cheatsheet][Cheat Sheet]]
 :PROPERTIES:
@@ -3785,6 +3804,9 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 TODO: Use tree-sitter for syntax highlighting instead of font-lock-mode
 
 ** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode
+:END:
 
 #+begin_src emacs-lisp
   ;; This package needs to be loaded to use language parsers
