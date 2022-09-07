@@ -18,7 +18,7 @@ Literate configuration for [[https://www.gnu.org/software/emacs/manual/html_node
 
 * Header
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;;; early-init.el --- Emacs early init -*- lexical-binding: t -*-
   ;;
 
@@ -43,29 +43,29 @@ Literate configuration for [[https://www.gnu.org/software/emacs/manual/html_node
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;; Code:
 
-#+end_src
+#+END_SRC
 
 * Decrease GC frequency
 
 By increasing the GC threshold we ensure that it will run less frequently and thus lead to a faster start-up.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq gc-cons-threshold 100000000)
-#+end_src
+#+END_SRC
 
 * Increase data read from processes
 
 This is useful for lsp, notably
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
-#+end_src
+#+END_SRC
 
 * Native compilation settings
 
 Disable warnings, async compilation and cache directory for native compilation.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;;; Native compilation settings
   (when (featurep 'native-compile)
     ;; Silence compiler warnings as they can be pretty disruptive
@@ -80,21 +80,21 @@ Disable warnings, async compilation and cache directory for native compilation.
       (if (version< emacs-version "29")
           (add-to-list 'native-comp-eln-load-path (convert-standard-filename (expand-file-name "var/eln-cache/" user-emacs-directory)))
         (startup-redirect-eln-cache (convert-standard-filename (expand-file-name "var/eln-cache/" user-emacs-directory))))))
-#+end_src
+#+END_SRC
 
 * Disable package-enable-at-startup
 
 Package initialize occurs automatically, before init.el is loaded, but after early-init.el. We handle package initialization, so we must prevent Emacs from doing it early.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq package-enable-at-startup nil)
-#+end_src
+#+END_SRC
 
 * Reduce Redisplay
 
 To reduce slowdowns caused by early redisplays when loading, the following code will reduce the amount of times Emacs redisplays when setting up windows. This idea came from the Doom Emacs early-init.el file.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq-default inhibit-redisplay t
                 inhibit-message t)
 
@@ -103,45 +103,45 @@ To reduce slowdowns caused by early redisplays when loading, the following code 
               (setq-default inhibit-redisplay nil
                             inhibit-message nil)
               (redisplay)))
-#+end_src
+#+END_SRC
 
 * Unset file-name-handler-alist
 
 Every file opened and loaded by Emacs will run through this list to check for a proper handler for the file, but during startup, it won’t need any of them.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defvar file-name-handler-alist-original file-name-handler-alist)
   (setq file-name-handler-alist nil)
-#+end_src
+#+END_SRC
 
 * Disable site-run-file
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq site-run-file nil)
-#+end_src
+#+END_SRC
 
 * Disable Unnecessary Interface
 
 It will be faster to disable them here before they've been initialized.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-mode . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
-#+end_src
+#+END_SRC
 
 * Initial mode
 
 Make the initial buffer load faster by setting its mode to fundamental-mode
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (customize-set-variable 'initial-major-mode 'fundamental-mode)
-#+end_src
+#+END_SRC
 
 * End
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (provide 'early-init)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;; early-init.el ends here
-#+end_src
+#+END_SRC

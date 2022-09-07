@@ -19,7 +19,7 @@
    '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
  '(doom-modeline-bar-width 4)
  '(doom-modeline-height 25)
- '(doom-theme 'doom-one)
+ '(doom-theme 'doom-solarized-dark)
  '(doom-themes-enable-bold t)
  '(doom-themes-enable-italic t)
  '(electric-indent-mode t)
@@ -42,9 +42,9 @@
      ("XXXX*" . "#cc9393")))
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages
-   '(tree-sitter-langs tree-sitter kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
- '(safe-local-variable-values '((comment-fill-column . 80)))
+   '(auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(show-paren-style 'expression)
+ '(use-agenda-start t)
  '(use-company t)
  '(use-fsharp t)
  '(use-god nil)
@@ -65,7 +65,7 @@
  '(use-visual-fill t)
  '(use-web t)
  '(vertico-multiform-categories
-   '((imenu buffer posframe)
+   '((imenu buffer)
      (file
       (vertico-sort-function . sort-directories-first))
      (company

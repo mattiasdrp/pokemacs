@@ -126,7 +126,7 @@
   :group 'mdrp-packages
   :type 'boolean)
 
-(defcustom doom-theme 'doom-one
+(defcustom doom-theme 'doom-solarized-dark
   "Theme to load"
   :group 'mdrp-packages
   :type 'symbol)
@@ -252,6 +252,9 @@
  echo-keystrokes 0.1
  )
 
+(load "server")
+(unless (server-running-p) (server-start))
+
 (global-prettify-symbols-mode t)
 (prettify-symbols-mode)
 
@@ -270,6 +273,9 @@
 
 (when (fboundp 'global-so-long-mode)
   (global-so-long-mode))
+
+(unless (version< emacs-version "29")
+  (pixel-scroll-precision-mode t))
 
 (add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
 (add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
@@ -501,10 +507,6 @@ debian, and derivatives). On most it's 'fd'.")
    [f6]                      'recompile
    [f7]                      'next-error
    [f8]                      'normal-mode
-
-   ;; Mouse
-   [mouse-4]                 'down-slightly
-   [mouse-5]                 'up-slightly
    )
   (general-define-key
    :prefix "M-z"
@@ -551,7 +553,9 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package selected
   :ensure t
-  :init (selected-global-mode)
+  :init
+  (require 'hide-region)
+  (selected-global-mode)
   :general
   (:keymaps 'selected-keymap
             ;; "C-?"                     'hydra-selected/body
@@ -845,6 +849,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hide-region
   :load-path "lisp/"
+  :commands hide-region-pin
   :general
   ("C-c r u" 'hide-region-unpin)
   )
@@ -941,8 +946,6 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package hideshow
   :commands (hs-minor-mode
              hs-toggle-hiding)
-  :init
-  (add-hook 'prog-mode-hook #'hs-minor-mode)
   :diminish hs-minor-mode
   :config
   (setq hs-isearch-open t)
@@ -1086,10 +1089,14 @@ debian, and derivatives). On most it's 'fd'.")
   (vertico-mode)
   :general
   (:keymaps 'vertico-map
-            "<tab>" #'vertico-insert  ; Insert selected candidate into text area
+            "<tab>" #'minibuffer-complete         ; common prefix
             "<escape>" #'minibuffer-keyboard-quit ; Close minibuffer
             "C-M-n" #'vertico-next-group
-            "C-M-p" #'vertico-previous-group)
+            "C-M-p" #'vertico-previous-group
+            "?" #'minibuffer-completion-help
+            "M-RET" #'embark-dwim ;; pick some comfortable binding
+            "C-<up>" #'other-window
+            )
   (:keymaps 'minibuffer-local-map
             "M-h" #'backward-kill-word)
   :custom
@@ -1171,6 +1178,7 @@ debian, and derivatives). On most it's 'fd'.")
   ([remap yank-pop] 'consult-yank-replace)
   ([remap apropos-command] 'consult-apropos)
   ([remap goto-line] 'consult-goto-line)
+  ;; ([remap isearch-forward] 'consult-line)
   ;; Custom M-# bindings for fast register access
   ("M-#" 'consult-register-load)
   ("M-'" 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
@@ -1199,7 +1207,6 @@ debian, and derivatives). On most it's 'fd'.")
   ("M-s e" 'consult-isearch-history)
   (:keymaps 'isearch-mode-map
             [remap isearch-edit-string] 'consult-isearch-history
-            "M-s l" 'consult-line                  ;; needed by consult-line to detect isearch
             "M-s L" 'consult-line-multi            ;; needed by consult-line to detect isearch
             )
   ;; Minibuffer history
@@ -1233,6 +1240,16 @@ debian, and derivatives). On most it's 'fd'.")
   ;; after lazily loading the package.
   :config
 
+  ;; (defun consult-line-repeat ()
+  ;;   (interactive)
+
+
+  (defvar mdrp/consult-line-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map "\C-s" #'previous-history-element)
+      map))
+
+  (consult-customize consult-line :keymap mdrp/consult-line-map)
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
@@ -1247,7 +1264,7 @@ debian, and derivatives). On most it's 'fd'.")
    consult-bookmark consult-recent-file consult-xref
    consult--source-bookmark consult--source-recent-file
    consult--source-project-recent-file
-   :preview-key (kbd "M-."))
+   :preview-key 'any)
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
@@ -1260,14 +1277,14 @@ debian, and derivatives). On most it's 'fd'.")
   ;; By default `consult-project-function' uses `project-root' from project.el.
   ;; Optionally configure a different project root function.
   ;; There are multiple reasonable alternatives to chose from.
-  ;;;; 1. project.el (the default)
+    ;;;; 1. project.el (the default)
   ;; (setq consult-project-function #'consult--default-project--function)
-  ;;;; 2. projectile.el (projectile-project-root)
+    ;;;; 2. projectile.el (projectile-project-root)
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-function (lambda (_) (projectile-project-root)))
-  ;;;; 3. vc.el (vc-root-dir)
+    ;;;; 3. vc.el (vc-root-dir)
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-  ;;;; 4. locate-dominating-file
+    ;;;; 4. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
   )
 
@@ -1275,12 +1292,20 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
-  ("C-:" 'embark-dwim)         ;; good alternative: M-.
+  ("C-:" 'embark-dwim-noquit)  ;; good alternative: M-.
   ("C-h B" 'embark-bindings)   ;; alternative for `describe-bindings'
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
+  (setq embark-quit-after-action nil)
+  (defun embark-dwim-noquit ()
+    "Run action but don't quit the minibuffer afterwards."
+    (interactive)
+    (let ((embark-quit-after-action nil))
+      (embark-dwim)
+      (other-window 1)))
+
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -1291,27 +1316,8 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package embark-consult
   :ensure t
   :after (embark consult)
-  :general
-  (:keymaps 'vertico-map
-            "M-RET" 'embark-default-act-noquit ;; pick some comfortable binding
-            )
   :config
-  (defun embark-default-act-noquit ()
-    "Run action but don't quit the minibuffer afterwards."
-    (interactive)
-    (let* ((embark-quit-after-action nil)
-           (target (car (embark--targets)))
-           (orig-target (embark--orig-target target))
-           (action (embark--default-action
-                    (plist-get target :type))))
-      (embark--act
-       action
-       (if (and (eq action embark--command)
-                (not (memq action embark-multitarget-actions)))
-           (embark--orig-target target)
-         target))))
-
-  :demand t ; only necessary if you have the hook below
+  ;; :demand t ; only necessary if you have the hook below
   ;; if you want to have consult previews as you move around an
   ;; auto-updating embark collect buffer
   :hook
@@ -1749,6 +1755,9 @@ debian, and derivatives). On most it's 'fd'.")
   :config (minions-mode)
   :custom
   (minions-mode-line-lighter "☰")
+  ;; :general
+  ;; (:keymaps 'minions-mode-line-minor-modes-map
+  ;;           "<mode-line> <mouse-1>" 'minions-minor-modes-menu)
   )
 
 (use-package outline
@@ -1835,8 +1844,6 @@ debian, and derivatives). On most it's 'fd'.")
           outline-next-visible-heading
           outline-previous-visible-heading
           outline-up-heading
-          up-slightly
-          down-slightly
           ))
 
   (setq pulsar-pulse-on-window-change t)
@@ -1906,7 +1913,7 @@ debian, and derivatives). On most it's 'fd'.")
      ("Plaisir" . ?p)
      (:endgroup . nil)
      (:startgroup . nil)
-     ("Irmin" . ?i)
+     ("Usuba" . ?u)
      ("Ocaml" . ?o)
      ("Reste" . ?r)
      (:endgroup . nil)
@@ -1920,8 +1927,9 @@ debian, and derivatives). On most it's 'fd'.")
   (org-tag-faces
    '(
      ("Maison" . (:foreground "GoldenRod" :weight bold))
+     ("Plaisir" . (:foreground "GoldenRod" :weight bold))
      ("Boulot" . (:foreground "GoldenRod" :weight bold))
-     ("Irmin" . (:foreground "IndianRed1" :weight bold))
+     ("Usuba" . (:foreground "IndianRed1" :weight bold))
      ("OCaml" . (:foreground "IndianRed1" :weight bold))
      ("Reste" . (:foreground "IndianRed1" :weight bold))
      ("Facile" . (:foreground "OrangeRed" :weight bold))
@@ -2313,7 +2321,7 @@ function to get the type and, for example, kill and yank it."
   ("C-c C-t" 'lsp-describe-thing-at-point)
   ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
   ("C-c C-l" 'lsp-find-definition)
-  (:keymaps 'override "C-c &"   'pop-global-mark)
+  ("C-c &"   'pop-global-mark :keymaps 'override)
   (:keymaps 'lsp-command-map
             "d"   'lsp-find-definition
             "r"   'lsp-find-references
@@ -2706,6 +2714,7 @@ function to get the type and, for example, kill and yank it."
     :hook (tuareg-mode . dune-minor-mode)))
 
 (use-package pdf-tools
+  :ensure t
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
   :config
