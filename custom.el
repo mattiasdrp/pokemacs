@@ -75,9 +75,8 @@
  '(vertico-multiform-commands
    '((consult-imenu buffer)
      (consult-line buffer)
-     (execute-extended-command posframe mouse)
-     (find-file posframe
-                (vertico-sort-function . sort-directories-first))
+     (execute-extended-command mouse)
+     (find-file (vertico-sort-function . sort-directories-first))
      (insert-char
       (vertico-sort-function . sort-characters))
      (describe-symbol
