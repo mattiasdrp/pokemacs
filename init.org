@@ -1471,6 +1471,10 @@ Allows to go to the next/previous same symbol with ~M-S~<down>/<up>~.
     :ensure t
     :init (highlight-symbol-mode)
     :general
+    (:keymaps 'highlight-symbol-nav-mode-map
+              "M-n" nil
+              "M-p" nil
+              )
     ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
     ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
     :config

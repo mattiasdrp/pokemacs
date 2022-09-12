@@ -795,6 +795,10 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :init (highlight-symbol-mode)
   :general
+  (:keymaps 'highlight-symbol-nav-mode-map
+            "M-n" nil
+            "M-p" nil
+            )
   ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
   ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
   :config
@@ -982,7 +986,7 @@ debian, and derivatives). On most it's 'fd'.")
   (setq magit-auto-revert-immediately t)
   :general
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
-  ("M-n"                 'smerge-vc-next-conflict)
+  ("M-n"    'smerge-vc-next-conflict)
   (:keymaps 'smerge-mode-map
             "M-m"                 'smerge-keep-mine
             "M-o"                 'smerge-keep-other
