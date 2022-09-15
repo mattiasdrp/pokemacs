@@ -76,7 +76,8 @@
    '((consult-imenu buffer)
      (consult-line buffer)
      (execute-extended-command mouse)
-     (find-file (vertico-sort-function . sort-directories-first))
+     (find-file
+      (vertico-sort-function . sort-directories-first))
      (insert-char
       (vertico-sort-function . sort-characters))
      (describe-symbol
@@ -109,8 +110,8 @@
  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
  '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
- '(show-paren-match ((t (:foreground nil :weight normal :background "#57290B"))))
- '(show-paren-mismatch ((t (:foreground nil :weight normal :background "#7D3131"))))
+ '(show-paren-match ((t (:background "#084050" :distant-foreground "#687678" :foreground unspecified :weight unspecified))))
+ '(show-paren-mismatch ((t (:foreground unspecified :weight normal :background "#7D3131"))))
  '(variable-pitch ((t (:family "Ubuntu" :height 136 :weight thin)))))
 
 (provide 'custom)

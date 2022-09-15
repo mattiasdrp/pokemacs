@@ -1860,6 +1860,29 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   )
 
+(use-package eaf
+  :load-path "lisp/emacs-application-framework"
+  :ensure nil
+  :custom
+  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser)
+  (eaf-browser-default-search-engine "duckduckgo")
+  :config
+  (use-package eaf-browser)
+  (use-package eaf-pdf-viewer)
+  (use-package eaf-system-monitor)
+  (use-package eaf-image-viewer)
+  (use-package eaf-markdown-previewer)
+  (use-package eaf-org-previewer)
+  (use-package eaf-demo)
+
+  (defalias 'browse-web #'eaf-open-browser)
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+
 (require 'org-protocol)
 
 (use-package org

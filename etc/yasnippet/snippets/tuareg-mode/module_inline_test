@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Module Inline Test
+# key: <modt
+# --
+let%test_module "${1:Name}" = (module struct
+  $0
+end)
