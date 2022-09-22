@@ -31,6 +31,26 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-solaire t
+  "If non-nil, uses the solaire package"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-eaf t
+  "If non-nil, uses the emacs application framework"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-michelson nil
+  "If non-nil, uses the michelson package"
+  :group 'mdrp-packages
+  :type 'boolean)
+
+(defcustom use-window-purpose nil
+  "If non-nil, uses the window-purpose package"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-rainbow nil
   "If non-nil, don't be @thriim"
   :group 'mdrp-packages
@@ -1086,6 +1106,13 @@ debian, and derivatives). On most it's 'fd'.")
     :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
     ))
 
+(when use-window-purpose
+  (use-package window-purpose
+    :ensure t
+    :config
+    (purpose-mode)
+    (purpose-x-magit-multi-on)))
+
 (use-package vertico
   :ensure t
   :after general
@@ -1860,28 +1887,35 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   )
 
-(use-package eaf
-  :load-path "lisp/emacs-application-framework"
-  :ensure nil
-  :custom
-  ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  (eaf-browser-continue-where-left-off t)
-  (eaf-browser-enable-adblocker t)
-  (browse-url-browser-function 'eaf-open-browser)
-  (eaf-browser-default-search-engine "duckduckgo")
-  :config
-  (use-package eaf-browser)
-  (use-package eaf-pdf-viewer)
-  (use-package eaf-system-monitor)
-  (use-package eaf-image-viewer)
-  (use-package eaf-markdown-previewer)
-  (use-package eaf-org-previewer)
-  (use-package eaf-demo)
+(when use-solaire
+  (use-package solaire-mode
+    :ensure t
+    :config
+    (solaire-global-mode +1)))
 
-  (defalias 'browse-web #'eaf-open-browser)
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+(when use-eaf
+  (use-package eaf
+    :load-path "lisp/emacs-application-framework"
+    :ensure nil
+    :custom
+    ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+    (eaf-browser-continue-where-left-off t)
+    (eaf-browser-enable-adblocker t)
+    (browse-url-browser-function 'eaf-open-browser)
+    (eaf-browser-default-search-engine "duckduckgo")
+    :config
+    (use-package eaf-browser)
+    (use-package eaf-pdf-viewer)
+    (use-package eaf-system-monitor)
+    (use-package eaf-image-viewer)
+    (use-package eaf-markdown-previewer)
+    (use-package eaf-org-previewer)
+    (use-package eaf-demo)
+
+    (defalias 'browse-web #'eaf-open-browser)
+    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+    (eaf-bind-key nil "M-q" eaf-browser-keybinding))) ;; unbind, see more in the Wiki
 
 (require 'org-protocol)
 
@@ -1919,6 +1953,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-ellipsis " ▾")
   (org-footnote-auto-adjust t)
   (org-cycle-separator-lines -1)
+  (org-latex-compiler "latexmk")
   (org-startup-truncated nil)
   (org-adapt-indentation nil)
   (org-hide-emphasis-markers t)
@@ -2094,6 +2129,7 @@ debian, and derivatives). On most it's 'fd'.")
   )
 
 (use-package org-ref
+  :disabled
   :ensure t
   :after org
   :init
@@ -2101,7 +2137,7 @@ debian, and derivatives). On most it's 'fd'.")
    org-ref-completion-library 'org-ref-ivy-cite
    )
   :custom
-  (org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+  (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
   )
 
 (use-package org-bullets
@@ -2230,6 +2266,13 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :custom
   (org-make-toc-insert-custom-ids t))
+
+(use-package ox-moderncv
+  :load-path "lisp/org-cv/"
+  :init
+  (require 'ox-moderncv)
+  :config
+  (require 'ox-awesomecv))
 
 (use-package lsp-mode
   :hook (
@@ -2577,6 +2620,15 @@ function to get the type and, for example, kill and yank it."
     :ensure t
     :hook ((markdown-mode . pandoc-mode)
            (pandoc-mode . pandoc-load-default-settings))))
+
+(when use-michelson
+  (use-package deferred
+    :ensure t)
+
+  ;; TODO: rewrite it without hardcoded paths
+  (load (concat (getenv "HOME") "/dev/nl/tezos/emacs/michelson-mode.el") nil t)
+  (setq michelson-client-command (concat (getenv "HOME") "/dev/nl/tezos/tezos-client"))
+  (setq michelson-alphanet nil))
 
 ;; tuareg-mode has the prettify symbols itself
 ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))

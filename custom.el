@@ -23,6 +23,7 @@
  '(doom-themes-enable-bold t)
  '(doom-themes-enable-italic t)
  '(electric-indent-mode t)
+ '(fill-column 80)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -42,10 +43,12 @@
      ("XXXX*" . "#cc9393")))
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages
-   '(multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
+   '(solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(show-paren-style 'expression)
+ '(split-height-threshold nil)
  '(use-agenda-start t)
  '(use-company t)
+ '(use-eaf t)
  '(use-fsharp t)
  '(use-god nil)
  '(use-kotlin t)
@@ -53,6 +56,7 @@
  '(use-magit-todos t)
  '(use-markdown t)
  '(use-maximize t)
+ '(use-michelson nil)
  '(use-ocaml t)
  '(use-org-roam t)
  '(use-pandoc t)
@@ -60,10 +64,12 @@
  '(use-rainbow t)
  '(use-reason t)
  '(use-rust t)
+ '(use-solaire t)
  '(use-spotify nil)
  '(use-treemacs t)
  '(use-visual-fill t)
  '(use-web t)
+ '(use-window-purpose nil)
  '(vertico-multiform-categories
    '((imenu buffer)
      (file
@@ -110,7 +116,8 @@
  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
  '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
- '(show-paren-match ((t (:background "#084050" :distant-foreground "#687678" :foreground unspecified :weight unspecified))))
+ '(region ((t (:extend t :background "#93a1a1" :foreground "#073642" :inverse-video t))))
+ '(show-paren-match ((t (:foreground nil :weight normal :background "#57290B"))))
  '(show-paren-mismatch ((t (:foreground unspecified :weight normal :background "#7D3131"))))
  '(variable-pitch ((t (:family "Ubuntu" :height 136 :weight thin)))))
 

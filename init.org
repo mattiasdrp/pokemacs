@@ -30,6 +30,7 @@ Literate configuration for init.el.
   - [[#change-frame-title-format][Change frame title format]]
   - [[#ask-yn-instead-of-yesno][Ask y/n instead of yes/no]]
   - [[#default-values][Default values]]
+  - [[#start-emacs-as-a-server][Start emacs as a server]]
   - [[#prettifying][Prettifying]]
   - [[#revert-files-when-they-changed][Revert files when they changed]]
   - [[#show-parenthesis][Show parenthesis]]
@@ -106,6 +107,7 @@ Literate configuration for init.el.
   - [[#winner][Winner]]
   - [[#ace-window][Ace window]]
   - [[#visual-fill-column][Visual fill column]]
+  - [[#window-purpose][Window Purpose]]
 - [[#completion][Completion]]
   - [[#vertico][Vertico]]
     - [[#main-mode][Main mode]]
@@ -143,6 +145,8 @@ Literate configuration for init.el.
   - [[#rainbow-mode][Rainbow mode]]
   - [[#rainbow-delimiters][Rainbow delimiters]]
   - [[#pulsar][Pulsar]]
+  - [[#solaire][Solaire]]
+- [[#eaf][EAF]]
 - [[#org-mode][Org mode]]
   - [[#org-ref][Org ref]]
   - [[#org-bullets][Org bullets]]
@@ -154,6 +158,7 @@ Literate configuration for init.el.
   - [[#org-appear][Org appear]]
   - [[#org-roam][Org roam]]
   - [[#org-make-toc][Org make toc]]
+  - [[#org-cv][Org CV]]
 - [[#lsp][LSP]]
   - [[#main-mode][Main mode]]
   - [[#lsp-ui][Lsp ui]]
@@ -176,6 +181,7 @@ Literate configuration for init.el.
     - [[#main-mode][Main mode]]
     - [[#markdown-toc][Markdown toc]]
     - [[#pandoc][Pandoc]]
+  - [[#michelson][Michelson]]
   - [[#ocaml][OCaml]]
     - [[#useful-functions][Useful functions]]
     - [[#main-mode][Main mode]]
@@ -256,6 +262,26 @@ This is a list of custom variables that allow to enable/disable features. If you
 
   (defcustom use-spotify nil
     "If non-nil, uses the spotify packages"
+    :group 'mdrp-packages
+    :type 'boolean)
+
+  (defcustom use-solaire t
+    "If non-nil, uses the solaire package"
+    :group 'mdrp-packages
+    :type 'boolean)
+
+  (defcustom use-eaf t
+    "If non-nil, uses the emacs application framework"
+    :group 'mdrp-packages
+    :type 'boolean)
+
+  (defcustom use-michelson nil
+    "If non-nil, uses the michelson package"
+    :group 'mdrp-packages
+    :type 'boolean)
+
+  (defcustom use-window-purpose nil
+    "If non-nil, uses the window-purpose package"
     :group 'mdrp-packages
     :type 'boolean)
 
@@ -563,6 +589,9 @@ If you experience stuttering, increase this.
  # TODO: Change ansi color COLORS "#424242" "#EF9A9A" "#C5E1A5" "#FFEE58" "#64B5F6" "#E1BEE7" "#80DEEA" "#E0E0E0"]
 
 ** Start emacs as a server
+:PROPERTIES:
+:CUSTOM_ID: start-emacs-as-a-server
+:END:
 
 #+BEGIN_SRC emacs-lisp
   (load "server")
@@ -2049,6 +2078,20 @@ This mode will center the text when only one window is displayed.
       ))
 #+END_SRC
 
+** Window Purpose
+:PROPERTIES:
+:CUSTOM_ID: window-purpose
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (when use-window-purpose
+    (use-package window-purpose
+      :ensure t
+      :config
+      (purpose-mode)
+      (purpose-x-magit-multi-on)))
+#+END_SRC
+
 * Completion
 :PROPERTIES:
 :CUSTOM_ID: completion
@@ -3154,31 +3197,48 @@ Will pulse when the focus changes to show where the cursor is.
     )
 #+END_SRC
 
+** [[https://github.com/hlissner/emacs-solaire-mode][Solaire]]
+:PROPERTIES:
+:CUSTOM_ID: solaire
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (when use-solaire
+    (use-package solaire-mode
+      :ensure t
+      :config
+      (solaire-global-mode +1)))
+#+END_SRC
+
 * [[https://github.com/emacs-eaf/emacs-application-framework][EAF]]
+:PROPERTIES:
+:CUSTOM_ID: eaf
+:END:
 
 #+BEGIN_SRC elisp
-  (use-package eaf
-    :load-path "lisp/emacs-application-framework"
-    :ensure nil
-    :custom
-    ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-    (eaf-browser-continue-where-left-off t)
-    (eaf-browser-enable-adblocker t)
-    (browse-url-browser-function 'eaf-open-browser)
-    (eaf-browser-default-search-engine "duckduckgo")
-    :config
-    (use-package eaf-browser)
-    (use-package eaf-pdf-viewer)
-    (use-package eaf-system-monitor)
-    (use-package eaf-image-viewer)
-    (use-package eaf-markdown-previewer)
-    (use-package eaf-org-previewer)
-    (use-package eaf-demo)
+  (when use-eaf
+    (use-package eaf
+      :load-path "lisp/emacs-application-framework"
+      :ensure nil
+      :custom
+      ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+      (eaf-browser-continue-where-left-off t)
+      (eaf-browser-enable-adblocker t)
+      (browse-url-browser-function 'eaf-open-browser)
+      (eaf-browser-default-search-engine "duckduckgo")
+      :config
+      (use-package eaf-browser)
+      (use-package eaf-pdf-viewer)
+      (use-package eaf-system-monitor)
+      (use-package eaf-image-viewer)
+      (use-package eaf-markdown-previewer)
+      (use-package eaf-org-previewer)
+      (use-package eaf-demo)
 
-    (defalias 'browse-web #'eaf-open-browser)
-    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-    (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+      (defalias 'browse-web #'eaf-open-browser)
+      (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+      (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+      (eaf-bind-key nil "M-q" eaf-browser-keybinding))) ;; unbind, see more in the Wiki
 #+END_SRC
 
 * [[https://orgmode.org/][Org mode]]
@@ -3225,6 +3285,7 @@ Org mode is, well, org mode.
     (org-ellipsis " ▾")
     (org-footnote-auto-adjust t)
     (org-cycle-separator-lines -1)
+    (org-latex-compiler "latexmk")
     (org-startup-truncated nil)
     (org-adapt-indentation nil)
     (org-hide-emphasis-markers t)
@@ -3412,6 +3473,7 @@ Not using it anymore since I don't write articles but it may be useful
 :END:
 #+BEGIN_SRC emacs-lisp
   (use-package org-ref
+    :disabled
     :ensure t
     :after org
     :init
@@ -3419,7 +3481,7 @@ Not using it anymore since I don't write articles but it may be useful
      org-ref-completion-library 'org-ref-ivy-cite
      )
     :custom
-    (org-latex-pdf-process (list "latexmk -shell-escape -bibtex -f -pdf %f"))
+    (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
     )
 #+END_SRC
 
@@ -3628,6 +3690,20 @@ Helper to create table of contents in org files.
     :ensure t
     :custom
     (org-make-toc-insert-custom-ids t))
+#+END_SRC
+
+** [[https://gitlab.com/Titan-C/org-cv][Org CV]]
+:PROPERTIES:
+:CUSTOM_ID: org-cv
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ox-moderncv
+    :load-path "lisp/org-cv/"
+    :init
+    (require 'ox-moderncv)
+    :config
+    (require 'ox-awesomecv))
 #+END_SRC
 
 * [[https://github.com/emacs-lsp/lsp-mode/][LSP]]
@@ -4059,7 +4135,7 @@ Library for parsing and generating JSON
 :CUSTOM_ID: latex
 :END:
 
-If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-buf)~ with ~(require tex)~.
+If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-buf)~ with ~(require tex)~ in ~auctex-latexmk.el~.
 
 #+BEGIN_SRC emacs-lisp
 (when use-latex
@@ -4141,6 +4217,22 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       :ensure t
       :hook ((markdown-mode . pandoc-mode)
              (pandoc-mode . pandoc-load-default-settings))))
+#+END_SRC
+
+** Michelson
+:PROPERTIES:
+:CUSTOM_ID: michelson
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (when use-michelson
+    (use-package deferred
+      :ensure t)
+
+    ;; TODO: rewrite it without hardcoded paths
+    (load (concat (getenv "HOME") "/dev/nl/tezos/emacs/michelson-mode.el") nil t)
+    (setq michelson-client-command (concat (getenv "HOME") "/dev/nl/tezos/tezos-client"))
+    (setq michelson-alphanet nil))
 #+END_SRC
 
 ** OCaml
