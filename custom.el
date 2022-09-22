@@ -20,8 +20,8 @@
  '(doom-modeline-bar-width 4)
  '(doom-modeline-height 25)
  '(doom-theme 'doom-solarized-dark)
- '(doom-themes-enable-bold t)
- '(doom-themes-enable-italic t)
+ '(doom-themes-enable-bold nil)
+ '(doom-themes-enable-italic nil)
  '(electric-indent-mode t)
  '(fill-column 80)
  '(hl-todo-keyword-faces
@@ -45,8 +45,6 @@
  '(package-selected-packages
    '(solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(show-paren-style 'expression)
- '(split-height-threshold nil)
- '(use-agenda-start t)
  '(use-company t)
  '(use-eaf t)
  '(use-fsharp t)
@@ -58,6 +56,7 @@
  '(use-maximize t)
  '(use-michelson nil)
  '(use-ocaml t)
+ '(use-org-agenda-startup nil)
  '(use-org-roam t)
  '(use-pandoc t)
  '(use-python t)

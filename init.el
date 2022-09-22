@@ -141,8 +141,8 @@
   :group 'mdrp-packages
   :type 'boolean)
 
-(defcustom org-agenda-start nil
-  "Theme to load"
+(defcustom use-org-agenda-startup nil
+  "Start the org agenda at start-up"
   :group 'mdrp-packages
   :type 'boolean)
 
@@ -591,9 +591,9 @@ debian, and derivatives). On most it's 'fd'.")
             "M-u"                     'upcase-dwim
             "C-f"                     'fill-region
             "C-q"                     'selected-off
-            "C-s r"                   'reverse-region
-            "C-s s"                   'sort-lines
-            "C-s w"                   'mdrp/sort-words
+            "M-s r"                   'reverse-region
+            "M-s s"                   'sort-lines
+            "M-s w"                   'mdrp/sort-words
             "C-<return>"              'hide-region-hide
             "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window")))
 
@@ -1050,6 +1050,7 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :custom
   (global-diff-hl-mode 1)
+  (diff-hl-side 'right)
   :hook
   (magit-post-refresh . diff-hl-magit-post-refresh)
   (magit-pre-refresh  . diff-hl-magit-pre-refresh)
@@ -2038,110 +2039,111 @@ debian, and derivatives). On most it's 'fd'.")
     (concat
      (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform))
     )
-
-  (setq org-capture-templates
-        `(
-          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
-          ))
   (customize-set-value 'org-latex-with-hyperref nil)
-  (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
-  (setq org-image-actual-width nil)
-  (defun org-mode-<>-syntax-fix (start end)
-    "Change syntax of characters ?< and ?> to symbol within source code blocks."
-    (let ((case-fold-search t))
-      (when (eq major-mode 'org-mode)
-        (save-excursion
-          (goto-char start)
-          (while (re-search-forward "<\\|>" end t)
-            (when (save-excursion
-                    (and
-                     (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
-                     (string-equal (downcase (match-string 1)) "begin")))
-              ;; This is a < or > in an org-src block
-              (put-text-property (point) (1- (point))
-                                 'syntax-table (string-to-syntax "_"))))))))
+(add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
+(setq org-image-actual-width nil)
+(defun org-mode-<>-syntax-fix (start end)
+  "Change syntax of characters ?< and ?> to symbol within source code blocks."
+  (let ((case-fold-search t))
+    (when (eq major-mode 'org-mode)
+      (save-excursion
+        (goto-char start)
+        (while (re-search-forward "<\\|>" end t)
+          (when (save-excursion
+                  (and
+                   (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
+                   (string-equal (downcase (match-string 1)) "begin")))
+            ;; This is a < or > in an org-src block
+            (put-text-property (point) (1- (point))
+                               'syntax-table (string-to-syntax "_"))))))))
 
-  (defun org-setup-<>-syntax-fix ()
-    "Setup for characters ?< and ?> in source code blocks.
+(defun org-setup-<>-syntax-fix ()
+  "Setup for characters ?< and ?> in source code blocks.
     Add this function to `org-mode-hook'."
-    (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
-    (syntax-propertize (point-max)))
+  (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
+  (syntax-propertize (point-max)))
 
-  (add-hook 'org-mod-hook #'org-setup-<>-syntax-fix)
+(add-hook 'org-mod-hook #'org-setup-<>-syntax-fix)
 
-  (setq org-agenda-custom-commands
-        '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
-           ((org-agenda-span 'month)
-            (org-agenda-show-all-dates nil)
-            ))))
-  (calendar-set-date-style 'iso)
-  (use-package ob-rust :ensure t)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (emacs-lisp . t)
-     (rust . t)
-     (ocaml . t)
-     (latex . t)
-     (shell . t)
-     ))
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (push '("- [ ]" . "") prettify-symbols-alist)
-              (push '("+ [ ]" . "") prettify-symbols-alist)
-              (push '("* [ ]" . "") prettify-symbols-alist)
-              (push '("- [X]" . "") prettify-symbols-alist)
-              (push '("+ [X]" . "") prettify-symbols-alist)
-              (push '("* [X]" . "") prettify-symbols-alist)
-              (push '("- [-]" . "") prettify-symbols-alist)
-              (push '("+ [-]" . "") prettify-symbols-alist)
-              (push '("* [-]" . "") prettify-symbols-alist)
-              (prettify-symbols-mode)
-              ))
-  (custom-theme-set-faces
-   'user
-   '(org-block ((t (:inherit fixed-pitch))))
-   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
-   '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
-   '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
-   '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
-   '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
-   '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-property-value ((t (:inherit fixed-pitch))) t)
-   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
-   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
-   ;; (let ((re "\\}\\(+\\|-\\) "))
-   ;;   (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+(setq org-agenda-custom-commands
+      '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
+         ((org-agenda-span 'month)
+          (org-agenda-show-all-dates nil)
+          ))))
+(calendar-set-date-style 'iso)
+(use-package ob-rust :ensure t)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (emacs-lisp . t)
+   (rust . t)
+   (ocaml . t)
+   (latex . t)
+   (shell . t)
+   ))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (push '("- [ ]" . "") prettify-symbols-alist)
+            (push '("+ [ ]" . "") prettify-symbols-alist)
+            (push '("* [ ]" . "") prettify-symbols-alist)
+            (push '("- [X]" . "") prettify-symbols-alist)
+            (push '("+ [X]" . "") prettify-symbols-alist)
+            (push '("* [X]" . "") prettify-symbols-alist)
+            (push '("- [-]" . "") prettify-symbols-alist)
+            (push '("+ [-]" . "") prettify-symbols-alist)
+            (push '("* [-]" . "") prettify-symbols-alist)
+            (prettify-symbols-mode)
+            ))
+(setq org-capture-templates
+      `(
+        ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+         "* TODO %?\n  %u\n  %a")
+        ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+         "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+        ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+         "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+        ))
+(custom-theme-set-faces
+ 'user
+ '(org-block ((t (:inherit fixed-pitch))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+ '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
+ '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+ '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
+ '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
+ '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
+ '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+ ;; (let ((re "\\}\\(+\\|-\\) "))
+ ;;   (font-lock-add-keywords
+ ;;     'org-mode
+ ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) re)
+ ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
+ ;;    (font-lock-add-keywords
+ ;;     'org-mode
+ ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
+ ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
 
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
-   ;;                                    (* 2 (+ 2 org-list-indent-offset))) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
-   ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
-   ;;    )
-   )
-  )
+ ;;    (font-lock-add-keywords
+ ;;     'org-mode
+ ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
+ ;;                                    (* 2 (+ 2 org-list-indent-offset))) re)
+ ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
+ ;;    (font-lock-add-keywords
+ ;;     'org-mode
+ ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
+ ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
+ ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
+ ;;    )
+ )
+)
 
 (use-package org-ref
   :disabled
@@ -2245,7 +2247,7 @@ debian, and derivatives). On most it's 'fd'.")
           ;; match any of these groups, with the default order position of 99
           ))
   (org-super-agenda-mode)
-  (when org-agenda-start (org-agenda nil "a"))
+  (when use-org-agenda-startup (org-agenda nil "a"))
   )
 
 (use-package org-appear
