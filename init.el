@@ -750,11 +750,11 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :hook (find-file . mdrp/flyspell-on-for-buffer-type)
   :general
-  ("M-f" 'mdrp-flyspell-map)
-  ("C-f" 'mdrp-flyspell-map)
+  ("M-f" 'mdrp-fly-map)
+  ("C-f" 'mdrp-fly-map)
   (:keymaps 'flyspell-mode-map
             "C-;" nil)
-  (:keymaps 'mdrp-flyspell-map
+  (:keymaps 'mdrp-fly-map
             "t" '(mdrp/flyspell-toggle :which-key "toggle flyspell mode and decides to put it in prog or text mode")
             "f" '(mdrp/french-dict :which-key "load the french dictionary")
             "e" '(mdrp/english-dict :which-key "load the english dictionary")
@@ -769,8 +769,6 @@ debian, and derivatives). On most it's 'fd'.")
     (flyspell-buffer))
 
   (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
-  (define-prefix-command 'mdrp-flyspell-map nil "Flyspell-")
-
   (setq flyspell-issue-welcome-flag nil
         ;; Significantly speeds up flyspell, which would otherwise print
         ;; messages for every word when checking the entire buffer
@@ -804,7 +802,7 @@ debian, and derivatives). On most it's 'fd'.")
   :general
   (:keymaps 'popup-menu-keymap
             "<return>" 'popup-select)
-  (:keymaps 'mdrp-flyspell-map
+  (:keymaps 'mdrp-fly-map
             "C-f" 'flyspell-correct-wrapper
             ))
 
@@ -940,7 +938,18 @@ debian, and derivatives). On most it's 'fd'.")
   )
 
 (use-package flycheck
+  :preface
+  (define-prefix-command 'mdrp-fly-map nil "Fly-")
   :ensure t
+  :config
+  (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
+  (defun flycheck-reset (&optional n reset)
+    (if (flycheck-next-error-pos n reset)
+        (list n reset)
+      (list n t)))
+  :general
+  (:keymaps 'mdrp-fly-map
+            "p" 'flycheck-prev-error)
   :hook ((prog-mode markdown-mode) . flycheck-mode))
 
 (use-package quick-peek
@@ -1004,9 +1013,15 @@ debian, and derivatives). On most it's 'fd'.")
   :config
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
+  (defun mdrp/smerge-or-flycheck-next ()
+    (interactive)
+    (let (files (vc-git-conflicted-files default-directory))
+      (if (null files)
+          (flycheck-next-error)
+        (smerge-vc-next-conflict))))
   :general
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
-  ("M-n"    'smerge-vc-next-conflict)
+  ("M-n"    'mdrp/smerge-or-flycheck-next)
   (:keymaps 'smerge-mode-map
             "M-m"                 'smerge-keep-mine
             "M-o"                 'smerge-keep-other
@@ -2387,7 +2402,6 @@ function to get the type and, for example, kill and yank it."
     :server-id 'ocaml-lsp-server))
   :general
   ("M-l" 'lsp-command-map)
-  ("C-c n"   'flycheck-next-error)
   ("C-c C-t" 'lsp-describe-thing-at-point)
   ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
   ("C-c C-l" 'lsp-find-definition)
