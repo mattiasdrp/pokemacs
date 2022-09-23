@@ -4,3 +4,6 @@
 [submodule "lisp/ts-fold"]
 	path = lisp/ts-fold
 	url = git@github.com:jcs-elpa/ts-fold.git
+[submodule "lisp/emacs-application-framework"]
+	path = lisp/emacs-application-framework
+	url = git@github.com:emacs-eaf/emacs-application-framework.git
