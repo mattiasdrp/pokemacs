@@ -4015,7 +4015,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+BEGIN_SRC emacs-lisp
   (use-package conf-mode
     :ensure nil
-    :ensure-system-package (taplo . "cargo install taplo-cli")
     :mode (
            ("/\\.merlin\\'" . conf-mode)
            ("_tags\\'" . conf-mode)
@@ -4614,6 +4613,7 @@ Some people use this, not my responsibility.
   (when use-rust
     (use-package rustic
       :ensure t
+      :ensure-system-package (taplo . "cargo install taplo-cli")
       :mode "\\.rs'"
       ;; :hook
       ;; (rustic-mode-local-vars . tree-sitter 'append)

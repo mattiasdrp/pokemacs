@@ -2499,7 +2499,6 @@ function to get the type and, for example, kill and yank it."
 
 (use-package conf-mode
   :ensure nil
-  :ensure-system-package (taplo . "cargo install taplo-cli")
   :mode (
          ("/\\.merlin\\'" . conf-mode)
          ("_tags\\'" . conf-mode)
@@ -2910,6 +2909,7 @@ function to get the type and, for example, kill and yank it."
 (when use-rust
   (use-package rustic
     :ensure t
+    :ensure-system-package (taplo . "cargo install taplo-cli")
     :mode "\\.rs'"
     ;; :hook
     ;; (rustic-mode-local-vars . tree-sitter 'append)
