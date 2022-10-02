@@ -68,8 +68,10 @@ Literate configuration for init.el.
   - [[#delete-block][Delete block]]
   - [[#discover-my-major][Discover my major]]
   - [[#easy-kill][Easy-kill]]
-  - [[#flyspell][Flyspell]]
-    - [[#flyspell-correct][Flyspell correct]]
+  - [[#spell-and-grammar-checking][Spell and grammar checking]]
+    - [[#flycheck-languagetool][Flycheck Languagetool]]
+    - [[#flyspell][Flyspell]]
+      - [[#flyspell-correct][Flyspell correct]]
   - [[#fringe-helper][Fringe helper]]
   - [[#highlight-symbol][Highlight symbol]]
   - [[#hydra][Hydra]]
@@ -198,10 +200,9 @@ Literate configuration for init.el.
   - [[#web-modes][Web modes]]
     - [[#main-mode][Main mode]]
     - [[#css-mode][CSS mode]]
-- [[#miscellaneous][Miscellaneous]]
-  - [[#disabled-spotify][DISABLED: Spotify]]
 - [[#end][End]]
 :END:
+
 
 * Header
 :PROPERTIES:
@@ -1340,7 +1341,29 @@ Better ~M-w~
     (global-set-key [remap mark-sexp] #'easy-mark))
 #+END_SRC
 
-** [[https://www.emacswiki.org/emacs/FlySpell][Flyspell]]
+** Spell and grammar checking
+:PROPERTIES:
+:CUSTOM_ID: spell-and-grammar-checking
+:END:
+
+*** [[https://github.com/emacs-languagetool/flycheck-languagetool][Flycheck Languagetool]]
+:PROPERTIES:
+:CUSTOM_ID: flycheck-languagetool
+:END:
+
+#+BEGIN_SRC emacs-lisp
+    (use-package flycheck-languagetool
+    :ensure t
+    ;; :custom ((flycheck-languagetool-active-modes
+    ;;           '(text-mode latex-mode org-mode markdown-mode message-mode prog-mode)))
+    :hook (text-mode . flycheck-languagetool-setup)
+    ;; :ensure-system-package
+    ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
+    :init
+    (setq flycheck-languagetool-server-jar (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar")))
+#+END_SRC
+
+*** [[https://www.emacswiki.org/emacs/FlySpell][Flyspell]]
 :PROPERTIES:
 :CUSTOM_ID: flyspell
 :END:
@@ -1425,6 +1448,13 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
 
     (setq ispell-list-command "--list")
     (setq ispell-dictionary "english")
+    (setq-default flyspell-prog-text-faces
+                  '(tree-sitter-hl-face:comment
+                    tree-sitter-hl-face:doc
+                    tree-sitter-hl-face:string
+                    font-lock-comment-face
+                    font-lock-doc-face
+                    font-lock-string-face))
     (defun flyspell-buffer-after-pdict-save (&rest _)
       (flyspell-buffer))
 
@@ -1457,7 +1487,7 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
     )
 #+END_SRC
 
-*** [[https://github.com/d12frosted/flyspell-correct][Flyspell correct]]
+**** [[https://github.com/d12frosted/flyspell-correct][Flyspell correct]]
 :PROPERTIES:
 :CUSTOM_ID: flyspell-correct
 :END:
@@ -1737,7 +1767,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
     :general
     (:keymaps 'mdrp-fly-map
               "p" 'flycheck-prev-error)
-    :hook ((prog-mode markdown-mode) . flycheck-mode))
+    :hook ((prog-mode markdown-mode git-commit-mode) . flycheck-mode))
 #+END_SRC
 
 *** [[https://github.com/cpitclaudel/quick-peek][Quick Peek]]
@@ -3243,6 +3273,8 @@ Will pulse when the focus changes to show where the cursor is.
       (browse-url-browser-function 'eaf-open-browser)
       (eaf-browser-default-search-engine "duckduckgo")
       :config
+      (use-package eaf-all-the-icons)
+      (use-package eaf-org)
       (use-package eaf-browser)
       (use-package eaf-pdf-viewer)
       (use-package eaf-system-monitor)
@@ -4741,41 +4773,6 @@ Some people use this, not my responsibility.
     (use-package css-mode
       :ensure nil
       :mode "\\.css\\'"))
-#+END_SRC
-
-* Miscellaneous
-:PROPERTIES:
-:CUSTOM_ID: miscellaneous
-:END:
-
-** DISABLED: Spotify
-:PROPERTIES:
-:CUSTOM_ID: disabled-spotify
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package consult-spotify
-    :disabled
-    :after ivy
-    :init
-    (define-prefix-command 'mdrp-spotify-map nil "Spotify-")
-    :custom
-    (counsel-spotify-client-id (get-secrets-config-value 'spotify-client-id))
-    (counsel-spotify-client-secret (get-secrets-config-value 'spotify-client-secret))
-    :bind-keymap ("s-x" . mdrp-spotify-map)
-    :bind (
-           (:map mdrp-spotify-map
-                 ("q"       . counsel-spotify-previous)
-                 ("<left>"  . counsel-spotify-previous)
-                 ("s"       . counsel-spotify-toggle-play-pause)
-                 ("<down>"  . counsel-spotify-toggle-play-pause)
-                 ("d"       . counsel-spotify-next)
-                 ("<right>" . counsel-spotify-next)
-                 ("z"       . counsel-spotify-play)
-                 ("<up>"    . counsel-spotify-play)
-                 )
-           )
-    )
 #+END_SRC
 
 * End

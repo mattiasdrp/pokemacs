@@ -690,6 +690,16 @@ debian, and derivatives). On most it's 'fd'.")
   (global-set-key [remap kill-ring-save] #'easy-kill)
   (global-set-key [remap mark-sexp] #'easy-mark))
 
+(use-package flycheck-languagetool
+:ensure t
+;; :custom ((flycheck-languagetool-active-modes
+;;           '(text-mode latex-mode org-mode markdown-mode message-mode prog-mode)))
+:hook (text-mode . flycheck-languagetool-setup)
+;; :ensure-system-package
+;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
+:init
+(setq flycheck-languagetool-server-jar (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar")))
+
 (use-package flyspell
   :init
   (defun mdrp/flyspell-on-for-buffer-type ()
@@ -765,6 +775,13 @@ debian, and derivatives). On most it's 'fd'.")
 
   (setq ispell-list-command "--list")
   (setq ispell-dictionary "english")
+  (setq-default flyspell-prog-text-faces
+                '(tree-sitter-hl-face:comment
+                  tree-sitter-hl-face:doc
+                  tree-sitter-hl-face:string
+                  font-lock-comment-face
+                  font-lock-doc-face
+                  font-lock-string-face))
   (defun flyspell-buffer-after-pdict-save (&rest _)
     (flyspell-buffer))
 
@@ -950,7 +967,7 @@ debian, and derivatives). On most it's 'fd'.")
   :general
   (:keymaps 'mdrp-fly-map
             "p" 'flycheck-prev-error)
-  :hook ((prog-mode markdown-mode) . flycheck-mode))
+  :hook ((prog-mode markdown-mode git-commit-mode) . flycheck-mode))
 
 (use-package quick-peek
   :ensure t
@@ -1920,6 +1937,8 @@ debian, and derivatives). On most it's 'fd'.")
     (browse-url-browser-function 'eaf-open-browser)
     (eaf-browser-default-search-engine "duckduckgo")
     :config
+    (use-package eaf-all-the-icons)
+    (use-package eaf-org)
     (use-package eaf-browser)
     (use-package eaf-pdf-viewer)
     (use-package eaf-system-monitor)
@@ -3018,29 +3037,6 @@ function to get the type and, for example, kill and yank it."
   (use-package css-mode
     :ensure nil
     :mode "\\.css\\'"))
-
-(use-package consult-spotify
-  :disabled
-  :after ivy
-  :init
-  (define-prefix-command 'mdrp-spotify-map nil "Spotify-")
-  :custom
-  (counsel-spotify-client-id (get-secrets-config-value 'spotify-client-id))
-  (counsel-spotify-client-secret (get-secrets-config-value 'spotify-client-secret))
-  :bind-keymap ("s-x" . mdrp-spotify-map)
-  :bind (
-         (:map mdrp-spotify-map
-               ("q"       . counsel-spotify-previous)
-               ("<left>"  . counsel-spotify-previous)
-               ("s"       . counsel-spotify-toggle-play-pause)
-               ("<down>"  . counsel-spotify-toggle-play-pause)
-               ("d"       . counsel-spotify-next)
-               ("<right>" . counsel-spotify-next)
-               ("z"       . counsel-spotify-play)
-               ("<up>"    . counsel-spotify-play)
-               )
-         )
-  )
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
