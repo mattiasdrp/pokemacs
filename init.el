@@ -272,7 +272,7 @@
  echo-keystrokes 0.1
  )
 
-(load "server")
+(require 'server)
 (unless (server-running-p) (server-start))
 
 (global-prettify-symbols-mode t)
@@ -287,6 +287,7 @@
 
 ;; (global-display-line-numbers-mode t)
 
+(setq save-place-forget-unreadable-files t)
 (save-place-mode 1)
 
 (delete-selection-mode t)
@@ -337,12 +338,10 @@
 (use-package no-littering
   :ensure t)
 
-(setq auto-save-file-name-transforms
-      `((".*" ,(no-littering-expand-var-file-name "backups/") t)))
-
 (auto-save-visited-mode 1)
-(setq auto-save-default nil)
-(setq auto-save-timeout 600)
+(setq auto-save-default t)
+(setq auto-save-timeout 60)
+(setq auto-save-interval 200)
 
 (require 'cl-lib)
 (require 'package)
@@ -373,6 +372,8 @@ debian, and derivatives). On most it's 'fd'.")
   :init (savehist-mode t)
   ;; Remember recently opened files
   (recentf-mode t)
+  :custom
+  (history-delete-duplicates t)
   :config
   ;; Persist 'compile' history
   (add-to-list 'savehist-additional-variables 'compile-history)
@@ -626,6 +627,13 @@ debian, and derivatives). On most it's 'fd'.")
          )
   )
 
+(defun mdrp/unpropertize-kill-ring ()
+  (setq kill-ring (mapcar 'substring-no-properties kill-ring)))
+
+(add-hook 'kill-emacs-hook 'mdrp/unpropertize-kill-ring)
+
+(setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
+
 (use-package nlinum
   :init
   (global-nlinum-mode 1)
@@ -769,7 +777,9 @@ debian, and derivatives). On most it's 'fd'.")
             "f" '(mdrp/french-dict :which-key "load the french dictionary")
             "e" '(mdrp/english-dict :which-key "load the english dictionary")
             )
-  :ensure-system-package (aspell)
+  :ensure-system-package aspell
+  ;; :ensure-system-package aspell-fr
+  ;; :ensure-system-package aspell-en
   :config
   (provide 'ispell) ; forcibly load ispell configs
 
@@ -1095,6 +1105,31 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ghub
   :ensure t
 )
+
+(use-package uniquify
+  :config
+  (setq uniquify-buffer-name-style 'reverse
+        uniquify-separator " • "
+        uniquify-after-kill-buffer-p t
+        uniquify-ignore-buffers-re "^\\*"))
+
+(use-package frame
+  :disabled
+  :config
+  (setq default-frame-alist
+        '(
+          (min-height . 1)
+          '(height . 45)
+          (min-width  . 1)
+          '(width  . 81)
+          (vertical-scroll-bars . nil)
+          ;; (internal-border-width . 24)
+          (left-fringe . 1)
+          (right-fringe . 1)
+          (tool-bar-lines . 0)
+          (menu-bar-lines . 1)))
+  ;; Default frame settings
+  (setq initial-frame-alist default-frame-alist))
 
 (use-package winner
   :ensure nil
@@ -1539,8 +1574,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (add-to-list 'company-backends '(company-capf
                                    company-yasnippet
-                                   company-files
-                                   company-dabbrev-code))
+                                   company-files))
   (global-company-mode 1))
 
 (use-package consult-company
@@ -1926,6 +1960,24 @@ debian, and derivatives). On most it's 'fd'.")
     :config
     (solaire-global-mode +1)))
 
+(use-package svg-tag-mode
+  :disabled
+  :ensure t
+  :config
+  (setq svg-tag-tags
+        '((":TODO:" . ((lambda (tag)
+                         (svg-tag-make "TODO" :face 'org-tag
+                                       :radius 0 :inverse t :margin 0))))
+          (":NOTE:" . ((lambda (tag)
+                         (svg-tag-make "NOTE" :face 'font-lock-comment-face
+                                       :inverse nil :margin 0 :radius 0))))
+          ("\([0-9a-zA-Z]\)" . ((lambda (tag)
+                                  (svg-tag-make tag :beg 1 :end -1 :radius 12))))
+          ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
+                                             (svg-tag-make tag :beg 1 :end -1 :radius 8))))))
+  (svg-tag-mode)
+  (global-svg-tag-mode))
+
 (when use-eaf
   (use-package eaf
     :load-path "lisp/emacs-application-framework"
@@ -1956,7 +2008,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package org
   :ensure t
-  ;; :hook (org-mode . variable-pitch-mode)
+  :hook (org-mode . variable-pitch-mode)
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -2163,6 +2215,11 @@ debian, and derivatives). On most it's 'fd'.")
  ;;    )
  )
 )
+
+(use-package org-auto-tangle
+  :ensure t
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
 
 (use-package org-ref
   :disabled
