@@ -26,7 +26,9 @@
  '(electric-indent-mode t)
  '(fill-column 80)
  '(flycheck-languagetool-server-jar
-   (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
+   (concat
+    (getenv "HOME")
+    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar") t)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -49,7 +51,7 @@
    '(flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(show-paren-style 'expression)
  '(use-company t)
- '(use-eaf t)
+ '(use-eaf nil)
  '(use-fsharp t)
  '(use-god nil)
  '(use-kotlin t)
