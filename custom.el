@@ -14,6 +14,9 @@
  ;; If there is more than one, they won't work right.
  '(auth-source-save-behavior nil)
  '(auth-sources '("~/.authinfo"))
+ '(blink-cursor-mode t)
+ '(cursor-intangible-mode t)
+ '(cursor-type t)
  '(completion-ignored-extensions (remove ".git/" completion-ignored-extensions))
  '(describe-char-unidata-list
    '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
@@ -48,7 +51,7 @@
      ("XXXX*" . "#cc9393")))
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages
-   '(flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
+   '(svg-tag-mode org-auto-tangle flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(show-paren-style 'expression)
  '(use-company t)
  '(use-eaf nil)
@@ -92,6 +95,7 @@
       (vertico-sort-function . sort-characters))
      (describe-symbol
       (vertico-sort-override-function . vertico-sort-alpha))))
+ '(x-stretch-cursor nil)
  '(warning-suppress-types '((comp))))
 
 (custom-set-faces
@@ -99,7 +103,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Fira Code" :slant normal :weight normal :height 136 :width normal :foundry "CTDB"))))
+ '(default ((t (:family "Fira Code" :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
  '(fixed-pitch ((t (:family "Fira Code" :slant normal :weight normal :height 136 :width normal :foundry "CTDB"))))
  '(lsp-lens-face ((t (:family "Fira Code" :foundry "CTDB" :inherit lsp-details-face))))
  '(menu ((t (:inherit mode-line))))
@@ -123,7 +127,7 @@
  '(region ((t (:extend t :background "#93a1a1" :foreground "#073642" :inverse-video t))))
  '(show-paren-match ((t (:foreground nil :weight normal :background "#57290B"))))
  '(show-paren-mismatch ((t (:foreground unspecified :weight normal :background "#7D3131"))))
- '(variable-pitch ((t (:family "Ubuntu" :height 136 :weight thin)))))
+ '(variable-pitch ((t (:family "Cantarell" :height 136 :weight regular)))))
 
 (provide 'custom)
 ;;; custom.el ends here

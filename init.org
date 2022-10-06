@@ -6,6 +6,7 @@
 #+date: <2022-08-17 Wed>
 #+language: en_US
 #+property: header-args :results silent :exports code :tangle yes
+#+auto_tangle: t
 
 #+keywords: Emacs
 
@@ -62,6 +63,8 @@ Literate configuration for init.el.
   - [[#selected][Selected]]
   - [[#disabled-god-mode][DISABLED: God mode]]
 - [[#general-utilities][General Utilities]]
+  - [[#kill-ring-doesnt-kill-text-properties][Kill ring doesn't kill text properties]]
+  - [[#cursor][Cursor]]
   - [[#nlinum][Nlinum]]
   - [[#cheat-sheet][Cheat Sheet]]
   - [[#crux][Crux]]
@@ -106,6 +109,8 @@ Literate configuration for init.el.
   - [[#git-modes][Git modes]]
   - [[#ghub][Ghub]]
 - [[#windowsframe-management][Windows/Frame management]]
+  - [[#uniquify][Uniquify]]
+  - [[#frame][Frame]]
   - [[#winner][Winner]]
   - [[#ace-window][Ace window]]
   - [[#visual-fill-column][Visual fill column]]
@@ -148,8 +153,11 @@ Literate configuration for init.el.
   - [[#rainbow-delimiters][Rainbow delimiters]]
   - [[#pulsar][Pulsar]]
   - [[#solaire][Solaire]]
+  - [[#svg-tags][SVG Tags]]
 - [[#eaf][EAF]]
 - [[#org-mode][Org mode]]
+  - [[#main-mode][Main mode]]
+  - [[#org-auto-tangle][Org auto tangle]]
   - [[#org-ref][Org ref]]
   - [[#org-bullets][Org bullets]]
   - [[#org-inline-pdf][Org inline pdf]]
@@ -594,7 +602,7 @@ If you experience stuttering, increase this.
 :END:
 
 #+BEGIN_SRC emacs-lisp
-  (load "server")
+  (require 'server)
   (unless (server-running-p) (server-start))
 #+END_SRC
 
@@ -658,6 +666,7 @@ Since this is highly user dependent (I see you @thriim), the variable ~show-pare
   #+END_SRC
 - Save the place of the cursor when exiting the buffer
   #+BEGIN_SRC emacs-lisp
+    (setq save-place-forget-unreadable-files t)
     (save-place-mode 1)
   #+END_SRC
 - Replace selection when writing
@@ -772,19 +781,13 @@ Stop creating files everywhere and put them all in a single place
     :ensure t)
 #+END_SRC
 
-And by the way, put the backup files in the same directory to prevent polluting the my project directories
-
-#+BEGIN_SRC emacs-lisp
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "backups/") t)))
-#+END_SRC
-
-And just save the visited file, don't create a ~#file#~ while waiting for it to be saved
+Create a ~#file#~ while waiting for it to be saved and for backup (if emacs crashes you can recover your previous session with ~M-x recover-session~)
 
 #+BEGIN_SRC emacs-lisp
   (auto-save-visited-mode 1)
-  (setq auto-save-default nil)
-  (setq auto-save-timeout 600)
+  (setq auto-save-default t)
+  (setq auto-save-timeout 60)
+  (setq auto-save-interval 200)
 #+END_SRC
 
 * Requirements
@@ -859,6 +862,8 @@ We're not saving the minibuffer history but compile history too
     :init (savehist-mode t)
     ;; Remember recently opened files
     (recentf-mode t)
+    :custom
+    (history-delete-duplicates t)
     :config
     ;; Persist 'compile' history
     (add-to-list 'savehist-additional-variables 'compile-history)
@@ -1221,6 +1226,27 @@ This mode allows to switch between a mode where modifier keys are not used (~C-k
 
 This part will load packages that are useful for emacs and are not specific to modes (usually, better commands and buffer manipulations)
 
+** Kill ring doesn't kill text properties
+:PROPERTIES:
+:CUSTOM_ID: kill-ring-doesnt-kill-text-properties
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (defun mdrp/unpropertize-kill-ring ()
+    (setq kill-ring (mapcar 'substring-no-properties kill-ring)))
+
+  (add-hook 'kill-emacs-hook 'mdrp/unpropertize-kill-ring)
+#+END_SRC
+
+** Cursor
+:PROPERTIES:
+:CUSTOM_ID: cursor
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
+ #+END_SRC
+
 ** [[https://github.com/emacsmirror/nlinum/blob/master/nlinum.el][Nlinum]]
 :PROPERTIES:
 :CUSTOM_ID: nlinum
@@ -1313,7 +1339,7 @@ Better block deletion.
     )
 #+END_SRC
 
-**  [[https://framagit.org/steckerhalter/discover-my-major][Discover my major]]
+** [[https://framagit.org/steckerhalter/discover-my-major][Discover my major]]
 :PROPERTIES:
 :CUSTOM_ID: discover-my-major
 :END:
@@ -1443,7 +1469,9 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
               "f" '(mdrp/french-dict :which-key "load the french dictionary")
               "e" '(mdrp/english-dict :which-key "load the english dictionary")
               )
-    :ensure-system-package (aspell)
+    :ensure-system-package aspell
+    ;; :ensure-system-package aspell-fr
+    ;; :ensure-system-package aspell-en
     :config
     (provide 'ispell) ; forcibly load ispell configs
 
@@ -2054,6 +2082,48 @@ Major modes for editing .gitignore files, .git/config etc
 :PROPERTIES:
 :CUSTOM_ID: windowsframe-management
 :END:
+
+** Uniquify
+:PROPERTIES:
+:CUSTOM_ID: uniquify
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package uniquify
+    :config
+    (setq uniquify-buffer-name-style 'reverse
+          uniquify-separator " • "
+          uniquify-after-kill-buffer-p t
+          uniquify-ignore-buffers-re "^\\*"))
+#+END_SRC
+
+** TODO Frame
+:PROPERTIES:
+:CUSTOM_ID: frame
+:END:
+
+Try to create frames that are nicer.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package frame
+    :disabled
+    :config
+    (setq default-frame-alist
+          '(
+            (min-height . 1)
+            '(height . 45)
+            (min-width  . 1)
+            '(width  . 81)
+            (vertical-scroll-bars . nil)
+            ;; (internal-border-width . 24)
+            (left-fringe . 1)
+            (right-fringe . 1)
+            (tool-bar-lines . 0)
+            (menu-bar-lines . 1)))
+    ;; Default frame settings
+    (setq initial-frame-alist default-frame-alist))
+
+#+END_SRC
 
 ** [[https://www.emacswiki.org/emacs/WinnerMode][Winner]]
 :PROPERTIES:
@@ -2666,8 +2736,7 @@ Text completion framework.
 
     (add-to-list 'company-backends '(company-capf
                                      company-yasnippet
-                                     company-files
-                                     company-dabbrev-code))
+                                     company-files))
     (global-company-mode 1))
 #+END_SRC
 
@@ -3257,6 +3326,32 @@ Will pulse when the focus changes to show where the cursor is.
       (solaire-global-mode +1)))
 #+END_SRC
 
+** TODO SVG Tags
+:PROPERTIES:
+:CUSTOM_ID: svg-tags
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package svg-tag-mode
+    :disabled
+    :ensure t
+    :config
+    (setq svg-tag-tags
+          '((":TODO:" . ((lambda (tag)
+                           (svg-tag-make "TODO" :face 'org-tag
+                                         :radius 0 :inverse t :margin 0))))
+            (":NOTE:" . ((lambda (tag)
+                           (svg-tag-make "NOTE" :face 'font-lock-comment-face
+                                         :inverse nil :margin 0 :radius 0))))
+            ("\([0-9a-zA-Z]\)" . ((lambda (tag)
+                                    (svg-tag-make tag :beg 1 :end -1 :radius 12))))
+            ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
+                                               (svg-tag-make tag :beg 1 :end -1 :radius 8))))))
+    (svg-tag-mode)
+    (global-svg-tag-mode))
+
+#+END_SRC
+
 * [[https://github.com/emacs-eaf/emacs-application-framework][EAF]]
 :PROPERTIES:
 :CUSTOM_ID: eaf
@@ -3297,12 +3392,17 @@ Will pulse when the focus changes to show where the cursor is.
 
 Org mode is, well, org mode.
 
+** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode
+:END:
+
 #+BEGIN_SRC emacs-lisp
   (require 'org-protocol)
 
   (use-package org
     :ensure t
-    ;; :hook (org-mode . variable-pitch-mode)
+    :hook (org-mode . variable-pitch-mode)
     :init
     (setq org-list-allow-alphabetical t)
     ;; If you don't want the agenda in french you can comment the following
@@ -3509,6 +3609,19 @@ Org mode is, well, org mode.
    ;;    )
    )
   )
+#+END_SRC
+
+
+** [[https://github.com/yilkalargaw/org-auto-tangle][Org auto tangle]]
+:PROPERTIES:
+:CUSTOM_ID: org-auto-tangle
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-auto-tangle
+    :ensure t
+    :defer t
+    :hook (org-mode . org-auto-tangle-mode))
 #+END_SRC
 
 ** [[https://github.com/jkitchin/org-ref][Org ref]]
