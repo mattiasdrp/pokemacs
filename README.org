@@ -22,6 +22,8 @@
   - [[#once-emacs-is-installed][Once emacs is installed:]]
   - [[#configure-packages][Configure packages]]
   - [[#git-hosts-and-forges][Git hosts and forges]]
+    - [[#ghub][Ghub]]
+    - [[#code-review][Code Review]]
   - [[#external-files][External files]]
 - [[#emacs-config][Emacs config]]
 - [[#big-thanks][Big Thanks]]
@@ -221,6 +223,11 @@ After everything is installed you need to run these two commands just once.
 :CUSTOM_ID: git-hosts-and-forges
 :END:
 
+*** Ghub
+:PROPERTIES:
+:CUSTOM_ID: ghub
+:END:
+
 [[https://github.com/magit/ghub][Ghub]] is used and needs a bit of tuning first.
 
 In [[file:custom.el][custom.el]] you can see the line ~'(auth-sources '("~/.authinfo"))~, this is where packages looking for authentication sources will look. You can obviously customize it.
@@ -234,7 +241,6 @@ Ghub expects to see lines of the following format:
   machine gitlab.com/api/v4 login <username>^<package> password <token_from_gitlab>
 #+end_src
 
-
 For pokemacs you need one line only (working towards gitlab integration):
 - ~machine api.github.com login <username>^ghub password <token_from_github>~)
 # - ~machine gitlab.com/api/v4 login <username>^ghub password <token_from_github>~)
@@ -245,7 +251,28 @@ Ghub also expects you to have set your username for the hosts you use with:
   git config --<global | local> <host>.user <username>
 #+end_src
 
-For pokemacs you need two set it for GitHub.
+For pokemacs you need to set it for GitHub.
+
+*** Code Review
+:PROPERTIES:
+:CUSTOM_ID: code-review
+:END:
+
+Code review needs authentication tokens for ~forge~ and ~code-review~. Both tokens need the ~repo~ scope active for github and the ~api~ scope for gitlab. You need to store them like this in your ~authinfo~ file:
+
+#+BEGIN_SRC shell
+  machine api.github.com login <username>^forge password <token_from_github>
+  machine api.github.com login <username>^code-review password <token_from_github>
+  machine gitlab.com/api login <username>^forge password <token_from_gitlab>
+  machine gitlab.com/api login <username>^code-review password <token_from_gitlab>
+#+END_SRC
+
+And, of course, you need to let both tools know who you are:
+
+#+begin_src sh
+  git config --<global | local> github.user <username>
+  git config --<global | local> gitlab.gitlab.com/api.user <username>
+#+end_src
 
 ** External files
 :PROPERTIES:

@@ -1,14 +1,15 @@
 :PROPERTIES:
 :TOC:      :include all :force ((nothing)) :ignore ((nothing)) :local ((nothing))
 :END:
-#+title: Emacs Init
-#+author: mattiasdrp
-#+date: <2022-08-17 Wed>
-#+language: en_US
-#+property: header-args :results silent :exports code :tangle yes
-#+auto_tangle: t
+#+TITLE: Emacs Init
+#+AUTHOR: mattiasdrp
+#+DATE: <2022-08-17 Wed>
+#+LANGUAGE: en_US
+#+PROPERTY: header-args :results silent :exports code :tangle yes
+#+AUTO_TANGLE: t
+#+STARTUP: hideblocks
 
-#+keywords: Emacs
+#+KEYWORDS: Emacs
 
 Literate configuration for init.el.
 
@@ -57,6 +58,7 @@ Literate configuration for init.el.
   - [[#ligatures][Ligatures]]
   - [[#ansi-color][Ansi color]]
   - [[#kurecolor][Kurecolor]]
+  - [[#emojify][Emojify]]
 - [[#keybindings][Keybindings]]
   - [[#general][General]]
   - [[#which-key][Which-key]]
@@ -101,12 +103,13 @@ Literate configuration for init.el.
 - [[#git][Git]]
   - [[#magit][Magit]]
   - [[#magit-todos][Magit todos]]
-    - [[#highlight-todo][Highlight todo]]
+  - [[#highlight-todo][Highlight todo]]
   - [[#diff-hl][Diff hl]]
   - [[#git-commit][Git commit]]
   - [[#git-messenger][Git messenger]]
   - [[#git-timemachine][Git timemachine]]
   - [[#git-modes][Git modes]]
+  - [[#code-review][Code review]]
   - [[#ghub][Ghub]]
 - [[#windowsframe-management][Windows/Frame management]]
   - [[#uniquify][Uniquify]]
@@ -1002,6 +1005,17 @@ Other all-the-icons related packages:
 #+BEGIN_SRC emacs-lisp
   (use-package kurecolor
     :ensure t)
+#+END_SRC
+
+** [[https://github.com/iqbalansari/emacs-emojify][Emojify]]
+:PROPERTIES:
+:CUSTOM_ID: emojify
+:END:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package emojify
+    :ensure t
+    :hook (after-init . global-emojify-mode))
 #+END_SRC
 
 * Keybindings
@@ -1975,7 +1989,7 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
       (magit-mode . magit-todos-mode)))
 #+END_SRC
 
-*** [[https://github.com/tarsius/hl-todo][Highlight todo]]
+** [[https://github.com/tarsius/hl-todo][Highlight todo]]
 :PROPERTIES:
 :CUSTOM_ID: highlight-todo
 :END:
@@ -2063,6 +2077,20 @@ Major modes for editing .gitignore files, .git/config etc
 #+BEGIN_SRC emacs-lisp
   (use-package git-modes
     :ensure t)
+#+END_SRC
+
+** [[https://github.com/wandersoncferreira/code-review][Code review]]
+:PROPERTIES:
+:CUSTOM_ID: code-review
+:END:
+
+Some configuration is needed for this to work. See [[file:README.org::#git-hosts-and-forges][README.org Git hosts and forges]]
+
+#+BEGIN_SRC emacs-lisp
+  (use-package code-review
+    :ensure t
+    :config
+    (setq code-review-download-dir (no-littering-expand-var-file-name "backups/")))
 #+END_SRC
 
 ** [[https://github.com/magit/ghub][Ghub]]

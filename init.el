@@ -449,6 +449,10 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package kurecolor
   :ensure t)
 
+(use-package emojify
+  :ensure t
+  :hook (after-init . global-emojify-mode))
+
 (use-package general
   :demand t
   :ensure t
@@ -1101,6 +1105,11 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package git-modes
   :ensure t)
+
+(use-package code-review
+  :ensure t
+  :config
+  (setq code-review-download-dir (no-littering-expand-var-file-name "backups/")))
 
 (use-package ghub
   :ensure t

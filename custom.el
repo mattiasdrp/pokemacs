@@ -22,7 +22,7 @@
    '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
  '(doom-modeline-bar-width 4)
  '(doom-modeline-height 25)
- '(doom-theme 'doom-nord-aurora)
+ '(doom-theme 'doom-solarized-dark)
  '(doom-themes-enable-bold nil)
  '(doom-themes-enable-italic nil)
  '(eaf-browser-blank-page-url "https://duckduckgo.com/")
