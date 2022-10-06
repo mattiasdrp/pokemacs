@@ -700,15 +700,13 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package flycheck-languagetool
   :ensure t
-  :preface
-  (defconst jar-path (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
   ;; :custom ((flycheck-languagetool-active-modes
   ;;           '(text-mode latex-mode org-mode markdown-mode message-mode prog-mode)))
   :hook (text-mode . flycheck-languagetool-setup)
   ;; :ensure-system-package
   ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
   :init
-  (setq flycheck-languagetool-server-jar jar-path))
+  (setq flycheck-languagetool-server-jar (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar")))
 
 (use-package flyspell
   :init
