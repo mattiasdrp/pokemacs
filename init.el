@@ -983,6 +983,13 @@ debian, and derivatives). On most it's 'fd'.")
             "p" 'flycheck-prev-error)
   :hook ((prog-mode markdown-mode git-commit-mode) . flycheck-mode))
 
+(use-package flycheck-correct
+:load-path "lisp/"
+:hook flycheck-mode
+:general
+(:keymaps 'flycheck-mode-map
+          "M-RET" 'mdrp/correct-or-newline))
+
 (use-package quick-peek
   :ensure t
   )
@@ -1730,7 +1737,7 @@ debian, and derivatives). On most it's 'fd'.")
   ;; The limit of the window width.
   ;; If `window-width' is smaller than the limit, some information won't be
   ;; displayed. It can be an integer or a float number. `nil' means no limit."
-  (doom-modeline-window-width-limit 85)
+  (doom-modeline-window-width-limit nil)
 
   ;; How to detect the project root.
   ;; nil means to use `default-directory'.
@@ -2015,9 +2022,11 @@ debian, and derivatives). On most it's 'fd'.")
 
 (require 'org-protocol)
 
+(use-package mixed-pitch :ensure t)
+
 (use-package org
   :ensure t
-  :hook (org-mode . variable-pitch-mode)
+  :hook (org-mode . mixed-pitch-mode)
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -2037,7 +2046,13 @@ debian, and derivatives). On most it's 'fd'.")
     (org-latex-export-to-pdf)
     (mdrp/update-other-buffer)
     )
-
+  (defun mdrp/filter-timestamp (trans back _comm)
+    "Remove <> around time-stamps."
+    (pcase back
+      (`html
+       (replace-regexp-in-string "&[lg]t;" "" trans))
+      (`latex
+       (replace-regexp-in-string "[<>]" "" trans))))
   :custom
   (org-directory "~/org/")
   ;; Babel
@@ -2045,6 +2060,8 @@ debian, and derivatives). On most it's 'fd'.")
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
   ;; Rest
+  (org-display-custom-times t)
+  (org-time-stamp-custom-formats '("<%d %b %Y>" . "<%d/%d/%y %a %H:%M>"))
   (org-agenda-files `(,org-directory))
   (org-ellipsis " ▾")
   (org-footnote-auto-adjust t)
@@ -2121,6 +2138,7 @@ debian, and derivatives). On most it's 'fd'.")
     )
   (customize-set-value 'org-latex-with-hyperref nil)
 (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
+(add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
 (setq org-image-actual-width nil)
 (defun org-mode-<>-syntax-fix (start end)
   "Change syntax of characters ?< and ?> to symbol within source code blocks."
@@ -2238,8 +2256,8 @@ debian, and derivatives). On most it's 'fd'.")
   (setq
    org-ref-completion-library 'org-ref-ivy-cite
    )
-  :custom
-  (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
+  ;; :custom
+  ;; (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
   )
 
 (use-package org-bullets
@@ -2690,10 +2708,6 @@ function to get the type and, for example, kill and yank it."
     (auctex-latexmk-setup)
     (setq auctex-latexmk-inherit-TeX-PDF-mode t)
     )
-
-  (use-package LaTeX-math-mode
-    :hook auctex
-    )
   )
 
 (when use-markdown
@@ -2755,25 +2769,31 @@ function to get the type and, for example, kill and yank it."
     (let ((path (concat opam-share "/emacs/site-lisp")))
       (message "Path is %s" path)
       path
-    )
-  ))
+      )
+    ))
 
 (defun mdrp/erase-and-fill-buffer (buffer)
-  "Blahblah BUFFER."
+  "Erase the current BUFFER and move point to beginning of buffer."
   (with-current-buffer buffer
-    (erase-buffer)
-    (insert "Dune watch buffer")
-    ))
+    (let ((npoint (search-backward "**********")))
+      (message "Buffer %S" buffer)
+      (goto-char npoint)
+      (message "Point %S" npoint)
+      (set-window-point (get-buffer-window buffer) (point))
+      (message "Window Point %S" (window-point (get-buffer-window buffer))))))
 
 ;; TODO: This function should be its own package
 (defun mdrp/dune-watch (exe)
   "Will call dune build -w EXE on an async process."
   (interactive "sBuild name: ")
-  (let ((buffer (get-buffer-create "Dune watch")))
-    (add-hook 'before-save-hook (lambda () (mdrp/erase-and-fill-buffer buffer)))
-    (with-current-buffer buffer (compilation-minor-mode t))
+  (let ((buffer (get-buffer-create "*compilation*")))
     (projectile-run-async-shell-command-in-root (concat "dune build -w " exe) buffer)
     ;; Make this process non blocking for killing
+    (defun mdrp/erase-and-fill-buffer-no-lambda ()
+      "Wrapper to avoid using lambda"
+      (mdrp/erase-and-fill-buffer buffer))
+    (add-hook 'after-save-hook #'mdrp/erase-and-fill-buffer-no-lambda)
+    (with-current-buffer buffer (compilation-minor-mode t))
     (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
     (display-buffer buffer '((display-buffer-below-selected display-buffer-at-bottom)
                              (inhibit-same-window . t)

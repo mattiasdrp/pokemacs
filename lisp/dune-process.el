@@ -192,7 +192,7 @@
   "Start the Dune process NAME with the dune command COMMAND.
 OPENS-EXTERNAL is non-nil if the COMMAND is expected to open an external application.
 Returns the created process."
-  (let* ((buffer (concat "*Dune " name "*"))
+  (let* ((buffer (concat "*compilation*"))
          (project-root (dune-process--project-root))
          (cmd
           (or last-cmd

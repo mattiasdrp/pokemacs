@@ -1,24 +1,16 @@
-;;; dune-minor.el --- Emacs Minor Mode for Dune, Rust's Package Manager.
+;;; dune-minor.el --- Emacs Minor Mode for Dune, OCaml's Package Manager.
 
 ;; Copyright (C) 2021  mattiasdrp
 
-;; Author: Mattias <5543639+mattiasdrp@users.noreply.github.com>
-;; Version  : 0.1.0
-;; Keywords: tools
-;; Package-Requires: ((emacs "24.3"))
 
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; Author: mattiasdrp
+;; Maintainer: mattiasdrp <https://github.com/mattiasdrp>
+;; Created: 17 august 2022
+;; Version: 0.1.0
+;; Licence: MIT
+;; Keywords: emacs, tools
+;; URL: https://github.com/mattiasdrp/pokemacs
+;; Copyright (c) 2022 mattiasdrp and contributors.
 
 ;;; Commentary:
 ;;
