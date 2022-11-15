@@ -1407,19 +1407,19 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
-  ("C-:" 'embark-dwim-noquit)  ;; good alternative: M-.
+  ("C-:" 'embark-default-act-noquit)  ;; good alternative: M-.
   ("C-h B" 'embark-bindings)   ;; alternative for `describe-bindings'
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
   (setq embark-quit-after-action nil)
-  (defun embark-dwim-noquit ()
-    "Run action but don't quit the minibuffer afterwards."
+  (defun embark-default-act-noquit ()
     (interactive)
     (let ((embark-quit-after-action nil))
       (embark-dwim)
-      (other-window 1)))
+      (when-let ((win (minibuffer-selected-window)))
+        (select-window win))))
 
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
@@ -3014,7 +3014,9 @@ function to get the type and, for example, kill and yank it."
 (when use-rust
   (use-package rustic
     :ensure t
-    :ensure-system-package (taplo . "cargo install taplo-cli")
+    :ensure-system-package
+    (taplo . "cargo install taplo-cli")
+    (rustfmt . "cargo install rustfmt")
     :mode "\\.rs'"
     ;; :hook
     ;; (rustic-mode-local-vars . tree-sitter 'append)
