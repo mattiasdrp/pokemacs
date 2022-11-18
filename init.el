@@ -3026,6 +3026,8 @@ function to get the type and, for example, kill and yank it."
               "C-c s" 'lsp-rust-analyzer-status
               "C-M-;" 'mdrp/rust-doc-comment-dwim-following
               "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing
+              [remap compile] 'rustic-compile
+              [remap recompile] 'rustic-recompile
               )
     :config
     ;; Conflicts with (and is redundant with) ligatures
