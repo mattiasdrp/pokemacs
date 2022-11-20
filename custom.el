@@ -32,7 +32,7 @@
  '(flycheck-languagetool-server-jar
    (concat
     (getenv "HOME")
-    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar") t)
+    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -51,9 +51,11 @@
      ("FIXME" . "#cc9393")
      ("XXXX*" . "#cc9393")))
  '(lsp-auto-guess-root t)
+ '(org-agenda-files
+   '("/home/mattias/org/academie_djoukui_roux.org" "/home/mattias/org/agenda.org" "/home/mattias/org/agenda.sync-conflict-20221017-103511-SKAKFUN.org" "/home/mattias/org/applis_pc.org" "/home/mattias/org/bd.org" "/home/mattias/org/bebe.org" "/home/mattias/org/calendar_company.org" "/home/mattias/org/calendar_user.org" "/home/mattias/org/cduce.org" "/home/mattias/org/conseil_decole_17_10_2022.org" "/home/mattias/org/garde.org" "/home/mattias/org/ikea.org" "/home/mattias/org/informatique.org" "/home/mattias/org/notes.org" "/home/mattias/org/orgzly.org" "/home/mattias/org/usuba.org" "/home/mattias/org/usuba.sync-conflict-20221017-103511-SKAKFUN.org") nil nil "Customized with use-package org")
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages
-   '(mixed-pitch svg-tag-mode org-auto-tangle flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
+   '(page-break-lines dashboard auctex-latexmk mixed-pitch svg-tag-mode org-auto-tangle flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(safe-local-variable-values
    '((projectile-project-root-functions . (projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring))))
  '(show-paren-style 'expression)
@@ -109,12 +111,27 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Fira Code" :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
  '(fixed-pitch ((t (:family "Fira Code" :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
- '(highlight ((t (:extend t :foreground unspecified))))
  '(lsp-lens-face ((t (:family "Fira Code" :foundry "CTDB" :inherit lsp-details-face))))
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
  '(mode-line-inactive ((nil :family "Fira Code" :height 140)))
+ '(org-block ((t (:inherit fixed-pitch))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+ '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
+ '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+ '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
+ '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
+ '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+ '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
+ '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
  '(region ((t (:extend t :background "#93a1a1" :foreground "#073642" :inverse-video t))))
+ '(secondary-selection  ((t (:inherit region))))
  '(show-paren-match ((t (:inherit highlight :foreground unspecified :weight normal))))
  '(show-paren-mismatch ((t (:foreground unspecified :weight normal :background "#7D3131"))))
  '(variable-pitch ((t (:family "Ubuntu" :height 118 :weight regular)))))
