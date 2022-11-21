@@ -32,7 +32,7 @@
  '(flycheck-languagetool-server-jar
    (concat
     (getenv "HOME")
-    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
+    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar") t)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -51,13 +51,11 @@
      ("FIXME" . "#cc9393")
      ("XXXX*" . "#cc9393")))
  '(lsp-auto-guess-root t)
- '(org-agenda-files
-   '("/home/mattias/org/academie_djoukui_roux.org" "/home/mattias/org/agenda.org" "/home/mattias/org/agenda.sync-conflict-20221017-103511-SKAKFUN.org" "/home/mattias/org/applis_pc.org" "/home/mattias/org/bd.org" "/home/mattias/org/bebe.org" "/home/mattias/org/calendar_company.org" "/home/mattias/org/calendar_user.org" "/home/mattias/org/cduce.org" "/home/mattias/org/conseil_decole_17_10_2022.org" "/home/mattias/org/garde.org" "/home/mattias/org/ikea.org" "/home/mattias/org/informatique.org" "/home/mattias/org/notes.org" "/home/mattias/org/orgzly.org" "/home/mattias/org/usuba.org" "/home/mattias/org/usuba.sync-conflict-20221017-103511-SKAKFUN.org") nil nil "Customized with use-package org")
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages
-   '(page-break-lines dashboard auctex-latexmk mixed-pitch svg-tag-mode org-auto-tangle flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
+   '(pass pinentry page-break-lines dashboard auctex-latexmk mixed-pitch svg-tag-mode org-auto-tangle flycheck-languagetool solaire-mode multiple-cursors auctex pdf-tools kurecolor consult-flycheck consult-yasnippet flyspell-correct fontify-face dune iedit tree-sitter-langs tree-sitter hide-mode-line ocp-indent tuareg calfw-org yasnippet lsp-ui web-mode flycheck-rust cargo rustic reason-mode lsp-pyright pyvenv saveplace-pdf-view pandoc-mode markdown-toc kotlin-mode fsharp-mode org-make-toc org-roam org-appear org-super-agenda calfw org-inline-pdf org-bullets org-ref which-key vertico use-package-ensure-system-package separedit selected rainbow-mode rainbow-delimiters pulsar projectile outshine orderless ob-rust no-littering minions marginalia magit-todos ligature keycast highlight-symbol git-timemachine git-modes git-messenger general fringe-helper flycheck embark-consult easy-kill dumb-jump doom-themes doom-modeline discover-my-major diff-hl dap-mode crux company-web company-quickhelp company-prescient company-box auto-package-update apheleia anzu all-the-icons-dired all-the-icons-completion))
  '(safe-local-variable-values
-   '((projectile-project-root-functions . (projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring))))
+   '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
  '(use-company t)
  '(use-eaf t)
@@ -68,6 +66,7 @@
  '(use-magit-todos t)
  '(use-markdown t)
  '(use-maximize t)
+ '(use-mu4e t)
  '(use-michelson nil)
  '(use-ocaml t)
  '(use-org-agenda-startup nil)
@@ -131,7 +130,7 @@
  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
  '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
  '(region ((t (:extend t :background "#93a1a1" :foreground "#073642" :inverse-video t))))
- '(secondary-selection  ((t (:inherit region))))
+ '(secondary-selection ((t (:inherit region))))
  '(show-paren-match ((t (:inherit highlight :foreground unspecified :weight normal))))
  '(show-paren-mismatch ((t (:foreground unspecified :weight normal :background "#7D3131"))))
  '(variable-pitch ((t (:family "Ubuntu" :height 118 :weight regular)))))
