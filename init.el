@@ -36,6 +36,11 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-dashboard nil
+  "If non-nil, uses the dashboard packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-solaire t
   "If non-nil, uses the solaire package"
   :group 'mdrp-packages
@@ -786,9 +791,7 @@ debian, and derivatives). On most it's 'fd'.")
             "f" '(mdrp/french-dict :which-key "load the french dictionary")
             "e" '(mdrp/english-dict :which-key "load the english dictionary")
             )
-  :ensure-system-package aspell
-  ;; :ensure-system-package aspell-fr
-  ;; :ensure-system-package aspell-en
+  :ensure-system-package ((aspell) (aspell-fr) (aspell-en))
   :config
   (provide 'ispell) ; forcibly load ispell configs
 
@@ -1981,27 +1984,28 @@ debian, and derivatives). On most it's 'fd'.")
     :config
     (solaire-global-mode +1)))
 
-(use-package page-break-lines :ensure t)
+(when use-dashboard
+  (use-package page-break-lines :ensure t)
 
-(use-package dashboard
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook)
-  ;; Set the title
-  (setq dashboard-banner-logo-title "Pokemacs")
-  ;; Set the banner
-  (setq dashboard-startup-banner "~/.emacs.d/etc/dashboard/calvin_hobbes.jpeg")
-  (setq dashboard-center-content t)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)))
-  (setq dashboard-set-navigator t)
-  (setq dashboard-set-footer nil)
-  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
-  (setq dashboard-week-agenda t))
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    ;; Set the title
+    (setq dashboard-banner-logo-title "Pokemacs")
+    ;; Set the banner
+    (setq dashboard-startup-banner "~/.emacs.d/etc/dashboard/calvin_hobbes.jpeg")
+    (setq dashboard-center-content t)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-items '((recents  . 5)
+                            (bookmarks . 5)
+                            (projects . 5)
+                            (agenda . 5)))
+    (setq dashboard-set-navigator t)
+    (setq dashboard-set-footer nil)
+    (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+    (setq dashboard-week-agenda t)))
 
 (use-package svg-tag-mode
   :disabled
@@ -2755,6 +2759,7 @@ function to get the type and, for example, kill and yank it."
     )
 
   (use-package auctex-latexmk
+    :ensure t
     :after tex-site
     :config
     (auctex-latexmk-setup)

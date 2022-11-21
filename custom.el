@@ -58,6 +58,7 @@
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
  '(use-company t)
+ '(use-dashboard t)
  '(use-eaf t)
  '(use-fsharp t)
  '(use-god nil)
