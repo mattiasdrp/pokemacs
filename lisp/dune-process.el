@@ -235,7 +235,8 @@ if the CMD is expected to open and external application."
   "Run the Dune build command.
 With the prefix argument, modify the command's invocation.
 Dune: Compile the current project."
-  (interactive "sBuild name: ")
+  (interactive
+   (list (read-from-minibuffer "Build name: " nil nil nil 'mdrp/dune-history)))
   (dune-process--start (concat "Build " name)
                         (concat dune-process--command-build " " name)))
 
@@ -244,7 +245,8 @@ Dune: Compile the current project."
   "Run the dune run <name> command.
 With the prefix argument, modify the command's invocation.
 Dune: Build and execute a specific binary"
-  (interactive "sBinary name: ")
+  (interactive
+   (list (read-from-minibuffer "Binary name: " nil nil nil 'mdrp/dune-history)))
   (dune-process--start (concat "Run " name)
                         (concat dune-process--command-exec " " name)))
 

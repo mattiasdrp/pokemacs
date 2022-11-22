@@ -2840,12 +2840,16 @@ function to get the type and, for example, kill and yank it."
       (set-window-point (get-buffer-window buffer) (point))
       (message "Window Point %S" (window-point (get-buffer-window buffer))))))
 
+(defvar mdrp/dune-history nil
+  "The history list for dune watch builds.")
+
 ;; TODO: This function should be its own package
-(defun mdrp/dune-watch (exe)
-  "Will call dune build -w EXE on an async process."
-  (interactive "sBuild name: ")
+(defun mdrp/dune-watch (build)
+  "Will call dune build -w BUILD on an async process."
+  (interactive
+   (list (read-from-minibuffer "Build name: " nil nil nil 'mdrp/dune-history)))
   (let ((buffer (get-buffer-create "*compilation*")))
-    (projectile-run-async-shell-command-in-root (concat "dune build -w " exe) buffer)
+    (projectile-run-async-shell-command-in-root (concat "dune build -w " build) buffer)
     ;; Make this process non blocking for killing
     (defun mdrp/erase-and-fill-buffer-no-lambda ()
       "Wrapper to avoid using lambda"
