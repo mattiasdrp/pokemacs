@@ -791,7 +791,9 @@ debian, and derivatives). On most it's 'fd'.")
             "f" '(mdrp/french-dict :which-key "load the french dictionary")
             "e" '(mdrp/english-dict :which-key "load the english dictionary")
             )
-  :ensure-system-package ((aspell) (aspell-fr) (aspell-en))
+  :ensure-system-package aspell
+  ;; :ensure-system-package aspell-fr
+  ;; :ensure-system-package aspell-en
   :config
   (provide 'ispell) ; forcibly load ispell configs
 
@@ -2440,8 +2442,7 @@ debian, and derivatives). On most it's 'fd'.")
   (setf epa-pinentry-mode 'loopback)
   (pinentry-start)
   ;; Start GPG agent with SSH support
-  (shell-command "gpg-connect-agent /bye")
-  )
+  (shell-command "gpg-connect-agent /bye"))
 
 (when use-mu4e
   (use-package smtpmail
@@ -2860,8 +2861,8 @@ function to get the type and, for example, kill and yank it."
   (use-package tuareg
     :ensure t
     :ensure-system-package
-    (ocamllsp . "opam install ocaml-lsp-server")
-    (ocamlformat . "opam install ocamlformat")
+    ((ocamllsp . "opam install ocaml-lsp-server")
+     (ocamlformat . "opam install ocamlformat"))
     :mode ("\\.ml\\'" . tuareg-mode)
     ;; The following line can be used instead of :ensure t to load
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -3072,8 +3073,8 @@ function to get the type and, for example, kill and yank it."
   (use-package rustic
     :ensure t
     :ensure-system-package
-    (taplo . "cargo install taplo-cli")
-    (rustfmt . "cargo install rustfmt")
+    ((taplo . "cargo install taplo-cli")
+     (rustfmt . "cargo install rustfmt"))
     :mode "\\.rs'"
     ;; :hook
     ;; (rustic-mode-local-vars . tree-sitter 'append)

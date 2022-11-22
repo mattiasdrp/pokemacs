@@ -1496,7 +1496,9 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
               "f" '(mdrp/french-dict :which-key "load the french dictionary")
               "e" '(mdrp/english-dict :which-key "load the english dictionary")
               )
-    :ensure-system-package ((aspell) (aspell-fr) (aspell-en))
+    :ensure-system-package aspell
+    ;; :ensure-system-package aspell-fr
+    ;; :ensure-system-package aspell-en
     :config
     (provide 'ispell) ; forcibly load ispell configs
 
@@ -3989,8 +3991,7 @@ Helper to create table of contents in org files.
     (setf epa-pinentry-mode 'loopback)
     (pinentry-start)
     ;; Start GPG agent with SSH support
-    (shell-command "gpg-connect-agent /bye")
-    )
+    (shell-command "gpg-connect-agent /bye"))
 #+END_SRC
 
 *** Mu4e
@@ -3999,17 +4000,20 @@ Helper to create table of contents in org files.
 :END:
 
 Based on this [[https://macowners.club/posts/email-emacs-mu4e-macos/#setup-msmtp-for-sending][tutorial]].
+For WSL see [[https://www.39digits.com/signed-git-commits-on-wsl2-using-visual-studio-code][this]]
 
 - Create directories for your mails
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC shell :tangle no
       .maildir
       ├── acc1
       ├── acc2
       └── acc3
     #+END_SRC
+
 - Install [[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html][mu4e]] from the latest release.
+
 - Fill a ~.mbsyncrc~ with the following fields (for each account):
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC shell :tangle no
       IMAPAccount acc
       Host imap.mail.me.com
       User imap-user
@@ -4040,17 +4044,21 @@ Based on this [[https://macowners.club/posts/email-emacs-mu4e-macos/#setup-msmtp
     #+END_SRC
 
 - To create ~.mbsyncpass-acc.gpg~ store your password in ~.mbsyncpass-acc~ and encrypt with ~gpg2 -c .mbsyncpass-acc~ before removing the original file.
+
 - Synchronise all your mails with ~mbsync -aV~
+
 - Initialise ~mu4e~ with
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC shell :tangle no
       mu init -m ~/.maildir \
          --my-address dummy@icloud.com \
          --my-address dummy@gmail.com \
          --my-address dummy@example.com
     #+END_SRC
+
 - Create the index with ~mu index~
+
 - Fill a ~.mbsyncrc~ with the following fields (for each account):
-    #+BEGIN_SRC shell
+    #+BEGIN_SRC shell :tangle no
       # Set default values for all the accounts.
       defaults
       logfile ~/.maildir/msmtp.log
@@ -4680,8 +4688,8 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
     (use-package tuareg
       :ensure t
       :ensure-system-package
-      (ocamllsp . "opam install ocaml-lsp-server")
-      (ocamlformat . "opam install ocamlformat")
+      ((ocamllsp . "opam install ocaml-lsp-server")
+       (ocamlformat . "opam install ocamlformat"))
       :mode ("\\.ml\\'" . tuareg-mode)
       ;; The following line can be used instead of :ensure t to load
       ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -4973,8 +4981,8 @@ Some people use this, not my responsibility.
     (use-package rustic
       :ensure t
       :ensure-system-package
-      (taplo . "cargo install taplo-cli")
-      (rustfmt . "cargo install rustfmt")
+      ((taplo . "cargo install taplo-cli")
+       (rustfmt . "cargo install rustfmt"))
       :mode "\\.rs'"
       ;; :hook
       ;; (rustic-mode-local-vars . tree-sitter 'append)
