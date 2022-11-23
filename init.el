@@ -171,7 +171,7 @@
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
-(defvar better-gc-cons-threshold 67108864) ; 64mb
+(defvar better-gc-cons-threshold (* 511 1024 1024)) ; 64mb
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -196,6 +196,10 @@
 
             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+(setq gc-cons-threshold better-gc-cons-threshold)
+(setq gc-cons-percentage 0.5)
+(run-with-idle-timer 5 t #'garbage-collect)
+(setq garbage-collection-messages t)
 
 (defun update-to-load-path (folder)
   "Update FOLDER and its subdirectories to `load-path'."
@@ -2489,35 +2493,6 @@ debian, and derivatives). On most it's 'fd'.")
   :commands lsp
 
   :config
-  ;; Temporary solution until https://github.com/emacs-lsp/lsp-mode/pull/3637 is merged
-  (defcustom lsp-cut-signature 'space
-    "If non-nil, signatures returned on hover will not be split on newline."
-    :group 'lsp-ocaml
-    :type '(choice (symbol :tag "Default behaviour" 'cut)
-                   (symbol :tag "Display all the lines with spaces" 'space)))
-
-  (cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql ocaml-lsp-server)) &optional storable)
-    "Extract a representative line from OCaml's CONTENTS, to show in the echo area.
-This function splits the content between the signature
-and the documentation to display the signature
-and truncate it if it's too wide.
-The STORABLE argument is used if you want to use this
-function to get the type and, for example, kill and yank it."
-    (let ((type (s-trim (lsp--render-element (lsp-make-marked-string
-                                              :language "ocaml"
-                                              :value (car (s-split "---" (lsp--render-element contents))))))))
-      (if (equal nil storable)
-          (if (eq lsp-cut-signature 'cut)
-              (car (s-lines type))
-            ;; else lsp-cut-signature is 'space
-            (let ((ntype (s-replace "\n" " " type)))
-              (if (>= (length ntype) (frame-width))
-                  (concat (substring ntype 0 (- (frame-width) 4)) "...")
-                ntype)))
-        type)))
-
-  ;;- end of temporary solution
-
   (defvar mdrp/type-map
     (let ((keymap (make-sparse-keymap)))
       (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
