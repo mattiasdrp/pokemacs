@@ -31,11 +31,6 @@
   :group 'mdrp-packages
   :type 'boolean)
 
-(defcustom use-mu4e nil
-  "If non-nil, uses emacs as an email client with mu4e"
-  :group 'mdrp-packages
-  :type 'boolean)
-
 (defcustom use-dashboard nil
   "If non-nil, uses the dashboard packages"
   :group 'mdrp-packages
@@ -2058,6 +2053,7 @@ debian, and derivatives). On most it's 'fd'.")
     (eaf-bind-key nil "M-q" eaf-browser-keybinding))) ;; unbind, see more in the Wiki
 
 (require 'org-protocol)
+(require 'ox)
 
 (use-package mixed-pitch :ensure t)
 
@@ -2438,22 +2434,6 @@ debian, and derivatives). On most it's 'fd'.")
   (require 'ox-moderncv)
   :config
   (require 'ox-awesomecv))
-
-(use-package pinentry
-  :ensure t
-  :config
-
-  (setf epa-pinentry-mode 'loopback)
-  (pinentry-start)
-  ;; Start GPG agent with SSH support
-  (shell-command "gpg-connect-agent /bye"))
-
-(when use-mu4e
-  (use-package smtpmail
-    :ensure t
-    :ensure-system-package msmtp)
-
-  (load-file (expand-file-name "~/mu4e/mu4e.el")))
 
 (use-package lsp-mode
   :hook (

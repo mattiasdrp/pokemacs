@@ -174,9 +174,6 @@ Literate configuration for init.el.
   - [[#org-roam][Org roam]]
   - [[#org-make-toc][Org make toc]]
   - [[#org-cv][Org CV]]
-- [[#mail-gpg-et-al][Mail, gpg et al]]
-  - [[#pinentry][Pinentry]]
-  - [[#mu4e][Mu4e]]
 - [[#lsp][LSP]]
   - [[#main-mode][Main mode]]
   - [[#lsp-ui][Lsp ui]]
@@ -278,11 +275,6 @@ This is a list of custom variables that allow to enable/disable features. If you
 
   (defcustom use-spotify nil
     "If non-nil, uses the spotify packages"
-    :group 'mdrp-packages
-    :type 'boolean)
-
-  (defcustom use-mu4e nil
-    "If non-nil, uses emacs as an email client with mu4e"
     :group 'mdrp-packages
     :type 'boolean)
 
@@ -3488,6 +3480,7 @@ Org mode is, well, org mode.
 
 #+BEGIN_SRC emacs-lisp
   (require 'org-protocol)
+  (require 'ox)
 
   (use-package mixed-pitch :ensure t)
 
@@ -3975,120 +3968,6 @@ Helper to create table of contents in org files.
     (require 'ox-moderncv)
     :config
     (require 'ox-awesomecv))
-#+END_SRC
-
-* Mail, gpg et al
-:PROPERTIES:
-:CUSTOM_ID: mail-gpg-et-al
-:END:
-
-*** [[http://elpa.gnu.org/packages/pinentry.html][Pinentry]]
-:PROPERTIES:
-:CUSTOM_ID: pinentry
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package pinentry
-    :ensure t
-    :config
-
-    (setf epa-pinentry-mode 'loopback)
-    (pinentry-start)
-    ;; Start GPG agent with SSH support
-    (shell-command "gpg-connect-agent /bye"))
-#+END_SRC
-
-*** Mu4e
-:PROPERTIES:
-:CUSTOM_ID: mu4e
-:END:
-
-Based on this [[https://macowners.club/posts/email-emacs-mu4e-macos/#setup-msmtp-for-sending][tutorial]].
-For WSL see [[https://www.39digits.com/signed-git-commits-on-wsl2-using-visual-studio-code][this]]
-
-- Create directories for your mails
-    #+BEGIN_SRC shell :tangle no
-      .maildir
-      ├── acc1
-      ├── acc2
-      └── acc3
-    #+END_SRC
-
-- Install [[https://www.djcbsoftware.nl/code/mu/mu4e/Installation.html][mu4e]] from the latest release.
-
-- Fill a ~.mbsyncrc~ with the following fields (for each account):
-    #+BEGIN_SRC shell :tangle no
-      IMAPAccount acc
-      Host imap.mail.me.com
-      User imap-user
-      PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/mu4e/.mbsyncpass-acc.gpg"
-      Port 993
-      SSLType IMAPS
-      SSLVersions TLSv1.2
-      AuthMechs PLAIN
-      SystemCertificates no
-      CertificateFile /etc/ssl/certs/ca-certificates.crt
-
-      IMAPStore acc-remote
-      Account acc
-
-      MaildirStore acc-local
-      SubFolders Verbatim
-      Path ~/.maildir/acc/
-      Inbox ~/.maildir/acc/INBOX
-
-      Channel acc
-      Far :acc-remote:
-      Near :acc-local:
-      Patterns *
-      Create Near
-      Sync All
-      Expunge Both
-      SyncState *
-    #+END_SRC
-
-- To create ~.mbsyncpass-acc.gpg~ store your password in ~.mbsyncpass-acc~ and encrypt with ~gpg2 -c .mbsyncpass-acc~ before removing the original file.
-
-- Synchronise all your mails with ~mbsync -aV~
-
-- Initialise ~mu4e~ with
-    #+BEGIN_SRC shell :tangle no
-      mu init -m ~/.maildir \
-         --my-address dummy@icloud.com \
-         --my-address dummy@gmail.com \
-         --my-address dummy@example.com
-    #+END_SRC
-
-- Create the index with ~mu index~
-
-- Fill a ~.mbsyncrc~ with the following fields (for each account):
-    #+BEGIN_SRC shell :tangle no
-      # Set default values for all the accounts.
-      defaults
-      logfile ~/.maildir/msmtp.log
-      tls_trust_file /etc/ssl/certs/ca-certificates.crt
-
-      # ======================================================================
-
-      account acc
-      auth on
-      host smtp.mail.me.com
-      port 465
-      protocol smtp
-      from smtp-login@acc.com
-      user smtp-login
-      passwordeval "gpg2 -q --for-your-eyes-only --no-tty -d ~/mu4e/.mbsyncpass-acc.gpg"
-      tls on
-      tls_starttls off
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (when use-mu4e
-    (use-package smtpmail
-      :ensure t
-      :ensure-system-package msmtp)
-
-    (load-file (expand-file-name "~/mu4e/mu4e.el")))
 #+END_SRC
 
 * [[https://github.com/emacs-lsp/lsp-mode/][LSP]]

@@ -17,6 +17,21 @@
 
 ;;; Code:
 
+(use-package pinentry
+  :ensure t
+  :config
+
+  (setf epa-pinentry-mode 'loopback)
+  (pinentry-start)
+  ;; Start GPG agent with SSH support
+  (shell-command "gpg-connect-agent /bye"))
+
+(use-package smtpmail
+  :ensure t
+  :ensure-system-package msmtp)
+
+(load-file (expand-file-name "~/mu4e/mu4e.el"))
+
 ;; (general-unbind
 ;;   "C-o"
 ;;   )
