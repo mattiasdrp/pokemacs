@@ -712,14 +712,18 @@ debian, and derivatives). On most it's 'fd'.")
   (global-set-key [remap mark-sexp] #'easy-mark))
 
 (use-package flycheck-languagetool
-  :ensure t
+  :load-path "lisp/flycheck-languagetool/"
   ;; :custom ((flycheck-languagetool-active-modes
   ;;           '(text-mode latex-mode org-mode markdown-mode message-mode prog-mode)))
-  :hook (text-mode . flycheck-languagetool-setup)
+  :hook ((text-mode . flycheck-languagetool-setup)
+         (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
+                       (require 'flycheck-languagetool)
+                       (flycheck-languagetool-flycheck-enable))))
   ;; :ensure-system-package
   ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
   :init
-  (setq flycheck-languagetool-server-jar (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar")))
+  (setq flycheck-languagetool-server-jar (expand-file-name "~/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
+  )
 
 (use-package flyspell
   :init
@@ -980,6 +984,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package flycheck
   :preface
   (define-prefix-command 'mdrp-fly-map nil "Fly-")
+  :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
   :ensure t
   :config
   (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
@@ -989,8 +994,7 @@ debian, and derivatives). On most it's 'fd'.")
       (list n t)))
   :general
   (:keymaps 'mdrp-fly-map
-            "p" 'flycheck-prev-error)
-  :hook ((prog-mode markdown-mode git-commit-mode) . flycheck-mode))
+            "p" 'flycheck-prev-error))
 
 (use-package flycheck-correct
 :load-path "lisp/"
@@ -2436,8 +2440,7 @@ debian, and derivatives). On most it's 'fd'.")
   (require 'ox-awesomecv))
 
 (use-package lsp-mode
-  :hook (
-         (tuareg-mode . lsp-deferred)
+  :hook ((tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
          (elm-mode . lsp-deferred)
          (rustic-mode . lsp-deferred)
@@ -2677,6 +2680,13 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package elisp-mode
   :hook (elisp-mode . semantic-mode)
   )
+
+(use-package paredit
+  :ensure t
+  :general
+  (:keymaps 'paredit-mode-map
+   "C-<right>" nil
+   "C-<left>" nil))
 
 (when use-fsharp
   (use-package fsharp-mode

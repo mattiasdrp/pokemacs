@@ -189,6 +189,8 @@ Literate configuration for init.el.
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
   - [[#elisp][Elisp]]
+    - [[#main-mode][Main Mode]]
+    - [[#paredit][Paredit]]
   - [[#fsharp][Fsharp]]
   - [[#kotlin][Kotlin]]
   - [[#latex][LaTeX]]
@@ -1403,14 +1405,18 @@ Better ~M-w~
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-languagetool
-    :ensure t
+    :load-path "lisp/flycheck-languagetool/"
     ;; :custom ((flycheck-languagetool-active-modes
     ;;           '(text-mode latex-mode org-mode markdown-mode message-mode prog-mode)))
-    :hook (text-mode . flycheck-languagetool-setup)
+    :hook ((text-mode . flycheck-languagetool-setup)
+           (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
+                         (require 'flycheck-languagetool)
+                         (flycheck-languagetool-flycheck-enable))))
     ;; :ensure-system-package
     ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
     :init
-    (setq flycheck-languagetool-server-jar (concat (getenv "HOME") "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar")))
+    (setq flycheck-languagetool-server-jar (expand-file-name "~/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
+    )
 #+END_SRC
 
 *** [[https://www.emacswiki.org/emacs/FlySpell][Flyspell]]
@@ -1809,6 +1815,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
   (use-package flycheck
     :preface
     (define-prefix-command 'mdrp-fly-map nil "Fly-")
+    :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
     :ensure t
     :config
     (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
@@ -1818,8 +1825,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
         (list n t)))
     :general
     (:keymaps 'mdrp-fly-map
-              "p" 'flycheck-prev-error)
-    :hook ((prog-mode markdown-mode git-commit-mode) . flycheck-mode))
+              "p" 'flycheck-prev-error))
 #+END_SRC
 
 *** Flycheck Correct
@@ -3984,8 +3990,7 @@ Minor mode acting as a client between a language server protocol and emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
-    :hook (
-           (tuareg-mode . lsp-deferred)
+    :hook ((tuareg-mode . lsp-deferred)
            (caml-mode . lsp-deferred)
            (elm-mode . lsp-deferred)
            (rustic-mode . lsp-deferred)
@@ -4324,10 +4329,23 @@ Library for parsing and generating JSON
 :CUSTOM_ID: elisp
 :END:
 
+*** Main Mode
+
 #+BEGIN_SRC emacs-lisp
   (use-package elisp-mode
     :hook (elisp-mode . semantic-mode)
     )
+#+END_SRC
+
+*** Paredit
+
+#+BEGIN_SRC emacs-lisp
+    (use-package paredit
+      :ensure t
+      :general
+      (:keymaps 'paredit-mode-map
+       "C-<right>" nil
+       "C-<left>" nil))
 #+END_SRC
 
 ** [[https://github.com/fsharp/emacs-fsharp-mode][Fsharp]]
