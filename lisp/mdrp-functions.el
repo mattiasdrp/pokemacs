@@ -64,7 +64,11 @@ affects the sort order.
 
 See `sort-regexp-fields'."
   (interactive "*P\nr")
-  (sort-regexp-fields reverse "\\w+" "\\&" beg end))
+  (let ((temp-table (copy-syntax-table text-mode-syntax-table)))
+    (with-syntax-table temp-table
+      (modify-syntax-entry ?- "w" temp-table)
+      (modify-syntax-entry ?_ "w" temp-table)
+      (sort-regexp-fields reverse "\\w+" "\\&" beg end))))
 
 (defvar-local mdrp/hydra-super-body nil)
 
