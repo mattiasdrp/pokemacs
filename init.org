@@ -325,6 +325,11 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'mdrp-packages
     :type 'boolean)
 
+  (defcustom use-clojure t
+    "If non-nil, uses the Clojure packages"
+    :group 'mdrp-packages
+    :type 'boolean)
+
   (defcustom use-rust nil
     "If non-nil, uses the rust packages"
     :group 'mdrp-packages
@@ -1979,6 +1984,7 @@ Allows to see immediately how a face will look
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t
+    :hook (magit-mode . (lambda () (company-mode -1)))
     :config
     (setq magit-auto-revert-mode t)
     (setq magit-auto-revert-immediately t)
@@ -2140,13 +2146,14 @@ Some configuration is needed for this to work. See [[file:README.org::#git-hosts
 :CUSTOM_ID: windowsframe-management
 :END:
 
-** Uniquify
+*** DISABLED Uniquify
 :PROPERTIES:
 :CUSTOM_ID: uniquify
 :END:
 
 #+BEGIN_SRC emacs-lisp
   (use-package uniquify
+    :disabled
     :config
     (setq uniquify-buffer-name-style 'reverse
           uniquify-separator " • "
@@ -3992,6 +3999,9 @@ Minor mode acting as a client between a language server protocol and emacs.
   (use-package lsp-mode
     :hook ((tuareg-mode . lsp-deferred)
            (caml-mode . lsp-deferred)
+           (clojure-mode . lsp-deferred)
+           (clojurescript-mode-hook . lsp-deferred)
+           (clojurec-mode-hook . lsp-deferred)
            (elm-mode . lsp-deferred)
            (rustic-mode . lsp-deferred)
            (conf-toml-mode . lsp-deferred)
@@ -4155,14 +4165,12 @@ TODO: Not working with OCaml
     :disabled)
 #+END_SRC
 
-* TODO [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][Tree sitter]]
+* [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][Tree sitter]]
 :PROPERTIES:
 :CUSTOM_ID: tree-sitter
 :END:
 
 Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP use incremental compilation to give useful informations about programs, tree-sitter use incremental parsing of current buffer to help with syntax highlighting, code folding etc.
-
-TODO: Use tree-sitter for syntax highlighting instead of font-lock-mode
 
 ** Main mode
 :PROPERTIES:
@@ -4322,6 +4330,25 @@ Library for parsing and generating JSON
     :ensure nil
     :hook (make-mode . semantic-mode)
     )
+#+END_SRC
+
+** Clojure
+
+*** Main mode
+
+#+BEGIN_SRC emacs-lisp
+  (when use-clojure
+    (use-package clojure-mode
+    :ensure t
+    ))
+#+END_SRC
+
+*** CIDER
+
+#+BEGIN_SRC emacs-lisp
+  (when use-clojure
+    (use-package cider
+      :ensure t))
 #+END_SRC
 
 ** Elisp

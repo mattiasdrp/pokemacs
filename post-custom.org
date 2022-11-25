@@ -61,24 +61,6 @@ Literate configuration for [[file:post-custom.el][post-custom.el]].
 :CUSTOM_ID: mail-gpg-et-al
 :END:
 
-If you don't plan on using mu4e, you should delete this.
-
-*** [[http://elpa.gnu.org/packages/pinentry.html][Pinentry]]
-:PROPERTIES:
-:CUSTOM_ID: pinentry
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package pinentry
-    :ensure t
-    :config
-
-    (setf epa-pinentry-mode 'loopback)
-    (pinentry-start)
-    ;; Start GPG agent with SSH support
-    (shell-command "gpg-connect-agent /bye"))
-#+END_SRC
-
 *** Mu4e
 :PROPERTIES:
 :CUSTOM_ID: mu4e

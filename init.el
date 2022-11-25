@@ -76,6 +76,11 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-clojure t
+  "If non-nil, uses the Clojure packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-rust nil
   "If non-nil, uses the rust packages"
   :group 'mdrp-packages
@@ -1061,6 +1066,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package magit
   :ensure t
+  :hook (magit-mode . (lambda () (company-mode -1)))
   :config
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
@@ -1136,6 +1142,7 @@ debian, and derivatives). On most it's 'fd'.")
 )
 
 (use-package uniquify
+  :disabled
   :config
   (setq uniquify-buffer-name-style 'reverse
         uniquify-separator " • "
@@ -2442,6 +2449,9 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package lsp-mode
   :hook ((tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
+         (clojure-mode . lsp-deferred)
+         (clojurescript-mode-hook . lsp-deferred)
+         (clojurec-mode-hook . lsp-deferred)
          (elm-mode . lsp-deferred)
          (rustic-mode . lsp-deferred)
          (conf-toml-mode . lsp-deferred)
@@ -2676,6 +2686,15 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure nil
   :hook (make-mode . semantic-mode)
   )
+
+(when use-clojure
+  (use-package clojure-mode
+  :ensure t
+  ))
+
+(when use-clojure
+  (use-package cider
+    :ensure t))
 
 (use-package elisp-mode
   :hook (elisp-mode . semantic-mode)
