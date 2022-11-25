@@ -1094,9 +1094,7 @@ debian, and derivatives). On most it's 'fd'.")
   (use-package magit-todos
     :ensure t
     :config
-    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
-    :hook
-    (magit-mode . magit-todos-mode)))
+    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))))
 
 (use-package hl-todo
   :ensure t
@@ -2531,11 +2529,12 @@ debian, and derivatives). On most it's 'fd'.")
     :major-modes '(caml-mode tuareg-mode)
     :server-id 'ocaml-lsp-server))
   :general
-  ("M-l" 'lsp-command-map)
-  ("C-c C-t" 'lsp-describe-thing-at-point)
-  ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
-  ("C-c C-l" 'lsp-find-definition)
-  ("C-c &"   'pop-global-mark :keymaps 'override)
+  (:keymaps 'lsp-mode-map
+            "M-l" 'lsp-command-map
+            "C-c C-t" 'lsp-describe-thing-at-point
+            "C-c C-w" 'mdrp/lsp-get-type-and-kill
+            "C-c C-l" 'lsp-find-definition
+            "C-c &"   'pop-global-mark :keymaps 'override)
   (:keymaps 'lsp-command-map
             "d"   'lsp-find-definition
             "r"   'lsp-find-references
@@ -2706,6 +2705,10 @@ debian, and derivatives). On most it's 'fd'.")
   (:keymaps 'paredit-mode-map
    "C-<right>" nil
    "C-<left>" nil))
+
+(use-package flycheck-package
+  :ensure t
+  :hook (flycheck-mode . (lambda () (flycheck-package-setup))))
 
 (when use-fsharp
   (use-package fsharp-mode

@@ -2021,9 +2021,7 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
     (use-package magit-todos
       :ensure t
       :config
-      (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
-      :hook
-      (magit-mode . magit-todos-mode)))
+      (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))))
 #+END_SRC
 
 ** [[https://github.com/tarsius/hl-todo][Highlight todo]]
@@ -4081,11 +4079,12 @@ Minor mode acting as a client between a language server protocol and emacs.
       :major-modes '(caml-mode tuareg-mode)
       :server-id 'ocaml-lsp-server))
     :general
-    ("M-l" 'lsp-command-map)
-    ("C-c C-t" 'lsp-describe-thing-at-point)
-    ("C-c C-w" 'mdrp/lsp-get-type-and-kill)
-    ("C-c C-l" 'lsp-find-definition)
-    ("C-c &"   'pop-global-mark :keymaps 'override)
+    (:keymaps 'lsp-mode-map
+              "M-l" 'lsp-command-map
+              "C-c C-t" 'lsp-describe-thing-at-point
+              "C-c C-w" 'mdrp/lsp-get-type-and-kill
+              "C-c C-l" 'lsp-find-definition
+              "C-c &"   'pop-global-mark :keymaps 'override)
     (:keymaps 'lsp-command-map
               "d"   'lsp-find-definition
               "r"   'lsp-find-references
@@ -4356,7 +4355,7 @@ Library for parsing and generating JSON
 :CUSTOM_ID: elisp
 :END:
 
-*** Main Mode
+*** Main mode
 
 #+BEGIN_SRC emacs-lisp
   (use-package elisp-mode
@@ -4373,6 +4372,14 @@ Library for parsing and generating JSON
       (:keymaps 'paredit-mode-map
        "C-<right>" nil
        "C-<left>" nil))
+#+END_SRC
+
+*** Package lint
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-package
+    :ensure t
+    :hook (flycheck-mode . (lambda () (flycheck-package-setup))))
 #+END_SRC
 
 ** [[https://github.com/fsharp/emacs-fsharp-mode][Fsharp]]
