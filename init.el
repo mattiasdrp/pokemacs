@@ -2689,7 +2689,7 @@ debian, and derivatives). On most it's 'fd'.")
 (when use-clojure
   (use-package clojure-mode
   :ensure t
-  ))
+  :hook (before-save . lsp-format-buffer)))
 
 (when use-clojure
   (use-package cider

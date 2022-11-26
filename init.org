@@ -113,7 +113,7 @@ Literate configuration for init.el.
   - [[#code-review][Code review]]
   - [[#ghub][Ghub]]
 - [[#windowsframe-management][Windows/Frame management]]
-  - [[#uniquify][Uniquify]]
+  - [[#disabled-uniquify][DISABLED Uniquify]]
   - [[#frame][Frame]]
   - [[#winner][Winner]]
   - [[#ace-window][Ace window]]
@@ -188,9 +188,13 @@ Literate configuration for init.el.
     - [[#json][Json]]
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
+  - [[#clojure][Clojure]]
+    - [[#main-mode][Main mode]]
+    - [[#cider][CIDER]]
   - [[#elisp][Elisp]]
-    - [[#main-mode][Main Mode]]
+    - [[#main-mode][Main mode]]
     - [[#paredit][Paredit]]
+    - [[#package-lint][Package lint]]
   - [[#fsharp][Fsharp]]
   - [[#kotlin][Kotlin]]
   - [[#latex][LaTeX]]
@@ -2144,9 +2148,9 @@ Some configuration is needed for this to work. See [[file:README.org::#git-hosts
 :CUSTOM_ID: windowsframe-management
 :END:
 
-*** DISABLED Uniquify
+** DISABLED Uniquify
 :PROPERTIES:
-:CUSTOM_ID: uniquify
+:CUSTOM_ID: disabled-uniquify
 :END:
 
 #+BEGIN_SRC emacs-lisp
@@ -4332,17 +4336,26 @@ Library for parsing and generating JSON
 #+END_SRC
 
 ** Clojure
+:PROPERTIES:
+:CUSTOM_ID: clojure
+:END:
 
 *** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode
+:END:
 
 #+BEGIN_SRC emacs-lisp
   (when use-clojure
     (use-package clojure-mode
     :ensure t
-    ))
+    :hook (before-save . lsp-format-buffer)))
 #+END_SRC
 
 *** CIDER
+:PROPERTIES:
+:CUSTOM_ID: cider
+:END:
 
 #+BEGIN_SRC emacs-lisp
   (when use-clojure
@@ -4356,6 +4369,9 @@ Library for parsing and generating JSON
 :END:
 
 *** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode
+:END:
 
 #+BEGIN_SRC emacs-lisp
   (use-package elisp-mode
@@ -4364,6 +4380,9 @@ Library for parsing and generating JSON
 #+END_SRC
 
 *** Paredit
+:PROPERTIES:
+:CUSTOM_ID: paredit
+:END:
 
 #+BEGIN_SRC emacs-lisp
     (use-package paredit
@@ -4375,6 +4394,9 @@ Library for parsing and generating JSON
 #+END_SRC
 
 *** Package lint
+:PROPERTIES:
+:CUSTOM_ID: package-lint
+:END:
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-package
