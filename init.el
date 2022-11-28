@@ -2530,7 +2530,6 @@ debian, and derivatives). On most it's 'fd'.")
     :server-id 'ocaml-lsp-server))
   :general
   (:keymaps 'lsp-mode-map
-            "M-l" 'lsp-command-map
             "C-c C-t" 'lsp-describe-thing-at-point
             "C-c C-w" 'mdrp/lsp-get-type-and-kill
             "C-c C-l" 'lsp-find-definition
@@ -2699,12 +2698,13 @@ debian, and derivatives). On most it's 'fd'.")
   :hook (elisp-mode . semantic-mode)
   )
 
-(use-package paredit
+(use-package puni
   :ensure t
-  :general
-  (:keymaps 'paredit-mode-map
-   "C-<right>" nil
-   "C-<left>" nil))
+  ;; :general
+  ;; (:keymaps 'paredit-mode-map
+  ;;  "C-<right>" nil
+  ;;  "C-<left>" nil)
+  )
 
 (use-package flycheck-package
   :ensure t

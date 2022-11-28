@@ -193,7 +193,7 @@ Literate configuration for init.el.
     - [[#cider][CIDER]]
   - [[#elisp][Elisp]]
     - [[#main-mode][Main mode]]
-    - [[#paredit][Paredit]]
+    - [[#puni][Puni]]
     - [[#package-lint][Package lint]]
   - [[#fsharp][Fsharp]]
   - [[#kotlin][Kotlin]]
@@ -4084,7 +4084,6 @@ Minor mode acting as a client between a language server protocol and emacs.
       :server-id 'ocaml-lsp-server))
     :general
     (:keymaps 'lsp-mode-map
-              "M-l" 'lsp-command-map
               "C-c C-t" 'lsp-describe-thing-at-point
               "C-c C-w" 'mdrp/lsp-get-type-and-kill
               "C-c C-l" 'lsp-find-definition
@@ -4379,18 +4378,19 @@ Library for parsing and generating JSON
     )
 #+END_SRC
 
-*** Paredit
+*** Puni
 :PROPERTIES:
-:CUSTOM_ID: paredit
+:CUSTOM_ID: puni
 :END:
 
 #+BEGIN_SRC emacs-lisp
-    (use-package paredit
-      :ensure t
-      :general
-      (:keymaps 'paredit-mode-map
-       "C-<right>" nil
-       "C-<left>" nil))
+  (use-package puni
+    :ensure t
+    ;; :general
+    ;; (:keymaps 'paredit-mode-map
+    ;;  "C-<right>" nil
+    ;;  "C-<left>" nil)
+    )
 #+END_SRC
 
 *** Package lint
