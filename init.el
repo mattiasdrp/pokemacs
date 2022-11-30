@@ -986,13 +986,14 @@ debian, and derivatives). On most it's 'fd'.")
     ("b" dumb-jump-back "Back"))
   )
 
-(setq find-sibling-rules
-      '(
-       ("\\([^/]+\\)\\.org\\'" "\\1.el")
-       ("\\([^/]+\\)\\.el\\'" "\\1.org")))
+(unless (version< emacs-version "29")
+  (setq find-sibling-rules
+        '(
+          ("\\([^/]+\\)\\.org\\'" "\\1.el")
+          ("\\([^/]+\\)\\.el\\'" "\\1.org")))
 
-(general-define-key
- "C-c C-a"                       'find-sibling-file)
+  (general-define-key
+   "C-c C-a"                       'find-sibling-file))
 
 (use-package fontify-face
   :ensure t
@@ -2839,22 +2840,35 @@ debian, and derivatives). On most it's 'fd'.")
   "The history list for dune watch builds.")
 
 ;; TODO: This function should be its own package
-(defun mdrp/dune-watch (build)
+(defun mdrp/dune-watch ()
   "Will call dune build -w BUILD on an async process."
-  (interactive
-   (list (read-from-minibuffer "Build name: " nil nil nil 'mdrp/dune-history)))
-  (let ((buffer (get-buffer-create "*compilation*")))
-    (projectile-run-async-shell-command-in-root (concat "dune build -w " build) buffer)
-    ;; Make this process non blocking for killing
-    ;; (defun mdrp/erase-and-fill-buffer-no-lambda ()
-    ;;   "Wrapper to avoid using lambda"
-    ;;   (mdrp/erase-and-fill-buffer buffer))
-    ;; (add-hook 'after-save-hook #'mdrp/erase-and-fill-buffer-no-lambda)
-    (with-current-buffer buffer (compilation-minor-mode t))
-    (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
-    (display-buffer buffer '((display-buffer-below-selected display-buffer-at-bottom)
-                             (inhibit-same-window . t)
-                             (window-height . 0.2)))))
+  (interactive)
+  (cond
+   ((and-let* ((window (get-buffer-window "*dune watch*")))
+      (aw-switch-to-window window)))
+   ((and-let* ((buffer (get-buffer "*dune watch*")))
+      (with-current-buffer buffer
+        (with-selected-window
+            (display-buffer-at-bottom (current-buffer)
+                                      '((window-height . 0.2)))
+          (set-window-dedicated-p (selected-window) t)
+          (compilation-minor-mode t)))))
+   ((let ((build (read-from-minibuffer "Build name: " nil nil nil 'mdrp/dune-history))
+          (buffer (get-buffer-create "*dune watch*"))
+          (inhibit-read-only t))
+      (with-current-buffer buffer
+        (projectile-run-async-shell-command-in-root (concat "dune build -w " build) buffer)
+        ;; Make this process non blocking for killing
+        ;; (defun mdrp/erase-and-fill-buffer-no-lambda ()
+        ;;   "Wrapper to avoid using lambda"
+        ;;   (mdrp/erase-and-fill-buffer buffer))
+        ;; (add-hook 'after-save-hook #'mdrp/erase-and-fill-buffer-no-lambda)
+        (with-selected-window
+            (display-buffer-at-bottom (current-buffer)
+                                      '((window-height . 0.2)))
+          (set-window-dedicated-p (selected-window) t)
+          (compilation-minor-mode t))
+        (set-process-query-on-exit-flag (get-buffer-process buffer) nil))))))
 
 (when use-ocaml
   (use-package tuareg
@@ -2872,7 +2886,6 @@ debian, and derivatives). On most it's 'fd'.")
               "C-c C-t" nil
               "C-c C-w" nil
               "C-c C-l" nil
-              "C-c C-a" nil
               "C-c w"   'mdrp/dune-watch
               )
     :config
@@ -2885,28 +2898,6 @@ debian, and derivatives). On most it's 'fd'.")
     (defun cons-reverse (c)
       (cons (cdr c) (car c)))
 
-    (let* ((l '(
-                (".mli" . ".ml")
-                (".mli" . ".mll")
-                (".mli" . ".mly")
-                (".mli" . ".pp.ml")
-                (".mli" . "_intf.ml")
-                ("_intf.ml" . ".ml")
-                (".pp.mli" . ".ml")
-                (".pp.mli" . ".mll")
-                (".pp.mli" . ".mly")
-                (".pp.mli" . ".pp.ml")
-                (".mll" . ".ml")
-                (".mll" . ".ml")
-                (".mly" . ".ml")
-                (".eliomi" . ".eliom")
-                ))
-           (rl (-map #'cons-reverse l))
-           (l (mdrp/map l))
-           (rl (mdrp/map rl)))
-      (message "l %S" l)
-      (message "rl %S" rl)
-      (setq find-sibling-rules (append find-sibling-rules l rl)))
     ;; Use opam to set environment
     (setq tuareg-opam-insinuate t)
     (setq tuareg-electric-indent t)
@@ -2935,7 +2926,30 @@ debian, and derivatives). On most it's 'fd'.")
         (add-hook 'post-command-hook 'mdrp/update-opam-env)
         (add-hook 'post-command-hook 'mdrp/update-load-path-opam)
         ))
-
+    (unless (version< emacs-version "29")
+      (message" unbind c-c c-a")
+      (general-unbind tuareg-mode-map
+        "C-c C-a")
+      (let* ((l '(
+                  (".mli" . ".ml")
+                  (".mli" . ".mll")
+                  (".mli" . ".mly")
+                  (".mli" . ".pp.ml")
+                  (".mli" . "_intf.ml")
+                  ("_intf.ml" . ".ml")
+                  (".pp.mli" . ".ml")
+                  (".pp.mli" . ".mll")
+                  (".pp.mli" . ".mly")
+                  (".pp.mli" . ".pp.ml")
+                  (".mll" . ".ml")
+                  (".mll" . ".ml")
+                  (".mly" . ".ml")
+                  (".eliomi" . ".eliom")
+                  ))
+             (rl (-map #'cons-reverse l))
+             (l (mdrp/map l))
+             (rl (mdrp/map rl)))
+        (setq find-sibling-rules (append find-sibling-rules l rl))))
     :hook
     (tuareg-mode .
                  (lambda ()
