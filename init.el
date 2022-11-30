@@ -986,6 +986,19 @@ debian, and derivatives). On most it's 'fd'.")
     ("b" dumb-jump-back "Back"))
   )
 
+(setq find-sibling-rules
+      '(
+       ("\\([^/]+\\)\\.org\\'" "\\1.el")
+       ("\\([^/]+\\)\\.el\\'" "\\1.org")))
+
+(general-define-key
+ "C-c C-a"                       'find-sibling-file)
+
+(use-package fontify-face
+  :ensure t
+  :hook (font-lock-mode . fontify-face-mode)
+  )
+
 (use-package flycheck
   :preface
   (define-prefix-command 'mdrp-fly-map nil "Fly-")
@@ -1058,11 +1071,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package treemacs
   :ensure t)
-
-(use-package fontify-face
-  :ensure t
-  :hook (font-lock-mode . fontify-face-mode)
-  )
 
 (use-package magit
   :ensure t
@@ -2160,18 +2168,18 @@ debian, and derivatives). On most it's 'fd'.")
      ("Difficile" . (:foreground "OrangeRed" :weight bold))
      )
    )
-  :bind-keymap ("M-o" . mdrp-org-map)
-  :bind (
-         ("C-x C-p" . mdrp/org-compile-latex-and-update-other-buffer)
-         (:map mdrp-org-map
-               ("l"                       . org-store-link)
-               ("a"                       . org-agenda)
-               ("c"                       . org-capture)
-               )
-         (:map org-mode-map
-               ("M-j"                     . org-goto)
-               )
-         )
+  :general
+  ("M-o" 'mdrp-org-map)
+  ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
+  (:keymaps 'mdrp-org-map
+            "l"                       'org-store-link
+            "a"                       'org-agenda
+            "c"                       'org-capture
+            )
+  (:keymaps 'org-mode-map
+            "M-j"                     'org-goto
+            "C-c C-a"                 nil
+            )
 
   :config
   ;; TODO states
@@ -2859,23 +2867,46 @@ debian, and derivatives). On most it's 'fd'.")
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
     ;; I'm not really sure that it's useful.
     ;; :load-path (lambda () (mdrp/load-path-opam))
-    :custom
-    (tuareg-other-file-alist
-     '(("\\.\\(?:pp\\.\\)?mli\\'" (".ml" ".mll" ".mly" ".pp.ml"))
-       ("_intf\\.ml\\'" (".ml"))
-       ("\\.\\(?:pp\\.\\)?ml\\'" (".mli" "_intf.ml"))
-       ("\\.mll\\'" (".mli"))
-       ("\\.mly\\'" (".mli"))
-       ("\\.eliomi\\'" (".eliom"))
-       ("\\.eliom\\'" (".eliomi"))))
     :general
     (:keymaps 'tuareg-mode-map
               "C-c C-t" nil
               "C-c C-w" nil
               "C-c C-l" nil
+              "C-c C-a" nil
               "C-c w"   'mdrp/dune-watch
               )
     :config
+    (defun mdrp/map (l)
+      (-map (lambda (x) (list
+                    (concat "\\([^/]+\\)" (regexp-quote (car x)))
+                    (concat "\\1" (regexp-quote (cdr x))))
+              ) l))
+
+    (defun cons-reverse (c)
+      (cons (cdr c) (car c)))
+
+    (let* ((l '(
+                (".mli" . ".ml")
+                (".mli" . ".mll")
+                (".mli" . ".mly")
+                (".mli" . ".pp.ml")
+                (".mli" . "_intf.ml")
+                ("_intf.ml" . ".ml")
+                (".pp.mli" . ".ml")
+                (".pp.mli" . ".mll")
+                (".pp.mli" . ".mly")
+                (".pp.mli" . ".pp.ml")
+                (".mll" . ".ml")
+                (".mll" . ".ml")
+                (".mly" . ".ml")
+                (".eliomi" . ".eliom")
+                ))
+           (rl (-map #'cons-reverse l))
+           (l (mdrp/map l))
+           (rl (mdrp/map rl)))
+      (message "l %S" l)
+      (message "rl %S" rl)
+      (setq find-sibling-rules (append find-sibling-rules l rl)))
     ;; Use opam to set environment
     (setq tuareg-opam-insinuate t)
     (setq tuareg-electric-indent t)
