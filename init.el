@@ -2846,10 +2846,10 @@ debian, and derivatives). On most it's 'fd'.")
   (let ((buffer (get-buffer-create "*compilation*")))
     (projectile-run-async-shell-command-in-root (concat "dune build -w " build) buffer)
     ;; Make this process non blocking for killing
-    (defun mdrp/erase-and-fill-buffer-no-lambda ()
-      "Wrapper to avoid using lambda"
-      (mdrp/erase-and-fill-buffer buffer))
-    (add-hook 'after-save-hook #'mdrp/erase-and-fill-buffer-no-lambda)
+    ;; (defun mdrp/erase-and-fill-buffer-no-lambda ()
+    ;;   "Wrapper to avoid using lambda"
+    ;;   (mdrp/erase-and-fill-buffer buffer))
+    ;; (add-hook 'after-save-hook #'mdrp/erase-and-fill-buffer-no-lambda)
     (with-current-buffer buffer (compilation-minor-mode t))
     (set-process-query-on-exit-flag (get-buffer-process buffer) nil)
     (display-buffer buffer '((display-buffer-below-selected display-buffer-at-bottom)
