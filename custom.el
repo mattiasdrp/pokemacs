@@ -57,7 +57,7 @@
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
- '(use-clojure nil)
+ '(use-clojure t)
  '(use-company t)
  '(use-dashboard t)
  '(use-eaf t)
