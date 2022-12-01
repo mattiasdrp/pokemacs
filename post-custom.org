@@ -17,7 +17,6 @@ Literate configuration for [[file:post-custom.el][post-custom.el]].
 :CONTENTS:
 - [[#header][Header]]
 - [[#mail-gpg-et-al][Mail, gpg et al]]
-  - [[#pinentry][Pinentry]]
   - [[#mu4e][Mu4e]]
 - [[#keybindings][Keybindings]]
   - [[#unbinding][Unbinding]]
