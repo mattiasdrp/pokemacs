@@ -1831,6 +1831,9 @@ debian, and derivatives). On most it's 'fd'.")
   ;; Whether display the minions minor mode
   (doom-modeline-minor-modes t)
 
+  ;; Whether display the mu4e notifications
+  (doom-modeline-mu4e t)
+
   ;; Whether display the GitHub notifications. It requires `ghub' package.
   (doom-modeline-github t)
 
@@ -1863,11 +1866,11 @@ debian, and derivatives). On most it's 'fd'.")
   ;; Define your custom doom-modeline
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
                               '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-                              '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                              '(misc-info persp-name battery grip github mu4e debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
   (doom-modeline-def-modeline 'mdrp/lsp-line
                               '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-                              '(misc-info persp-name battery grip github debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                              '(misc-info persp-name battery grip github mu4e debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
 
   ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
   (setq doom-modeline-fn-alist
@@ -2111,8 +2114,6 @@ debian, and derivatives). On most it's 'fd'.")
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
   ;; Rest
-  (org-display-custom-times t)
-  (org-time-stamp-custom-formats '("<%d %b %Y>" . "<%d/%d/%y %a %H:%M>"))
   (org-agenda-files
    '("/home/mattias/org/agenda.org" "/home/mattias/org/cduce.org" "/home/mattias/org/orgzly.org") nil nil "Customized with use-package org")
   (org-ellipsis " ▾")
