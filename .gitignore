@@ -10,7 +10,7 @@
 .\#*
 
 # elpa packages
-/elpa/
+# /elpa/
 
 # Undo-tree save-files
 *.~undo-tree

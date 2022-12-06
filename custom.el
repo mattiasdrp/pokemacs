@@ -32,7 +32,7 @@
  '(flycheck-languagetool-server-jar
    (concat
     (getenv "HOME")
-    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
+    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar") t)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
