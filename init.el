@@ -992,8 +992,73 @@ debian, and derivatives). On most it's 'fd'.")
           ("\\([^/]+\\)\\.org\\'" "\\1.el")
           ("\\([^/]+\\)\\.el\\'" "\\1.org")))
 
+  (defcustom create-sibling-rules nil
+    "Rules for creating \"sibling\" files.
+This is used by the `mdrp/find-sibling-file-wrapper' command.
+
+See `find-sibling-rules' for more informations.
+
+Unlike `find-sibling-rules', `create-sibling-rules' should only
+have one rule for each file type."
+    :type 'sexp
+    :version "29.1")
+
+  (setq create-sibling-rules
+        '(
+          ("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
+
+  (defun mdrp/find-sibling-file-wrapper (file)
+    "Visit a \"sibling\" file of FILE.
+   When called interactively, FILE is the currently visited file.
+
+   The \"sibling\" file is defined by the `find-sibling-rules' variable."
+    (interactive
+     (progn
+       (unless buffer-file-name
+         (user-error "Not visiting a file"))
+       (list buffer-file-name)))
+    (condition-case
+        nil
+        (find-sibling-file file)
+      (user-error
+       (-let* (((expansion . command)
+                (alist-get file create-sibling-rules nil nil 'string-match))
+               (match-data (match-data))
+               (start 0))
+         (cond
+          ((null expansion)
+           (user-error "Couldn't find any sibling files nor a way to create a sibling"))
+
+          (t
+           ;; Expand \\1 forms in the expansions.
+           (while (string-match "\\\\\\([&0-9]+\\)" expansion start)
+             (let ((index (string-to-number (match-string 1 expansion))))
+               (setq start (match-end 0)
+                     expansion
+                     (replace-match
+                      (substring file
+                                 (elt match-data (* index 2))
+                                 (elt match-data (1+ (* index 2))))
+                      t t expansion))
+               (let* ((file (file-relative-name file (projectile-project-root)))
+                      (output-buffer (get-buffer-create "*temp*" t))
+                      (new-file (expand-file-name expansion))
+                      (display-buffer-alist
+                       (list
+                        (cons "\\*temp\\*.*"
+                              (cons #'display-buffer-no-window nil)))))
+                 (with-current-buffer output-buffer
+                   ;; (projectile-run-shell-command-in-root
+                   ;;  (concat "dune exec -- ocaml-print-intf " file))
+                   (projectile-run-shell-command-in-root
+                    (concat command " " file) output-buffer)
+                   (dired-create-empty-file new-file)
+                   (write-file new-file))
+                 (kill-buffer output-buffer)
+                 (find-file new-file))))))))))
+
   (general-define-key
-   "C-c C-a"                       'find-sibling-file))
+   "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
 
 (use-package fontify-face
   :ensure t
@@ -2710,6 +2775,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package puni
   :ensure t
+  :hook ((clojure-mode elisp-mode) . puni-mode)
   ;; :general
   ;; (:keymaps 'paredit-mode-map
   ;;  "C-<right>" nil
@@ -2876,7 +2942,8 @@ debian, and derivatives). On most it's 'fd'.")
     :ensure t
     :ensure-system-package
     ((ocamllsp . "opam install ocaml-lsp-server")
-     (ocamlformat . "opam install ocamlformat"))
+     (ocamlformat . "opam install ocamlformat")
+     (ocaml-print-intf . "opam install ocaml-print-intf"))
     :mode ("\\.ml\\'" . tuareg-mode)
     ;; The following line can be used instead of :ensure t to load
     ;; the tuareg.el file installed with tuareg when running opam install tuareg

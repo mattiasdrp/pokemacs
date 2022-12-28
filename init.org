@@ -1820,9 +1820,73 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
             ("\\([^/]+\\)\\.org\\'" "\\1.el")
             ("\\([^/]+\\)\\.el\\'" "\\1.org")))
 
-    (general-define-key
-     "C-c C-a"                       'find-sibling-file))
+    (defcustom create-sibling-rules nil
+      "Rules for creating \"sibling\" files.
+  This is used by the `mdrp/find-sibling-file-wrapper' command.
 
+  See `find-sibling-rules' for more informations.
+
+  Unlike `find-sibling-rules', `create-sibling-rules' should only
+  have one rule for each file type."
+      :type 'sexp
+      :version "29.1")
+
+    (setq create-sibling-rules
+          '(
+            ("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
+
+    (defun mdrp/find-sibling-file-wrapper (file)
+      "Visit a \"sibling\" file of FILE.
+     When called interactively, FILE is the currently visited file.
+
+     The \"sibling\" file is defined by the `find-sibling-rules' variable."
+      (interactive
+       (progn
+         (unless buffer-file-name
+           (user-error "Not visiting a file"))
+         (list buffer-file-name)))
+      (condition-case
+          nil
+          (find-sibling-file file)
+        (user-error
+         (-let* (((expansion . command)
+                  (alist-get file create-sibling-rules nil nil 'string-match))
+                 (match-data (match-data))
+                 (start 0))
+           (cond
+            ((null expansion)
+             (user-error "Couldn't find any sibling files nor a way to create a sibling"))
+
+            (t
+             ;; Expand \\1 forms in the expansions.
+             (while (string-match "\\\\\\([&0-9]+\\)" expansion start)
+               (let ((index (string-to-number (match-string 1 expansion))))
+                 (setq start (match-end 0)
+                       expansion
+                       (replace-match
+                        (substring file
+                                   (elt match-data (* index 2))
+                                   (elt match-data (1+ (* index 2))))
+                        t t expansion))
+                 (let* ((file (file-relative-name file (projectile-project-root)))
+                        (output-buffer (get-buffer-create "*temp*" t))
+                        (new-file (expand-file-name expansion))
+                        (display-buffer-alist
+                         (list
+                          (cons "\\*temp\\*.*"
+                                (cons #'display-buffer-no-window nil)))))
+                   (with-current-buffer output-buffer
+                     ;; (projectile-run-shell-command-in-root
+                     ;;  (concat "dune exec -- ocaml-print-intf " file))
+                     (projectile-run-shell-command-in-root
+                      (concat command " " file) output-buffer)
+                     (dired-create-empty-file new-file)
+                     (write-file new-file))
+                   (kill-buffer output-buffer)
+                   (find-file new-file))))))))))
+
+    (general-define-key
+     "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
 #+END_SRC
 
 ** [[https://github.com/Fuco1/fontify-face][Fontify face]]
@@ -4399,6 +4463,7 @@ Library for parsing and generating JSON
 #+BEGIN_SRC emacs-lisp
   (use-package puni
     :ensure t
+    :hook ((clojure-mode elisp-mode) . puni-mode)
     ;; :general
     ;; (:keymaps 'paredit-mode-map
     ;;  "C-<right>" nil
@@ -4642,131 +4707,132 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 :END:
 
 #+BEGIN_SRC emacs-lisp
-  (when use-ocaml
-    (use-package tuareg
-      :ensure t
-      :ensure-system-package
-      ((ocamllsp . "opam install ocaml-lsp-server")
-       (ocamlformat . "opam install ocamlformat"))
-      :mode ("\\.ml\\'" . tuareg-mode)
-      ;; The following line can be used instead of :ensure t to load
-      ;; the tuareg.el file installed with tuareg when running opam install tuareg
-      ;; I'm not really sure that it's useful.
-      ;; :load-path (lambda () (mdrp/load-path-opam))
-      :general
-      (:keymaps 'tuareg-mode-map
-                "C-c C-t" nil
-                "C-c C-w" nil
-                "C-c C-l" nil
-                "C-c w"   'mdrp/dune-watch
-                )
-      :config
-      (defun mdrp/map (l)
-        (-map (lambda (x) (list
-                      (concat "\\([^/]+\\)" (regexp-quote (car x)))
-                      (concat "\\1" (regexp-quote (cdr x))))
-                ) l))
+    (when use-ocaml
+      (use-package tuareg
+        :ensure t
+        :ensure-system-package
+        ((ocamllsp . "opam install ocaml-lsp-server")
+         (ocamlformat . "opam install ocamlformat")
+         (ocaml-print-intf . "opam install ocaml-print-intf"))
+        :mode ("\\.ml\\'" . tuareg-mode)
+        ;; The following line can be used instead of :ensure t to load
+        ;; the tuareg.el file installed with tuareg when running opam install tuareg
+        ;; I'm not really sure that it's useful.
+        ;; :load-path (lambda () (mdrp/load-path-opam))
+        :general
+        (:keymaps 'tuareg-mode-map
+                  "C-c C-t" nil
+                  "C-c C-w" nil
+                  "C-c C-l" nil
+                  "C-c w"   'mdrp/dune-watch
+                  )
+        :config
+        (defun mdrp/map (l)
+          (-map (lambda (x) (list
+                        (concat "\\([^/]+\\)" (regexp-quote (car x)))
+                        (concat "\\1" (regexp-quote (cdr x))))
+                  ) l))
 
-      (defun cons-reverse (c)
-        (cons (cdr c) (car c)))
+        (defun cons-reverse (c)
+          (cons (cdr c) (car c)))
 
-      ;; Use opam to set environment
-      (setq tuareg-opam-insinuate t)
-      (setq tuareg-electric-indent t)
+        ;; Use opam to set environment
+        (setq tuareg-opam-insinuate t)
+        (setq tuareg-electric-indent t)
 
-      (tuareg-opam-update-env (tuareg-opam-current-compiler))
-      (defun mdrp/update-opam-env (&rest _)
-        (when (derived-mode-p 'tuareg-mode)
-          (tuareg-opam-update-env nil)
-          ))
+        (tuareg-opam-update-env (tuareg-opam-current-compiler))
+        (defun mdrp/update-opam-env (&rest _)
+          (when (derived-mode-p 'tuareg-mode)
+            (tuareg-opam-update-env nil)
+            ))
 
-      (defun mdrp/update-load-path-opam (&rest _)
-        (when (derived-mode-p 'tuareg-mode)
-          (let ((opam-share
-                 (let ((reply (mdrp/opam-shell-command-to-string "opam var share --safe")))
-                   (when reply (substring reply 0 -1)))))
-            (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
-            )
-          ))
+        (defun mdrp/update-load-path-opam (&rest _)
+          (when (derived-mode-p 'tuareg-mode)
+            (let ((opam-share
+                   (let ((reply (mdrp/opam-shell-command-to-string "opam var share --safe")))
+                     (when reply (substring reply 0 -1)))))
+              (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+              )
+            ))
 
-      (if (boundp 'window-buffer-change-functions)
+        (if (boundp 'window-buffer-change-functions)
+            (progn
+              (add-hook 'window-buffer-change-functions 'mdrp/update-opam-env)
+              (add-hook 'window-buffer-change-functions 'mdrp/update-load-path-opam)
+              )
           (progn
-            (add-hook 'window-buffer-change-functions 'mdrp/update-opam-env)
-            (add-hook 'window-buffer-change-functions 'mdrp/update-load-path-opam)
-            )
-        (progn
-          (add-hook 'post-command-hook 'mdrp/update-opam-env)
-          (add-hook 'post-command-hook 'mdrp/update-load-path-opam)
-          ))
-      (unless (version< emacs-version "29")
-        (message" unbind c-c c-a")
-        (general-unbind tuareg-mode-map
-          "C-c C-a")
-        (let* ((l '(
-                    (".mli" . ".ml")
-                    (".mli" . ".mll")
-                    (".mli" . ".mly")
-                    (".mli" . ".pp.ml")
-                    (".mli" . "_intf.ml")
-                    ("_intf.ml" . ".ml")
-                    (".pp.mli" . ".ml")
-                    (".pp.mli" . ".mll")
-                    (".pp.mli" . ".mly")
-                    (".pp.mli" . ".pp.ml")
-                    (".mll" . ".ml")
-                    (".mll" . ".ml")
-                    (".mly" . ".ml")
-                    (".eliomi" . ".eliom")
-                    ))
-               (rl (-map #'cons-reverse l))
-               (l (mdrp/map l))
-               (rl (mdrp/map rl)))
-          (setq find-sibling-rules (append find-sibling-rules l rl))))
-      :hook
-      (tuareg-mode .
-                   (lambda ()
-                     ;; Commented symbols are actually prettier with ligatures or just ugly
-                     (setq prettify-symbols-alist
-                           '(
-                             ("sqrt" . ?√)
-                             ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
-                             ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-                             ("<>" . ?≠)
-                             ;; Some greek letters for type parameters.
-                             ("'a" . ?α)
-                             ("'b" . ?β)
-                             ("'c" . ?γ)
-                             ("'d" . ?δ)
-                             ("'e" . ?ε)
-                             ("'f" . ?φ)
-                             ("'i" . ?ι)
-                             ("'k" . ?κ)
-                             ("'m" . ?μ)
-                             ("'n" . ?ν)
-                             ("'o" . ?ω)
-                             ("'p" . ?π)
-                             ("'r" . ?ρ)
-                             ("'s" . ?σ)
-                             ("'t" . ?τ)
-                             ("'x" . ?ξ)
-                             ("fun" . ?λ)
-                             ("not" . ?￢)
-                             (":=" . ?⟸)
-                             ))))))
+            (add-hook 'post-command-hook 'mdrp/update-opam-env)
+            (add-hook 'post-command-hook 'mdrp/update-load-path-opam)
+            ))
+        (unless (version< emacs-version "29")
+          (message" unbind c-c c-a")
+          (general-unbind tuareg-mode-map
+            "C-c C-a")
+          (let* ((l '(
+                      (".mli" . ".ml")
+                      (".mli" . ".mll")
+                      (".mli" . ".mly")
+                      (".mli" . ".pp.ml")
+                      (".mli" . "_intf.ml")
+                      ("_intf.ml" . ".ml")
+                      (".pp.mli" . ".ml")
+                      (".pp.mli" . ".mll")
+                      (".pp.mli" . ".mly")
+                      (".pp.mli" . ".pp.ml")
+                      (".mll" . ".ml")
+                      (".mll" . ".ml")
+                      (".mly" . ".ml")
+                      (".eliomi" . ".eliom")
+                      ))
+                 (rl (-map #'cons-reverse l))
+                 (l (mdrp/map l))
+                 (rl (mdrp/map rl)))
+            (setq find-sibling-rules (append find-sibling-rules l rl))))
+        :hook
+        (tuareg-mode .
+                     (lambda ()
+                       ;; Commented symbols are actually prettier with ligatures or just ugly
+                       (setq prettify-symbols-alist
+                             '(
+                               ("sqrt" . ?√)
+                               ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+                               ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
+                               ("<>" . ?≠)
+                               ;; Some greek letters for type parameters.
+                               ("'a" . ?α)
+                               ("'b" . ?β)
+                               ("'c" . ?γ)
+                               ("'d" . ?δ)
+                               ("'e" . ?ε)
+                               ("'f" . ?φ)
+                               ("'i" . ?ι)
+                               ("'k" . ?κ)
+                               ("'m" . ?μ)
+                               ("'n" . ?ν)
+                               ("'o" . ?ω)
+                               ("'p" . ?π)
+                               ("'r" . ?ρ)
+                               ("'s" . ?σ)
+                               ("'t" . ?τ)
+                               ("'x" . ?ξ)
+                               ("fun" . ?λ)
+                               ("not" . ?￢)
+                               (":=" . ?⟸)
+                               ))))))
 
-  (when use-ocaml
-    (use-package ocp-indent
-      ;; must be careful to always defer this, it has autoloads that adds hooks
-      ;; which we do not want if the executable can't be found
-      :ensure t
-      :hook
-      (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
-      :config
-      (defun mdrp/ocaml-init-ocp-indent-h ()
-        "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
-        (when (executable-find "ocp-indent")
-          (ocp-setup-indent)))
-      ))
+    (when use-ocaml
+      (use-package ocp-indent
+        ;; must be careful to always defer this, it has autoloads that adds hooks
+        ;; which we do not want if the executable can't be found
+        :ensure t
+        :hook
+        (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
+        :config
+        (defun mdrp/ocaml-init-ocp-indent-h ()
+          "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
+          (when (executable-find "ocp-indent")
+            (ocp-setup-indent)))
+        ))
 #+END_SRC
 
 *** Tuareg Menhir
