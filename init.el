@@ -2246,6 +2246,8 @@ have one rule for each file type."
   (:keymaps 'org-mode-map
             "M-j"                     'org-goto
             "C-c C-a"                 nil
+            "C-<return>"              'org-meta-return
+            "M-C-<return>"            'org-insert-heading-respect-content
             )
 
   :config
@@ -3289,6 +3291,9 @@ have one rule for each file type."
   (use-package css-mode
     :ensure nil
     :mode "\\.css\\'"))
+
+(use-package simple-httpd
+  :ensure t)
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)

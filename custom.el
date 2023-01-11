@@ -32,7 +32,7 @@
  '(flycheck-languagetool-server-jar
    (concat
     (getenv "HOME")
-    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar") t)
+    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -53,7 +53,7 @@
  '(lsp-auto-guess-root t)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages
-   '(mu4e-alert puni all-the-icons all-the-icons-dired anzu apheleia auctex auctex-latexmk auto-package-update calfw calfw-org cargo cider clojure-mode code-review company-box company-prescient company-quickhelp company-web consult-flycheck consult-yasnippet crux dap-mode dashboard diff-hl discover-my-major doom-themes dumb-jump dune easy-kill embark-consult emojify flycheck flycheck-inline flycheck-languagetool flycheck-package flycheck-rust flyspell-correct fontify-face fringe-helper fsharp-mode general git-messenger git-modes git-timemachine hide-mode-line highlight-symbol hydra iedit keycast kotlin-mode kurecolor ligature lispy lsp-pyright lsp-ui magit magit-todos markdown-toc minions mixed-pitch multiple-cursors nlinum no-littering ob-rust ocp-indent orderless org-appear org-auto-tangle org-bullets org-inline-pdf org-make-toc org-roam org-super-agenda outshine page-break-lines pandoc-mode paredit pdf-tools prescient projectile pulsar pyvenv quick-peek rainbow-delimiters rainbow-mode reason-mode rustic saveplace-pdf-view selected separedit solaire-mode svg-tag-mode tree-sitter tree-sitter-langs tuareg use-package-ensure-system-package vertico web-mode which-key yasnippet))
+   '(simple-httpd cdlatex telega kotlin-mode dashboard doom-modeline mu4e-alert puni all-the-icons all-the-icons-dired anzu auctex auctex-latexmk auto-package-update calfw calfw-org cargo clojure-mode company-box company-prescient company-quickhelp company-web consult-flycheck consult-yasnippet crux diff-hl discover-my-major doom-themes dumb-jump dune easy-kill embark-consult emojify flycheck flycheck-inline flycheck-languagetool flycheck-package flycheck-rust flyspell-correct fontify-face fringe-helper fsharp-mode general git-messenger git-modes git-timemachine hide-mode-line highlight-symbol hydra iedit keycast kurecolor ligature lispy lsp-pyright lsp-ui magit-todos markdown-toc minions mixed-pitch multiple-cursors nlinum no-littering ob-rust ocp-indent orderless org-appear org-auto-tangle org-bullets org-inline-pdf org-make-toc org-roam org-super-agenda outshine page-break-lines pandoc-mode paredit pdf-tools prescient projectile pulsar pyvenv quick-peek rainbow-delimiters rainbow-mode reason-mode rustic saveplace-pdf-view selected separedit solaire-mode svg-tag-mode tree-sitter tree-sitter-langs tuareg vertico web-mode which-key yasnippet))
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)

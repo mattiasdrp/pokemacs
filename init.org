@@ -3681,6 +3681,8 @@ Org mode is, well, org mode.
     (:keymaps 'org-mode-map
               "M-j"                     'org-goto
               "C-c C-a"                 nil
+              "C-<return>"              'org-meta-return
+              "M-C-<return>"            'org-insert-heading-respect-content
               )
 
     :config
@@ -5159,6 +5161,13 @@ Some people use this, not my responsibility.
     (use-package css-mode
       :ensure nil
       :mode "\\.css\\'"))
+#+END_SRC
+
+*** Simple HTTPD
+
+#+BEGIN_SRC emacs-lisp
+  (use-package simple-httpd
+    :ensure t)
 #+END_SRC
 
 * End
