@@ -1047,15 +1047,17 @@ have one rule for each file type."
                        (list
                         (cons "\\*temp\\*.*"
                               (cons #'display-buffer-no-window nil)))))
-                 (with-current-buffer output-buffer
-                   ;; (projectile-run-shell-command-in-root
-                   ;;  (concat "dune exec -- ocaml-print-intf " file))
-                   (projectile-run-shell-command-in-root
-                    (concat command " " file) output-buffer)
-                   (dired-create-empty-file new-file)
-                   (write-file new-file))
-                 (kill-buffer output-buffer)
-                 (find-file new-file))))))))))
+                 (when
+                     (y-or-n-p (format-message "Create `%s'?" new-file))
+                   (with-current-buffer output-buffer
+                     ;; (projectile-run-shell-command-in-root
+                     ;;  (concat "dune exec -- ocaml-print-intf " file))
+                     (projectile-run-shell-command-in-root
+                      (concat command " " file) output-buffer)
+                     (dired-create-empty-file new-file)
+                     (write-file new-file))
+                   (kill-buffer output-buffer)
+                   (find-file new-file)))))))))))
 
   (general-define-key
    "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
