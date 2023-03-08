@@ -101,6 +101,11 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-elm nil
+  "If non-nil, uses the Elm packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-fsharp nil
   "If non-nil, uses the F# packages"
   :group 'mdrp-packages
@@ -955,6 +960,7 @@ debian, and derivatives). On most it's 'fd'.")
   :hook
   (tuareg-mode  . apheleia-mode)
   (caml-mode    . apheleia-mode)
+  (elm-mode     . apheleia-mode)
   (python-mode  . apheleia-mode)
   (fsharp-mode  . apheleia-mode)
   (kotlin-mode  . apheleia-mode)
@@ -2789,6 +2795,10 @@ have one rule for each file type."
 (use-package flycheck-package
   :ensure t
   :hook (flycheck-mode . (lambda () (flycheck-package-setup))))
+
+(when use-elm
+  (use-package elm-mode
+    :ensure t))
 
 (when use-fsharp
   (use-package fsharp-mode

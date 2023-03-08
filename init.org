@@ -354,6 +354,11 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'mdrp-packages
     :type 'boolean)
 
+  (defcustom use-elm nil
+    "If non-nil, uses the Elm packages"
+    :group 'mdrp-packages
+    :type 'boolean)
+
   (defcustom use-fsharp nil
     "If non-nil, uses the F# packages"
     :group 'mdrp-packages
@@ -716,9 +721,9 @@ Since this is highly user dependent (I see you @thriim), the variable ~show-pare
 :END:
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
-(add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
-(add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
+  (add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
+  (add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
+  (add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
 #+END_SRC
 
 ** Delete whitespace
@@ -1760,6 +1765,7 @@ Asynchronous code formatting after saving files.
     :hook
     (tuareg-mode  . apheleia-mode)
     (caml-mode    . apheleia-mode)
+    (elm-mode     . apheleia-mode)
     (python-mode  . apheleia-mode)
     (fsharp-mode  . apheleia-mode)
     (kotlin-mode  . apheleia-mode)
@@ -4484,6 +4490,14 @@ Library for parsing and generating JSON
   (use-package flycheck-package
     :ensure t
     :hook (flycheck-mode . (lambda () (flycheck-package-setup))))
+#+END_SRC
+
+** Elm
+
+#+BEGIN_SRC emacs-lisp
+  (when use-elm
+    (use-package elm-mode
+      :ensure t))
 #+END_SRC
 
 ** [[https://github.com/fsharp/emacs-fsharp-mode][Fsharp]]
