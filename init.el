@@ -101,6 +101,11 @@
   :group 'mdrp-packages
   :type 'boolean)
 
+(defcustom use-elm nil
+  "If non-nil, uses the elm packages"
+  :group 'mdrp-packages
+  :type 'boolean)
+
 (defcustom use-fsharp nil
   "If non-nil, uses the F# packages"
   :group 'mdrp-packages
@@ -956,6 +961,7 @@ debian, and derivatives). On most it's 'fd'.")
   (tuareg-mode  . apheleia-mode)
   (caml-mode    . apheleia-mode)
   (python-mode  . apheleia-mode)
+  (elm-mode     . apheleia-mode)
   (fsharp-mode  . apheleia-mode)
   (kotlin-mode  . apheleia-mode)
   (rustic-mode  . apheleia-mode)
@@ -2766,8 +2772,8 @@ have one rule for each file type."
 
 (when use-clojure
   (use-package clojure-mode
-  :ensure t
-  :hook (before-save . lsp-format-buffer)))
+    :ensure t
+    :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))))
 
 (when use-clojure
   (use-package cider
@@ -2789,6 +2795,17 @@ have one rule for each file type."
 (use-package flycheck-package
   :ensure t
   :hook (flycheck-mode . (lambda () (flycheck-package-setup))))
+
+(when use-elm
+  (use-package elm-mode
+    :ensure t
+    :general
+    (:keymaps 'elm-mode-map
+     "<backtab>" 'elm-indent-cycle))
+
+  (use-package haskell-mode
+    :ensure t)
+  )
 
 (when use-fsharp
   (use-package fsharp-mode
