@@ -2406,6 +2406,7 @@ have one rule for each file type."
 
 (use-package org-inline-pdf
   :ensure t
+  :ensure-system-package pdf2svg
   :hook (org-mode . org-inline-pdf-mode)
   )
 

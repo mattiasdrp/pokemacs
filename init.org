@@ -3877,6 +3877,7 @@ See pdf inlined when included in org files.
 #+BEGIN_SRC emacs-lisp
   (use-package org-inline-pdf
     :ensure t
+    :ensure-system-package pdf2svg
     :hook (org-mode . org-inline-pdf-mode)
     )
 #+END_SRC
