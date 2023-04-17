@@ -1214,6 +1214,7 @@ have one rule for each file type."
   :ensure t)
 
 (use-package code-review
+  :disabled t
   :ensure t
   :config
   (setq code-review-download-dir (no-littering-expand-var-file-name "backups/")))

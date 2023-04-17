@@ -2212,6 +2212,7 @@ Some configuration is needed for this to work. See [[file:README.org::#git-hosts
 
 #+BEGIN_SRC emacs-lisp
   (use-package code-review
+    :disabled t
     :ensure t
     :config
     (setq code-review-download-dir (no-littering-expand-var-file-name "backups/")))
