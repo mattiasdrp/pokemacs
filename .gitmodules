@@ -6,8 +6,8 @@
 	url = https://github.com/emacs-eaf/emacs-application-framework.git
 [submodule "lisp/flycheck-languagetool"]
 	path = lisp/flycheck-languagetool
-	url = git@github.com:mattiasdrp/flycheck-languagetool.git
+	url = https://github.com/mattiasdrp/flycheck-languagetool.git
 [submodule "emacs"]
 	path = emacs
-	url = git@github.com:mattiasdrp/emacs.git
-	branch = main
+	url = https://github.com/emacs-mirror/emacs.git
+	branch = emacs-29
