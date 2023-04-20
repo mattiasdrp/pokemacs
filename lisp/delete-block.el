@@ -106,7 +106,7 @@
             (save-excursion
               (subword-forward)
               (point))))
-      (kill-region (point) (min syntax-move-point subword-move-point)))))
+      (delete-region (point) (min syntax-move-point subword-move-point)))))
 
 (defun delete-block-backward ()
   (interactive)
@@ -121,7 +121,7 @@
             (save-excursion
               (subword-backward)
               (point))))
-      (kill-region (point) (max syntax-move-point subword-move-point)))))
+      (delete-region (point) (max syntax-move-point subword-move-point)))))
 
 (provide 'delete-block)
 

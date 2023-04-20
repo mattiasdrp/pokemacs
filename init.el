@@ -19,6 +19,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
+(use-package gcmh
+  :load-path "lisp/"
+  :demand t
+  :config
+  (gcmh-mode 1)
+  (message "`gcmh' loaded"))
+
 (setq byte-compile-warnings '(cl-functions))
 
 (defgroup mdrp-packages nil
@@ -180,7 +187,7 @@
 
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold 67108864)
+            (setq gc-cons-threshold better-gc-cons-threshold)
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 
@@ -331,31 +338,38 @@
   (package-initialize))
 
 (unless (package-installed-p 'use-package)
+  (message "Installing use-package")
   (package-refresh-contents)
   (package-install 'use-package))
 
 (eval-and-compile
-  (setq use-package-verbose t)
-  (setq use-package-expand-minimally t)
-  (setq use-package-compute-statistics t)
-  (setq use-package-enable-imenu-support t))
+  (setq
+   use-package-verbose t
+   use-package-expand-minimally t
+   use-package-compute-statistics t
+   use-package-enable-imenu-support t))
 
 (eval-when-compile
   (require 'use-package)
   (require 'bind-key))
 
-(use-package use-package-ensure-system-package :ensure t)
+(use-package use-package-ensure-system-package
+  :ensure t
+  :config (message "`use-package-ensure-system-package' loaded")
+)
 
 (use-package auto-package-update
   :ensure t
+  :defer t
   :custom
   (auto-package-update-show-preview t)
   (auto-package-update-prompt-before-update t)
   (auto-package-update-delete-old-version t)
-  )
+  :config (message "`auto-package-update' loaded"))
 
 (use-package no-littering
-  :ensure t)
+  :ensure t
+  :config (message "`no-littering' loaded"))
 
 (auto-save-visited-mode 1)
 (setq auto-save-default t)
@@ -383,21 +397,34 @@
   "The filename of the `fd' executable. On some distros it's 'fdfind' (ubuntu,
 debian, and derivatives). On most it's 'fd'.")
 
-(use-package prescient
+(use-package esup
   :ensure t
-  :init (setq prescient-persist-mode 1))
+  :defer t
+  :config
+  (setq esup-depth 0)
+  (message "`esup' loaded"))
+
+(use-package prescient
+  :init
+  (setq prescient-persist-mode 1)
+  :ensure t
+  :defer t
+  :config (message "`prescient' loaded"))
 
 (use-package savehist
-  :init (savehist-mode t)
+  :init
+  (savehist-mode t)
   ;; Remember recently opened files
   (recentf-mode t)
+  :defer t
   :custom
   (history-delete-duplicates t)
   :config
   ;; Persist 'compile' history
   (add-to-list 'savehist-additional-variables 'compile-history)
   (add-to-list 'recentf-exclude no-littering-var-directory)
-  (add-to-list 'recentf-exclude no-littering-etc-directory))
+  (add-to-list 'recentf-exclude no-littering-etc-directory)
+  (message "`savehist' loaded"))
 
 (when (and (eq system-type 'gnu/linux)
            (string-match
@@ -421,22 +448,27 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :if (display-graphic-p)
   :config
-  (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons"))
+  (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
+  (message "`all-the-icons' loaded"))
 
 (use-package all-the-icons-dired
   :ensure t
   :hook (dired-mode . all-the-icons-dired-mode)
-  )
+  :config
+  (message "`all-the-icons-dired' loaded"))
 
 (use-package all-the-icons-completion
+  :init
+  (all-the-icons-completion-mode)
   :ensure t
   :after (marginalia all-the-icons)
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
-  :init
-  (all-the-icons-completion-mode))
+  :config
+  (message "`all-the-icons-completion' loaded"))
 
 (use-package ligature
   :ensure t
+  :defer t
   :config
   ;; Enable the "www" ligature in every possible major mode
   (ligature-set-ligatures 't '("www"))
@@ -458,19 +490,23 @@ debian, and derivatives). On most it's 'fd'.")
                                        "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
+  (global-ligature-mode t)
+  (message "`ligature' loaded"))
 
 (use-package ansi-color
+  :ensure t
   :hook
   (shell-mode . ansi-color-for-comint-mode-on)
-  )
+  :config (message "`ansi-color' loaded"))
 
 (use-package kurecolor
-  :ensure t)
+  :ensure t
+  :config (message "`kurecolor' loaded"))
 
 (use-package emojify
   :ensure t
-  :hook (after-init . global-emojify-mode))
+  :hook (after-init . global-emojify-mode)
+  :config (message "`emojify' loaded"))
 
 (use-package general
   :demand t
@@ -566,11 +602,15 @@ debian, and derivatives). On most it's 'fd'.")
   (general-def flyspell-mouse-map
     "RET"                     'flyspell-correct-at-point
     [return]                  'flyspell-correct-at-point
-    ))
+    )
+  :config (message "`general' loaded"))
 
 (use-package which-key
   :ensure t
   :init (which-key-mode)
+  :custom
+  (which-key-separator " ")
+  (which-key-prefix-prefix "+")
   :config
   (which-key-add-major-mode-key-based-replacements 'markdown-mode
     "C-c TAB" "markdown/images"
@@ -590,13 +630,11 @@ debian, and derivatives). On most it's 'fd'.")
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
         which-key-idle-delay 0.1)
-  :custom
-  (which-key-separator " ")
-  (which-key-prefix-prefix "+")
-  )
+  (message "`which-key' loaded"))
 
 (use-package selected
   :ensure t
+  :defer t
   :init
   (require 'hide-region)
   (selected-global-mode)
@@ -619,7 +657,8 @@ debian, and derivatives). On most it's 'fd'.")
             "M-s s"                   'sort-lines
             "M-s w"                   'mdrp/sort-words
             "C-<return>"              'hide-region-hide
-            "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window")))
+            "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window"))
+  :config (message "`selected' loaded"))
 
 (use-package god-mode
   :disabled
@@ -663,16 +702,19 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :config
   (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
+  (message "`nlinum' loaded")
   )
 
 (use-package cheatsheet
   :defer t
+  :config (message "`cheatsheet' loaded")
   )
 
 (use-package crux
   :ensure t
   :init
   (define-prefix-command 'mdrp-crux-map nil "Crux-")
+  :defer t
   :general
   ("M-m" 'mdrp-crux-map)
   ("C-a" 'crux-move-beginning-of-line)
@@ -700,31 +742,36 @@ debian, and derivatives). On most it's 'fd'.")
   (crux-with-region-or-buffer untabify)
   (crux-with-region-or-point-to-eol kill-ring-save)
   (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer)
+  (message "`crux' loaded")
   )
 
 (use-package delete-block
   :load-path "lisp/"
+  :defer t
   :general
   ("C-d"                     'delete-block-forward)
   ("C-<backspace>"           'delete-block-backward)
   ("M-<backspace>"           'delete-block-backward)
-  )
+  :config (message "`delete-block' loaded"))
 
 (use-package discover-my-major
   :after general
   :ensure t
-  :general ("C-h C-m" 'discover-my-major))
+  :defer t
+  :general ("C-h C-m" 'discover-my-major)
+  :config (message "`discover-my-major' loaded"))
 
 (use-package easy-kill
   :ensure t
+  :defer t
   :config
   (global-set-key [remap kill-ring-save] #'easy-kill)
-  (global-set-key [remap mark-sexp] #'easy-mark))
+  (global-set-key [remap mark-sexp] #'easy-mark)
+  (message "`easy-kill loaded"))
 
 (use-package flycheck-languagetool
   :load-path "lisp/flycheck-languagetool/"
-  ;; :custom ((flycheck-languagetool-active-modes
-  ;;           '(text-mode latex-mode org-mode markdown-mode message-mode prog-mode)))
+  :defer t
   :hook ((text-mode . flycheck-languagetool-setup)
          (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
                        (require 'flycheck-languagetool)
@@ -733,7 +780,7 @@ debian, and derivatives). On most it's 'fd'.")
   ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
   :init
   (setq flycheck-languagetool-server-jar (expand-file-name "~/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
-  )
+  :config (message "`flycheck-languagetool' loaded"))
 
 (use-package flyspell
   :init
@@ -848,7 +895,7 @@ debian, and derivatives). On most it's 'fd'.")
           (if b (setq e (re-search-forward end-regexp nil t))))
         (if (and b e (< (point) e)) (setq rlt nil)))
       (setq ad-return-value rlt)))
-  )
+  (message "`flyspell' loaded"))
 
 (use-package flyspell-correct
   :ensure t
@@ -858,26 +905,31 @@ debian, and derivatives). On most it's 'fd'.")
             "<return>" 'popup-select)
   (:keymaps 'mdrp-fly-map
             "C-f" 'flyspell-correct-wrapper
-            ))
+            )
+  :config (message "`flyspell-correct' loaded"))
 
 (use-package fringe-helper
-  :ensure t)
+  :ensure t
+  :config (message "`fringe-helper' loaded"))
 
 (use-package highlight-symbol
-  :ensure t
-  :init (highlight-symbol-mode)
-  :general
-  (:keymaps 'highlight-symbol-nav-mode-map
-            "M-n" nil
-            "M-p" nil
-            )
-  ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
-  ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
-  :config
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode))
+    :ensure t
+    :defer t
+    :init (highlight-symbol-mode)
+    :general
+    (:keymaps 'highlight-symbol-nav-mode-map
+              "M-n" nil
+              "M-p" nil
+              )
+    ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
+    ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
+    :config
+    (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+    (message "`highlight-symbol' loaded"))
 
 (use-package hydra
   :ensure t
+  :defer t
   :custom
   (hydra-default-hint nil)
   :config
@@ -895,10 +947,12 @@ debian, and derivatives). On most it's 'fd'.")
     ("I" mdrp/date-iso-with-time)
     ("l" mdrp/date-long)
     ("L" mdrp/date-long-with-time))
-  )
+  (message "`hydra' loaded"))
 
 (use-package keycast
   :ensure t
+  :defer t
+  :commands keycast-mode
   :config
   (define-minor-mode keycast-mode
     "Show current command and its key binding in the mode line (fix for use with doom-mode-line)."
@@ -906,41 +960,40 @@ debian, and derivatives). On most it's 'fd'.")
     (if keycast-mode
         (add-hook 'pre-command-hook 'keycast--update t)
       (remove-hook 'pre-command-hook 'keycast--update)))
-  (add-to-list 'global-mode-string '("" keycast-mode-line)))
-
-(use-package highlight-symbol
-  :ensure t
-  :general
-  ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
-  ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
-  :config
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode))
+  (add-to-list 'global-mode-string '("" keycast-mode-line))
+  (message "`keycast' loaded"))
 
 (use-package multiple-cursors
+  :ensure t
+  :defer t
   :general
   ("C-c n" 'mc/mark-next-like-this)
   ("C-c p" 'mc/mark-previous-like-this)
   ("C-c a" 'mc/mark-all-like-this)
-  )
+  :config (message "`a loaded"))
 
 (use-package hide-region
   :load-path "lisp/"
   :commands hide-region-pin
+  :defer t
   :general
   ("C-c r u" 'hide-region-unpin)
-  )
+  :config (message "`hide-region loaded"))
 
 (use-package hide-mode-line
   :ensure t
-  )
+  :defer t
+  :config (message "`hide-mode-line loaded"))
 
 (use-package whitespace
   :ensure nil
+  :defer t
   :hook
   (prog-mode . whitespace-mode)
   (text-mode . whitespace-mode)
   :custom
-  (whitespace-style '(face empty indentation::space tab trailing)))
+  (whitespace-style '(face empty indentation::space tab trailing))
+  :config (message "`whitespace loaded"))
 
 (use-package highlight-indent-guides
   :disabled
@@ -953,10 +1006,11 @@ debian, and derivatives). On most it's 'fd'.")
   (set-face-background 'highlight-indent-guides-top-character-face "pink")
   (set-face-foreground 'highlight-indent-guides-character-face "white")
   (setq highlight-indent-guides-method 'bitmap)
-  )
+  :config (message "`highlight-indent-guides' loaded"))
 
 (use-package apheleia
   :ensure t
+  :defer t
   :hook
   (tuareg-mode  . apheleia-mode)
   (caml-mode    . apheleia-mode)
@@ -970,16 +1024,20 @@ debian, and derivatives). On most it's 'fd'.")
   (setf (alist-get 'isort apheleia-formatters)
       '("isort" "--stdout" "-"))
   (setf (alist-get 'python-mode apheleia-mode-alist)
-        '(isort black)))
+        '(isort black))
+  (message "`apheleia' loaded"))
 
 (use-package dap-mode
   :ensure t
+  :defer t
   :after lsp-mode
   :config
-  (dap-auto-configure-mode))
+  (dap-auto-configure-mode)
+  (message "`dap' loaded"))
 
 (use-package dumb-jump
   :ensure t
+  :defer t
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   (defhydra dumb-jump-hydra (:color blue :columns 3)
@@ -991,7 +1049,7 @@ debian, and derivatives). On most it's 'fd'.")
     ("i" dumb-jump-go-prompt "Prompt")
     ("l" dumb-jump-quick-look "Quick look")
     ("b" dumb-jump-back "Back"))
-  )
+  (message "`dumb-jump' loaded"))
 
 (unless (version< emacs-version "29")
   (setq find-sibling-rules
@@ -1071,34 +1129,40 @@ have one rule for each file type."
 
 (use-package fontify-face
   :ensure t
+  :defer t
   :hook (font-lock-mode . fontify-face-mode)
-  )
+  :config (message "`fontify-face' loaded"))
 
 (use-package flycheck
-  :preface
+  :ensure t
+  :defer t
+  :init
   (define-prefix-command 'mdrp-fly-map nil "Fly-")
   :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
-  :ensure t
+  :general
+  (:keymaps 'mdrp-fly-map
+            "p" 'flycheck-prev-error)    :ensure t
   :config
   (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
         (list n reset)
       (list n t)))
-  :general
-  (:keymaps 'mdrp-fly-map
-            "p" 'flycheck-prev-error))
+  (message "`flycheck' loaded"))
 
 (use-package flycheck-correct
-:load-path "lisp/"
-:hook flycheck-mode
-:general
-(:keymaps 'flycheck-mode-map
-          "M-RET" 'mdrp/correct-or-newline))
+  :load-path "lisp/"
+  :defer t
+  :hook flycheck-mode
+  :general
+  (:keymaps 'flycheck-mode-map
+          "M-RET" 'mdrp/correct-or-newline)
+  :config (message "`flycheck-correct' loaded"))
 
 (use-package quick-peek
   :ensure t
-  )
+  :defer t
+  :config (message "`quick-peek' loaded"))
 
 (use-package flycheck-inline
   :ensure t
@@ -1113,52 +1177,49 @@ have one rule for each file type."
                   (concat contents (when contents "\n") msg))
             (quick-peek-update ov)))
         flycheck-inline-clear-function #'quick-peek-hide)
-  )
+  (message "`flycheck-inline' loaded"))
 
 (use-package consult-flycheck
   :ensure t
+  :defer t
   :general
-  ("C-c l" 'consult-flycheck))
+  ("C-c l" 'consult-flycheck)
+  :config (message "`consult-flycheck' loaded"))
 
 (use-package hideshow
+  :defer t
   :commands (hs-minor-mode
              hs-toggle-hiding)
   :diminish hs-minor-mode
   :config
   (setq hs-isearch-open t)
-  )
+  (message "`hideshow' loaded"))
 
 (use-package projectile
   :ensure t
+  :defer t
   :general
   ("M-p" 'projectile-command-map)
-  :init
-  (projectile-mode 1)
-  )
+  :config (message "`projectile' loaded"))
 
 (use-package separedit
   :ensure t
+  :defer t
   :general
   ("C-c C-e"                 'separedit)
   :config
   (setq separedit-default-mode 'markdown-mode)
-  )
+  (message "`separedit' loaded"))
 
 (use-package treemacs
-  :ensure t)
+  :ensure t
+  :defer t
+  :config (message "`treemacs' loaded"))
 
 (use-package magit
   :ensure t
+  :defer t
   :hook (magit-mode . (lambda () (company-mode -1)))
-  :config
-  (setq magit-auto-revert-mode t)
-  (setq magit-auto-revert-immediately t)
-  (defun mdrp/smerge-or-flycheck-next ()
-    (interactive)
-    (let (files (vc-git-conflicted-files default-directory))
-      (if (null files)
-          (flycheck-next-error)
-        (smerge-vc-next-conflict))))
   :general
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
   ("M-n"    'mdrp/smerge-or-flycheck-next)
@@ -1171,57 +1232,80 @@ have one rule for each file type."
             "G"             'git-messenger:popup-message
             "M-g"           'magit-dispatch
             )
-  )
+  :config
+  (setq magit-auto-revert-mode t)
+  (setq magit-auto-revert-immediately t)
+  (defun mdrp/smerge-or-flycheck-next ()
+    (interactive)
+    (let (files (vc-git-conflicted-files default-directory))
+      (if (null files)
+          (flycheck-next-error)
+        (smerge-vc-next-conflict))))
+  (message "`magit' loaded"))
 
 (when use-magit-todos
   (use-package magit-todos
     :ensure t
+    :defer t
+    :hook (magit . magit-todos)
     :config
-    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))))
+    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
+    (message "`magit-todos' loaded")))
 
 (use-package hl-todo
   :ensure t
   :config
-  (global-hl-todo-mode 1))
+  (global-hl-todo-mode 1)
+  (message "`hl-todo' loaded"))
 
 (use-package diff-hl
   :ensure t
+  :defer t
   :custom
   (global-diff-hl-mode 1)
   (diff-hl-side 'right)
   :hook
   (magit-post-refresh . diff-hl-magit-post-refresh)
   (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-  )
+  :config (message "`diff-hl' loaded"))
 
 (use-package git-commit
-  :hook (git-commit-mode . mdrp/english-dict))
+  :defer t
+  :hook (git-commit-mode . mdrp/english-dict)
+  :config (message "`git-commit' loaded"))
 
 (use-package git-messenger
   :ensure t
+  :defer t
   :config
   (setq git-messenger:show-detail t
-        git-messenger:use-magit-popup t))
+        git-messenger:use-magit-popup t)
+  (message "`git-messenger' loaded"))
 
 (use-package git-timemachine
   :ensure t
+  :defer t
   :general
   (:keymaps 'magit-mode-map
             "<left>" '(git-timemachine :wk "Go back in git history"))
-  )
+  :config (message "`git-timemachine' loaded"))
 
 (use-package git-modes
-  :ensure t)
+  :ensure t
+  :defer t
+  :config (message "`git-modes' loaded"))
 
 (use-package code-review
   :disabled t
   :ensure t
   :config
-  (setq code-review-download-dir (no-littering-expand-var-file-name "backups/")))
+  (setq code-review-download-dir (no-littering-expand-var-file-name "backups/"))
+  (message "`code-review' loaded"))
 
 (use-package ghub
   :ensure t
-)
+  :defer t
+  :config (message "`ghub' loaded"))
 
 (use-package uniquify
   :disabled
@@ -1229,7 +1313,8 @@ have one rule for each file type."
   (setq uniquify-buffer-name-style 'reverse
         uniquify-separator " • "
         uniquify-after-kill-buffer-p t
-        uniquify-ignore-buffers-re "^\\*"))
+        uniquify-ignore-buffers-re "^\\*")
+  (message "`uniquify' loaded"))
 
 (use-package frame
   :disabled
@@ -1247,10 +1332,12 @@ have one rule for each file type."
           (tool-bar-lines . 0)
           (menu-bar-lines . 1)))
   ;; Default frame settings
-  (setq initial-frame-alist default-frame-alist))
+  (setq initial-frame-alist default-frame-alist)
+  (message "`frame' loaded"))
 
 (use-package winner
   :ensure nil
+  :defer t
   :custom
   (winner-boring-buffers
    '("*Completions*"
@@ -1264,17 +1351,21 @@ have one rule for each file type."
      "*Ibuffer*"
      "*esh command on file*"))
   :config
-  (winner-mode 1))
+  (winner-mode 1)
+  (message "`winner' loaded"))
 
 (use-package ace-window
   :ensure t
   :config
   (setq aw-dispatch-always t)
-  (set-face-attribute 'aw-leading-char-face nil :height 2.5))
+  (set-face-attribute 'aw-leading-char-face nil :height 2.5)
+  (message "`ace-window' loaded"))
 
 (when use-visual-fill
   (use-package visual-fill-column
     :ensure t
+    :defer t
+    :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
     :custom
     (visual-fill-column-width 100)
     (visual-fill-column-center-text t)
@@ -1289,18 +1380,20 @@ have one rule for each file type."
       )
 
     (add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
-    :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
-    ))
+    (message "`visual-fill-column' loaded")))
 
 (when use-window-purpose
   (use-package window-purpose
     :ensure t
+    :defer t
     :config
     (purpose-mode)
-    (purpose-x-magit-multi-on)))
+    (purpose-x-magit-multi-on)
+    (message "`window-purpose' loaded")))
 
 (use-package vertico
   :ensure t
+  :defer t
   :after general
   :init
   (vertico-mode)
@@ -1340,11 +1433,14 @@ have one rule for each file type."
                  (if (= vertico--index index)
                      (propertize "⮕ " 'face 'vertico-current)
                    "  ")
-                 cand))))
+                 cand)))
+  (message "`vertico' loaded"))
 
 (use-package vertico-directory
   :after vertico
   :ensure nil
+  :defer t
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
   ;; More convenient directory navigation commands
   :general
   (:keymaps 'vertico-map
@@ -1352,11 +1448,12 @@ have one rule for each file type."
             "<backspace>" 'vertico-directory-delete-char
             "M-<backspace>" 'vertico-directory-delete-word)
   ;; Tidy shadowed file names
-  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+  :config (message "`vertico-directory' loaded"))
 
 (use-package vertico-multiform
   :after vertico
   :ensure nil
+  :defer t
   :custom
   (vertico-buffer-display-action '(display-buffer-in-side-window
                                    (side . right)
@@ -1371,13 +1468,20 @@ have one rule for each file type."
     (nconc (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))
            (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))))
 
-  (vertico-multiform-mode))
+  (vertico-multiform-mode)
+  (message "`vertico-multiform loaded"))
 
 (use-package vertico-posframe
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package consult
   :ensure t
+  :defer t
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :defer t
   :ensure-system-package (rg . ripgrep)
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :general
@@ -1432,9 +1536,6 @@ have one rule for each file type."
             [remap prev-matching-history-element] 'consult-history
             )
 
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -1503,10 +1604,11 @@ have one rule for each file type."
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
     ;;;; 4. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  )
+  (message "`consult' loaded"))
 
 (use-package embark
   :ensure t
+  :defer t
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
   ("C-:" 'embark-default-act-noquit)  ;; good alternative: M-.
@@ -1527,21 +1629,23 @@ have one rule for each file type."
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none)))))
+                 (window-parameters (mode-line-format . none))))
+  (message "`embark' loaded"))
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :ensure t
   :after (embark consult)
-  :config
-  ;; :demand t ; only necessary if you have the hook below
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
+  :defer t
   :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  (embark-collect-mode . consult-preview-at-point-mode)
+  :config
+  (message "`embark-consult' loaded"))
 
 (use-package corfu
   :ensure t
+  :defer t
+  :init (global-corfu-mode)
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
@@ -1562,11 +1666,12 @@ have one rule for each file type."
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode))
+  :config (message "`corfu' loaded")
+  )
 
 (use-package emacs
   :ensure t
+  :defer t
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
@@ -1592,17 +1697,21 @@ have one rule for each file type."
         #'command-completion-default-include-p)
 
   ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+  (setq enable-recursive-minibuffers t)
+  :config (message "`emacs' loaded"))
 
 (use-package orderless
   :ensure t
+  :defer t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  :config (message "`orderless' loaded"))
 
 (use-package cape
   :ensure t
+  :defer t
   ;; Bind dedicated completion commands
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
   ;; :bind (("C-c p p" . completion-at-point) ;; capf
@@ -1640,29 +1749,38 @@ have one rule for each file type."
 (use-package marginalia
   :after vertico
   :ensure t
+  :defer t
+  :init (marginalia-mode)
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  :init
-  (marginalia-mode))
+  :config (message "`marginalia' loaded")
+  )
 
 (use-package iedit
   :ensure t
+  :defer t
   :general
   (:keymaps 'lsp-mode-map
-            "C-;" nil))
+            "C-;" nil)
+  :config (message "`iedit' loaded"))
 
 (use-package yasnippet
   :ensure t
+  :defer t
   :config
-  (yas-global-mode 1))
+  (yas-global-mode 1)
+  (message "`yasnippet' loaded"))
 
 (use-package consult-yasnippet
   :ensure t
+  :defer t
   :general
-  ("C-<" 'consult-yasnippet))
+  ("C-<" 'consult-yasnippet)
+  :config (message "`consult-yasnippet' loaded"))
 
 (use-package company
   :ensure t
+  :defer t
   :hook ((prog-mode . company-mode)
          (org-mode . company-mode))
   :custom
@@ -1693,7 +1811,8 @@ have one rule for each file type."
   (add-to-list 'company-backends '(company-capf
                                    company-yasnippet
                                    company-files))
-  (global-company-mode 1))
+  (global-company-mode 1)
+  (message "`company loaded"))
 
 (use-package consult-company
   :load-path "lisp/consult-company/"
@@ -1707,6 +1826,7 @@ have one rule for each file type."
 
 (use-package company-quickhelp
   :ensure t
+  :defer t
   :after company
   :hook (company-mode . company-quickhelp-mode)
   :general
@@ -1716,10 +1836,11 @@ have one rule for each file type."
   :config
   (setq company-quickhelp-delay 0)
   (company-quickhelp-mode 1)
-  )
+  (message "`company-quickhelp' loaded"))
 
 (use-package company-web
   :ensure t
+  :defer t
   :preface
   (autoload 'company-web-html "company-web-html")
   (autoload 'company-web-jade "company-web-jade")
@@ -1728,10 +1849,12 @@ have one rule for each file type."
                        (setq-local company-backends '(company-web-html
                                                       company-web-jade
                                                       company-web-slim
-                                                      company-capf))))))
+                                                      company-capf)))))
+  :config (message "`company-web' loaded"))
 
 (use-package company-box
   :ensure t
+  :defer t
   :diminish
   :if (display-graphic-p)
   :defines company-box-icons-all-the-icons
@@ -1785,13 +1908,16 @@ have one rule for each file type."
             (Operator . ,(all-the-icons-material "control_point" :height 0.8 :v-adjust -0.15))
             (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
             (Template . ,(all-the-icons-material "format_align_left" :height 0.8 :v-adjust -0.15)))
-          company-box-icons-alist 'company-box-icons-all-the-icons)))
+          company-box-icons-alist 'company-box-icons-all-the-icons))
+  (message "`company-box' loaded"))
 
 (use-package company-prescient
     :ensure t
+    :defer t
     :after company
     :config
-    (company-prescient-mode 1))
+    (company-prescient-mode 1)
+    (message "`company-prescient' loaded"))
 
 (use-package doom-themes
   :ensure t
@@ -1810,10 +1936,12 @@ have one rule for each file type."
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
+  (message "`doom-themes' loaded")
   )
 
 (use-package anzu
   :ensure t
+  :defer t
   :init
   (global-anzu-mode +1)
   (anzu-mode +1)
@@ -1821,7 +1949,8 @@ have one rule for each file type."
   (global-set-key [remap query-replace] 'anzu-query-replace)
   (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
   (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
-  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp))
+  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
+  (message "`anzu' loaded"))
 
 (use-package doom-modeline
   :ensure t
@@ -1838,7 +1967,7 @@ have one rule for each file type."
 
   ;; The limit of the window width.
   ;; If `window-width' is smaller than the limit, some information won't be
-  ;; displayed. It can be an integer or a float number. `nil' means no limit."
+  ;; displayed. It can be an integer or a float number. `nil' means no limit.
   (doom-modeline-window-width-limit nil)
 
   ;; How to detect the project root.
@@ -1966,8 +2095,8 @@ have one rule for each file type."
 
   (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
   (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
-  (message "doom modeline loaded")
-  (doom-modeline-mode))
+  (doom-modeline-mode)
+  (message "`doom-modeline' loaded"))
 
 (use-package minions
   :ensure t
@@ -1977,14 +2106,10 @@ have one rule for each file type."
   ;; :general
   ;; (:keymaps 'minions-mode-line-minor-modes-map
   ;;           "<mode-line> <mouse-1>" 'minions-minor-modes-menu)
+  :config (message "`minions' loaded")
   )
 
 (use-package outline
-  :config
-  (define-prefix-command 'cm-map nil "Outline-")
-  (set-display-table-slot standard-display-table
-                          'selective-display
-                          (string-to-vector "+++"))
   :general
   ("C-o" 'cm-map)
   (:keymaps 'cm-map
@@ -2008,19 +2133,28 @@ have one rule for each file type."
             "f" '(outline-forward-same-level :which-key "Forward - same leve")
             "b" '(outline-backward-same-level :which-key "Backward - same leve")
             )
-  )
+  :config
+  (define-prefix-command 'cm-map nil "Outline-")
+  (set-display-table-slot standard-display-table
+                          'selective-display
+                          (string-to-vector "+++"))
+
+  (message "`outline' loaded"))
 
 (use-package outline-minor
   :ensure nil
+  :defer t
   :hook (prog-mode . outline-minor-mode)
-)
+  :config (message "`outline-minor' loaded"))
 
 (use-package outshine
   :ensure t
+  :defer t
   :init (defvar outline-minor-mode-prefix "\C-o")
   :hook (outline-minor-mode . outshine-mode)
   :config
   (setq outshine-preserve-delimiter-whitespace nil)
+  (message "`outshine' loaded")
   )
 
 (use-package pretty-outlines
@@ -2031,20 +2165,25 @@ have one rule for each file type."
          (outline-minor-mode . pretty-outlines-set-display-table)
          (emacs-lisp-mode . pretty-outlines-add-bullets)
          )
-  )
+  :config (message "`pretty-outlines' loaded"))
 
 (use-package rainbow-mode
   :ensure t
+  :defer t
   :hook (help-mode prog-mode text-mode org-mode)
+  :config (message "`rainbow-mode' loaded")
   )
 
 (if use-rainbow
     (use-package rainbow-delimiters
       :ensure t
-      :hook (prog-mode . rainbow-delimiters-mode)))
+      :defer t
+      :hook (prog-mode . rainbow-delimiters-mode)
+      :config (message "`rainbow-delimiters' loaded")))
 
 (use-package pulsar
   :ensure t
+  :defer t
   :config
   (setq pulsar-pulse-functions
         '(recenter-top-bottom
@@ -2072,17 +2211,21 @@ have one rule for each file type."
   (setq pulsar-face 'pulsar-magenta)
   (setq pulsar-highlight-face 'pulsar-yellow)
   (pulsar-global-mode 1)
-  :defer t
-  )
+  (message "`pulsar' loaded"))
 
 (when use-solaire
   (use-package solaire-mode
     :ensure t
+    :defer t
     :config
-    (solaire-global-mode +1)))
+    (solaire-global-mode +1)
+    (message "`solaire' loaded")))
 
 (when use-dashboard
-  (use-package page-break-lines :ensure t)
+  (use-package page-break-lines
+    :ensure t
+    :defer t
+    :config (message "`page-break-lines' loaded"))
 
   (use-package dashboard
     :ensure t
@@ -2102,11 +2245,13 @@ have one rule for each file type."
     (setq dashboard-set-navigator t)
     (setq dashboard-set-footer nil)
     (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
-    (setq dashboard-week-agenda t)))
+    (setq dashboard-week-agenda t)
+    (message "`dashboard' loaded")))
 
 (use-package svg-tag-mode
   :disabled
   :ensure t
+  :defer t
   :config
   (setq svg-tag-tags
         '((":TODO:" . ((lambda (tag)
@@ -2120,12 +2265,14 @@ have one rule for each file type."
           ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
                                              (svg-tag-make tag :beg 1 :end -1 :radius 8))))))
   (svg-tag-mode)
-  (global-svg-tag-mode))
+  (global-svg-tag-mode)
+  (message "`svg-tag-mode' loaded"))
 
 (when use-eaf
   (use-package eaf
     :load-path "lisp/emacs-application-framework"
     :ensure nil
+    :defer t
     :custom
     ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
     (eaf-browser-continue-where-left-off t)
@@ -2146,16 +2293,57 @@ have one rule for each file type."
     (defalias 'browse-web #'eaf-open-browser)
     (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-    (eaf-bind-key nil "M-q" eaf-browser-keybinding))) ;; unbind, see more in the Wiki
+    (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+    (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
-(require 'org-protocol)
-(require 'ox)
+(use-package org-protocol
+  :ensure nil
+  :defer t
+  :config
+  (message "`org-protocol' loaded"))
 
-(use-package mixed-pitch :ensure t)
+(use-package ox
+  :ensure nil
+  :defer t
+  :init
+  (defun mdrp/filter-timestamp (trans back _comm)
+    "Remove <> around time-stamps."
+    (pcase back
+      (`html
+       (replace-regexp-in-string "&[lg]t;" "" trans))
+      (`latex
+       (replace-regexp-in-string "[<>]" "" trans))))
+
+  :mode ("\\.org\\'" . org-mode)
+  :config
+  (add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
+  (message "`ox' loaded"))
+
+(use-package mixed-pitch
+  :ensure t
+  :defer t
+  :config (message "`mixed-pitch' loaded"))
 
 (use-package org
   :ensure t
+  :defer t
+  :mode ("\\.org\\'" . org-mode)
   :hook (org-mode . mixed-pitch-mode)
+
+  :general
+  ("M-o" 'mdrp-org-map)
+  ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
+  (:keymaps 'mdrp-org-map
+            "l"                       'org-store-link
+            "a"                       'org-agenda
+            "c"                       'org-capture
+            )
+  (:keymaps 'org-mode-map
+            "M-j"                     'org-goto
+            "C-c C-a"                 nil
+            "C-<return>"              'org-meta-return
+            "M-C-<return>"            'org-insert-heading-respect-content
+            )
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -2170,18 +2358,11 @@ have one rule for each file type."
 
   (defun mdrp/org-compile-latex-and-update-other-buffer ()
     "Has as a premise that it's run from an org-mode buffer and the
-        other buffer already has the PDF open"
+           other buffer already has the PDF open"
     (interactive)
     (org-latex-export-to-pdf)
     (mdrp/update-other-buffer)
     )
-  (defun mdrp/filter-timestamp (trans back _comm)
-    "Remove <> around time-stamps."
-    (pcase back
-      (`html
-       (replace-regexp-in-string "&[lg]t;" "" trans))
-      (`latex
-       (replace-regexp-in-string "[<>]" "" trans))))
   :custom
   (org-directory "~/org/")
   ;; Babel
@@ -2201,12 +2382,12 @@ have one rule for each file type."
   (org-fontify-done-headline t)
   (org-footnote-auto-adjust t)
   (org-hide-emphasis-markers t)
-  (org-hide-leading-stars t)
+  (org-hide-leading-stars nil)
   (org-hide-macro-markers t)
   (org-image-actual-width '(300))
   (org-latex-compiler "latexmk")
   (org-log-done 'time)
-  (org-odd-levels-only t)
+  (org-odd-levels-only nil)
   (org-pretty-entities t)
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
@@ -2245,20 +2426,6 @@ have one rule for each file type."
      ("Difficile" . (:foreground "OrangeRed" :weight bold))
      )
    )
-  :general
-  ("M-o" 'mdrp-org-map)
-  ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
-  (:keymaps 'mdrp-org-map
-            "l"                       'org-store-link
-            "a"                       'org-agenda
-            "c"                       'org-capture
-            )
-  (:keymaps 'org-mode-map
-            "M-j"                     'org-goto
-            "C-c C-a"                 nil
-            "C-<return>"              'org-meta-return
-            "M-C-<return>"            'org-insert-heading-respect-content
-            )
 
   :config
   ;; TODO states
@@ -2273,7 +2440,6 @@ have one rule for each file type."
     )
   (customize-set-value 'org-latex-with-hyperref nil)
   (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
-  (add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
   (setq org-image-actual-width nil)
   (defun org-mode-<>-syntax-fix (start end)
     "Change syntax of characters ?< and ?> to symbol within source code blocks."
@@ -2292,7 +2458,7 @@ have one rule for each file type."
 
   (defun org-setup-<>-syntax-fix ()
     "Setup for characters ?< and ?> in source code blocks.
-     Add this function to `org-mode-hook'."
+        Add this function to `org-mode-hook'."
     (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
     (syntax-propertize (point-max)))
 
@@ -2378,12 +2544,13 @@ have one rule for each file type."
    ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
    ;;    )
    )
-  )
+  (message "`org-mode' loaded"))
 
 (use-package org-auto-tangle
   :ensure t
   :defer t
-  :hook (org-mode . org-auto-tangle-mode))
+  :hook (org-mode . org-auto-tangle-mode)
+  :config (message "`org-auto-tangle' loaded"))
 
 (use-package org-ref
   :disabled
@@ -2399,16 +2566,19 @@ have one rule for each file type."
 
 (use-package org-bullets
   :ensure t
+  :defer t
   :after org
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("" "" "" "" "" "" ""))
-  )
+  :config (message "`org-bullets' loaded"))
 
 (use-package org-inline-pdf
   :ensure t
+  :defer t
   :ensure-system-package pdf2svg
   :hook (org-mode . org-inline-pdf-mode)
+  :config (message "`org-inline-pdf' loaded")
   )
 
 (use-package calfw
@@ -2427,20 +2597,10 @@ have one rule for each file type."
 
 (use-package calfw-org
   :ensure t
+  :defer t
   :after calfw
   :init
   (define-prefix-command 'mdrp-calfw-map nil "Cal-")
-  :config
-  (defun cfw:org-capture-day ()
-    (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
-      (let ((pos (cfw:cursor-to-nearest-date)))
-        (concat "<"
-                (format-time-string  "%Y-%m-%d %a 09:00"
-                                     (encode-time 0 0 0
-                                                  (calendar-extract-day pos)
-                                                  (calendar-extract-month pos)
-                                                  (calendar-extract-year pos)))
-                ">"))))
   :general
   ("M-c" 'mdrp-calfw-map)
   (:keymaps 'mdrp-calfw-map
@@ -2454,7 +2614,18 @@ have one rule for each file type."
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
      "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
    )
-  )
+  :config
+  (defun cfw:org-capture-day ()
+    (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
+      (let ((pos (cfw:cursor-to-nearest-date)))
+        (concat "<"
+                (format-time-string  "%Y-%m-%d %a 09:00"
+                                     (encode-time 0 0 0
+                                                  (calendar-extract-day pos)
+                                                  (calendar-extract-month pos)
+                                                  (calendar-extract-year pos)))
+                ">"))))
+  (message "`calfw-org' loaded"))
 
 ;; The request can be wrong depending on Google updates, evaluate this:
 ;; (concat org-gcal-auth-url
@@ -2478,6 +2649,7 @@ have one rule for each file type."
 
 (use-package org-super-agenda
   :ensure t
+  :defer t
   :config
   (setq org-super-agenda-groups
         '(;; Each group has an implicit Boolean OR operator between its selectors.
@@ -2489,18 +2661,20 @@ have one rule for each file type."
           ))
   (org-super-agenda-mode)
   (when use-org-agenda-startup (org-agenda nil "a"))
-  )
+  (message "`org-super-agenda' loaded"))
 
 (use-package org-appear
   :ensure t
+  :defer t
   :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autolinks t)
-  )
+  (message "`org-appear loaded"))
 
 (when use-org-roam
   (use-package org-roam
     :ensure t
+    :defer t
     :after org
     :custom
     (org-roam-directory (file-truename "~/org/org-roam"))
@@ -2518,21 +2692,30 @@ have one rule for each file type."
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
     (org-roam-db-autosync-mode)
     ;; If using org-roam-protocol
-    (require 'org-roam-protocol)))
+    (require 'org-roam-protocol)
+    (message "`org-roam' loaded")))
 
 (use-package org-make-toc
   :ensure t
+  :defer t
   :custom
-  (org-make-toc-insert-custom-ids t))
+  (org-make-toc-insert-custom-ids t)
+  (message "`org-make-toc' loaded"))
+
+(use-package ox-awesomecv
+  :load-path "lisp/org-cv/"
+  :defer t
+  :config (message "`ox-awesomecv' loaded"))
 
 (use-package ox-moderncv
   :load-path "lisp/org-cv/"
-  :init
-  (require 'ox-moderncv)
-  :config
-  (require 'ox-awesomecv))
+  :defer t
+  :config (message "`ox-moderncv' loaded"))
 
 (use-package lsp-mode
+  :ensure t
+  :defer t
+  :commands lsp
   :hook ((tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
          (clojure-mode . lsp-deferred)
@@ -2544,6 +2727,23 @@ have one rule for each file type."
          (kotlin-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (python-mode . lsp-deferred))
+  :general
+  (:keymaps 'lsp-mode-map
+            "C-c C-t" 'lsp-describe-thing-at-point
+            "C-c C-w" 'mdrp/lsp-get-type-and-kill
+            "C-c C-l" 'lsp-find-definition
+            "C-c &"   'pop-global-mark :keymaps 'override)
+  (:keymaps 'lsp-command-map
+            "d"   'lsp-find-definition
+            "r"   'lsp-find-references
+            "n"   'lsp-ui-find-next-reference
+            "p"   'lsp-ui-find-prev-reference
+            "i"   'counsel-semantic-or-imenu
+            "R"   'lsp-rename
+            "f"   'consult-flycheck
+            "t r" 'lsp-treemacs-references
+            "t s" 'lsp-treemacs-symbols
+            )
   :custom
   (lsp-log-io nil)
   (lsp-headerline-breadcrumb-enable t)
@@ -2569,7 +2769,6 @@ have one rule for each file type."
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
-  :commands lsp
 
   :config
   (defvar mdrp/type-map
@@ -2616,28 +2815,24 @@ have one rule for each file type."
                      '("opam" "exec" "--" "ocamllsp"))
     :major-modes '(caml-mode tuareg-mode)
     :server-id 'ocaml-lsp-server))
-  :general
-  (:keymaps 'lsp-mode-map
-            "C-c C-t" 'lsp-describe-thing-at-point
-            "C-c C-w" 'mdrp/lsp-get-type-and-kill
-            "C-c C-l" 'lsp-find-definition
-            "C-c &"   'pop-global-mark :keymaps 'override)
-  (:keymaps 'lsp-command-map
-            "d"   'lsp-find-definition
-            "r"   'lsp-find-references
-            "n"   'lsp-ui-find-next-reference
-            "p"   'lsp-ui-find-prev-reference
-            "i"   'counsel-semantic-or-imenu
-            "R"   'lsp-rename
-            "f"   'consult-flycheck
-            "t r" 'lsp-treemacs-references
-            "t s" 'lsp-treemacs-symbols
-            ))
+  (message "`lsp' loaded"))
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
 (use-package lsp-ui
   :ensure t
+  :defer t
   :hook (lsp-mode . lsp-ui-mode)
+  :general
+  ("C-M-d" 'lsp-ui-doc-show)
+  ("C-c i" 'lsp-ui-imenu)
+  (:keymaps 'lsp-ui-mode-map
+            [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+            [remap xref-find-references] 'lsp-ui-peek-find-references
+            )
+  (:keymaps 'lsp-command-map
+            "u f" 'lsp-ui-doc-focus-frame
+            "u i" 'lsp-ui-imenu
+            )
   :custom
   (lsp-ui-doc-delay 0.9)
   (lsp-ui-doc-position 'at-point)
@@ -2655,35 +2850,29 @@ have one rule for each file type."
   ;; (lsp-ui-sideline-ignore-duplicate t)
   ;; Whether to show code actions in sideline.
   ;; (lsp-ui-sideline-show-code-actions nil)
-  :general
-  ("C-M-d" 'lsp-ui-doc-show)
-  ("C-c i" 'lsp-ui-imenu)
-  (:keymaps 'lsp-ui-mode-map
-            [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
-            [remap xref-find-references] 'lsp-ui-peek-find-references
-        )
-  (:keymaps 'lsp-command-map
-        "u f" 'lsp-ui-doc-focus-frame
-        "u i" 'lsp-ui-imenu
-        )
-  )
+  :config (message "`lsp-ui' loaded"))
 
 (use-package lsp-treemacs
   :ensure t
+  :defer t
   :after lsp
+  :config (message "`lsp-treemacs' loaded")
   )
 
 (use-package consult-lsp
   :ensure t
+  :defer t
   :disabled)
 
 ;; This package needs to be loaded to use language parsers
 (use-package tree-sitter-langs
   :ensure t
-  )
+  :defer t
+  :config (message "`tree-sitter-langs' loaded"))
 
 (use-package tree-sitter
   :ensure t
+  :defer t
   :hook
   (tree-sitter-after-on . tree-sitter-hl-mode)
   :config
@@ -2691,37 +2880,44 @@ have one rule for each file type."
   (setq tree-sitter-debug-jump-buttons t)
   ;; and this highlights the entire sub tree in your code
   (setq tree-sitter-debug-highlight-jump-region t)
-  (global-tree-sitter-mode))
+  (global-tree-sitter-mode)
+  :config (message "`tree-sitter' loaded"))
 
 (use-package ts-fold
   :load-path "lisp/ts-fold/"
+  :defer t
   :hook
   (tuareg-mode . ts-fold-mode)
   (c++-mode    . ts-fold-mode)
   (python-mode . ts-fold-mode)
   (rustic-mode . ts-fold-mode)
+  :config (message "`ts-fold' loaded")
   )
 
 (use-package ts-fold-indicators
   :load-path "lisp/ts-fold/"
+  :defer t
+  :hook
+  (tree-sitter-after-on . ts-fold-indicators-mode)
   :config
   (setq ts-fold-indicators-fringe 'left-fringe)
   (setq ts-fold-indicators-priority 100)
-  :hook
-  (tree-sitter-after-on . ts-fold-indicators-mode)
-  )
+  (message "`ts-fold-indicators' loaded"))
 
 (use-package conf-mode
   :ensure nil
+  :defer t
   :mode (
          ("/\\.merlin\\'" . conf-mode)
          ("_tags\\'" . conf-mode)
          ("_log\\'" . conf-mode)
          ("\\.toml\\'" . conf-toml-mode)
-         ))
+         )
+  :config (message "`conf-mode' loaded"))
 
 (use-package json-mode
   :ensure nil
+  :defer t
   :mode (("\\.bowerrc$"     . json-mode)
          ("\\.jshintrc$"    . json-mode)
          ("\\.json_schema$" . json-mode)
@@ -2735,18 +2931,21 @@ have one rule for each file type."
             "C-c C-l" 'hs-hide-level
             )
   :config
-  (make-local-variable 'js-indent-level))
+  (make-local-variable 'js-indent-level)
+  (message "`json-mode' loaded"))
 
 (use-package json
+  :defer t
   :config
   (defun get-secrets-config-value (key)
     "Return the value of the json file secrets for key"
     (cdr (assoc key (json-read-file "~/.secrets/secrets.json")))
     )
-  )
+  (message "`json' loaded"))
 
 (use-package dune
   :ensure t
+  :defer t
   :mode ("^dune$" "^dune-project$")
   :init
   (define-prefix-command 'mdrp-dune-map nil "Dune-")
@@ -2766,29 +2965,38 @@ have one rule for each file type."
             "c" 'dune-insert-copyfiles-form
             "t" 'dune-insert-tests-form
             "v" 'dune-insert-env-form
-            "d" 'dune-insert-ignored-subdirs-form))
+            "d" 'dune-insert-ignored-subdirs-form)
+  :config (message "`dune' loaded"))
 
 (use-package make-mode
   :ensure nil
+  :defer t
   :hook (make-mode . semantic-mode)
-  )
+  :config (message "`make-mode' loaded"))
 
 (when use-clojure
   (use-package clojure-mode
     :ensure t
-    :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))))
+    :defer t
+    :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
+    :config (message "`clojure-mode' loaded")))
 
 (when use-clojure
   (use-package cider
-    :ensure t))
+    :ensure t
+    :defer t
+    :config (message "`cider' loaded")))
 
 (use-package elisp-mode
+  :defer t
   :hook (elisp-mode . semantic-mode)
-  )
+  :config (message "`elisp-mode' loaded"))
 
 (use-package puni
   :ensure t
+  :defer t
   :hook ((clojure-mode elisp-mode) . puni-mode)
+  :config (message "`puni' loaded")
   ;; :general
   ;; (:keymaps 'paredit-mode-map
   ;;  "C-<right>" nil
@@ -2797,21 +3005,29 @@ have one rule for each file type."
 
 (use-package flycheck-package
   :ensure t
-  :hook (flycheck-mode . (lambda () (flycheck-package-setup))))
+  :defer t
+  :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
+  :config (message "`flycheck-package' loaded"))
 
 (when use-elm
   (use-package elm-mode
     :ensure t
+    :defer t
     :general
     (:keymaps 'elm-mode-map
-     "<backtab>" 'elm-indent-cycle))
+     "<backtab>" 'elm-indent-cycle)
+    :config (message "`elm-mode' loaded"))
 
   (use-package haskell-mode
-    :ensure t)
+    :ensure t
+    :defer t
+    :config (message "`haskell-mode' loaded"))
   )
 
 (when use-fsharp
   (use-package fsharp-mode
+    :defer t
+    :ensure t
     :init
     (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet"))
     (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet/tools"))
@@ -2822,16 +3038,18 @@ have one rule for each file type."
              (concat (getenv "HOME") "/.dotnet/tools")
              ":"
              (getenv "PATH")))
-    :defer t
-    :ensure t))
+    :config (message "`fsharp-mode' loaded")))
 
 (when use-kotlin
   (use-package kotlin-mode
-    :ensure t))
+    :ensure t
+    :defer t
+    :config (message "`kotlin-mode' loaded")))
 
 (when use-latex
   (use-package tex-site
     :ensure auctex
+    :defer t
     :mode ("\\.tex\\'" . latex-mode)
     :config
     (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
@@ -2844,20 +3062,21 @@ have one rule for each file type."
     (setq TeX-PDF-mode t)
     (setq TeX-source-correlate-method 'synctex)
     (setq TeX-source-correlate-start-server t)
-    )
+    (message "`tex-site' loaded"))
 
   (use-package auctex-latexmk
     :ensure t
+    :defer t
     :after tex-site
     :config
     (auctex-latexmk-setup)
     (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-    )
-  )
+    (message "`auctex-latexmk' loaded")))
 
 (when use-markdown
   (use-package markdown-mode
     :ensure t
+    :defer t
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'"       . markdown-mode)
            ("\\.markdown\\'" . gfm-mode))
@@ -2867,22 +3086,28 @@ have one rule for each file type."
     (setq markdown-open-command "retext")
     :hook (gfm-mode . (lambda ()
                         (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
-    ))
+    :config (message "`markdown-mode' loaded")))
 
 (when use-markdown
   (use-package markdown-toc
-    :ensure t))
+    :ensure t
+    :defer t
+    :config (message "`markdown-toc' loaded")))
 
 (when use-pandoc
   (use-package pandoc-mode
     :ensure-system-package pandoc
     :ensure t
+    :defer t
     :hook ((markdown-mode . pandoc-mode)
-           (pandoc-mode . pandoc-load-default-settings))))
+           (pandoc-mode . pandoc-load-default-settings))
+    :config (message "`pandoc-mode' loaded")))
 
 (when use-michelson
   (use-package deferred
-    :ensure t)
+    :ensure t
+    :defer t
+    :config (message "`deferred' loaded"))
 
   ;; TODO: rewrite it without hardcoded paths
   (load (concat (getenv "HOME") "/dev/nl/tezos/emacs/michelson-mode.el") nil t)
@@ -2964,6 +3189,7 @@ have one rule for each file type."
 (when use-ocaml
   (use-package tuareg
     :ensure t
+    :defer t
     :ensure-system-package
     ((ocamllsp . "opam install ocaml-lsp-server")
      (ocamlformat . "opam install ocamlformat")
@@ -3041,40 +3267,39 @@ have one rule for each file type."
              (rl (-map #'cons-reverse l))
              (l (mdrp/map l))
              (rl (mdrp/map rl)))
-        (setq find-sibling-rules (append find-sibling-rules l rl))))
+        (setq find-sibling-rules (append find-sibling-rules l rl))
+        (message "`tuareg' loaded")))
     :hook
-    (tuareg-mode .
-                 (lambda ()
-                   ;; Commented symbols are actually prettier with ligatures or just ugly
-                   (setq prettify-symbols-alist
-                         '(
-                           ("sqrt" . ?√)
-                           ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
-                           ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-                           ("<>" . ?≠)
-                           ;; Some greek letters for type parameters.
-                           ("'a" . ?α)
-                           ("'b" . ?β)
-                           ("'c" . ?γ)
-                           ("'d" . ?δ)
-                           ("'e" . ?ε)
-                           ("'f" . ?φ)
-                           ("'i" . ?ι)
-                           ("'k" . ?κ)
-                           ("'m" . ?μ)
-                           ("'n" . ?ν)
-                           ("'o" . ?ω)
-                           ("'p" . ?π)
-                           ("'r" . ?ρ)
-                           ("'s" . ?σ)
-                           ("'t" . ?τ)
-                           ("'x" . ?ξ)
-                           ("fun" . ?λ)
-                           ("not" . ?￢)
-                           (":=" . ?⟸)
-                           ))))))
+    (tuareg-mode . (lambda ()
+                     ;; Commented symbols are actually prettier with ligatures or just ugly
+                     (setq prettify-symbols-alist
+                           '(
+                             ("sqrt" . ?√)
+                             ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+                             ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
+                             ("<>" . ?≠)
+                             ;; Some greek letters for type parameters.
+                             ("'a" . ?α)
+                             ("'b" . ?β)
+                             ("'c" . ?γ)
+                             ("'d" . ?δ)
+                             ("'e" . ?ε)
+                             ("'f" . ?φ)
+                             ("'i" . ?ι)
+                             ("'k" . ?κ)
+                             ("'m" . ?μ)
+                             ("'n" . ?ν)
+                             ("'o" . ?ω)
+                             ("'p" . ?π)
+                             ("'r" . ?ρ)
+                             ("'s" . ?σ)
+                             ("'t" . ?τ)
+                             ("'x" . ?ξ)
+                             ("fun" . ?λ)
+                             ("not" . ?￢)
+                             (":=" . ?⟸)
+                             )))))
 
-(when use-ocaml
   (use-package ocp-indent
     ;; must be careful to always defer this, it has autoloads that adds hooks
     ;; which we do not want if the executable can't be found
@@ -3086,37 +3311,46 @@ have one rule for each file type."
       "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
       (when (executable-find "ocp-indent")
         (ocp-setup-indent)))
-    ))
+    (message "`ocp-indent' loaded")))
 
 (when use-ocaml
   (use-package tuareg-menhir
+    :defer t
     :mode ("\\.mly'" . tuareg-menhir-mode)
-  ))
+    :config (message "`tuareg-menhir' loaded")))
 
 (when use-ocaml
   (use-package dune-minor
     :load-path "lisp/"
-    :hook (tuareg-mode . dune-minor-mode)))
+    :defer t
+    :hook (tuareg-mode . dune-minor-mode)
+    :config (message "`dune-minor' loaded")))
 
 (use-package pdf-tools
   :ensure t
+  :defer t
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
+  :hook
+  (pdf-view-mode . (lambda () (nlinum-mode 0)))
   :config
   (setq-default pdf-view-display-size 'fit-page)
   ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
   (setq pdf-view-use-scaling t
         pdf-view-use-imagemagick nil)
-  :hook
-  (pdf-view-mode . (lambda () (nlinum-mode 0))))
+  (message "`pdf-tools' loaded"))
 
 (use-package saveplace-pdf-view
   :ensure t
-  :after pdf-view)
+  :defer t
+  :after pdf-view
+  :config (message "`saveplace-pdf-view' loaded"))
 
 (when use-python
   (use-package python
     :ensure t
+    :defer t
+    :hook (python-mode . semantic-mode)
     :config
     ;; Remove guess indent python message
     (setq python-indent-guess-indent-offset-verbose nil)
@@ -3133,12 +3367,13 @@ have one rule for each file type."
       (setq python-shell-interpreter "python2"))
      (t
       (setq python-shell-interpreter "python")))
-    :hook (python-mode . semantic-mode)))
+    (message "`python' loaded")))
 
 (when use-python
   (use-package pyvenv
     :ensure t
     :defer t
+    :hook (python-mode . pyvenv-mode)
     :config
     ;; Setting work on to easily switch between environments
     (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs/"))
@@ -3147,7 +3382,7 @@ have one rule for each file type."
     ;; Restart the python process when switching environments
     (add-hook 'pyvenv-post-activate-hooks (lambda ()
                                             (pyvenv-restart-python)))
-    :hook (python-mode . pyvenv-mode)))
+    (message "`pyvenv' loaded")))
 
 (when use-python
   (use-package lsp-pyright
@@ -3160,7 +3395,7 @@ have one rule for each file type."
           lsp-pyright-auto-import-completions t
           lsp-pyright-use-library-code-for-types t
           lsp-pyright-venv-path "~/miniconda3/envs")
-    ))
+    (message "`lsp-pyright' loaded")))
 
 (when use-reason
   (defun shell-cmd (cmd)
@@ -3190,16 +3425,19 @@ have one rule for each file type."
 
   (use-package reason-mode
     :ensure t
+    :defer t
     :config
     (add-hook
      'reason-mode-hook
      (lambda ()
        (add-hook 'before-save-hook 'refmt-before-save)
-       (merlin-mode)))))
+       (merlin-mode)))
+    (message "`reason-mode' loaded")))
 
 (when use-rust
   (use-package rustic
     :ensure t
+    :defer t
     :ensure-system-package
     ((taplo . "cargo install taplo-cli")
      (rustfmt . "cargo install rustfmt"))
@@ -3215,20 +3453,7 @@ have one rule for each file type."
               [remap compile] 'rustic-compile
               [remap recompile] 'rustic-recompile
               )
-    :config
-    ;; Conflicts with (and is redundant with) ligatures
-    (setq rust-prettify-symbols-alist nil)
-    ;; Allign to `.`
-    (setq rustic-indent-method-chain t)
-    ;; Let apheleia handle reformatting
-    (setq rustic-babel-format-src-block nil)
-    (setq rustic-format-trigger nil)
-    ;; uncomment for less flashiness
-    ;; (setq lsp-eldoc-hook nil)
-    ;; (setq lsp-enable-symbol-highlighting nil)
-    ;; (setq lsp-signature-auto-activate nil)
-    ;; (defun my/rust-mode-outline-regexp-setup ()
-    ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
+    :init
     (defun mdrp/rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
       (interactive)
@@ -3301,25 +3526,45 @@ have one rule for each file type."
     (defun mdrp/rust-doc-comment-dwim-enclosing ()
       (interactive)
       (mdrp/rust-doc-comment-dwim "! "))
-    ))
+    :config
+    ;; Conflicts with (and is redundant with) ligatures
+    (setq rust-prettify-symbols-alist nil)
+    ;; Allign to `.`
+    (setq rustic-indent-method-chain t)
+    ;; Let apheleia handle reformatting
+    (setq rustic-babel-format-src-block nil)
+    (setq rustic-format-trigger nil)
+    ;; uncomment for less flashiness
+    ;; (setq lsp-eldoc-hook nil)
+    ;; (setq lsp-enable-symbol-highlighting nil)
+    ;; (setq lsp-signature-auto-activate nil)
+    ;; (defun my/rust-mode-outline-regexp-setup ()
+    ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
+    (message "`rustic' loaded")))
 
 (when use-web
   (use-package web-mode
     :ensure t
+    :defer t
     :mode "\\.php\\'"
-    ))
+    :config (message "`web-mode' loaded")))
 
 (when use-web
   (use-package css-mode
     :ensure nil
-    :mode "\\.css\\'"))
+    :defer t
+    :mode "\\.css\\'"
+    :config (message "`css-mode' loaded")))
 
 (use-package simple-httpd
-  :ensure t)
+  :ensure t
+  :defer t
+  :config (message "`simple-httpd' loaded"))
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
 
+(message "`init' file loaded")
 ;;;; Footer
 
 ;; End:

@@ -50,7 +50,7 @@ Literate configuration for [[https://www.gnu.org/software/emacs/manual/html_node
 By increasing the GC threshold we ensure that it will run less frequently and thus lead to a faster start-up.
 
 #+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 100000000)
+  (setq gc-cons-threshold most-positive-fixnum)
 #+END_SRC
 
 * Increase data read from processes
