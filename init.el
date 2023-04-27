@@ -19,8 +19,68 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
+(defvar elpaca-installer-version 0.3)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (kill-buffer buffer)
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+
+;; Install use-package support
+(elpaca elpaca-use-package
+        ;; Enable :elpaca use-package keyword.
+        (elpaca-use-package-mode)
+        ;; Assume :elpaca t unless otherwise specified.
+        (setq elpaca-use-package-by-default t))
+
+(elpaca-wait)
+
+(eval-and-compile
+  (setq
+   use-package-verbose t
+   use-package-expand-minimally t
+   use-package-compute-statistics t
+   use-package-enable-imenu-support t))
+
+(elpaca bind-key)
+(elpaca use-package)
+
+(use-package use-package-ensure-system-package
+      :config (message "`use-package-ensure-system-package' loaded")
+)
+
 (use-package gcmh
   :load-path "lisp/"
+  :elpaca nil
   :demand t
   :config
   (gcmh-mode 1)
@@ -330,37 +390,11 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-(setq package-archives '(("melpa" . "http://melpa.org/packages/")
-                         ("elpa" . "http://elpa.gnu.org/packages/")))
-
-(unless (bound-and-true-p package--initialized)
-  (setq package-enable-at-startup nil)          ; To prevent initializing twice
-  (package-initialize))
-
-(unless (package-installed-p 'use-package)
-  (message "Installing use-package")
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-and-compile
-  (setq
-   use-package-verbose t
-   use-package-expand-minimally t
-   use-package-compute-statistics t
-   use-package-enable-imenu-support t))
-
-(eval-when-compile
-  (require 'use-package)
-  (require 'bind-key))
-
-(use-package use-package-ensure-system-package
-  :ensure t
-  :config (message "`use-package-ensure-system-package' loaded")
-)
+;; (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+;;                          ("elpa" . "http://elpa.gnu.org/packages/")))
 
 (use-package auto-package-update
-  :ensure t
-  :defer t
+      :defer t
   :custom
   (auto-package-update-show-preview t)
   (auto-package-update-prompt-before-update t)
@@ -368,8 +402,8 @@
   :config (message "`auto-package-update' loaded"))
 
 (use-package no-littering
-  :ensure t
-  :config (message "`no-littering' loaded"))
+      :config (message "`no-littering' loaded"))
+(elpaca-wait)
 
 (auto-save-visited-mode 1)
 (setq auto-save-default t)
@@ -398,8 +432,7 @@
 debian, and derivatives). On most it's 'fd'.")
 
 (use-package esup
-  :ensure t
-  :defer t
+      :defer t
   :config
   (setq esup-depth 0)
   (message "`esup' loaded"))
@@ -407,11 +440,11 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package prescient
   :init
   (setq prescient-persist-mode 1)
-  :ensure t
-  :defer t
+      :defer t
   :config (message "`prescient' loaded"))
 
 (use-package savehist
+  :elpaca nil
   :init
   (savehist-mode t)
   ;; Remember recently opened files
@@ -445,30 +478,26 @@ debian, and derivatives). On most it's 'fd'.")
   (setq locale-coding-system 'utf-8))
 
 (use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p)
+      :if (display-graphic-p)
   :config
   (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
   (message "`all-the-icons' loaded"))
 
 (use-package all-the-icons-dired
-  :ensure t
-  :hook (dired-mode . all-the-icons-dired-mode)
+      :hook (dired-mode . all-the-icons-dired-mode)
   :config
   (message "`all-the-icons-dired' loaded"))
 
 (use-package all-the-icons-completion
   :init
   (all-the-icons-completion-mode)
-  :ensure t
-  :after (marginalia all-the-icons)
+      :after (marginalia all-the-icons)
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
   :config
   (message "`all-the-icons-completion' loaded"))
 
 (use-package ligature
-  :ensure t
-  :defer t
+      :defer t
   :config
   ;; Enable the "www" ligature in every possible major mode
   (ligature-set-ligatures 't '("www"))
@@ -494,23 +523,20 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`ligature' loaded"))
 
 (use-package ansi-color
-  :ensure t
+  :elpaca nil
   :hook
   (shell-mode . ansi-color-for-comint-mode-on)
   :config (message "`ansi-color' loaded"))
 
 (use-package kurecolor
-  :ensure t
-  :config (message "`kurecolor' loaded"))
+        :config (message "`kurecolor' loaded"))
 
 (use-package emojify
-  :ensure t
-  :hook (after-init . global-emojify-mode)
+      :hook (after-init . global-emojify-mode)
   :config (message "`emojify' loaded"))
 
 (use-package general
   :demand t
-  :ensure t
   :init
   (general-unbind
     "C-o"
@@ -604,10 +630,10 @@ debian, and derivatives). On most it's 'fd'.")
     [return]                  'flyspell-correct-at-point
     )
   :config (message "`general' loaded"))
+(elpaca-wait)
 
 (use-package which-key
-  :ensure t
-  :init (which-key-mode)
+      :init (which-key-mode)
   :custom
   (which-key-separator " ")
   (which-key-prefix-prefix "+")
@@ -633,8 +659,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`which-key' loaded"))
 
 (use-package selected
-  :ensure t
-  :defer t
+      :defer t
   :init
   (require 'hide-region)
   (selected-global-mode)
@@ -699,8 +724,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package nlinum
   :init
   (global-nlinum-mode 1)
-  :ensure t
-  :config
+      :config
   (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
   (message "`nlinum' loaded")
   )
@@ -711,8 +735,7 @@ debian, and derivatives). On most it's 'fd'.")
   )
 
 (use-package crux
-  :ensure t
-  :init
+      :init
   (define-prefix-command 'mdrp-crux-map nil "Crux-")
   :defer t
   :general
@@ -747,6 +770,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package delete-block
   :load-path "lisp/"
+  :elpaca nil
   :defer t
   :general
   ("C-d"                     'delete-block-forward)
@@ -756,14 +780,12 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package discover-my-major
   :after general
-  :ensure t
-  :defer t
+      :defer t
   :general ("C-h C-m" 'discover-my-major)
   :config (message "`discover-my-major' loaded"))
 
 (use-package easy-kill
-  :ensure t
-  :defer t
+      :defer t
   :config
   (global-set-key [remap kill-ring-save] #'easy-kill)
   (global-set-key [remap mark-sexp] #'easy-mark)
@@ -771,6 +793,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package flycheck-languagetool
   :load-path "lisp/flycheck-languagetool/"
+  :elpaca nil
   :defer t
   :hook ((text-mode . flycheck-languagetool-setup)
          (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
@@ -780,9 +803,16 @@ debian, and derivatives). On most it's 'fd'.")
   ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
   :init
   (setq flycheck-languagetool-server-jar (expand-file-name "~/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
-  :config (message "`flycheck-languagetool' loaded"))
+  :config
+  (defun flycheck-languagetool-disable ()
+    "Disable flycheck-languagetool-package."
+    (interactive)
+    (setq flycheck-languagetool--text-mode nil)
+    (delete 'languagetool 'flycheck-checkers))
+  (message "`flycheck-languagetool' loaded"))
 
 (use-package flyspell
+  :elpaca nil
   :init
   (defun mdrp/flyspell-on-for-buffer-type ()
     "Enable Flyspell appropriately for the major mode of the current buffer.
@@ -898,8 +928,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`flyspell' loaded"))
 
 (use-package flyspell-correct
-  :ensure t
-  :after flyspell
+      :after flyspell
   :general
   (:keymaps 'popup-menu-keymap
             "<return>" 'popup-select)
@@ -909,12 +938,10 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`flyspell-correct' loaded"))
 
 (use-package fringe-helper
-  :ensure t
-  :config (message "`fringe-helper' loaded"))
+      :config (message "`fringe-helper' loaded"))
 
 (use-package highlight-symbol
-    :ensure t
-    :defer t
+          :defer t
     :init (highlight-symbol-mode)
     :general
     (:keymaps 'highlight-symbol-nav-mode-map
@@ -928,8 +955,7 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`highlight-symbol' loaded"))
 
 (use-package hydra
-  :ensure t
-  :defer t
+      :defer t
   :custom
   (hydra-default-hint nil)
   :config
@@ -950,8 +976,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`hydra' loaded"))
 
 (use-package keycast
-  :ensure t
-  :defer t
+      :defer t
   :commands keycast-mode
   :config
   (define-minor-mode keycast-mode
@@ -964,7 +989,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`keycast' loaded"))
 
 (use-package multiple-cursors
-  :ensure t
   :defer t
   :general
   ("C-c n" 'mc/mark-next-like-this)
@@ -974,6 +998,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hide-region
   :load-path "lisp/"
+  :elpaca nil
   :commands hide-region-pin
   :defer t
   :general
@@ -981,12 +1006,11 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`hide-region loaded"))
 
 (use-package hide-mode-line
-  :ensure t
-  :defer t
+      :defer t
   :config (message "`hide-mode-line loaded"))
 
 (use-package whitespace
-  :ensure nil
+  :elpaca nil
   :defer t
   :hook
   (prog-mode . whitespace-mode)
@@ -995,10 +1019,672 @@ debian, and derivatives). On most it's 'fd'.")
   (whitespace-style '(face empty indentation::space tab trailing))
   :config (message "`whitespace loaded"))
 
+(use-package git-commit
+  :defer t
+  :hook (git-commit-mode . mdrp/english-dict)
+  :config (message "`git-commit' loaded"))
+
+(use-package magit
+  :defer t
+  :hook (magit-mode . (lambda () (company-mode -1)))
+  :elpaca (magit :files (:defaults "lisp/magit*.el" "lisp/git-rebase.el" "docs/magit.texi" "docs/AUTHORS.md" "LICENSE" "Documentation/magit.texi" "Documentation/AUTHORS.md" "lisp/magit-section.el" "lisp/magit-section-pkg.el" (:exclude "lisp/magit-libgit.el" "lisp/magit-libgit-pkg.el")))
+  :general
+  ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
+  ("M-n"    'mdrp/smerge-or-flycheck-next)
+  (:keymaps 'smerge-mode-map
+            "M-m"                 'smerge-keep-mine
+            "M-o"                 'smerge-keep-other
+            )
+  (:keymaps 'magit-mode-map
+            "g"             'magit-status
+            "G"             'git-messenger:popup-message
+            "M-g"           'magit-dispatch
+            )
+  :config
+  (setq magit-auto-revert-mode t)
+  (setq magit-auto-revert-immediately t)
+  (defun mdrp/smerge-or-flycheck-next ()
+    (interactive)
+    (let (files (vc-git-conflicted-files default-directory))
+      (if (null files)
+          (flycheck-next-error)
+        (smerge-vc-next-conflict))))
+  (message "`magit' loaded"))
+
+(when use-magit-todos
+  (use-package magit-todos
+    :defer t
+    :hook (magit . magit-todos)
+    :config
+    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
+    (message "`magit-todos' loaded")))
+
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode 1)
+  (message "`hl-todo' loaded"))
+
+(use-package diff-hl
+  :defer t
+  :custom
+  (global-diff-hl-mode 1)
+  (diff-hl-side 'right)
+  :hook
+  (magit-post-refresh . diff-hl-magit-post-refresh)
+  (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+  :config (message "`diff-hl' loaded"))
+
+(use-package git-messenger
+  :defer t
+  :config
+  (setq git-messenger:show-detail t
+        git-messenger:use-magit-popup t)
+  (message "`git-messenger' loaded"))
+
+(use-package git-timemachine
+  :defer t
+  :general
+  (:keymaps 'magit-mode-map
+            "<left>" '(git-timemachine :wk "Go back in git history"))
+  :config (message "`git-timemachine' loaded"))
+
+(use-package git-modes
+  :defer t
+  :config (message "`git-modes' loaded"))
+
+(use-package code-review
+  :disabled t
+  :config
+  (setq code-review-download-dir (no-littering-expand-var-file-name "backups/"))
+  (message "`code-review' loaded"))
+
+(use-package ghub
+  :defer t
+  :config (message "`ghub' loaded"))
+
+(use-package org-protocol
+  :elpaca nil
+  :defer t
+  :config
+  (message "`org-protocol' loaded"))
+
+(use-package ox
+  :elpaca nil
+  :defer t
+  :init
+  (defun mdrp/filter-timestamp (trans back _comm)
+    "Remove <> around time-stamps."
+    (pcase back
+      (`html
+       (replace-regexp-in-string "&[lg]t;" "" trans))
+      (`latex
+       (replace-regexp-in-string "[<>]" "" trans))))
+
+  :mode ("\\.org\\'" . org-mode)
+  :config
+  (add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
+  (message "`ox' loaded"))
+
+(use-package mixed-pitch
+  :defer t
+  :config (message "`mixed-pitch' loaded"))
+
+;; (use-package ob-rust :defer t)
+
+(use-package org
+  :defer t
+  :elpaca nil
+  :mode ("\\.org\\'" . org-mode)
+  :hook (org-mode . mixed-pitch-mode)
+
+  :general
+  ("M-o" 'mdrp-org-map)
+  ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
+  (:keymaps 'mdrp-org-map
+            "l"                       'org-store-link
+            "a"                       'org-agenda
+            "c"                       'org-capture
+            )
+  (:keymaps 'org-mode-map
+            "M-j"                     'org-goto
+            "C-c C-a"                 nil
+            "C-<return>"              'org-meta-return
+            "M-C-<return>"            'org-insert-heading-respect-content
+            )
+  :init
+  (setq org-list-allow-alphabetical t)
+  ;; If you don't want the agenda in french you can comment the following
+  ;; expression. You can even set it to your preferred language
+  ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
+  (setq calendar-week-start-day 1
+        calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
+                                 "Jeudi" "Vendredi" "Samedi"]
+        calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
+                                   "Juin" "Juillet" "Août" "Septembre"
+                                   "Octobre" "Novembre" "Décembre"])
+
+  (defun mdrp/org-compile-latex-and-update-other-buffer ()
+    "Has as a premise that it's run from an org-mode buffer and the
+             other buffer already has the PDF open"
+    (interactive)
+    (org-latex-export-to-pdf)
+    (mdrp/update-other-buffer)
+    )
+  :custom
+  (org-directory "~/org/")
+  ;; Babel
+  (org-confirm-babel-evaluate nil)
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
+  ;; Rest
+  (org-agenda-files
+   '("/home/mattias/org/agenda.org" "/home/mattias/org/cduce.org" "/home/mattias/org/orgzly.org") nil nil "Customized with use-package org")
+  (org-ellipsis " ▾")
+  (org-adapt-indentation nil)
+  (org-agenda-span 'week)
+  (org-agenda-start-day "1d")
+  (org-agenda-start-on-weekday nil)
+  (org-agenda-start-with-log-mode t)
+  (org-cycle-separator-lines -1)
+  (org-fontify-done-headline t)
+  (org-footnote-auto-adjust t)
+  (org-hide-emphasis-markers t)
+  (org-hide-leading-stars nil)
+  (org-hide-macro-markers t)
+  (org-image-actual-width '(300))
+  (org-latex-compiler "latexmk")
+  (org-log-done 'time)
+  (org-odd-levels-only nil)
+  (org-pretty-entities t)
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
+  (org-startup-truncated nil)
+  (org-startup-with-inline-images t)
+  (org-support-shift-select 'always)
+  (org-roam-v2-ack t) ; anonying startup message
+  (org-tag-persistent-alist
+   '((:startgroup . nil)
+     ("Maison" . ?h)
+     ("Boulot" . ?b)
+     ("Plaisir" . ?p)
+     (:endgroup . nil)
+     (:startgroup . nil)
+     ("Usuba" . ?u)
+     ("Ocaml" . ?o)
+     ("Reste" . ?r)
+     (:endgroup . nil)
+     (:startgroup . nil)
+     ("Facile" . ?f)
+     ("Moyen" . ?m)
+     ("Difficile" . ?d)
+     (:endgroup . nil)
+     )
+   )
+  (org-tag-faces
+   '(
+     ("Maison" . (:foreground "GoldenRod" :weight bold))
+     ("Plaisir" . (:foreground "GoldenRod" :weight bold))
+     ("Boulot" . (:foreground "GoldenRod" :weight bold))
+     ("Usuba" . (:foreground "IndianRed1" :weight bold))
+     ("OCaml" . (:foreground "IndianRed1" :weight bold))
+     ("Reste" . (:foreground "IndianRed1" :weight bold))
+     ("Facile" . (:foreground "OrangeRed" :weight bold))
+     ("Moyen" . (:foreground "OrangeRed" :weight bold))
+     ("Difficile" . (:foreground "OrangeRed" :weight bold))
+     )
+   )
+
+  :config
+  ;; TODO states
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
+          ))
+  (define-prefix-command 'mdrp-org-map nil "Org-")
+  (defun transform-square-brackets-to-round-ones(string-to-transform)
+    "Transforms [ into ( and ] into ), other chars left unchanged."
+    (concat
+     (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform)))
+  (customize-set-value 'org-latex-with-hyperref nil)
+  (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
+  (setq org-image-actual-width nil)
+  (defun org-mode-<>-syntax-fix (start end)
+    "Change syntax of characters ?< and ?> to symbol within source code blocks."
+    (let ((case-fold-search t))
+      (when (eq major-mode 'org-mode)
+        (save-excursion
+          (goto-char start)
+          (while (re-search-forward "<\\|>" end t)
+            (when (save-excursion
+                    (and
+                     (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
+                     (string-equal (downcase (match-string 1)) "begin")))
+              ;; This is a < or > in an org-src block
+              (put-text-property (point) (1- (point))
+                                 'syntax-table (string-to-syntax "_"))))))))
+
+  (defun org-setup-<>-syntax-fix ()
+    "Setup for characters ?< and ?> in source code blocks.
+          Add this function to `org-mode-hook'."
+    (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
+    (syntax-propertize (point-max)))
+
+  (add-hook 'org-mod-hook #'org-setup-<>-syntax-fix)
+
+  (setq org-agenda-custom-commands
+        '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
+           ((org-agenda-span 'month)
+            (org-agenda-show-all-dates nil)
+            ))))
+  (calendar-set-date-style 'iso)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (emacs-lisp . t)
+     ;; (rust . t)
+     (ocaml . t)
+     (latex . t)
+     (shell . t)))
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (push '("- [ ]" . "") prettify-symbols-alist)
+              (push '("+ [ ]" . "") prettify-symbols-alist)
+              (push '("* [ ]" . "") prettify-symbols-alist)
+              (push '("- [X]" . "") prettify-symbols-alist)
+              (push '("+ [X]" . "") prettify-symbols-alist)
+              (push '("* [X]" . "") prettify-symbols-alist)
+              (push '("- [-]" . "") prettify-symbols-alist)
+              (push '("+ [-]" . "") prettify-symbols-alist)
+              (push '("* [-]" . "") prettify-symbols-alist)
+              (prettify-symbols-mode)
+              ))
+  (setq org-capture-templates
+        `(
+          ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+           "* TODO %?\n  %u\n  %a")
+          ("s" "Scheduled" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+           "* TODO %?\n SCHEDULED: %^t \n %a")
+          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+          ))
+  (custom-theme-set-faces
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+   '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
+   '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+   '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
+   '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
+   '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+   ;; (let ((re "\\}\\(+\\|-\\) "))
+   ;;   (font-lock-add-keywords
+   ;;     'org-mode
+   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) re)
+   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+   ;;    (font-lock-add-keywords
+   ;;     'org-mode
+   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
+   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
+
+   ;;    (font-lock-add-keywords
+   ;;     'org-mode
+   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
+   ;;                                    (* 2 (+ 2 org-list-indent-offset))) re)
+   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
+   ;;    (font-lock-add-keywords
+   ;;     'org-mode
+   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
+   ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
+   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
+   ;;    )
+   )
+  (message "`org-mode' loaded"))
+
+(use-package org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode)
+  :config (message "`org-auto-tangle' loaded"))
+
+(use-package org-ref
+  :disabled
+  :after org
+  :init
+  (setq org-ref-completion-library 'org-ref-ivy-cite)
+  ;; :custom
+  ;; (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
+  )
+
+(use-package org-bullets
+  :defer t
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("" "" "" "" "" "" ""))
+  :config (message "`org-bullets' loaded"))
+
+(use-package org-inline-pdf
+  :defer t
+  :ensure-system-package pdf2svg
+  :hook (org-mode . org-inline-pdf-mode)
+  :config (message "`org-inline-pdf' loaded")
+  )
+
+(use-package calfw
+  :config
+  (setq cfw:org-overwrite-default-keybinding t)
+  (setq cfw:fchar-junction ?╋
+        cfw:fchar-vertical-line ?┃
+        cfw:fchar-horizontal-line ?━
+        cfw:fchar-left-junction ?┣
+        cfw:fchar-right-junction ?┫
+        cfw:fchar-top-junction ?┯
+        cfw:fchar-top-left-corner ?┏
+        cfw:fchar-top-right-corner ?┓)
+  )
+
+(use-package calfw-org
+  :defer t
+  :after calfw
+  :elpaca nil
+  :init
+  (define-prefix-command 'mdrp-calfw-map nil "Cal-")
+  :general
+  ("M-c" 'mdrp-calfw-map)
+  (:keymaps 'mdrp-calfw-map
+            "c" 'cfw:open-calendar-buffer
+            "o" 'cfw:open-org-calendar
+            )
+  (:keymaps 'cfw:calendar-mode-map
+            "RET" 'cfw:org-open-agenda-day)
+  :custom
+  (cfw:org-capture-template
+   `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+     "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
+   )
+  :config
+  (defun cfw:org-capture-day ()
+    (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
+      (let ((pos (cfw:cursor-to-nearest-date)))
+        (concat "<"
+                (format-time-string  "%Y-%m-%d %a 09:00"
+                                     (encode-time 0 0 0
+                                                  (calendar-extract-day pos)
+                                                  (calendar-extract-month pos)
+                                                  (calendar-extract-year pos)))
+                ">"))))
+  (message "`calfw-org' loaded"))
+
+;; The request can be wrong depending on Google updates, evaluate this:
+;; (concat org-gcal-auth-url
+;;         "?client_id=" (url-hexify-string org-gcal-client-id)
+;;         "&response_type=code"
+;;         "&redirect_uri=" (url-hexify-string "urn:ietf:wg:oauth:2.0:oob")
+;;         "&scope=" (url-hexify-string org-gcal-resource-url))
+
+(use-package org-gcal
+  :disabled
+  :custom
+  (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
+  (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
+  (org-gcal-fetch-file-alist
+   `(
+     (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
+     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")
+     )
+   )
+  )
+
+(use-package org-super-agenda
+  :defer t
+  :config
+  (setq org-super-agenda-groups
+        '(;; Each group has an implicit Boolean OR operator between its selectors.
+          (:name "Rendez-vous"  ; Optionally specify section name
+                 :time-grid t  ; Items that appear on the time grid
+                 )
+          ;; After the last group, the agenda will display items that didn't
+          ;; match any of these groups, with the default order position of 99
+          ))
+  (org-super-agenda-mode)
+  (when use-org-agenda-startup (org-agenda nil "a"))
+  (message "`org-super-agenda' loaded"))
+
+(use-package org-appear
+  :defer t
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autolinks t)
+  (message "`org-appear loaded"))
+
+(when use-org-roam
+  (use-package org-roam
+    :defer t
+    :after org
+    :custom
+    (org-roam-directory (file-truename "~/org/org-roam"))
+    :general
+    (:keymaps 'mdrp-org-map
+              "r" 'org-roam-buffer-toggle
+              "f" 'org-roam-node-find
+              "g" 'org-roam-graph
+              "i" 'org-roam-node-insert
+              "c" 'org-roam-capture
+              ;; Dailies
+              "j" 'org-roam-dailies-capture-today)
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-roam-db-autosync-mode)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol)
+    (message "`org-roam' loaded")))
+
+(use-package org-make-toc
+  :defer t
+  :custom
+  (org-make-toc-insert-custom-ids t)
+  (message "`org-make-toc' loaded"))
+
+(use-package ox-awesomecv
+  :load-path "lisp/org-cv/"
+  :elpaca nil
+  :defer t
+  :config (message "`ox-awesomecv' loaded"))
+
+(use-package ox-moderncv
+  :load-path "lisp/org-cv/"
+  :elpaca nil
+  :defer t
+  :config (message "`ox-moderncv' loaded"))
+
+(when use-markdown
+  (use-package markdown-mode
+    :defer t
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'"       . markdown-mode)
+           ("\\.markdown\\'" . gfm-mode))
+    :init
+    (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
+    (setq markdown-command "markdown")
+    (setq markdown-open-command "retext")
+    :hook (gfm-mode . (lambda ()
+                        (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
+    :config (message "`markdown-mode' loaded")))
+
+(when use-markdown
+  (use-package markdown-toc
+    :defer t
+    :config (message "`markdown-toc' loaded")))
+
+(when use-pandoc
+  (use-package pandoc-mode
+    :ensure-system-package pandoc
+    :defer t
+    :hook ((markdown-mode . pandoc-mode)
+           (pandoc-mode . pandoc-load-default-settings))
+    :config (message "`pandoc-mode' loaded")))
+
+(use-package lsp-mode
+  :defer t
+  :commands lsp
+  :hook ((tuareg-mode . lsp-deferred)
+         (caml-mode . lsp-deferred)
+         (clojure-mode . lsp-deferred)
+         (clojurescript-mode-hook . lsp-deferred)
+         (clojurec-mode-hook . lsp-deferred)
+         (elm-mode . lsp-deferred)
+         (rustic-mode . lsp-deferred)
+         (conf-toml-mode . lsp-deferred)
+         (kotlin-mode . lsp-deferred)
+         (fsharp-mode . lsp-deferred)
+         (python-mode . lsp-deferred))
+  :general
+  (:keymaps 'lsp-mode-map
+            "C-c C-t" 'lsp-describe-thing-at-point
+            "C-c C-w" 'mdrp/lsp-get-type-and-kill
+            "C-c C-l" 'lsp-find-definition
+            "C-c &"   'pop-global-mark :keymaps 'override)
+  (:keymaps 'lsp-command-map
+            "d"   'lsp-find-definition
+            "r"   'lsp-find-references
+            "n"   'lsp-ui-find-next-reference
+            "p"   'lsp-ui-find-prev-reference
+            "i"   'counsel-semantic-or-imenu
+            "R"   'lsp-rename
+            "f"   'consult-flycheck
+            "t r" 'lsp-treemacs-references
+            "t s" 'lsp-treemacs-symbols
+            )
+  :custom
+  (lsp-log-io nil)
+  (lsp-headerline-breadcrumb-enable t)
+  (lsp-headerline-breadcrumb-segments '(project path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-keymap-prefix "M-l")
+  (lsp-prefer-capf t)
+  (lsp-lens-enable nil)
+  (lsp-completion-provider :none)
+  (lsp-completion-enable t)
+  (lsp-enable-imenu t)
+  (lsp-disabled-clients '((python-mode . pyls)))
+
+  ;; Rust-analyzer is the almost official lsp server for Rust
+  (lsp-rust-server 'rust-analyzer)
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  ;; enable / disable the hints as you prefer:
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+  (lsp-rust-analyzer-display-closure-return-type-hints t)
+  (lsp-rust-analyzer-display-parameter-hints nil)
+  (lsp-rust-analyzer-display-reborrow-hints nil)
+
+  :config
+  (defvar mdrp/type-map
+    (let ((keymap (make-sparse-keymap)))
+      (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
+      keymap)
+    "The local map to navigate type enclosing.")
+
+  (defun mdrp/set-type-map (&rest r)
+    (set-transient-map mdrp/type-map)
+    )
+
+  (advice-add 'lsp-describe-thing-at-point :after #'mdrp/set-type-map)
+
+  (defun mdrp/lsp-get-type-and-kill ()
+    (interactive)
+    (let ((contents (-some->> (lsp--text-document-position-params)
+                      (lsp--make-request "textDocument/hover")
+                      (lsp--send-request)
+                      (lsp:hover-contents))))
+      (let ((contents (and contents
+                           (lsp--render-on-hover-content
+                            contents
+                            t))))
+        (let ((contents
+               (pcase (lsp-workspaces)
+                 (`(,workspace)
+                  (lsp-clients-extract-signature-on-hover
+                   contents
+                   (lsp--workspace-server-id workspace)
+                   t))
+                 (lsp-clients-extract-signature-on-hover
+                  contents
+                  nil)
+                 )))
+          (message "Copied %s to kill-ring" contents)
+          (kill-new contents)
+          ))))
+  (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
+  (lsp-enable-which-key-integration t)
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection
+                     '("opam" "exec" "--" "ocamllsp"))
+    :major-modes '(caml-mode tuareg-mode)
+    :server-id 'ocaml-lsp-server))
+  (message "`lsp' loaded"))
+
+;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
+(use-package lsp-ui
+  :defer t
+  :hook (lsp-mode . lsp-ui-mode)
+  :general
+  ("C-M-d" 'lsp-ui-doc-show)
+  ("C-c i" 'lsp-ui-imenu)
+  (:keymaps 'lsp-ui-mode-map
+            [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+            [remap xref-find-references] 'lsp-ui-peek-find-references
+            )
+  (:keymaps 'lsp-command-map
+            "u f" 'lsp-ui-doc-focus-frame
+            "u i" 'lsp-ui-imenu
+            )
+  :custom
+  (lsp-ui-doc-delay 0.9)
+  (lsp-ui-doc-position 'at-point)
+  ;; Whether or not to enable the header which displays the symbol string.
+  (lsp-ui-doc-header t)
+  ;; Whether or not to include the object signature/type in the frame.
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-show-with-cursor nil)
+  (lsp-ui-doc-show-with-mouse nil)
+  ;; Border color of the frame
+  (lsp-ui-doc-border (face-foreground 'default))
+  ;; Whether or not to enable lsp-ui-sideline
+  (lsp-ui-sideline-enable nil)
+  ;; Ignore duplicates when there is a same symbol with same contents
+  ;; (lsp-ui-sideline-ignore-duplicate t)
+  ;; Whether to show code actions in sideline.
+  ;; (lsp-ui-sideline-show-code-actions nil)
+  :config (message "`lsp-ui' loaded"))
+
+(use-package lsp-treemacs
+  :defer t
+  :after lsp
+  :config (message "`lsp-treemacs' loaded")
+  )
+
+(use-package consult-lsp
+  :defer t
+  :disabled)
+
 (use-package highlight-indent-guides
   :disabled
-  :ensure t
-  :hook (prog-mode . highlight-indent-guides-mode)
+      :hook (prog-mode . highlight-indent-guides-mode)
   :config
   (setq highlight-indent-guides-auto-enabled nil)
   ;; (setq highlight-indent-guides-responsive 'stack)
@@ -1009,8 +1695,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`highlight-indent-guides' loaded"))
 
 (use-package apheleia
-  :ensure t
-  :defer t
+      :defer t
   :hook
   (tuareg-mode  . apheleia-mode)
   (caml-mode    . apheleia-mode)
@@ -1028,16 +1713,14 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`apheleia' loaded"))
 
 (use-package dap-mode
-  :ensure t
-  :defer t
+      :defer t
   :after lsp-mode
   :config
   (dap-auto-configure-mode)
   (message "`dap' loaded"))
 
 (use-package dumb-jump
-  :ensure t
-  :defer t
+      :defer t
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   (defhydra dumb-jump-hydra (:color blue :columns 3)
@@ -1128,21 +1811,18 @@ have one rule for each file type."
    "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
 
 (use-package fontify-face
-  :ensure t
-  :defer t
+      :defer t
   :hook (font-lock-mode . fontify-face-mode)
   :config (message "`fontify-face' loaded"))
 
 (use-package flycheck
-  :ensure t
-  :defer t
+      :defer t
   :init
   (define-prefix-command 'mdrp-fly-map nil "Fly-")
   :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
   :general
   (:keymaps 'mdrp-fly-map
-            "p" 'flycheck-prev-error)    :ensure t
-  :config
+            "p" 'flycheck-prev-error)        :config
   (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
@@ -1152,6 +1832,7 @@ have one rule for each file type."
 
 (use-package flycheck-correct
   :load-path "lisp/"
+  :elpaca nil
   :defer t
   :hook flycheck-mode
   :general
@@ -1160,12 +1841,10 @@ have one rule for each file type."
   :config (message "`flycheck-correct' loaded"))
 
 (use-package quick-peek
-  :ensure t
   :defer t
   :config (message "`quick-peek' loaded"))
 
 (use-package flycheck-inline
-  :ensure t
   :after quick-peek
   :hook (flycheck-mode . flycheck-inline-mode)
   :config
@@ -1180,7 +1859,6 @@ have one rule for each file type."
   (message "`flycheck-inline' loaded"))
 
 (use-package consult-flycheck
-  :ensure t
   :defer t
   :general
   ("C-c l" 'consult-flycheck)
@@ -1188,6 +1866,7 @@ have one rule for each file type."
 
 (use-package hideshow
   :defer t
+  :elpaca nil
   :commands (hs-minor-mode
              hs-toggle-hiding)
   :diminish hs-minor-mode
@@ -1196,14 +1875,12 @@ have one rule for each file type."
   (message "`hideshow' loaded"))
 
 (use-package projectile
-  :ensure t
   :defer t
   :general
   ("M-p" 'projectile-command-map)
   :config (message "`projectile' loaded"))
 
 (use-package separedit
-  :ensure t
   :defer t
   :general
   ("C-c C-e"                 'separedit)
@@ -1212,100 +1889,8 @@ have one rule for each file type."
   (message "`separedit' loaded"))
 
 (use-package treemacs
-  :ensure t
   :defer t
   :config (message "`treemacs' loaded"))
-
-(use-package magit
-  :ensure t
-  :defer t
-  :hook (magit-mode . (lambda () (company-mode -1)))
-  :general
-  ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
-  ("M-n"    'mdrp/smerge-or-flycheck-next)
-  (:keymaps 'smerge-mode-map
-            "M-m"                 'smerge-keep-mine
-            "M-o"                 'smerge-keep-other
-            )
-  (:keymaps 'magit-mode-map
-            "g"             'magit-status
-            "G"             'git-messenger:popup-message
-            "M-g"           'magit-dispatch
-            )
-  :config
-  (setq magit-auto-revert-mode t)
-  (setq magit-auto-revert-immediately t)
-  (defun mdrp/smerge-or-flycheck-next ()
-    (interactive)
-    (let (files (vc-git-conflicted-files default-directory))
-      (if (null files)
-          (flycheck-next-error)
-        (smerge-vc-next-conflict))))
-  (message "`magit' loaded"))
-
-(when use-magit-todos
-  (use-package magit-todos
-    :ensure t
-    :defer t
-    :hook (magit . magit-todos)
-    :config
-    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
-    (message "`magit-todos' loaded")))
-
-(use-package hl-todo
-  :ensure t
-  :config
-  (global-hl-todo-mode 1)
-  (message "`hl-todo' loaded"))
-
-(use-package diff-hl
-  :ensure t
-  :defer t
-  :custom
-  (global-diff-hl-mode 1)
-  (diff-hl-side 'right)
-  :hook
-  (magit-post-refresh . diff-hl-magit-post-refresh)
-  (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-  :config (message "`diff-hl' loaded"))
-
-(use-package git-commit
-  :defer t
-  :hook (git-commit-mode . mdrp/english-dict)
-  :config (message "`git-commit' loaded"))
-
-(use-package git-messenger
-  :ensure t
-  :defer t
-  :config
-  (setq git-messenger:show-detail t
-        git-messenger:use-magit-popup t)
-  (message "`git-messenger' loaded"))
-
-(use-package git-timemachine
-  :ensure t
-  :defer t
-  :general
-  (:keymaps 'magit-mode-map
-            "<left>" '(git-timemachine :wk "Go back in git history"))
-  :config (message "`git-timemachine' loaded"))
-
-(use-package git-modes
-  :ensure t
-  :defer t
-  :config (message "`git-modes' loaded"))
-
-(use-package code-review
-  :disabled t
-  :ensure t
-  :config
-  (setq code-review-download-dir (no-littering-expand-var-file-name "backups/"))
-  (message "`code-review' loaded"))
-
-(use-package ghub
-  :ensure t
-  :defer t
-  :config (message "`ghub' loaded"))
 
 (use-package uniquify
   :disabled
@@ -1336,7 +1921,7 @@ have one rule for each file type."
   (message "`frame' loaded"))
 
 (use-package winner
-  :ensure nil
+  :elpaca nil
   :defer t
   :custom
   (winner-boring-buffers
@@ -1355,16 +1940,14 @@ have one rule for each file type."
   (message "`winner' loaded"))
 
 (use-package ace-window
-  :ensure t
-  :config
+        :config
   (setq aw-dispatch-always t)
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
 (when use-visual-fill
   (use-package visual-fill-column
-    :ensure t
-    :defer t
+          :defer t
     :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
     :custom
     (visual-fill-column-width 100)
@@ -1384,15 +1967,14 @@ have one rule for each file type."
 
 (when use-window-purpose
   (use-package window-purpose
-    :ensure t
-    :defer t
+          :defer t
     :config
     (purpose-mode)
     (purpose-x-magit-multi-on)
     (message "`window-purpose' loaded")))
 
 (use-package vertico
-  :ensure t
+  :elpaca (vertico :files (:defaults "extensions/*"))
   :defer t
   :after general
   :init
@@ -1438,8 +2020,7 @@ have one rule for each file type."
 
 (use-package vertico-directory
   :after vertico
-  :ensure nil
-  :defer t
+  :elpaca nil
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
   ;; More convenient directory navigation commands
   :general
@@ -1452,7 +2033,7 @@ have one rule for each file type."
 
 (use-package vertico-multiform
   :after vertico
-  :ensure nil
+  :elpaca nil
   :defer t
   :custom
   (vertico-buffer-display-action '(display-buffer-in-side-window
@@ -1471,12 +2052,9 @@ have one rule for each file type."
   (vertico-multiform-mode)
   (message "`vertico-multiform loaded"))
 
-(use-package vertico-posframe
-  :ensure t
-  :defer t)
+(use-package vertico-posframe :defer t)
 
 (use-package consult
-  :ensure t
   :defer t
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -1607,7 +2185,6 @@ have one rule for each file type."
   (message "`consult' loaded"))
 
 (use-package embark
-  :ensure t
   :defer t
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
@@ -1634,8 +2211,8 @@ have one rule for each file type."
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t
   :after (embark consult)
+  :elpaca nil
   :defer t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode)
@@ -1643,7 +2220,6 @@ have one rule for each file type."
   (message "`embark-consult' loaded"))
 
 (use-package corfu
-  :ensure t
   :defer t
   :init (global-corfu-mode)
   :custom
@@ -1670,8 +2246,8 @@ have one rule for each file type."
   )
 
 (use-package emacs
-  :ensure t
   :defer t
+  :elpaca nil
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
@@ -1701,7 +2277,6 @@ have one rule for each file type."
   :config (message "`emacs' loaded"))
 
 (use-package orderless
-  :ensure t
   :defer t
   :custom
   (completion-styles '(orderless basic))
@@ -1710,7 +2285,6 @@ have one rule for each file type."
   :config (message "`orderless' loaded"))
 
 (use-package cape
-  :ensure t
   :defer t
   ;; Bind dedicated completion commands
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
@@ -1748,7 +2322,6 @@ have one rule for each file type."
 
 (use-package marginalia
   :after vertico
-  :ensure t
   :defer t
   :init (marginalia-mode)
   :custom
@@ -1757,7 +2330,6 @@ have one rule for each file type."
   )
 
 (use-package iedit
-  :ensure t
   :defer t
   :general
   (:keymaps 'lsp-mode-map
@@ -1765,21 +2337,18 @@ have one rule for each file type."
   :config (message "`iedit' loaded"))
 
 (use-package yasnippet
-  :ensure t
   :defer t
   :config
   (yas-global-mode 1)
   (message "`yasnippet' loaded"))
 
 (use-package consult-yasnippet
-  :ensure t
   :defer t
   :general
   ("C-<" 'consult-yasnippet)
   :config (message "`consult-yasnippet' loaded"))
 
 (use-package company
-  :ensure t
   :defer t
   :hook ((prog-mode . company-mode)
          (org-mode . company-mode))
@@ -1825,7 +2394,6 @@ have one rule for each file type."
   ;; ([remap completion-at-point] #'consult-company))
 
 (use-package company-quickhelp
-  :ensure t
   :defer t
   :after company
   :hook (company-mode . company-quickhelp-mode)
@@ -1839,7 +2407,6 @@ have one rule for each file type."
   (message "`company-quickhelp' loaded"))
 
 (use-package company-web
-  :ensure t
   :defer t
   :preface
   (autoload 'company-web-html "company-web-html")
@@ -1853,7 +2420,6 @@ have one rule for each file type."
   :config (message "`company-web' loaded"))
 
 (use-package company-box
-  :ensure t
   :defer t
   :diminish
   :if (display-graphic-p)
@@ -1912,15 +2478,13 @@ have one rule for each file type."
   (message "`company-box' loaded"))
 
 (use-package company-prescient
-    :ensure t
-    :defer t
-    :after company
-    :config
-    (company-prescient-mode 1)
-    (message "`company-prescient' loaded"))
+  :defer t
+  :after company
+  :config
+  (company-prescient-mode 1)
+  (message "`company-prescient' loaded"))
 
 (use-package doom-themes
-  :ensure t
   :config
   ;; Global settings (defaults)
   (load-theme doom-theme t)
@@ -1940,7 +2504,6 @@ have one rule for each file type."
   )
 
 (use-package anzu
-  :ensure t
   :defer t
   :init
   (global-anzu-mode +1)
@@ -1953,7 +2516,6 @@ have one rule for each file type."
   (message "`anzu' loaded"))
 
 (use-package doom-modeline
-  :ensure t
   :init
   ;; If non-nil, cause imenu to see `doom-modeline' declarations.
   ;; This is done by adjusting `lisp-imenu-generic-expression' to
@@ -2099,7 +2661,6 @@ have one rule for each file type."
   (message "`doom-modeline' loaded"))
 
 (use-package minions
-  :ensure t
   :config (minions-mode)
   :custom
   (minions-mode-line-lighter "☰")
@@ -2110,6 +2671,7 @@ have one rule for each file type."
   )
 
 (use-package outline
+  :elpaca nil
   :general
   ("C-o" 'cm-map)
   (:keymaps 'cm-map
@@ -2142,24 +2704,23 @@ have one rule for each file type."
   (message "`outline' loaded"))
 
 (use-package outline-minor
-  :ensure nil
+  :elpaca nil
   :defer t
   :hook (prog-mode . outline-minor-mode)
   :config (message "`outline-minor' loaded"))
 
 (use-package outshine
-  :ensure t
   :defer t
   :init (defvar outline-minor-mode-prefix "\C-o")
   :hook (outline-minor-mode . outshine-mode)
   :config
   (setq outshine-preserve-delimiter-whitespace nil)
-  (message "`outshine' loaded")
-  )
+  (message "`outshine' loaded"))
 
 (use-package pretty-outlines
   :defer t
   :load-path "lisp/"
+  :elpaca nil
   :hook (
          (outline-mode . pretty-outlines-set-display-table)
          (outline-minor-mode . pretty-outlines-set-display-table)
@@ -2168,22 +2729,17 @@ have one rule for each file type."
   :config (message "`pretty-outlines' loaded"))
 
 (use-package rainbow-mode
-  :ensure t
   :defer t
   :hook (help-mode prog-mode text-mode org-mode)
-  :config (message "`rainbow-mode' loaded")
-  )
+  :config (message "`rainbow-mode' loaded"))
 
 (if use-rainbow
     (use-package rainbow-delimiters
-      :ensure t
       :defer t
       :hook (prog-mode . rainbow-delimiters-mode)
       :config (message "`rainbow-delimiters' loaded")))
 
 (use-package pulsar
-  :ensure t
-  :defer t
   :config
   (setq pulsar-pulse-functions
         '(recenter-top-bottom
@@ -2215,7 +2771,6 @@ have one rule for each file type."
 
 (when use-solaire
   (use-package solaire-mode
-    :ensure t
     :defer t
     :config
     (solaire-global-mode +1)
@@ -2223,12 +2778,10 @@ have one rule for each file type."
 
 (when use-dashboard
   (use-package page-break-lines
-    :ensure t
     :defer t
     :config (message "`page-break-lines' loaded"))
 
   (use-package dashboard
-    :ensure t
     :config
     (dashboard-setup-startup-hook)
     ;; Set the title
@@ -2246,11 +2799,11 @@ have one rule for each file type."
     (setq dashboard-set-footer nil)
     (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
     (setq dashboard-week-agenda t)
-    (message "`dashboard' loaded")))
+    (message "`dashboard' loaded"))
+  (elpaca-wait))
 
 (use-package svg-tag-mode
   :disabled
-  :ensure t
   :defer t
   :config
   (setq svg-tag-tags
@@ -2271,7 +2824,7 @@ have one rule for each file type."
 (when use-eaf
   (use-package eaf
     :load-path "lisp/emacs-application-framework"
-    :ensure nil
+    :elpaca nil
     :defer t
     :custom
     ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
@@ -2296,582 +2849,12 @@ have one rule for each file type."
     (eaf-bind-key nil "M-q" eaf-browser-keybinding)
     (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
-(use-package org-protocol
-  :ensure nil
-  :defer t
-  :config
-  (message "`org-protocol' loaded"))
-
-(use-package ox
-  :ensure nil
-  :defer t
-  :init
-  (defun mdrp/filter-timestamp (trans back _comm)
-    "Remove <> around time-stamps."
-    (pcase back
-      (`html
-       (replace-regexp-in-string "&[lg]t;" "" trans))
-      (`latex
-       (replace-regexp-in-string "[<>]" "" trans))))
-
-  :mode ("\\.org\\'" . org-mode)
-  :config
-  (add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
-  (message "`ox' loaded"))
-
-(use-package mixed-pitch
-  :ensure t
-  :defer t
-  :config (message "`mixed-pitch' loaded"))
-
-(use-package org
-  :ensure t
-  :defer t
-  :mode ("\\.org\\'" . org-mode)
-  :hook (org-mode . mixed-pitch-mode)
-
-  :general
-  ("M-o" 'mdrp-org-map)
-  ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
-  (:keymaps 'mdrp-org-map
-            "l"                       'org-store-link
-            "a"                       'org-agenda
-            "c"                       'org-capture
-            )
-  (:keymaps 'org-mode-map
-            "M-j"                     'org-goto
-            "C-c C-a"                 nil
-            "C-<return>"              'org-meta-return
-            "M-C-<return>"            'org-insert-heading-respect-content
-            )
-  :init
-  (setq org-list-allow-alphabetical t)
-  ;; If you don't want the agenda in french you can comment the following
-  ;; expression. You can even set it to your preferred language
-  ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
-  (setq calendar-week-start-day 1
-        calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
-                                 "Jeudi" "Vendredi" "Samedi"]
-        calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
-                                   "Juin" "Juillet" "Août" "Septembre"
-                                   "Octobre" "Novembre" "Décembre"])
-
-  (defun mdrp/org-compile-latex-and-update-other-buffer ()
-    "Has as a premise that it's run from an org-mode buffer and the
-           other buffer already has the PDF open"
-    (interactive)
-    (org-latex-export-to-pdf)
-    (mdrp/update-other-buffer)
-    )
-  :custom
-  (org-directory "~/org/")
-  ;; Babel
-  (org-confirm-babel-evaluate nil)
-  (org-src-fontify-natively t)
-  (org-src-tab-acts-natively t)
-  ;; Rest
-  (org-agenda-files
-   '("/home/mattias/org/agenda.org" "/home/mattias/org/cduce.org" "/home/mattias/org/orgzly.org") nil nil "Customized with use-package org")
-  (org-ellipsis " ▾")
-  (org-adapt-indentation nil)
-  (org-agenda-span 'week)
-  (org-agenda-start-day "1d")
-  (org-agenda-start-on-weekday nil)
-  (org-agenda-start-with-log-mode t)
-  (org-cycle-separator-lines -1)
-  (org-fontify-done-headline t)
-  (org-footnote-auto-adjust t)
-  (org-hide-emphasis-markers t)
-  (org-hide-leading-stars nil)
-  (org-hide-macro-markers t)
-  (org-image-actual-width '(300))
-  (org-latex-compiler "latexmk")
-  (org-log-done 'time)
-  (org-odd-levels-only nil)
-  (org-pretty-entities t)
-  (org-src-fontify-natively t)
-  (org-src-tab-acts-natively t)
-  (org-startup-truncated nil)
-  (org-startup-with-inline-images t)
-  (org-support-shift-select 'always)
-  (org-roam-v2-ack t) ; anonying startup message
-  (org-tag-persistent-alist
-   '((:startgroup . nil)
-     ("Maison" . ?h)
-     ("Boulot" . ?b)
-     ("Plaisir" . ?p)
-     (:endgroup . nil)
-     (:startgroup . nil)
-     ("Usuba" . ?u)
-     ("Ocaml" . ?o)
-     ("Reste" . ?r)
-     (:endgroup . nil)
-     (:startgroup . nil)
-     ("Facile" . ?f)
-     ("Moyen" . ?m)
-     ("Difficile" . ?d)
-     (:endgroup . nil)
-     )
-   )
-  (org-tag-faces
-   '(
-     ("Maison" . (:foreground "GoldenRod" :weight bold))
-     ("Plaisir" . (:foreground "GoldenRod" :weight bold))
-     ("Boulot" . (:foreground "GoldenRod" :weight bold))
-     ("Usuba" . (:foreground "IndianRed1" :weight bold))
-     ("OCaml" . (:foreground "IndianRed1" :weight bold))
-     ("Reste" . (:foreground "IndianRed1" :weight bold))
-     ("Facile" . (:foreground "OrangeRed" :weight bold))
-     ("Moyen" . (:foreground "OrangeRed" :weight bold))
-     ("Difficile" . (:foreground "OrangeRed" :weight bold))
-     )
-   )
-
-  :config
-  ;; TODO states
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
-          ))
-  (define-prefix-command 'mdrp-org-map nil "Org-")
-  (defun transform-square-brackets-to-round-ones(string-to-transform)
-    "Transforms [ into ( and ] into ), other chars left unchanged."
-    (concat
-     (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform))
-    )
-  (customize-set-value 'org-latex-with-hyperref nil)
-  (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
-  (setq org-image-actual-width nil)
-  (defun org-mode-<>-syntax-fix (start end)
-    "Change syntax of characters ?< and ?> to symbol within source code blocks."
-    (let ((case-fold-search t))
-      (when (eq major-mode 'org-mode)
-        (save-excursion
-          (goto-char start)
-          (while (re-search-forward "<\\|>" end t)
-            (when (save-excursion
-                    (and
-                     (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
-                     (string-equal (downcase (match-string 1)) "begin")))
-              ;; This is a < or > in an org-src block
-              (put-text-property (point) (1- (point))
-                                 'syntax-table (string-to-syntax "_"))))))))
-
-  (defun org-setup-<>-syntax-fix ()
-    "Setup for characters ?< and ?> in source code blocks.
-        Add this function to `org-mode-hook'."
-    (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
-    (syntax-propertize (point-max)))
-
-  (add-hook 'org-mod-hook #'org-setup-<>-syntax-fix)
-
-  (setq org-agenda-custom-commands
-        '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
-           ((org-agenda-span 'month)
-            (org-agenda-show-all-dates nil)
-            ))))
-  (calendar-set-date-style 'iso)
-  (use-package ob-rust :ensure t)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (emacs-lisp . t)
-     (rust . t)
-     (ocaml . t)
-     (latex . t)
-     (shell . t)
-     ))
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (push '("- [ ]" . "") prettify-symbols-alist)
-              (push '("+ [ ]" . "") prettify-symbols-alist)
-              (push '("* [ ]" . "") prettify-symbols-alist)
-              (push '("- [X]" . "") prettify-symbols-alist)
-              (push '("+ [X]" . "") prettify-symbols-alist)
-              (push '("* [X]" . "") prettify-symbols-alist)
-              (push '("- [-]" . "") prettify-symbols-alist)
-              (push '("+ [-]" . "") prettify-symbols-alist)
-              (push '("* [-]" . "") prettify-symbols-alist)
-              (prettify-symbols-mode)
-              ))
-  (setq org-capture-templates
-        `(
-          ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-           "* TODO %?\n  %u\n  %a")
-          ("s" "Scheduled" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-           "* TODO %?\n SCHEDULED: %^t \n %a")
-          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
-          ))
-  (custom-theme-set-faces
-   'user
-   '(org-block ((t (:inherit fixed-pitch))))
-   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
-   '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
-   '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
-   '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
-   '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
-   '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-property-value ((t (:inherit fixed-pitch))) t)
-   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
-   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
-   ;; (let ((re "\\}\\(+\\|-\\) "))
-   ;;   (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
-
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
-   ;;                                    (* 2 (+ 2 org-list-indent-offset))) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
-   ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
-   ;;    )
-   )
-  (message "`org-mode' loaded"))
-
-(use-package org-auto-tangle
-  :ensure t
-  :defer t
-  :hook (org-mode . org-auto-tangle-mode)
-  :config (message "`org-auto-tangle' loaded"))
-
-(use-package org-ref
-  :disabled
-  :ensure t
-  :after org
-  :init
-  (setq
-   org-ref-completion-library 'org-ref-ivy-cite
-   )
-  ;; :custom
-  ;; (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
-  )
-
-(use-package org-bullets
-  :ensure t
-  :defer t
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("" "" "" "" "" "" ""))
-  :config (message "`org-bullets' loaded"))
-
-(use-package org-inline-pdf
-  :ensure t
-  :defer t
-  :ensure-system-package pdf2svg
-  :hook (org-mode . org-inline-pdf-mode)
-  :config (message "`org-inline-pdf' loaded")
-  )
-
-(use-package calfw
-  :ensure t
-  :config
-  (setq cfw:org-overwrite-default-keybinding t)
-  (setq cfw:fchar-junction ?╋
-        cfw:fchar-vertical-line ?┃
-        cfw:fchar-horizontal-line ?━
-        cfw:fchar-left-junction ?┣
-        cfw:fchar-right-junction ?┫
-        cfw:fchar-top-junction ?┯
-        cfw:fchar-top-left-corner ?┏
-        cfw:fchar-top-right-corner ?┓)
-  )
-
-(use-package calfw-org
-  :ensure t
-  :defer t
-  :after calfw
-  :init
-  (define-prefix-command 'mdrp-calfw-map nil "Cal-")
-  :general
-  ("M-c" 'mdrp-calfw-map)
-  (:keymaps 'mdrp-calfw-map
-            "c" 'cfw:open-calendar-buffer
-            "o" 'cfw:open-org-calendar
-            )
-  (:keymaps 'cfw:calendar-mode-map
-            "RET" 'cfw:org-open-agenda-day)
-  :custom
-  (cfw:org-capture-template
-   `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-     "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
-   )
-  :config
-  (defun cfw:org-capture-day ()
-    (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
-      (let ((pos (cfw:cursor-to-nearest-date)))
-        (concat "<"
-                (format-time-string  "%Y-%m-%d %a 09:00"
-                                     (encode-time 0 0 0
-                                                  (calendar-extract-day pos)
-                                                  (calendar-extract-month pos)
-                                                  (calendar-extract-year pos)))
-                ">"))))
-  (message "`calfw-org' loaded"))
-
-;; The request can be wrong depending on Google updates, evaluate this:
-;; (concat org-gcal-auth-url
-;;         "?client_id=" (url-hexify-string org-gcal-client-id)
-;;         "&response_type=code"
-;;         "&redirect_uri=" (url-hexify-string "urn:ietf:wg:oauth:2.0:oob")
-;;         "&scope=" (url-hexify-string org-gcal-resource-url))
-
-(use-package org-gcal
-  :disabled
-  :custom
-  (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
-  (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
-  (org-gcal-fetch-file-alist
-   `(
-     (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
-     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")
-     )
-   )
-  )
-
-(use-package org-super-agenda
-  :ensure t
-  :defer t
-  :config
-  (setq org-super-agenda-groups
-        '(;; Each group has an implicit Boolean OR operator between its selectors.
-          (:name "Rendez-vous"  ; Optionally specify section name
-                 :time-grid t  ; Items that appear on the time grid
-                 )
-          ;; After the last group, the agenda will display items that didn't
-          ;; match any of these groups, with the default order position of 99
-          ))
-  (org-super-agenda-mode)
-  (when use-org-agenda-startup (org-agenda nil "a"))
-  (message "`org-super-agenda' loaded"))
-
-(use-package org-appear
-  :ensure t
-  :defer t
-  :hook (org-mode . org-appear-mode)
-  :config
-  (setq org-appear-autolinks t)
-  (message "`org-appear loaded"))
-
-(when use-org-roam
-  (use-package org-roam
-    :ensure t
-    :defer t
-    :after org
-    :custom
-    (org-roam-directory (file-truename "~/org/org-roam"))
-    :general
-    (:keymaps 'mdrp-org-map
-              "r" 'org-roam-buffer-toggle
-              "f" 'org-roam-node-find
-              "g" 'org-roam-graph
-              "i" 'org-roam-node-insert
-              "c" 'org-roam-capture
-              ;; Dailies
-              "j" 'org-roam-dailies-capture-today)
-    :config
-    ;; If you're using a vertical completion framework, you might want a more informative completion interface
-    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    (org-roam-db-autosync-mode)
-    ;; If using org-roam-protocol
-    (require 'org-roam-protocol)
-    (message "`org-roam' loaded")))
-
-(use-package org-make-toc
-  :ensure t
-  :defer t
-  :custom
-  (org-make-toc-insert-custom-ids t)
-  (message "`org-make-toc' loaded"))
-
-(use-package ox-awesomecv
-  :load-path "lisp/org-cv/"
-  :defer t
-  :config (message "`ox-awesomecv' loaded"))
-
-(use-package ox-moderncv
-  :load-path "lisp/org-cv/"
-  :defer t
-  :config (message "`ox-moderncv' loaded"))
-
-(use-package lsp-mode
-  :ensure t
-  :defer t
-  :commands lsp
-  :hook ((tuareg-mode . lsp-deferred)
-         (caml-mode . lsp-deferred)
-         (clojure-mode . lsp-deferred)
-         (clojurescript-mode-hook . lsp-deferred)
-         (clojurec-mode-hook . lsp-deferred)
-         (elm-mode . lsp-deferred)
-         (rustic-mode . lsp-deferred)
-         (conf-toml-mode . lsp-deferred)
-         (kotlin-mode . lsp-deferred)
-         (fsharp-mode . lsp-deferred)
-         (python-mode . lsp-deferred))
-  :general
-  (:keymaps 'lsp-mode-map
-            "C-c C-t" 'lsp-describe-thing-at-point
-            "C-c C-w" 'mdrp/lsp-get-type-and-kill
-            "C-c C-l" 'lsp-find-definition
-            "C-c &"   'pop-global-mark :keymaps 'override)
-  (:keymaps 'lsp-command-map
-            "d"   'lsp-find-definition
-            "r"   'lsp-find-references
-            "n"   'lsp-ui-find-next-reference
-            "p"   'lsp-ui-find-prev-reference
-            "i"   'counsel-semantic-or-imenu
-            "R"   'lsp-rename
-            "f"   'consult-flycheck
-            "t r" 'lsp-treemacs-references
-            "t s" 'lsp-treemacs-symbols
-            )
-  :custom
-  (lsp-log-io nil)
-  (lsp-headerline-breadcrumb-enable t)
-  (lsp-headerline-breadcrumb-segments '(project path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-keymap-prefix "M-l")
-  (lsp-prefer-capf t)
-  (lsp-lens-enable nil)
-  (lsp-completion-provider :none)
-  (lsp-completion-enable t)
-  (lsp-enable-imenu t)
-  (lsp-disabled-clients '((python-mode . pyls)))
-
-  ;; Rust-analyzer is the almost official lsp server for Rust
-  (lsp-rust-server 'rust-analyzer)
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  ;; enable / disable the hints as you prefer:
-  (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-  (lsp-rust-analyzer-display-chaining-hints t)
-  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
-  (lsp-rust-analyzer-display-closure-return-type-hints t)
-  (lsp-rust-analyzer-display-parameter-hints nil)
-  (lsp-rust-analyzer-display-reborrow-hints nil)
-
-  :config
-  (defvar mdrp/type-map
-    (let ((keymap (make-sparse-keymap)))
-      (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
-      keymap)
-    "The local map to navigate type enclosing.")
-
-  (defun mdrp/set-type-map (&rest r)
-    (set-transient-map mdrp/type-map)
-    )
-
-  (advice-add 'lsp-describe-thing-at-point :after #'mdrp/set-type-map)
-
-  (defun mdrp/lsp-get-type-and-kill ()
-    (interactive)
-    (let ((contents (-some->> (lsp--text-document-position-params)
-                      (lsp--make-request "textDocument/hover")
-                      (lsp--send-request)
-                      (lsp:hover-contents))))
-      (let ((contents (and contents
-                           (lsp--render-on-hover-content
-                            contents
-                            t))))
-        (let ((contents
-               (pcase (lsp-workspaces)
-                 (`(,workspace)
-                  (lsp-clients-extract-signature-on-hover
-                   contents
-                   (lsp--workspace-server-id workspace)
-                   t))
-                 (lsp-clients-extract-signature-on-hover
-                  contents
-                  nil)
-                 )))
-          (message "Copied %s to kill-ring" contents)
-          (kill-new contents)
-          ))))
-  (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
-  (lsp-enable-which-key-integration t)
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection (lsp-stdio-connection
-                     '("opam" "exec" "--" "ocamllsp"))
-    :major-modes '(caml-mode tuareg-mode)
-    :server-id 'ocaml-lsp-server))
-  (message "`lsp' loaded"))
-
-;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
-(use-package lsp-ui
-  :ensure t
-  :defer t
-  :hook (lsp-mode . lsp-ui-mode)
-  :general
-  ("C-M-d" 'lsp-ui-doc-show)
-  ("C-c i" 'lsp-ui-imenu)
-  (:keymaps 'lsp-ui-mode-map
-            [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
-            [remap xref-find-references] 'lsp-ui-peek-find-references
-            )
-  (:keymaps 'lsp-command-map
-            "u f" 'lsp-ui-doc-focus-frame
-            "u i" 'lsp-ui-imenu
-            )
-  :custom
-  (lsp-ui-doc-delay 0.9)
-  (lsp-ui-doc-position 'at-point)
-  ;; Whether or not to enable the header which displays the symbol string.
-  (lsp-ui-doc-header t)
-  ;; Whether or not to include the object signature/type in the frame.
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-show-with-cursor nil)
-  (lsp-ui-doc-show-with-mouse nil)
-  ;; Border color of the frame
-  (lsp-ui-doc-border (face-foreground 'default))
-  ;; Whether or not to enable lsp-ui-sideline
-  (lsp-ui-sideline-enable nil)
-  ;; Ignore duplicates when there is a same symbol with same contents
-  ;; (lsp-ui-sideline-ignore-duplicate t)
-  ;; Whether to show code actions in sideline.
-  ;; (lsp-ui-sideline-show-code-actions nil)
-  :config (message "`lsp-ui' loaded"))
-
-(use-package lsp-treemacs
-  :ensure t
-  :defer t
-  :after lsp
-  :config (message "`lsp-treemacs' loaded")
-  )
-
-(use-package consult-lsp
-  :ensure t
-  :defer t
-  :disabled)
-
 ;; This package needs to be loaded to use language parsers
 (use-package tree-sitter-langs
-  :ensure t
   :defer t
   :config (message "`tree-sitter-langs' loaded"))
 
 (use-package tree-sitter
-  :ensure t
   :defer t
   :hook
   (tree-sitter-after-on . tree-sitter-hl-mode)
@@ -2885,6 +2868,7 @@ have one rule for each file type."
 
 (use-package ts-fold
   :load-path "lisp/ts-fold/"
+  :elpaca nil
   :defer t
   :hook
   (tuareg-mode . ts-fold-mode)
@@ -2896,6 +2880,7 @@ have one rule for each file type."
 
 (use-package ts-fold-indicators
   :load-path "lisp/ts-fold/"
+  :elpaca nil
   :defer t
   :hook
   (tree-sitter-after-on . ts-fold-indicators-mode)
@@ -2905,7 +2890,7 @@ have one rule for each file type."
   (message "`ts-fold-indicators' loaded"))
 
 (use-package conf-mode
-  :ensure nil
+  :elpaca nil
   :defer t
   :mode (
          ("/\\.merlin\\'" . conf-mode)
@@ -2916,7 +2901,7 @@ have one rule for each file type."
   :config (message "`conf-mode' loaded"))
 
 (use-package json-mode
-  :ensure nil
+  :elpaca nil
   :defer t
   :mode (("\\.bowerrc$"     . json-mode)
          ("\\.jshintrc$"    . json-mode)
@@ -2935,6 +2920,7 @@ have one rule for each file type."
   (message "`json-mode' loaded"))
 
 (use-package json
+  :elpaca nil
   :defer t
   :config
   (defun get-secrets-config-value (key)
@@ -2944,7 +2930,6 @@ have one rule for each file type."
   (message "`json' loaded"))
 
 (use-package dune
-  :ensure t
   :defer t
   :mode ("^dune$" "^dune-project$")
   :init
@@ -2969,31 +2954,29 @@ have one rule for each file type."
   :config (message "`dune' loaded"))
 
 (use-package make-mode
-  :ensure nil
+  :elpaca nil
   :defer t
   :hook (make-mode . semantic-mode)
   :config (message "`make-mode' loaded"))
 
 (when use-clojure
   (use-package clojure-mode
-    :ensure t
     :defer t
     :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
     :config (message "`clojure-mode' loaded")))
 
 (when use-clojure
   (use-package cider
-    :ensure t
     :defer t
     :config (message "`cider' loaded")))
 
 (use-package elisp-mode
   :defer t
+  :elpaca nil
   :hook (elisp-mode . semantic-mode)
   :config (message "`elisp-mode' loaded"))
 
 (use-package puni
-  :ensure t
   :defer t
   :hook ((clojure-mode elisp-mode) . puni-mode)
   :config (message "`puni' loaded")
@@ -3004,14 +2987,12 @@ have one rule for each file type."
   )
 
 (use-package flycheck-package
-  :ensure t
   :defer t
   :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
   :config (message "`flycheck-package' loaded"))
 
 (when use-elm
   (use-package elm-mode
-    :ensure t
     :defer t
     :general
     (:keymaps 'elm-mode-map
@@ -3019,7 +3000,6 @@ have one rule for each file type."
     :config (message "`elm-mode' loaded"))
 
   (use-package haskell-mode
-    :ensure t
     :defer t
     :config (message "`haskell-mode' loaded"))
   )
@@ -3027,7 +3007,6 @@ have one rule for each file type."
 (when use-fsharp
   (use-package fsharp-mode
     :defer t
-    :ensure t
     :init
     (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet"))
     (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet/tools"))
@@ -3042,12 +3021,11 @@ have one rule for each file type."
 
 (when use-kotlin
   (use-package kotlin-mode
-    :ensure t
     :defer t
     :config (message "`kotlin-mode' loaded")))
 
 (when use-latex
-  (use-package tex-site
+  (use-package auctex
     :ensure auctex
     :defer t
     :mode ("\\.tex\\'" . latex-mode)
@@ -3065,7 +3043,6 @@ have one rule for each file type."
     (message "`tex-site' loaded"))
 
   (use-package auctex-latexmk
-    :ensure t
     :defer t
     :after tex-site
     :config
@@ -3073,39 +3050,8 @@ have one rule for each file type."
     (setq auctex-latexmk-inherit-TeX-PDF-mode t)
     (message "`auctex-latexmk' loaded")))
 
-(when use-markdown
-  (use-package markdown-mode
-    :ensure t
-    :defer t
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'"       . markdown-mode)
-           ("\\.markdown\\'" . gfm-mode))
-    :init
-    (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
-    (setq markdown-command "markdown")
-    (setq markdown-open-command "retext")
-    :hook (gfm-mode . (lambda ()
-                        (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
-    :config (message "`markdown-mode' loaded")))
-
-(when use-markdown
-  (use-package markdown-toc
-    :ensure t
-    :defer t
-    :config (message "`markdown-toc' loaded")))
-
-(when use-pandoc
-  (use-package pandoc-mode
-    :ensure-system-package pandoc
-    :ensure t
-    :defer t
-    :hook ((markdown-mode . pandoc-mode)
-           (pandoc-mode . pandoc-load-default-settings))
-    :config (message "`pandoc-mode' loaded")))
-
 (when use-michelson
   (use-package deferred
-    :ensure t
     :defer t
     :config (message "`deferred' loaded"))
 
@@ -3188,7 +3134,6 @@ have one rule for each file type."
 
 (when use-ocaml
   (use-package tuareg
-    :ensure t
     :defer t
     :ensure-system-package
     ((ocamllsp . "opam install ocaml-lsp-server")
@@ -3303,9 +3248,8 @@ have one rule for each file type."
   (use-package ocp-indent
     ;; must be careful to always defer this, it has autoloads that adds hooks
     ;; which we do not want if the executable can't be found
-    :ensure t
-    :hook
-    (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
+    :defer t
+    :hook (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
     :config
     (defun mdrp/ocaml-init-ocp-indent-h ()
       "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
@@ -3315,6 +3259,7 @@ have one rule for each file type."
 
 (when use-ocaml
   (use-package tuareg-menhir
+    :elpaca nil
     :defer t
     :mode ("\\.mly'" . tuareg-menhir-mode)
     :config (message "`tuareg-menhir' loaded")))
@@ -3322,12 +3267,12 @@ have one rule for each file type."
 (when use-ocaml
   (use-package dune-minor
     :load-path "lisp/"
+    :elpaca nil
     :defer t
     :hook (tuareg-mode . dune-minor-mode)
     :config (message "`dune-minor' loaded")))
 
 (use-package pdf-tools
-  :ensure t
   :defer t
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
@@ -3341,14 +3286,12 @@ have one rule for each file type."
   (message "`pdf-tools' loaded"))
 
 (use-package saveplace-pdf-view
-  :ensure t
   :defer t
   :after pdf-view
   :config (message "`saveplace-pdf-view' loaded"))
 
 (when use-python
   (use-package python
-    :ensure t
     :defer t
     :hook (python-mode . semantic-mode)
     :config
@@ -3371,7 +3314,6 @@ have one rule for each file type."
 
 (when use-python
   (use-package pyvenv
-    :ensure t
     :defer t
     :hook (python-mode . pyvenv-mode)
     :config
@@ -3386,7 +3328,6 @@ have one rule for each file type."
 
 (when use-python
   (use-package lsp-pyright
-    :ensure t
     :defer t
     :config
     (setq lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
@@ -3424,8 +3365,7 @@ have one rule for each file type."
       (setq refmt-command refmt-bin)))
 
   (use-package reason-mode
-    :ensure t
-    :defer t
+          :defer t
     :config
     (add-hook
      'reason-mode-hook
@@ -3436,7 +3376,6 @@ have one rule for each file type."
 
 (when use-rust
   (use-package rustic
-    :ensure t
     :defer t
     :ensure-system-package
     ((taplo . "cargo install taplo-cli")
@@ -3544,20 +3483,18 @@ have one rule for each file type."
 
 (when use-web
   (use-package web-mode
-    :ensure t
     :defer t
     :mode "\\.php\\'"
     :config (message "`web-mode' loaded")))
 
 (when use-web
   (use-package css-mode
-    :ensure nil
+    :elpaca nil
     :defer t
     :mode "\\.css\\'"
     :config (message "`css-mode' loaded")))
 
 (use-package simple-httpd
-  :ensure t
   :defer t
   :config (message "`simple-httpd' loaded"))
 
