@@ -75,12 +75,9 @@
 (elpaca use-package)
 
 (use-package use-package-ensure-system-package
-      :config (message "`use-package-ensure-system-package' loaded")
-)
+  :config (message "`use-package-ensure-system-package' loaded"))
 
 (use-package gcmh
-  :load-path "lisp/"
-  :elpaca nil
   :demand t
   :config
   (gcmh-mode 1)
@@ -402,7 +399,7 @@
   :config (message "`auto-package-update' loaded"))
 
 (use-package no-littering
-      :config (message "`no-littering' loaded"))
+  :config (message "`no-littering' loaded"))
 (elpaca-wait)
 
 (auto-save-visited-mode 1)
@@ -432,7 +429,7 @@
 debian, and derivatives). On most it's 'fd'.")
 
 (use-package esup
-      :defer t
+  :defer t
   :config
   (setq esup-depth 0)
   (message "`esup' loaded"))
@@ -440,7 +437,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package prescient
   :init
   (setq prescient-persist-mode 1)
-      :defer t
+  :defer t
   :config (message "`prescient' loaded"))
 
 (use-package savehist
@@ -478,26 +475,26 @@ debian, and derivatives). On most it's 'fd'.")
   (setq locale-coding-system 'utf-8))
 
 (use-package all-the-icons
-      :if (display-graphic-p)
+  :if (display-graphic-p)
   :config
   (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
   (message "`all-the-icons' loaded"))
 
 (use-package all-the-icons-dired
-      :hook (dired-mode . all-the-icons-dired-mode)
+  :hook (dired-mode . all-the-icons-dired-mode)
   :config
   (message "`all-the-icons-dired' loaded"))
 
 (use-package all-the-icons-completion
   :init
   (all-the-icons-completion-mode)
-      :after (marginalia all-the-icons)
+  :after (marginalia all-the-icons)
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
   :config
   (message "`all-the-icons-completion' loaded"))
 
 (use-package ligature
-      :defer t
+  :defer t
   :config
   ;; Enable the "www" ligature in every possible major mode
   (ligature-set-ligatures 't '("www"))
@@ -529,10 +526,10 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`ansi-color' loaded"))
 
 (use-package kurecolor
-        :config (message "`kurecolor' loaded"))
+  :config (message "`kurecolor' loaded"))
 
 (use-package emojify
-      :hook (after-init . global-emojify-mode)
+  :hook (after-init . global-emojify-mode)
   :config (message "`emojify' loaded"))
 
 (use-package general
@@ -633,7 +630,7 @@ debian, and derivatives). On most it's 'fd'.")
 (elpaca-wait)
 
 (use-package which-key
-      :init (which-key-mode)
+  :init (which-key-mode)
   :custom
   (which-key-separator " ")
   (which-key-prefix-prefix "+")
@@ -659,7 +656,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`which-key' loaded"))
 
 (use-package selected
-      :defer t
+  :defer t
   :init
   (require 'hide-region)
   (selected-global-mode)
@@ -724,18 +721,16 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package nlinum
   :init
   (global-nlinum-mode 1)
-      :config
+  :config
   (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
-  (message "`nlinum' loaded")
-  )
+  (message "`nlinum' loaded"))
 
 (use-package cheatsheet
   :defer t
-  :config (message "`cheatsheet' loaded")
-  )
+  :config (message "`cheatsheet' loaded"))
 
 (use-package crux
-      :init
+  :init
   (define-prefix-command 'mdrp-crux-map nil "Crux-")
   :defer t
   :general
@@ -765,8 +760,7 @@ debian, and derivatives). On most it's 'fd'.")
   (crux-with-region-or-buffer untabify)
   (crux-with-region-or-point-to-eol kill-ring-save)
   (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer)
-  (message "`crux' loaded")
-  )
+  (message "`crux' loaded"))
 
 (use-package delete-block
   :load-path "lisp/"
@@ -780,20 +774,18 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package discover-my-major
   :after general
-      :defer t
+  :defer t
   :general ("C-h C-m" 'discover-my-major)
   :config (message "`discover-my-major' loaded"))
 
 (use-package easy-kill
-      :defer t
+  :defer t
   :config
   (global-set-key [remap kill-ring-save] #'easy-kill)
   (global-set-key [remap mark-sexp] #'easy-mark)
   (message "`easy-kill loaded"))
 
 (use-package flycheck-languagetool
-  :load-path "lisp/flycheck-languagetool/"
-  :elpaca nil
   :defer t
   :hook ((text-mode . flycheck-languagetool-setup)
          (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
@@ -928,7 +920,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`flyspell' loaded"))
 
 (use-package flyspell-correct
-      :after flyspell
+  :after flyspell
   :general
   (:keymaps 'popup-menu-keymap
             "<return>" 'popup-select)
@@ -938,10 +930,10 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`flyspell-correct' loaded"))
 
 (use-package fringe-helper
-      :config (message "`fringe-helper' loaded"))
+  :config (message "`fringe-helper' loaded"))
 
 (use-package highlight-symbol
-          :defer t
+  :defer t
     :init (highlight-symbol-mode)
     :general
     (:keymaps 'highlight-symbol-nav-mode-map
@@ -955,7 +947,7 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`highlight-symbol' loaded"))
 
 (use-package hydra
-      :defer t
+  :defer t
   :custom
   (hydra-default-hint nil)
   :config
@@ -976,7 +968,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`hydra' loaded"))
 
 (use-package keycast
-      :defer t
+  :defer t
   :commands keycast-mode
   :config
   (define-minor-mode keycast-mode
@@ -1006,7 +998,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`hide-region loaded"))
 
 (use-package hide-mode-line
-      :defer t
+  :defer t
   :config (message "`hide-mode-line loaded"))
 
 (use-package whitespace
@@ -1675,8 +1667,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package lsp-treemacs
   :defer t
   :after lsp
-  :config (message "`lsp-treemacs' loaded")
-  )
+  :config (message "`lsp-treemacs' loaded"))
 
 (use-package consult-lsp
   :defer t
@@ -1684,7 +1675,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package highlight-indent-guides
   :disabled
-      :hook (prog-mode . highlight-indent-guides-mode)
+  :hook (prog-mode . highlight-indent-guides-mode)
   :config
   (setq highlight-indent-guides-auto-enabled nil)
   ;; (setq highlight-indent-guides-responsive 'stack)
@@ -1695,7 +1686,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`highlight-indent-guides' loaded"))
 
 (use-package apheleia
-      :defer t
+  :defer t
   :hook
   (tuareg-mode  . apheleia-mode)
   (caml-mode    . apheleia-mode)
@@ -1713,14 +1704,14 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`apheleia' loaded"))
 
 (use-package dap-mode
-      :defer t
+  :defer t
   :after lsp-mode
   :config
   (dap-auto-configure-mode)
   (message "`dap' loaded"))
 
 (use-package dumb-jump
-      :defer t
+  :defer t
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   (defhydra dumb-jump-hydra (:color blue :columns 3)
@@ -1811,12 +1802,12 @@ have one rule for each file type."
    "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
 
 (use-package fontify-face
-      :defer t
+  :defer t
   :hook (font-lock-mode . fontify-face-mode)
   :config (message "`fontify-face' loaded"))
 
 (use-package flycheck
-      :defer t
+  :defer t
   :init
   (define-prefix-command 'mdrp-fly-map nil "Fly-")
   :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
@@ -1940,14 +1931,14 @@ have one rule for each file type."
   (message "`winner' loaded"))
 
 (use-package ace-window
-        :config
+  :config
   (setq aw-dispatch-always t)
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
 (when use-visual-fill
   (use-package visual-fill-column
-          :defer t
+    :defer t
     :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
     :custom
     (visual-fill-column-width 100)
@@ -1967,7 +1958,7 @@ have one rule for each file type."
 
 (when use-window-purpose
   (use-package window-purpose
-          :defer t
+    :defer t
     :config
     (purpose-mode)
     (purpose-x-magit-multi-on)
@@ -2326,8 +2317,7 @@ have one rule for each file type."
   :init (marginalia-mode)
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  :config (message "`marginalia' loaded")
-  )
+  :config (message "`marginalia' loaded"))
 
 (use-package iedit
   :defer t
@@ -2500,8 +2490,7 @@ have one rule for each file type."
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
-  (message "`doom-themes' loaded")
-  )
+  (message "`doom-themes' loaded"))
 
 (use-package anzu
   :defer t
@@ -2667,8 +2656,7 @@ have one rule for each file type."
   ;; :general
   ;; (:keymaps 'minions-mode-line-minor-modes-map
   ;;           "<mode-line> <mouse-1>" 'minions-minor-modes-menu)
-  :config (message "`minions' loaded")
-  )
+  :config (message "`minions' loaded"))
 
 (use-package outline
   :elpaca nil
@@ -2867,16 +2855,14 @@ have one rule for each file type."
   :config (message "`tree-sitter' loaded"))
 
 (use-package ts-fold
-  :load-path "lisp/ts-fold/"
-  :elpaca nil
+  :elpaca (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
   :defer t
   :hook
   (tuareg-mode . ts-fold-mode)
   (c++-mode    . ts-fold-mode)
   (python-mode . ts-fold-mode)
   (rustic-mode . ts-fold-mode)
-  :config (message "`ts-fold' loaded")
-  )
+  :config (message "`ts-fold' loaded"))
 
 (use-package ts-fold-indicators
   :load-path "lisp/ts-fold/"
@@ -3001,8 +2987,7 @@ have one rule for each file type."
 
   (use-package haskell-mode
     :defer t
-    :config (message "`haskell-mode' loaded"))
-  )
+    :config (message "`haskell-mode' loaded")))
 
 (when use-fsharp
   (use-package fsharp-mode
@@ -3026,7 +3011,6 @@ have one rule for each file type."
 
 (when use-latex
   (use-package auctex
-    :ensure auctex
     :defer t
     :mode ("\\.tex\\'" . latex-mode)
     :config
@@ -3044,7 +3028,7 @@ have one rule for each file type."
 
   (use-package auctex-latexmk
     :defer t
-    :after tex-site
+    :after auctex
     :config
     (auctex-latexmk-setup)
     (setq auctex-latexmk-inherit-TeX-PDF-mode t)

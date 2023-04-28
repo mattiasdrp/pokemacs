@@ -1,12 +1,6 @@
-[submodule "lisp/ts-fold"]
-	path = lisp/ts-fold
-	url = https://github.com/emacs-tree-sitter/ts-fold.git
 [submodule "lisp/emacs-application-framework"]
 	path = lisp/emacs-application-framework
 	url = https://github.com/emacs-eaf/emacs-application-framework.git
-[submodule "lisp/flycheck-languagetool"]
-	path = lisp/flycheck-languagetool
-	url = https://github.com/mattiasdrp/flycheck-languagetool.git
 [submodule "emacs"]
 	path = emacs
 	url = https://github.com/emacs-mirror/emacs.git
