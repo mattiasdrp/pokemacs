@@ -32,7 +32,7 @@
  '(flycheck-languagetool-server-jar
    (concat
     (getenv "HOME")
-    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
+    "/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar") t)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -52,8 +52,6 @@
      ("XXXX*" . "#cc9393")))
  '(lsp-auto-guess-root t)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
- '(package-selected-packages
-   '(all-the-icons all-the-icons-completion all-the-icons-dired anzu apheleia auctex auctex-latexmk auto-package-update calfw calfw-org cargo cdlatex cider clojure-mode company-web consult-flycheck consult-yasnippet crux dap-mode dashboard discover-my-major doom-modeline doom-themes dumb-jump dune easy-kill elm-mode emojify flycheck flycheck-inline flycheck-languagetool flycheck-package flycheck-rust flyspell-correct fontify-face fringe-helper fsharp-mode general git-messenger git-timemachine haskell-mode hide-mode-line highlight-symbol hydra iedit keycast kotlin-mode kurecolor ligature lispy lsp-pyright lsp-ui magit-todos markdown-toc minions mixed-pitch mu4e-alert multiple-cursors nlinum no-littering ob-rust ocp-indent org-appear org-auto-tangle org-bullets org-inline-pdf org-make-toc org-roam org-super-agenda outshine page-break-lines pandoc-mode paredit pdf-tools prescient projectile pulsar puni pyvenv quick-peek rainbow-delimiters rainbow-mode reason-mode rustic saveplace-pdf-view selected separedit simple-httpd solaire-mode svg-tag-mode tree-sitter tree-sitter-langs tuareg web-mode which-key yasnippet))
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
