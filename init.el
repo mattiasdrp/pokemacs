@@ -787,6 +787,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package flycheck-languagetool
   :defer t
+  :elpaca (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
   :hook ((text-mode . flycheck-languagetool-setup)
          (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
                        (require 'flycheck-languagetool)
@@ -1019,7 +1020,6 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package magit
   :defer t
   :hook (magit-mode . (lambda () (company-mode -1)))
-  :elpaca (magit :files (:defaults "lisp/magit*.el" "lisp/git-rebase.el" "docs/magit.texi" "docs/AUTHORS.md" "LICENSE" "Documentation/magit.texi" "Documentation/AUTHORS.md" "lisp/magit-section.el" "lisp/magit-section-pkg.el" (:exclude "lisp/magit-libgit.el" "lisp/magit-libgit-pkg.el")))
   :general
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
   ("M-n"    'mdrp/smerge-or-flycheck-next)
@@ -1368,8 +1368,7 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :ensure-system-package pdf2svg
   :hook (org-mode . org-inline-pdf-mode)
-  :config (message "`org-inline-pdf' loaded")
-  )
+  :config (message "`org-inline-pdf' loaded"))
 
 (use-package calfw
   :config
@@ -1381,8 +1380,7 @@ debian, and derivatives). On most it's 'fd'.")
         cfw:fchar-right-junction ?┫
         cfw:fchar-top-junction ?┯
         cfw:fchar-top-left-corner ?┏
-        cfw:fchar-top-right-corner ?┓)
-  )
+        cfw:fchar-top-right-corner ?┓))
 
 (use-package calfw-org
   :defer t
@@ -1832,11 +1830,9 @@ have one rule for each file type."
   :config (message "`flycheck-correct' loaded"))
 
 (use-package quick-peek
-  :defer t
   :config (message "`quick-peek' loaded"))
 
 (use-package flycheck-inline
-  :after quick-peek
   :hook (flycheck-mode . flycheck-inline-mode)
   :config
   (setq flycheck-inline-display-function

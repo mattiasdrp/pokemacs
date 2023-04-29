@@ -1503,6 +1503,7 @@ Better ~M-w~
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-languagetool
     :defer t
+    :elpaca (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
     :hook ((text-mode . flycheck-languagetool-setup)
            (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
                          (require 'flycheck-languagetool)
@@ -1848,7 +1849,6 @@ Adds keybindings when editing a commit message.
   (use-package magit
     :defer t
     :hook (magit-mode . (lambda () (company-mode -1)))
-    :elpaca (magit :files (:defaults "lisp/magit*.el" "lisp/git-rebase.el" "docs/magit.texi" "docs/AUTHORS.md" "LICENSE" "Documentation/magit.texi" "Documentation/AUTHORS.md" "lisp/magit-section.el" "lisp/magit-section-pkg.el" (:exclude "lisp/magit-libgit.el" "lisp/magit-libgit-pkg.el")))
     :general
     ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
     ("M-n"    'mdrp/smerge-or-flycheck-next)
@@ -2319,8 +2319,7 @@ See pdf inlined when included in org files.
     :defer t
     :ensure-system-package pdf2svg
     :hook (org-mode . org-inline-pdf-mode)
-    :config (message "`org-inline-pdf' loaded")
-    )
+    :config (message "`org-inline-pdf' loaded"))
 #+END_SRC
 
 ** [[https://github.com/kiwanami/emacs-calfw][Calfw]]
@@ -2341,8 +2340,7 @@ Calendar view in emacs buffer.
           cfw:fchar-right-junction ?┫
           cfw:fchar-top-junction ?┯
           cfw:fchar-top-left-corner ?┏
-          cfw:fchar-top-right-corner ?┓)
-    )
+          cfw:fchar-top-right-corner ?┓))
 #+END_SRC
 
 ** [[https://github.com/kiwanami/emacs-calfw][Calfw org]]
@@ -2999,7 +2997,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 #+BEGIN_SRC emacs-lisp
   (use-package quick-peek
-    :defer t
     :config (message "`quick-peek' loaded"))
 #+END_SRC
 
@@ -3010,7 +3007,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck-inline
-    :after quick-peek
     :hook (flycheck-mode . flycheck-inline-mode)
     :config
     (setq flycheck-inline-display-function
