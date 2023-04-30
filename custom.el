@@ -29,6 +29,10 @@
  '(eaf-browser-blank-page-url "https://duckduckgo.com/")
  '(electric-indent-mode t)
  '(fill-column 80)
+ '(flycheck-languagetool-server-jar
+   (concat
+    (getenv "HOME")
+    "/.emacs.d/LanguageTool-6.1/languagetool-server.jar") t)
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")

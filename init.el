@@ -792,10 +792,6 @@ debian, and derivatives). On most it's 'fd'.")
          (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
                        (require 'flycheck-languagetool)
                        (flycheck-languagetool-flycheck-enable))))
-  ;; :ensure-system-package
-  ;;   ("LanguageTool-5.9-stable/languagetool-commandline.jar" . "curl -L https://raw.githubusercontent.com/languagetool-org/languagetool/master/install.sh | sudo bash -a")
-  :init
-  (setq flycheck-languagetool-server-jar (expand-file-name "~/.emacs.d/LanguageTool-5.9-stable/languagetool-server.jar"))
   :config
   (defun flycheck-languagetool-disable ()
     "Disable flycheck-languagetool-package."
@@ -3356,14 +3352,12 @@ have one rule for each file type."
 
 (when use-rust
   (use-package rustic
-    :defer t
+    :mode ("\\.rs\\'" . rustic-mode)
     :ensure-system-package
     ((taplo . "cargo install taplo-cli")
      (rustfmt . "cargo install rustfmt"))
-    :mode "\\.rs'"
     ;; :hook
     ;; (rustic-mode-local-vars . tree-sitter 'append)
-    ;; :hook (rust-mode . my/rust-mode-outline-regexp-setup)
     :general
     (:keymaps 'rust-mode-map
               "C-c s" 'lsp-rust-analyzer-status
@@ -3373,6 +3367,10 @@ have one rule for each file type."
               [remap recompile] 'rustic-recompile
               )
     :init
+    (let ((mode '("\\.rs\\'" . rust-mode)))
+      (when (member mode auto-mode-alist)
+        (setq auto-mode-alist (remove mode auto-mode-alist))))
+
     (defun mdrp/rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
       (interactive)
