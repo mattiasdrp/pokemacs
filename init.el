@@ -1008,6 +1008,16 @@ debian, and derivatives). On most it's 'fd'.")
   (whitespace-style '(face empty indentation::space tab trailing))
   :config (message "`whitespace loaded"))
 
+(use-package locked-window-buffer-mode
+  :elpaca nil
+  :general ("M-l"    'locked-window-buffer-mode))
+
+
+(define-minor-mode locked-window-buffer-mode
+  "Make the current window always display this buffer."
+  nil "locked" nil
+  (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
+
 (use-package git-commit
   :defer t
   :hook (git-commit-mode . mdrp/english-dict)
@@ -3352,7 +3362,7 @@ have one rule for each file type."
 
 (when use-rust
   (use-package rustic
-    :mode ("\\.rs\\'" . rustic-mode)
+    :mode ((rx ".rs" string-end) . rustic-mode)
     :ensure-system-package
     ((taplo . "cargo install taplo-cli")
      (rustfmt . "cargo install rustfmt"))

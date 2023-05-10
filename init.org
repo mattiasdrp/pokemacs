@@ -1817,6 +1817,19 @@ Simple mode to visualize blanks
     :config (message "`whitespace loaded"))
 #+END_SRC
 
+** Window locking
+
+#+BEGIN_SRC emacs-lisp
+  (use-package locked-window-buffer-mode
+    :elpaca nil
+    :general ("M-l"    'locked-window-buffer-mode))
+
+
+  (define-minor-mode locked-window-buffer-mode
+    "Make the current window always display this buffer."
+    nil "locked" nil
+    (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
+#+END_SRC
 * Git
 :PROPERTIES:
 :CUSTOM_ID: git
