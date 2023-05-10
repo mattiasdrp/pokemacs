@@ -266,7 +266,7 @@ Literate configuration for init.el.
 :END:
 
 #+BEGIN_SRC emacs-lisp
-  (defvar elpaca-installer-version 0.3)
+  (defvar elpaca-installer-version 0.4)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -1830,6 +1830,7 @@ Simple mode to visualize blanks
     nil "locked" nil
     (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
 #+END_SRC
+
 * Git
 :PROPERTIES:
 :CUSTOM_ID: git
@@ -2266,7 +2267,6 @@ Org mode is, well, org mode.
      )
     (message "`org-mode' loaded"))
 #+END_SRC
-
 
 ** [[https://github.com/yilkalargaw/org-auto-tangle][Org auto tangle]]
 :PROPERTIES:
