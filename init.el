@@ -1869,8 +1869,8 @@ have one rule for each file type."
 
 (use-package projectile
   :defer t
-  :general
-  ("M-p" 'projectile-command-map)
+  :hook (prog-mode . projectile-mode)
+  :general ("M-p" 'projectile-command-map)
   :config (message "`projectile' loaded"))
 
 (use-package separedit
