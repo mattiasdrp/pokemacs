@@ -195,11 +195,6 @@
   :group 'mdrp-packages
   :type 'boolean)
 
-(defcustom use-company t
-  "If non-nil, uses the company packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
 (defcustom use-treemacs t
   "If non-nil, uses the treemacs packages"
   :group 'mdrp-packages
@@ -227,8 +222,23 @@
 
 (defcustom doom-theme 'doom-solarized-dark
   "Theme to load"
-  :group 'mdrp-packages
+  :group 'doom-themes
   :type 'symbol)
+
+(defgroup mdrp-dictionaries nil
+  "Pokemacs dictionaries options."
+  :group 'dictionary
+  :tag "Dictionaries options group")
+
+(defcustom pokemacs/french-dict "FR"
+  "Use a french dictionary"
+  :group 'mdrp-dictionaries
+  :type 'string)
+
+(defcustom pokemacs/english-dict "US"
+  "Use an Englisher dictionary"
+  :group 'mdrp-dictionaries
+  :type 'string)
 
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
@@ -387,11 +397,8 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-;; (setq package-archives '(("melpa" . "http://melpa.org/packages/")
-;;                          ("elpa" . "http://elpa.gnu.org/packages/")))
-
 (use-package auto-package-update
-      :defer t
+  :defer t
   :custom
   (auto-package-update-show-preview t)
   (auto-package-update-prompt-before-update t)
@@ -549,7 +556,6 @@ debian, and derivatives). On most it's 'fd'.")
     "M-f"
     )
   (general-define-key
-   [remap indent-for-tab-command]       'company-indent-or-complete-common
    [remap kill-buffer]                  'kill-this-buffer
    [remap ispell-word]                  'flyspell-correct-at-point
    ;; Prefixed by C
@@ -567,7 +573,7 @@ debian, and derivatives). On most it's 'fd'.")
    "C-="                     'text-scale-increase
    "C-+"                     'text-scale-increase
    "C--"                     'text-scale-decrease
-   "C-c h b"                 'describe-personal-keybindings
+   "C-c b"                   'describe-personal-keybindings
    ;; Create new line contextualised by the previous one
    ;; (will add a comment if in comment mode for example)
    "C-<return>"              'default-indent-new-line
@@ -803,6 +809,24 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package flyspell
   :elpaca nil
   :init
+  (defconst aspell-dicts-dumps
+    (file-name-as-directory (no-littering-expand-etc-file-name "aspell-dicts-dumps/")))
+
+  ;; Create the aspell dictionaries dumps directory
+  (unless (file-exists-p aspell-dicts-dumps)
+    (make-directory aspell-dicts-dumps))
+
+  ;; Dump dictionaries if they don't exist
+  (defconst english-dump (concat aspell-dicts-dumps "english"))
+  (defconst french-dump (concat aspell-dicts-dumps "francais"))
+
+  (unless (or (not pokemacs/english-dict) (file-exists-p english-dump))
+    (async-shell-command
+     (concat "aspell --master=en_" pokemacs/english-dict " dump master > " english-dump)))
+  (unless (or (not pokemacs/french-dict) (file-exists-p french-dump))
+    (async-shell-command
+     (concat "aspell --master=fr_" pokemacs/french-dict " dump master > " french-dump)))
+
   (defun mdrp/flyspell-on-for-buffer-type ()
     "Enable Flyspell appropriately for the major mode of the current buffer.
   Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
@@ -820,35 +844,28 @@ debian, and derivatives). On most it's 'fd'.")
               ;; else
               (progn
                 (message "Flyspell on (text)")
-                (flyspell-mode 1)
-                )
-              )
-            )
-          )
-      )
-    )
+                (flyspell-mode 1)))))))
 
   (defun mdrp/change-dict (lang)
     "Change dictionary to english. LANG is the desired language"
     (interactive "sLang: ")
     (ispell-change-dictionary lang)
-    (mdrp/flyspell-on-for-buffer-type)
-    )
+    (mdrp/flyspell-on-for-buffer-type))
 
   (defun mdrp/english-dict ()
     "Change dictionary to english."
     (interactive)
-    (mdrp/change-dict "english")
-    )
+    (setq cape-dict-file english-dump)
+    (mdrp/change-dict "english"))
 
   (defun mdrp/french-dict ()
     "Change dictionary to french."
     (interactive)
-    (mdrp/change-dict "francais")
-    )
+    (setq cape-dict-file french-dump)
+    (mdrp/change-dict "francais"))
 
   (defun mdrp/flyspell-toggle ()
-    "Turn Flyspell on if it is off, or off if it is on.  When turning on,
+    "Turn Flyspell on if it is off, or off if it is on. When turning on,
   it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
     (interactive)
     (if (symbol-value flyspell-mode)
@@ -868,16 +885,14 @@ debian, and derivatives). On most it's 'fd'.")
   (:keymaps 'mdrp-fly-map
             "t" '(mdrp/flyspell-toggle :which-key "toggle flyspell mode and decides to put it in prog or text mode")
             "f" '(mdrp/french-dict :which-key "load the french dictionary")
-            "e" '(mdrp/english-dict :which-key "load the english dictionary")
-            )
+            "e" '(mdrp/english-dict :which-key "load the english dictionary"))
   :ensure-system-package aspell
   ;; :ensure-system-package aspell-fr
   ;; :ensure-system-package aspell-en
   :config
   (provide 'ispell) ; forcibly load ispell configs
-
   (setq ispell-list-command "--list")
-  (setq ispell-dictionary "english")
+  (mdrp/english-dict)
   (setq-default flyspell-prog-text-faces
                 '(tree-sitter-hl-face:comment
                   tree-sitter-hl-face:doc
@@ -1025,7 +1040,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package magit
   :defer t
-  :hook (magit-mode . (lambda () (company-mode -1)))
   :general
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
   ("M-n"    'mdrp/smerge-or-flycheck-next)
@@ -1395,7 +1409,7 @@ debian, and derivatives). On most it's 'fd'.")
   :init
   (define-prefix-command 'mdrp-calfw-map nil "Cal-")
   :general
-  ("M-c" 'mdrp-calfw-map)
+  ("M-C" 'mdrp-calfw-map)
   (:keymaps 'mdrp-calfw-map
             "c" 'cfw:open-calendar-buffer
             "o" 'cfw:open-org-calendar
@@ -1533,7 +1547,20 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package lsp-mode
   :defer t
   :commands lsp
-  :hook ((tuareg-mode . lsp-deferred)
+  :init
+  (defun minad/orderless-dispatch-flex-first (_pattern index _total)
+    (and (eq index 0) 'orderless-flex))
+
+  (defun minad/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
+
+  (add-hook 'orderless-style-dispatchers #'minad/orderless-dispatch-flex-first)
+  (setq-local completion-at-point-functions
+              (list (cape-capf-buster #'lsp-completion-at-point)))
+
+  :hook ((lsp-completion-mode . minad/lsp-mode-setup-completion)
+         (tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
          (clojure-mode . lsp-deferred)
          (clojurescript-mode-hook . lsp-deferred)
@@ -2104,8 +2131,7 @@ have one rule for each file type."
   ;; Minibuffer history
   (:keymaps 'minibuffer-local-map
             [remap next-matching-history-element] 'consult-history
-            [remap prev-matching-history-element] 'consult-history
-            )
+            [remap prev-matching-history-element] 'consult-history)
 
 
   ;; The :init configuration is always executed (Not lazy)
@@ -2213,37 +2239,100 @@ have one rule for each file type."
   (message "`embark-consult' loaded"))
 
 (use-package corfu
+  :elpaca (corfu :files (:defaults "extensions/*"))
   :defer t
-  :init (global-corfu-mode)
+  :init
+  ;; Function definitions
+
+  (defun corfu-enable-always-in-minibuffer ()
+    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+    (unless (or (bound-and-true-p mct--active)
+                (bound-and-true-p vertico--input)
+                (eq (current-local-map) read-passwd-map))
+      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                  corfu-popupinfo-delay nil)
+      (corfu-mode 1)))
+
+  (defun corfu-move-to-minibuffer ()
+    (interactive)
+    (when completion-in-region--data
+      (let ((completion-extra-properties corfu--extra)
+            completion-cycle-threshold completion-cycling)
+        (apply #'consult-completion-in-region completion-in-region--data))))
+
+  ;; Activate mode globally
+  (global-corfu-mode)
+
+  :general
+  (:keymaps 'corfu-map
+            "C-g" 'corfu-quit
+            "<return>" 'corfu-insert
+            "M-d" 'corfu-info-documentation
+            "M-l" 'corfu-info-location
+            "TAB" 'corfu-insert-separator
+            "M-SPC" 'corfu-insert-separator
+            "M-m" 'corfu-move-to-minibuffer)
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-quit-no-match t)
+  (corfu-auto-prefix 0)
+  (corfu-auto-delay 0)
+  (corfu-separator ?\s)
+  (corfu-preview-current 'insert)
+  (corfu-preselect-first t)
+  (corfu-echo-documentation t)
+
   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
   ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  :config
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+  (message "`corfu' loaded"))
 
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
+(use-package corfu-popupinfo
+  :elpaca nil
+  :after corfu
+  :hook (corfu-mode . corfu-popupinfo-mode)
+  :general
 
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  :config (message "`corfu' loaded")
-  )
+  :custom
+  (corfu-popupinfo-delay '(0.5 . 0.5)))
+
+(use-package corfu-prescient
+  :config
+  (corfu-prescient-mode 1)
+  (message "`corfu-precient' loaded"))
+
+(use-package kind-icon
+  :after corfu
+  :custom
+  (kind-icon-use-icons t)
+  (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
+  (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
+  (kind-icon-blend-frac 0.08)
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+
+  ;; Add hook to reset cache so the icon colors match my theme
+  ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
+  ;; the theme using my custom defined command for switching themes. If I don't
+  ;; do this, then the backgound color will remain the same, meaning it will not
+  ;; match the background color corresponding to the current theme. Important
+  ;; since I have a light theme and dark theme I switch between. This has no
+  ;; function unless you use something similar
+  ;; (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache)))
+  :config (message "`kind-icon' loaded"))
 
 (use-package emacs
   :defer t
   :elpaca nil
   :init
-  ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
+  ;; Try to indent and if already indented, complete
+  (setq tab-always-indent 'complete)
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
@@ -2262,11 +2351,11 @@ have one rule for each file type."
 
   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
   ;; Vertico commands are hidden in normal buffers.
-  (setq read-extended-command-predicate
-        #'command-completion-default-include-p)
+  (setq read-extended-command-predicate #'command-completion-default-include-p)
 
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t)
+  ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
   :config (message "`emacs' loaded"))
 
 (use-package orderless
@@ -2279,39 +2368,39 @@ have one rule for each file type."
 
 (use-package cape
   :defer t
-  ;; Bind dedicated completion commands
-  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
-  ;; :bind (("C-c p p" . completion-at-point) ;; capf
-  ;;        ("C-c p t" . complete-tag)        ;; etags
-  ;;        ("C-c p d" . cape-dabbrev)        ;; or dabbrev-completion
-  ;;        ("C-c p h" . cape-history)
-  ;;        ("C-c p f" . cape-file)
-  ;;        ("C-c p k" . cape-keyword)
-  ;;        ("C-c p s" . cape-symbol)
-  ;;        ("C-c p a" . cape-abbrev)
-  ;;        ("C-c p i" . cape-ispell)
-  ;;        ("C-c p l" . cape-line)
-  ;;        ("C-c p w" . cape-dict)
-  ;;        ("C-c p \\" . cape-tex)
-  ;;        ("C-c p _" . cape-tex)
-  ;;        ("C-c p ^" . cape-tex)
-  ;;        ("C-c p &" . cape-sgml)
-  ;;        ("C-c p r" . cape-rfc1345))
+  :init
+  (define-prefix-command 'mdrp-cape-map nil "Cape-")
+  :general
+  ("M-c" 'mdrp-cape-map)
+  (:keymaps 'mdrp-cape-map
+            "p" 'completion-at-point ;; capf
+            "t" 'complete-tag        ;; etags
+            "d" 'cape-dabbrev        ;; or dabbrev-completion
+            "h" 'cape-history
+            "f" 'cape-file
+            "k" 'cape-keyword
+            "s" 'cape-symbol
+            "a" 'cape-abbrev
+            "i" 'cape-ispell
+            "l" 'cape-line
+            "w" 'cape-dict
+            "\\" 'cape-tex
+            "_" 'cape-tex
+            "^" 'cape-tex
+            "&" 'cape-sgml
+            "r" 'cape-rfc1345)
   :init
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-)
+
+  ;; Defining capf for specific modes
+  (defalias 'cape-?dict+keyword
+    (if (or pokemacs/english-dict pokemacs/french-dict)
+        (cape-super-capf #'cape-dict #'cape-keyword)
+      (cape-super-capf #'cape-keyword)))
+  :hook
+  (git-commit-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword)))
+  (text-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword))))
 
 (use-package marginalia
   :after vertico
@@ -2328,153 +2417,37 @@ have one rule for each file type."
             "C-;" nil)
   :config (message "`iedit' loaded"))
 
-(use-package yasnippet
-  :defer t
-  :config
-  (yas-global-mode 1)
-  (message "`yasnippet' loaded"))
-
-(use-package consult-yasnippet
-  :defer t
+;; Configure Tempel
+(use-package tempel
+  ;; Require trigger prefix before template name when completing.
   :general
-  ("C-<" 'consult-yasnippet)
-  :config (message "`consult-yasnippet' loaded"))
+  ("M-+" 'tempel-complete) ;; Alternative tempel-expand
+  ("M-*" 'tempel-insert)
+  :init
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
 
-(use-package company
-  :defer t
-  :hook ((prog-mode . company-mode)
-         (org-mode . company-mode))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0)
-  :general
-  (:keymaps 'company-active-map
-            "<tab>" 'company-complete-selection)
-  :config
-  (defun mdrp/disable-automatic-company ()
-    (interactive)
-    (setq company-idle-delay nil))
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
 
-  (defun mdrp/enable-automatic-company (i)
-    (interactive "nIdle-delay: ")
-    (setq-local company-idle-delay i))
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  (global-tempel-abbrev-mode))
 
-  (defun add-pcomplete-to-capf ()
-    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-
-  (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
-
-  (setq company-minimum-prefix-length 1
-        company-show-numbers ''left
-        company-tooltip-align-annotations t
-        company-require-match 'never)
-
-  (add-to-list 'company-backends '(company-capf
-                                   company-yasnippet
-                                   company-files))
-  (global-company-mode 1)
-  (message "`company loaded"))
-
-(use-package consult-company
-  :load-path "lisp/consult-company/"
-  :disabled
-  :config
-  (defun company-complete-common ()
-    (interactive)
-    (consult-company)))
-  ;; :general
-  ;; ([remap completion-at-point] #'consult-company))
-
-(use-package company-quickhelp
-  :defer t
-  :after company
-  :hook (company-mode . company-quickhelp-mode)
-  :general
-  (:keymaps 'company-active-map
-            "C-c h" 'company-quickhelp-manual-begin
-            "M-h"   'company-quickhelp-manual-begin)
-  :config
-  (setq company-quickhelp-delay 0)
-  (company-quickhelp-mode 1)
-  (message "`company-quickhelp' loaded"))
-
-(use-package company-web
-  :defer t
-  :preface
-  (autoload 'company-web-html "company-web-html")
-  (autoload 'company-web-jade "company-web-jade")
-  (autoload 'company-web-slim "company-web-slim")
-  :hook ((web-mode . (lambda ()
-                       (setq-local company-backends '(company-web-html
-                                                      company-web-jade
-                                                      company-web-slim
-                                                      company-capf)))))
-  :config (message "`company-web' loaded"))
-
-(use-package company-box
-  :defer t
-  :diminish
-  :if (display-graphic-p)
-  :defines company-box-icons-all-the-icons
-  :hook (company-mode . company-box-mode)
-  :custom
-  (company-box-backends-colors nil)
-  :config
-  (with-no-warnings
-    ;; Prettify icons
-    (defun my-company-box-icons--elisp (candidate)
-      (when (derived-mode-p 'emacs-lisp-mode)
-        (let ((sym (intern candidate)))
-          (cond ((fboundp sym) 'Function)
-                ((featurep sym) 'Module)
-                ((facep sym) 'Color)
-                ((boundp sym) 'Variable)
-                ((symbolp sym) 'Text)
-                (t . nil)))))
-    (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp))
-
-  (when (and (display-graphic-p)
-             (require 'all-the-icons nil t))
-    (declare-function all-the-icons-faicon 'all-the-icons)
-    (declare-function all-the-icons-material 'all-the-icons)
-    (declare-function all-the-icons-octicon 'all-the-icons)
-    (setq company-box-icons-all-the-icons
-          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.8 :v-adjust -0.15))
-            (Text . ,(all-the-icons-faicon "text-width" :height 0.8 :v-adjust -0.02))
-            (Method . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-            (Function . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-            (Constructor . ,(all-the-icons-faicon "cube" :height 0.8 :v-adjust -0.02 :face 'all-the-icons-purple))
-            (Field . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Variable . ,(all-the-icons-octicon "tag" :height 0.85 :v-adjust 0 :face 'all-the-icons-lblue))
-            (Class . ,(all-the-icons-material "settings_input_component" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
-            (Interface . ,(all-the-icons-material "share" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-            (Module . ,(all-the-icons-material "view_module" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-            (Property . ,(all-the-icons-faicon "wrench" :height 0.8 :v-adjust -0.02))
-            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.8 :v-adjust -0.15))
-            (Value . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-lblue))
-            (Enum . ,(all-the-icons-material "storage" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
-            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.8 :v-adjust -0.15))
-            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.8 :v-adjust -0.15))
-            (Color . ,(all-the-icons-material "palette" :height 0.8 :v-adjust -0.15))
-            (File . ,(all-the-icons-faicon "file-o" :height 0.8 :v-adjust -0.02))
-            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.8 :v-adjust -0.15))
-            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.8 :v-adjust -0.02))
-            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.8 :v-adjust -0.15))
-            (Constant . ,(all-the-icons-faicon "square-o" :height 0.8 :v-adjust -0.1))
-            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.8 :v-adjust -0.15 :face 'all-the-icons-orange))
-            (Event . ,(all-the-icons-octicon "zap" :height 0.8 :v-adjust 0 :face 'all-the-icons-orange))
-            (Operator . ,(all-the-icons-material "control_point" :height 0.8 :v-adjust -0.15))
-            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.8 :v-adjust -0.02))
-            (Template . ,(all-the-icons-material "format_align_left" :height 0.8 :v-adjust -0.15)))
-          company-box-icons-alist 'company-box-icons-all-the-icons))
-  (message "`company-box' loaded"))
-
-(use-package company-prescient
-  :defer t
-  :after company
-  :config
-  (company-prescient-mode 1)
-  (message "`company-prescient' loaded"))
+;; Optional: Add tempel-collection.
+;; The package is young and doesn't have comprehensive coverage.
+(use-package tempel-collection)
 
 (use-package doom-themes
   :config

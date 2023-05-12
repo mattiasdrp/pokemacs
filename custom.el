@@ -51,12 +51,13 @@
      ("FIXME" . "#cc9393")
      ("XXXX*" . "#cc9393")))
  '(lsp-auto-guess-root t)
+ '(pokemacs/french-dict "FR")
+ '(pokemacs/english-dict "US")
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
  '(use-clojure t)
- '(use-company t)
  '(use-dashboard t)
  '(use-eaf t)
  '(use-elm t)
@@ -86,7 +87,7 @@
    '((imenu buffer)
      (file
       (vertico-sort-function . sort-directories-first))
-     (company
+     (corfu
       (vertico-sort-function . vertico-sort-alpha))
      (symbol
       (vertico-sort-function . vertico-sort-history-length-alpha))))
