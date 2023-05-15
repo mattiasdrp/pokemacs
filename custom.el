@@ -23,7 +23,6 @@
  '(describe-char-unidata-list
    '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
  '(doom-modeline-height 12)
- '(doom-theme 'doom-solarized-dark)
  '(doom-themes-enable-bold t)
  '(doom-themes-enable-italic t)
  '(eaf-browser-blank-page-url "https://duckduckgo.com/")
@@ -32,7 +31,7 @@
  '(flycheck-languagetool-server-jar
    (concat
     (getenv "HOME")
-    "/.emacs.d/LanguageTool-6.1/languagetool-server.jar") t)
+    "/.emacs.d/LanguageTool-6.1/languagetool-server.jar"))
  '(hl-todo-keyword-faces
    '(("MDRPTODO" . "red")
      ("HOLD" . "#d0bf8f")
@@ -51,12 +50,14 @@
      ("FIXME" . "#cc9393")
      ("XXXX*" . "#cc9393")))
  '(lsp-auto-guess-root t)
- '(pokemacs/french-dict "FR")
- '(pokemacs/english-dict "US")
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
+ '(pokemacs-theme 'doom-solarized-dark)
+ '(pokemacs/english-dict "US")
+ '(pokemacs/french-dict "FR")
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
+ '(use-all-the-icons nil)
  '(use-clojure t)
  '(use-dashboard t)
  '(use-eaf t)
@@ -75,11 +76,11 @@
  '(use-pandoc t)
  '(use-python t)
  '(use-rainbow t)
- '(use-reason t)
+ '(use-reason nil)
  '(use-rust t)
  '(use-solaire t)
  '(use-spotify nil)
- '(use-treemacs t)
+ '(use-treemacs nil)
  '(use-visual-fill t)
  '(use-web t)
  '(use-window-purpose nil)

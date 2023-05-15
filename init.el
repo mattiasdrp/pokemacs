@@ -85,160 +85,145 @@
 
 (setq byte-compile-warnings '(cl-functions))
 
-(defgroup mdrp-packages nil
-  "Pokemacs packages."
-  :group 'package
-  :tag "Packages options group")
+;; Miscellaneous Packages
+(defgroup pokemacs nil
+  "Customisation group for pokemacs"
+  :group 'emacs
+  :tag "Pokemacs customisation")
 
-(defcustom use-spotify nil
-  "If non-nil, uses the spotify packages"
-  :group 'mdrp-packages
-  :type 'boolean)
+(defgroup pokemacs-packages nil
+  "Pokemacs packages options."
+  :group 'pokemacs
+  :tag "Packages")
 
 (defcustom use-dashboard nil
-  "If non-nil, uses the dashboard packages"
-  :group 'mdrp-packages
-  :type 'boolean)
+  "If non-nil, uses the dashboard packages."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag "󰕮 Dashboard")
 
-(defcustom use-solaire t
-  "If non-nil, uses the solaire package"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-eaf t
-  "If non-nil, uses the emacs application framework"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-michelson nil
-  "If non-nil, uses the michelson package"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-window-purpose nil
-  "If non-nil, uses the window-purpose package"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-rainbow nil
-  "If non-nil, don't be @thriim"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-latex nil
-  "If non-nil, uses the LaTeX packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-org-roam nil
-  "If non-nil, uses Org roam"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-magit-todos nil
-  "If non-nil, show todos in the current project in magit buffer"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-clojure t
-  "If non-nil, uses the Clojure packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-rust nil
-  "If non-nil, uses the rust packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-ocaml t
-  "If non-nil, uses the OCaml packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-reason t
-  "If non-nil, uses the Reason packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-python nil
-  "If non-nil, uses the Python packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-elm nil
-  "If non-nil, uses the Elm packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-fsharp nil
-  "If non-nil, uses the F# packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-kotlin nil
-  "If non-nil, uses the Kotlin packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-web nil
-  "If non-nil, uses the web packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-markdown t
-  "If non-nil, uses the markdown packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-pandoc t
-  "If non-nil, uses the pandoc packages"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-treemacs t
-  "If non-nil, uses the treemacs packages"
-  :group 'mdrp-packages
-  :type 'boolean)
+(defcustom use-eaf nil
+  "If non-nil, uses the Emacs application framework."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag "󰲋 Emacs Application Framework")
 
 (defcustom use-god nil
-  "If non-nil, uses the god (mode) packages"
-  :group 'mdrp-packages
-  :type 'boolean)
+  "If non-nil, uses the god (mode) packages.
+Similar to Vim's separation of command/insert modes"
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " God Mode")
 
-(defcustom use-visual-fill nil
-  "If non-nil, fill the frame when there's only one"
-  :group 'mdrp-packages
-  :type 'boolean)
-
-(defcustom use-maximize nil
-  "If non-nil, maximize emacs at startup"
-  :group 'mdrp-packages
-  :type 'boolean)
+(defcustom use-magit-todos nil
+  "If non-nil, show todos in the current project in magit buffer."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Magit todos")
 
 (defcustom use-org-agenda-startup nil
-  "Start the org agenda at start-up"
-  :group 'mdrp-packages
-  :type 'boolean)
+  "Start the org agenda at startup."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Org Agenda")
 
-(defcustom doom-theme 'doom-solarized-dark
-  "Theme to load"
-  :group 'doom-themes
-  :type 'symbol)
+(defcustom use-org-roam nil
+  "If non-nil, uses Org roam."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag "󰠮 Zettelkasten/Org Roam")
 
-(defgroup mdrp-dictionaries nil
+(defcustom use-pandoc nil
+  "If non-nil, uses the pandoc packages."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Pandoc")
+
+(defcustom use-spotify nil
+  "If non-nil, uses the spotify packages."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Spotify")
+
+(defcustom use-treemacs nil
+  "If non-nil, uses the treemacs packages."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag "󰙅 Treemacs")
+
+(defcustom use-window-purpose nil
+  "If non-nil, uses the window-purpose package."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag "󰡃 Window Purpose")
+
+;; Themes
+
+(defgroup pokemacs-appearance nil
+  "Pokemacs appearance options."
+  :group 'pokemacs
+  :tag "Appearance")
+
+(defcustom pokemacs-theme 'doom-solarized-dark
+  "Theme to load."
+  :group 'pokemacs-appearance
+  :type 'symbol
+  :tag "󰔎 Theme")
+
+(defcustom use-all-the-icons nil
+  "Use all-the-icons (when t) or nerd-icons (when nil)."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag " Icons")
+
+(defcustom use-maximize nil
+  "If non-nil, maximize Emacs at startup."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag "󰊓 Maximize")
+
+(defcustom use-rainbow nil
+  "If non-nil, don't be @thriim.
+Rainbowify parentheses and other things."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag "󱃗 Rainbows")
+
+(defcustom use-solaire t
+  "If non-nil, uses the solaire package.
+Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag " Solaire")
+
+(defcustom use-visual-fill nil
+  "If non-nil, fill the frame when there's only one."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag " Visual Fill")
+
+;; Dictionaries
+
+(defgroup pokemacs-dictionaries nil
   "Pokemacs dictionaries options."
-  :group 'dictionary
-  :tag "Dictionaries options group")
-
-(defcustom pokemacs/french-dict "FR"
-  "Use a french dictionary"
-  :group 'mdrp-dictionaries
-  :type 'string)
+  :group 'pokemacs
+  :tag "Dictionaries")
 
 (defcustom pokemacs/english-dict "US"
-  "Use an Englisher dictionary"
-  :group 'mdrp-dictionaries
-  :type 'string)
+  "Use an English dictionary.
+Specify the linguistic variant (like GB, US etc)
+or nil if you don't want to use an english dictionary"
+  :group 'pokemacs-dictionaries
+  :type 'string
+  :tag "English variant")
+
+(defcustom pokemacs/french-dict "FR"
+  "Use a french dictionary.
+Specify the linguistic variant (like FR, BE etc)
+or nil if you don't want to use an english dictionary"
+  :group 'pokemacs-dictionaries
+  :type 'string
+  :tag "French variant")
 
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
@@ -324,8 +309,7 @@
  ;; Never insert tabs when indenting (default is now to always use space)
  indent-tabs-mode nil
  ;; I know emacs, I really don't need the startup-screen
- inhibit-startup-screen t
- )
+ inhibit-startup-screen t)
 
 (setq
  ;; Ask before killing emacs
@@ -362,8 +346,7 @@
  ;; Save backup files in a .backup directory
  backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
  ;; Show Keystrokes in Progress Instantly
- echo-keystrokes 0.1
- )
+ echo-keystrokes 0.1)
 
 (require 'server)
 (unless (server-running-p) (server-start))
@@ -484,21 +467,43 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package all-the-icons
   :if (display-graphic-p)
   :config
-  (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
+  (when use-all-the-icons (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons"))
+  (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
   (message "`all-the-icons' loaded"))
 
-(use-package all-the-icons-dired
-  :hook (dired-mode . all-the-icons-dired-mode)
-  :config
-  (message "`all-the-icons-dired' loaded"))
+(when use-all-the-icons
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode)
+    :config
+    (message "`all-the-icons-dired' loaded")))
 
-(use-package all-the-icons-completion
-  :init
-  (all-the-icons-completion-mode)
-  :after (marginalia all-the-icons)
-  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+(when use-all-the-icons
+  (use-package all-the-icons-completion
+    :init
+    (all-the-icons-completion-mode)
+    :after (marginalia all-the-icons)
+    :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+    :config
+    (message "`all-the-icons-completion' loaded")))
+
+(use-package nerd-icons
   :config
-  (message "`all-the-icons-completion' loaded"))
+  (unless use-all-the-icons (set-fontset-font t '(#xe3dA . #xf10d7) "Symbols Nerd Font Mono"))
+  (message "`nerd-icons' loaded"))
+
+(unless use-all-the-icons
+  (use-package nerd-icons-dired
+    :hook (dired-mode . nerd-icons-dired-mode)
+    :config
+    (message "`nerd-icons-dired' loaded")))
+
+(unless use-all-the-icons
+  (use-package nerd-icons-completion
+    :after (marginalia nerd-icons)
+    :hook (marginalia-mode . nerd-icons-completion-marginalia-setup)
+    :config
+    (nerd-icons-completion-mode)
+    (message "`nerd-icons-completion' loaded")))
 
 (use-package ligature
   :defer t
@@ -1141,7 +1146,7 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :config (message "`mixed-pitch' loaded"))
 
-;; (use-package ob-rust :defer t)
+(use-package ob-rust :defer t)
 
 (use-package org
   :defer t
@@ -1155,14 +1160,12 @@ debian, and derivatives). On most it's 'fd'.")
   (:keymaps 'mdrp-org-map
             "l"                       'org-store-link
             "a"                       'org-agenda
-            "c"                       'org-capture
-            )
+            "c"                       'org-capture)
   (:keymaps 'org-mode-map
             "M-j"                     'org-goto
             "C-c C-a"                 nil
             "C-<return>"              'org-meta-return
-            "M-C-<return>"            'org-insert-heading-respect-content
-            )
+            "M-C-<return>"            'org-insert-heading-respect-content)
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -1180,17 +1183,15 @@ debian, and derivatives). On most it's 'fd'.")
              other buffer already has the PDF open"
     (interactive)
     (org-latex-export-to-pdf)
-    (mdrp/update-other-buffer)
-    )
+    (mdrp/update-other-buffer))
   :custom
+  ;; Change this value to point to where your org files are
   (org-directory "~/org/")
   ;; Babel
   (org-confirm-babel-evaluate nil)
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
   ;; Rest
-  (org-agenda-files
-   '("/home/mattias/org/agenda.org" "/home/mattias/org/cduce.org" "/home/mattias/org/orgzly.org") nil nil "Customized with use-package org")
   (org-ellipsis " ▾")
   (org-adapt-indentation nil)
   (org-agenda-span 'week)
@@ -1214,38 +1215,6 @@ debian, and derivatives). On most it's 'fd'.")
   (org-startup-with-inline-images t)
   (org-support-shift-select 'always)
   (org-roam-v2-ack t) ; anonying startup message
-  (org-tag-persistent-alist
-   '((:startgroup . nil)
-     ("Maison" . ?h)
-     ("Boulot" . ?b)
-     ("Plaisir" . ?p)
-     (:endgroup . nil)
-     (:startgroup . nil)
-     ("Usuba" . ?u)
-     ("Ocaml" . ?o)
-     ("Reste" . ?r)
-     (:endgroup . nil)
-     (:startgroup . nil)
-     ("Facile" . ?f)
-     ("Moyen" . ?m)
-     ("Difficile" . ?d)
-     (:endgroup . nil)
-     )
-   )
-  (org-tag-faces
-   '(
-     ("Maison" . (:foreground "GoldenRod" :weight bold))
-     ("Plaisir" . (:foreground "GoldenRod" :weight bold))
-     ("Boulot" . (:foreground "GoldenRod" :weight bold))
-     ("Usuba" . (:foreground "IndianRed1" :weight bold))
-     ("OCaml" . (:foreground "IndianRed1" :weight bold))
-     ("Reste" . (:foreground "IndianRed1" :weight bold))
-     ("Facile" . (:foreground "OrangeRed" :weight bold))
-     ("Moyen" . (:foreground "OrangeRed" :weight bold))
-     ("Difficile" . (:foreground "OrangeRed" :weight bold))
-     )
-   )
-
   :config
   ;; TODO states
   (setq org-todo-keywords
@@ -1292,7 +1261,7 @@ debian, and derivatives). On most it's 'fd'.")
    'org-babel-load-languages
    '(
      (emacs-lisp . t)
-     ;; (rust . t)
+     (rust . t)
      (ocaml . t)
      (latex . t)
      (shell . t)))
@@ -1517,45 +1486,18 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :config (message "`ox-moderncv' loaded"))
 
-(when use-markdown
-  (use-package markdown-mode
-    :defer t
-    :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'"       . markdown-mode)
-           ("\\.markdown\\'" . gfm-mode))
-    :init
-    (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
-    (setq markdown-command "markdown")
-    (setq markdown-open-command "retext")
-    :hook (gfm-mode . (lambda ()
-                        (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
-    :config (message "`markdown-mode' loaded")))
-
-(when use-markdown
-  (use-package markdown-toc
-    :defer t
-    :config (message "`markdown-toc' loaded")))
-
-(when use-pandoc
-  (use-package pandoc-mode
-    :ensure-system-package pandoc
-    :defer t
-    :hook ((markdown-mode . pandoc-mode)
-           (pandoc-mode . pandoc-load-default-settings))
-    :config (message "`pandoc-mode' loaded")))
-
 (use-package lsp-mode
   :defer t
   :commands lsp
   :init
-  (defun minad/orderless-dispatch-flex-first (_pattern index _total)
-    (and (eq index 0) 'orderless-flex))
+  (defun minad/orderless-dispatch-prefixes-first (_pattern index _total)
+    (and (eq index 0) 'orderless-prefixes))
 
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless)))
 
-  (add-hook 'orderless-style-dispatchers #'minad/orderless-dispatch-flex-first)
+  (add-hook 'orderless-style-dispatchers #'minad/orderless-dispatch-prefixes-first)
   (setq-local completion-at-point-functions
               (list (cape-capf-buster #'lsp-completion-at-point)))
 
@@ -2272,7 +2214,8 @@ have one rule for each file type."
             "M-l" 'corfu-info-location
             "TAB" 'corfu-insert-separator
             "M-SPC" 'corfu-insert-separator
-            "M-m" 'corfu-move-to-minibuffer)
+            "M-m" 'corfu-move-to-minibuffer
+            "<down>" 'corfu-next)
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
@@ -2283,9 +2226,10 @@ have one rule for each file type."
   (corfu-preview-current 'insert)
   (corfu-preselect-first t)
   (corfu-echo-documentation t)
-
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  (corfu-preview-current nil)    ;; Disable current candidate preview
+  (corfu-preselect-first nil)    ;; Disable candidate preselection
+  (corfu-min-width 80)
+  (corfu-max-width 80)
   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
@@ -2298,9 +2242,13 @@ have one rule for each file type."
   :after corfu
   :hook (corfu-mode . corfu-popupinfo-mode)
   :general
-
+  (:keymaps 'corfu-popupinfo-map
+            "M-<up>" 'scroll-other-window-down
+            "M-<down>"   'scroll-other-window)
   :custom
-  (corfu-popupinfo-delay '(0.5 . 0.5)))
+  (corfu-popupinfo-delay '(0.5 . 0.5))
+  (corfu-popupinfo-min-width 80)
+  (corfu-popupinfo-max-width 80))
 
 (use-package corfu-prescient
   :config
@@ -2310,15 +2258,93 @@ have one rule for each file type."
 (use-package kind-icon
   :after corfu
   :custom
-  (kind-icon-use-icons t)
   (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
   (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
   (kind-icon-blend-frac 0.08)
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+  (setq kind-icon-mapping
+        '((array "a" :icon "code-brackets" :face font-lock-type-face)
+          (boolean "b" :icon "circle-half-full" :face font-lock-builtin-face)
+          (class "c" :icon "view-grid-plus-outline" :face font-lock-type-face)
+          (color "#" :icon "palette" :face success)
+          (command "cm" :icon "code-greater-than" :face default)
+          (constant "co" :icon "lock-remove-outline" :face font-lock-constant-face)
+          (constructor "cn" :icon "table-column-plus-after" :face font-lock-function-name-face)
+          (enummember "em" :icon "order-bool-ascending-variant" :face font-lock-builtin-face)
+          (enum-member "em" :icon "order-bool-ascending-variant" :face font-lock-builtin-face)
+          (enum "e" :icon "format-list-bulleted-square" :face font-lock-builtin-face)
+          (event "ev" :icon "lightning-bolt-outline" :face font-lock-warning-face)
+          (field "fd" :icon "application-braces-outline" :face font-lock-variable-name-face)
+          (file "f" :icon "file-document-outline" :face font-lock-string-face)
+          (folder "d" :icon "folder" :face font-lock-doc-face)
+          (interface "if" :icon "application-brackets-outline" :face font-lock-type-face)
+          (keyword "kw" :icon "key-variant" :face font-lock-keyword-face)
+          (macro "mc" :icon "lambda" :face font-lock-keyword-face)
+          (magic "ma" :icon "auto-fix" :face font-lock-builtin-face)
+          (method "m" :icon "function-variant" :face font-lock-function-name-face)
+          (function "f" :icon "function" :face font-lock-function-name-face)
+          (module "{" :icon "file-code-outline" :face font-lock-preprocessor-face)
+          (numeric "nu" :icon "numeric" :face font-lock-builtin-face)
+          (operator "op" :icon "plus-minus" :face font-lock-comment-delimiter-face)
+          (param "pa" :icon "cog" :face default)
+          (property "pr" :icon "wrench" :face font-lock-variable-name-face)
+          (reference "rf" :icon "library" :face font-lock-variable-name-face)
+          (snippet "S" :icon "note-text-outline" :face font-lock-string-face)
+          (string "s" :icon "sticker-text-outline" :face font-lock-string-face)
+          (struct "%" :icon "code-braces" :face font-lock-variable-name-face)
+          (text "tx" :icon "script-text-outline" :face font-lock-doc-face)
+          (typeparameter "tp" :icon "format-list-bulleted-type" :face font-lock-type-face)
+          (type-parameter "tp" :icon "format-list-bulleted-type" :face font-lock-type-face)
+          (unit "u" :icon "ruler-square" :face font-lock-constant-face)
+          (value "v" :icon "variable" :face font-lock-variable-name-face)
+          (variable "va" :icon "variable" :face font-lock-variable-name-face)
+          (t "." :icon "crosshairs-question" :face font-lock-warning-face)))
+
+  ;; If you want to use text-based icons (based on NerfFonts):
+
+  ;; (setq kind-icon-use-icons nil)
+  ;; (setq kind-icon-mapping
+  ;;       `(
+  ;;         (array ,(nerd-icons-codicon "nf-cod-symbol_array") :face font-lock-type-face)
+  ;;         (boolean ,(nerd-icons-codicon "nf-cod-symbol_boolean") :face font-lock-builtin-face)
+  ;;         (class ,(nerd-icons-codicon "nf-cod-symbol_class") :face font-lock-type-face)
+  ;;         (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
+  ;;         (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
+  ;;         (constant ,(nerd-icons-codicon "nf-cod-symbol_constant") :face font-lock-constant-face)
+  ;;         (constructor ,(nerd-icons-codicon "nf-cod-triangle_right") :face font-lock-function-name-face)
+  ;;         (enummember ,(nerd-icons-codicon "nf-cod-symbol_enum_member") :face font-lock-builtin-face)
+  ;;         (enum-member ,(nerd-icons-codicon "nf-cod-symbol_enum_member") :face font-lock-builtin-face)
+  ;;         (enum ,(nerd-icons-codicon "nf-cod-symbol_enum") :face font-lock-builtin-face)
+  ;;         (event ,(nerd-icons-codicon "nf-cod-symbol_event") :face font-lock-warning-face)
+  ;;         (field ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-variable-name-face)
+  ;;         (file ,(nerd-icons-codicon "nf-cod-symbol_file") :face font-lock-string-face)
+  ;;         (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
+  ;;         (interface ,(nerd-icons-codicon "nf-cod-symbol_interface") :face font-lock-type-face)
+  ;;         (keyword ,(nerd-icons-codicon "nf-cod-symbol_keyword") :face font-lock-keyword-face)
+  ;;         (macro ,(nerd-icons-codicon "nf-cod-symbol_misc") :face font-lock-keyword-face)
+  ;;         (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
+  ;;         (method ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
+  ;;         (function ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
+  ;;         (module ,(nerd-icons-codicon "nf-cod-file_submodule") :face font-lock-preprocessor-face)
+  ;;         (numeric ,(nerd-icons-codicon "nf-cod-symbol_numeric") :face font-lock-builtin-face)
+  ;;         (operator ,(nerd-icons-codicon "nf-cod-symbol_operator") :face font-lock-comment-delimiter-face)
+  ;;         (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
+  ;;         (property ,(nerd-icons-codicon "nf-cod-symbol_property") :face font-lock-variable-name-face)
+  ;;         (reference ,(nerd-icons-codicon "nf-cod-references") :face font-lock-variable-name-face)
+  ;;         (snippet ,(nerd-icons-codicon "nf-cod-symbol_snippet") :face font-lock-string-face)
+  ;;         (string ,(nerd-icons-codicon "nf-cod-symbol_string") :face font-lock-string-face)
+  ;;         (struct ,(nerd-icons-codicon "nf-cod-symbol_structure") :face font-lock-variable-name-face)
+  ;;         (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
+  ;;         (typeparameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
+  ;;         (type-parameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
+  ;;         (unit ,(nerd-icons-codicon "nf-cod-symbol_ruler") :face font-lock-constant-face)
+  ;;         (value ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-builtin-face)
+  ;;         (variable ,(nerd-icons-codicon "nf-cod-symbol_variable") :face font-lock-variable-name-face)
+  ;;         (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face)))
 
   ;; Add hook to reset cache so the icon colors match my theme
-  ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
+  ;; ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
   ;; the theme using my custom defined command for switching themes. If I don't
   ;; do this, then the backgound color will remain the same, meaning it will not
   ;; match the background color corresponding to the current theme. Important
@@ -2362,6 +2388,7 @@ have one rule for each file type."
   :defer t
   :custom
   (completion-styles '(orderless basic))
+  (orderless-matching-styles '(orderless-prefixes))
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion))))
   :config (message "`orderless' loaded"))
@@ -2452,7 +2479,7 @@ have one rule for each file type."
 (use-package doom-themes
   :config
   ;; Global settings (defaults)
-  (load-theme doom-theme t)
+  (load-theme pokemacs-theme t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -2745,14 +2772,14 @@ have one rule for each file type."
     :config (message "`page-break-lines' loaded"))
 
   (use-package dashboard
-    :config
-    (dashboard-setup-startup-hook)
+    :init
     ;; Set the title
     (setq dashboard-banner-logo-title "Pokemacs")
     ;; Set the banner
     (setq dashboard-startup-banner "~/.emacs.d/etc/dashboard/calvin_hobbes.jpeg")
     (setq dashboard-center-content t)
     (setq dashboard-set-heading-icons t)
+    (setq dashboard-icon-type (if use-all-the-icons 'all-the-icons 'nerd-icons))
     (setq dashboard-set-file-icons t)
     (setq dashboard-items '((recents  . 5)
                             (bookmarks . 5)
@@ -2762,6 +2789,9 @@ have one rule for each file type."
     (setq dashboard-set-footer nil)
     (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
     (setq dashboard-week-agenda t)
+
+    :config
+    (dashboard-setup-startup-hook)
     (message "`dashboard' loaded"))
   (elpaca-wait))
 
@@ -2849,6 +2879,111 @@ have one rule for each file type."
   (setq ts-fold-indicators-fringe 'left-fringe)
   (setq ts-fold-indicators-priority 100)
   (message "`ts-fold-indicators' loaded"))
+
+(defgroup pokemacs-languages nil
+  "Pokemacs languages options."
+  :group 'pokemacs
+  :tag "Languages")
+
+(defcustom use-clojure nil
+  "If non-nil, uses the Clojure packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Clojure")
+
+(defcustom use-elm nil
+  "If non-nil, uses the Elm packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Elm")
+
+(defcustom use-fsharp nil
+  "If non-nil, uses the F# packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " F#")
+
+(defcustom use-kotlin nil
+  "If non-nil, uses the Kotlin packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Kotlin")
+
+(defcustom use-latex nil
+  "If non-nil, uses the LaTeX packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag "LaTeX")
+
+(defcustom use-markdown nil
+  "If non-nil, uses the markdown packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Markdown")
+
+(defcustom use-michelson nil
+  "If non-nil, uses the michelson packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag "Michelson")
+
+(defcustom use-ocaml t
+  "If non-nil, uses the OCaml packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " OCaml")
+
+(defcustom use-python nil
+  "If non-nil, uses the Python packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Python")
+
+(defcustom use-reason nil
+  "If non-nil, uses the Reason packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " ReasonML")
+
+(defcustom use-rust nil
+  "If non-nil, uses the rust packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Rust")
+
+(defcustom use-web nil
+  "If non-nil, uses the web packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Web")
+
+(when use-markdown
+  (use-package markdown-mode
+    :elpaca nil
+    :defer t
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'"       . markdown-mode)
+           ("\\.markdown\\'" . gfm-mode))
+    :init
+    (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
+    (setq markdown-command "markdown")
+    (setq markdown-open-command "retext")
+    :hook (gfm-mode . (lambda ()
+                        (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
+    :config (message "`markdown-mode' loaded")))
+
+(when use-markdown
+  (use-package markdown-toc
+    :defer t
+    :config (message "`markdown-toc' loaded")))
+
+(when use-pandoc
+  (use-package pandoc-mode
+    :ensure-system-package pandoc
+    :defer t
+    :hook ((markdown-mode . pandoc-mode)
+           (pandoc-mode . pandoc-load-default-settings))
+    :config (message "`pandoc-mode' loaded")))
 
 (use-package conf-mode
   :elpaca nil
@@ -3461,11 +3596,13 @@ have one rule for each file type."
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
+;; Load personal configuration for org mode
+(load-file (expand-file-name "~/.secrets/org.el"))
 
 (message "`init' file loaded")
-;;;; Footer
+  ;;;; Footer
 
 ;; End:
 (provide 'init)
 
-;;; init.el ends here
+  ;;; init.el ends here
