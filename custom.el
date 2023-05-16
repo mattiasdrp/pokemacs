@@ -52,7 +52,7 @@
  '(lsp-auto-guess-root t)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(pokemacs-theme 'doom-solarized-dark)
- '(pokemacs/english-dict "US")
+ '(pokemacs/english-dict "GB")
  '(pokemacs/french-dict "FR")
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))

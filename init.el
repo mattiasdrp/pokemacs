@@ -285,68 +285,101 @@ or nil if you don't want to use an english dictionary"
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (setq-default
- ;; Don't lock files, I know what I'm doing
- create-lockfiles nil
- ;; Always kill compilation process before starting another
- compilation-always-kill t
- ;; Save all buffers before compiling
- compilation-ask-about-save nil
- ;; TODO: Not exactly sure what this does
- compilation-context-lines t
- ;; TODO: Not exactly sure what this does
- compilation-error-screen-columns t
- ;; Scroll to the first error in the compilation buffer
- compilation-scroll-output 'first-
- ;; Number of lines in a compilation window
- compilation-window-height 12
- ;; Don't put anything in the scratch buffer
- initial-scratch-message ""
- ;; Use the clipboard too when cutting and pasting
- select-enable-clipboard t
- ;; Turn font lock mode for all mods that allow it
- ;; TODO: Specify a list when we'll start using tree-sitter
- font-lock-global-modes t
- ;; Never insert tabs when indenting (default is now to always use space)
- indent-tabs-mode nil
- ;; I know emacs, I really don't need the startup-screen
- inhibit-startup-screen t)
+ ;; Save backup files in a .backup directory
+ backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
 
-(setq
- ;; Ask before killing emacs
- confirm-kill-emacs 'y-or-n-p
- ;; Move point by visual lines
- line-move-visual t
- ;; Highlight the location of the next-error in the source buffer
- next-error-highlight t
- ;; Highlight the locus indefinitely until some other locus replaces it.
- next-error-highlight-no-select t
- ;; Add a newline automatically at the end of the file upon save.
- require-final-newline t
  ;; Briefly move cursor to the matching open-paren
  ;; even if it is not visible in the window.
  blink-matching-paren 'jump-offscreen
+
  ;; Show matching parenthesis even for comments
  blink-matching-paren-dont-ignore-comments t
+
  ;; Show matching parentheses even when on screen
  blink-matching-paren-on-screen t
+
  ;; Show column with line in the modeline
  column-number-mode t
+
  ;; Full comments per line
  comment-style 'indent
- ;; I don't need scroll bars
- scroll-bar-mode nil
- ;; TODO: Not sure why I'm using it
- sentence-end-double-space nil
- ;; Long lines will span on a continuation line (makes the whole line visible)
- truncate-lines nil
- ;; Flash the screen
- visible-bell t
+
+ ;; Always kill compilation process before starting another
+ compilation-always-kill t
+
+ ;; Save all buffers before compiling
+ compilation-ask-about-save nil
+
+ ;; TODO: Not exactly sure what this does
+ compilation-context-lines t
+
+ ;; TODO: Not exactly sure what this does
+ compilation-error-screen-columns t
+
+ ;; Scroll to the first error in the compilation buffer
+ compilation-scroll-output 'first-error
+
+ ;; Number of lines in a compilation window
+ compilation-window-height 12
+
+ ;; Ask before killing emacs
+ confirm-kill-emacs 'y-or-n-p
+
+ ;; Don't lock files, I know what I'm doing
+ create-lockfiles nil
+
+ ;; Show Keystrokes in Progress Instantly
+ echo-keystrokes 0.1
+
+ ;; No frame title
+ frame-title-format nil
+
+ vc-follow-symlinks t
+ ;; Turn font lock mode for all modes that allow it
+ ;; TODO: Specify a list when we'll start using tree-sitter
+ font-lock-global-modes t
+
+ ;; Never insert tabs when indenting (default is now to always use space)
+ indent-tabs-mode nil
+
+ ;; I know emacs, I really don't need the startup-screen
+ inhibit-startup-screen t
+
+ ;; Don't put anything in the scratch buffer
+ initial-scratch-message nil
+
+ ;; Move point by visual lines
+ line-move-visual t
+
+ ;; Highlight the location of the next-error in the source buffer
+ next-error-highlight t
+
+ ;; Highlight the locus indefinitely until some other locus replaces it.
+ next-error-highlight-no-select t
+
+ ;; Add a newline automatically at the end of the file upon save.
+ require-final-newline t
+
  ;; Turn Off Cursor Alarms
  ring-bell-function 'ignore
- ;; Save backup files in a .backup directory
- backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
- ;; Show Keystrokes in Progress Instantly
- echo-keystrokes 0.1)
+
+ ;; Use the clipboard too when cutting and pasting
+ select-enable-clipboard t
+
+ ;; TODO: Not sure why I'm using it
+ sentence-end-double-space nil
+
+ ;; I don't need scroll bars
+ scroll-bar-mode nil
+
+ ;; Long lines will span on a continuation line (makes the whole line visible)
+ truncate-lines nil
+
+ ;; yes or no replace by y or n everywhere
+ use-short-answers t
+
+ ;; Flash the screen
+ visible-bell nil)
 
 (require 'server)
 (unless (server-running-p) (server-start))
@@ -788,6 +821,15 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :general ("C-h C-m" 'discover-my-major)
   :config (message "`discover-my-major' loaded"))
+
+(use-package helpful
+  :general
+  ([remap describe-key] 'helpful-key)
+  ([remap describe-function] 'helpful-callable)
+  ([remap describe-variable] 'helpful-variable)
+  ([remap describe-symbol] 'helpful-symbol)
+  ("C-h F" 'helpful-function)
+  ("C-h C" 'helpful-command))
 
 (use-package easy-kill
   :defer t
@@ -1864,20 +1906,24 @@ have one rule for each file type."
   (message "`uniquify' loaded"))
 
 (use-package frame
-  :disabled
+  :elpaca nil
   :config
   (setq default-frame-alist
         '(
-          (min-height . 1)
-          '(height . 45)
-          (min-width  . 1)
-          '(width  . 81)
-          (vertical-scroll-bars . nil)
-          ;; (internal-border-width . 24)
+          ;; (min-height . 1) '(height . 45)
+          ;; (min-width  . 1) '(width  . 81)
+          ;; (vertical-scroll-bars)
+          (internal-border-width . 0)
           (left-fringe . 1)
           (right-fringe . 1)
           (tool-bar-lines . 0)
-          (menu-bar-lines . 1)))
+          (menu-bar-lines . 0)))
+  (when (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))
+  (when (fboundp 'menu-bar-mode)
+    (menu-bar-mode -1))
+  (when (fboundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))
   ;; Default frame settings
   (setq initial-frame-alist default-frame-alist)
   (message "`frame' loaded"))
@@ -2387,8 +2433,12 @@ have one rule for each file type."
 (use-package orderless
   :defer t
   :custom
-  (completion-styles '(orderless basic))
+  (completion-styles '(substring orderless basic))
   (orderless-matching-styles '(orderless-prefixes))
+  (orderless-component-separator 'orderless-escapable-split-on-space)
+  (read-file-name-completion-ignore-case t)
+  (read-buffer-completion-ignore-case t)
+  (completion-ignore-case t)
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion))))
   :config (message "`orderless' loaded"))
@@ -2434,6 +2484,8 @@ have one rule for each file type."
   :defer t
   :init (marginalia-mode)
   :custom
+  (marginalia-align 'center)
+  (marginalia-align-offset -1)
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
   :config (message "`marginalia' loaded"))
 

@@ -12,6 +12,8 @@
 
 ;;; Commentary:
 
+;; Useful functions for pokemacs
+
 ;;; Code:
 
 ;; Custom comment function a bit more clever
