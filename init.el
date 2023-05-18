@@ -77,12 +77,6 @@
 (use-package use-package-ensure-system-package
   :config (message "`use-package-ensure-system-package' loaded"))
 
-(use-package gcmh
-  :demand t
-  :config
-  (gcmh-mode 1)
-  (message "`gcmh' loaded"))
-
 (setq byte-compile-warnings '(cl-functions))
 
 ;; Miscellaneous Packages
@@ -239,7 +233,7 @@ or nil if you don't want to use an english dictionary"
 
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold better-gc-cons-threshold)
+            (setq gc-cons-threshold 80000000)
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 
@@ -1077,7 +1071,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (define-minor-mode locked-window-buffer-mode
   "Make the current window always display this buffer."
-  nil "locked" nil
+  :lighter "locked"
   (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
 
 (use-package git-commit
@@ -1584,6 +1578,7 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-completion-provider :none)
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
+  (lsp-enable-snippet nil)
   (lsp-disabled-clients '((python-mode . pyls)))
 
   ;; Rust-analyzer is the almost official lsp server for Rust
@@ -2565,6 +2560,8 @@ have one rule for each file type."
   ;; include support for finding `doom-modeline-def-*' forms.
   ;; Must be set before loading doom-modeline.
   (setq doom-modeline-support-imenu t)
+  ;; I don't care about the percentage position of the cursor
+  (setq mode-line-percent-position nil)
   :custom
 
   ;; Whether to use hud instead of default bar. It's only respected in GUI.
@@ -2675,11 +2672,11 @@ have one rule for each file type."
   ;; Define your custom doom-modeline
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
                               '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-                              '(misc-info persp-name battery grip github mu4e debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                              '(misc-info persp-name grip github mu4e debug minor-modes major-mode process vcs checker))
 
   (doom-modeline-def-modeline 'mdrp/lsp-line
-                              '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-                              '(misc-info persp-name battery grip github mu4e debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                              '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
+                              '(misc-info persp-name grip github mu4e debug minor-modes major-mode process vcs checker))
 
   ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
   (setq doom-modeline-fn-alist

@@ -22,7 +22,6 @@ Literate configuration for init.el.
 - [[#global-options][Global options]]
   - [[#initialize-packages][Initialize packages]]
   - [[#install-and-set-use-package][Install and set use-package]]
-  - [[#gcmh][GCMH]]
   - [[#disable-warnings][Disable warnings]]
   - [[#disableenable-features][Disable/Enable features]]
   - [[#set-useful-variables][Set useful variables]]
@@ -333,19 +332,6 @@ Will be used to download non-emacs packages needed by emacs packages
     :config (message "`use-package-ensure-system-package' loaded"))
 #+END_SRC
 
-** [[https://github.com/emacsmirror/gcmh][GCMH]]
-:PROPERTIES:
-:CUSTOM_ID: gcmh
-:END:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package gcmh
-    :demand t
-    :config
-    (gcmh-mode 1)
-    (message "`gcmh' loaded"))
-#+END_SRC
-
 ** Disable warnings
 :PROPERTIES:
 :CUSTOM_ID: disable-warnings
@@ -559,7 +545,7 @@ If you experience stuttering, increase this.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (setq gc-cons-threshold better-gc-cons-threshold)
+              (setq gc-cons-threshold 80000000)
               (setq file-name-handler-alist file-name-handler-alist-original)
               (makunbound 'file-name-handler-alist-original)))
 #+END_SRC
@@ -1902,7 +1888,7 @@ Simple mode to visualize blanks
 
   (define-minor-mode locked-window-buffer-mode
     "Make the current window always display this buffer."
-    nil "locked" nil
+    :lighter "locked"
     (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
 #+END_SRC
 
@@ -2635,6 +2621,7 @@ Minor mode acting as a client between a language server protocol and emacs.
     (lsp-completion-provider :none)
     (lsp-completion-enable t)
     (lsp-enable-imenu t)
+    (lsp-enable-snippet nil)
     (lsp-disabled-clients '((python-mode . pyls)))
 
     ;; Rust-analyzer is the almost official lsp server for Rust
@@ -3999,6 +3986,8 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
     ;; include support for finding `doom-modeline-def-*' forms.
     ;; Must be set before loading doom-modeline.
     (setq doom-modeline-support-imenu t)
+    ;; I don't care about the percentage position of the cursor
+    (setq mode-line-percent-position nil)
     :custom
 
     ;; Whether to use hud instead of default bar. It's only respected in GUI.
@@ -4109,11 +4098,11 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
     ;; Define your custom doom-modeline
     (doom-modeline-def-modeline 'mdrp/no-lsp-line
                                 '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-                                '(misc-info persp-name battery grip github mu4e debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                                '(misc-info persp-name grip github mu4e debug minor-modes major-mode process vcs checker))
 
     (doom-modeline-def-modeline 'mdrp/lsp-line
-                                '(bar " " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-                                '(misc-info persp-name battery grip github mu4e debug minor-modes input-method indent-info buffer-encoding major-mode process vcs checker))
+                                '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
+                                '(misc-info persp-name grip github mu4e debug minor-modes major-mode process vcs checker))
 
     ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
     (setq doom-modeline-fn-alist
