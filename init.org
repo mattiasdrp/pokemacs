@@ -4358,7 +4358,6 @@ Will pulse when the focus changes to show where the cursor is.
       (setq dashboard-set-footer nil)
       (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
       (setq dashboard-week-agenda t)
-
       :config
       (dashboard-setup-startup-hook)
       (message "`dashboard' loaded"))
@@ -4664,12 +4663,11 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+BEGIN_SRC emacs-lisp
   (use-package json-mode
-    :elpaca nil
     :defer t
     :mode (("\\.bowerrc$"     . json-mode)
            ("\\.jshintrc$"    . json-mode)
            ("\\.json_schema$" . json-mode)
-           ("\\.json\\'" . json-mode))
+           ("\\.json\\'"      . json-mode))
     :general
     (:keymaps 'json-mode-map
               "C-c <tab>" 'json-mode-beautify
@@ -5500,7 +5498,6 @@ After everything has been done, load [[file:post-custom.el][post-custom.el]] to 
   (load post-custom-file)
   ;; Load personal configuration for org mode
   (load-file (expand-file-name "~/.secrets/org.el"))
-
   (message "`init' file loaded")
     ;;;; Footer
 

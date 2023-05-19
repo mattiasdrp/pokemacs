@@ -1919,6 +1919,7 @@ have one rule for each file type."
     (menu-bar-mode -1))
   (when (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
+
   ;; Default frame settings
   (setq initial-frame-alist default-frame-alist)
   (message "`frame' loaded"))
@@ -2838,7 +2839,6 @@ have one rule for each file type."
     (setq dashboard-set-footer nil)
     (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
     (setq dashboard-week-agenda t)
-
     :config
     (dashboard-setup-startup-hook)
     (message "`dashboard' loaded"))
@@ -3046,12 +3046,11 @@ have one rule for each file type."
   :config (message "`conf-mode' loaded"))
 
 (use-package json-mode
-  :elpaca nil
   :defer t
   :mode (("\\.bowerrc$"     . json-mode)
          ("\\.jshintrc$"    . json-mode)
          ("\\.json_schema$" . json-mode)
-         ("\\.json\\'" . json-mode))
+         ("\\.json\\'"      . json-mode))
   :general
   (:keymaps 'json-mode-map
             "C-c <tab>" 'json-mode-beautify
@@ -3647,7 +3646,6 @@ have one rule for each file type."
 (load post-custom-file)
 ;; Load personal configuration for org mode
 (load-file (expand-file-name "~/.secrets/org.el"))
-
 (message "`init' file loaded")
   ;;;; Footer
 
