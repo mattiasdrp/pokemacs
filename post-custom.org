@@ -123,7 +123,7 @@ For WSL see [[https://www.39digits.com/signed-git-commits-on-wsl2-using-visual-s
 
 - Create the index with ~mu index~
 
-- Fill a ~.mbsyncrc~ with the following fields (for each account):
+- Fill a ~.msmtprc~ with the following fields (for each account):
     #+BEGIN_SRC shell :tangle no
       # Set default values for all the accounts.
       defaults
