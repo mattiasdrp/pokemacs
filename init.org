@@ -227,7 +227,7 @@ Literate configuration for init.el.
 :CUSTOM_ID: header
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;;; init.el --- Emacs init -*- lexical-binding: t -*-
   ;;
 
@@ -249,7 +249,7 @@ Literate configuration for init.el.
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;; Code:
 
-#+END_SRC
+#+end_src
 
 * Global options
 :PROPERTIES:
@@ -261,7 +261,7 @@ Literate configuration for init.el.
 :CUSTOM_ID: initialize-packages
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar elpaca-installer-version 0.4)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
@@ -297,14 +297,14 @@ Literate configuration for init.el.
       (load "./elpaca-autoloads")))
   (add-hook 'after-init-hook #'elpaca-process-queues)
   (elpaca `(,@elpaca-order))
-#+END_SRC
+#+end_src
 
 ** Install and set use-package
 :PROPERTIES:
 :CUSTOM_ID: install-and-set-use-package
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; Install use-package support
   (elpaca elpaca-use-package
           ;; Enable :elpaca use-package keyword.
@@ -323,14 +323,14 @@ Literate configuration for init.el.
 
   (elpaca bind-key)
   (elpaca use-package)
-#+END_SRC
+#+end_src
 
 Will be used to download non-emacs packages needed by emacs packages
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package use-package-ensure-system-package
     :config (message "`use-package-ensure-system-package' loaded"))
-#+END_SRC
+#+end_src
 
 ** Disable warnings
 :PROPERTIES:
@@ -338,9 +338,9 @@ Will be used to download non-emacs packages needed by emacs packages
 :END:
 
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq byte-compile-warnings '(cl-functions))
-#+END_SRC
+#+end_src
 
 ** Disable/Enable features
 :PROPERTIES:
@@ -349,7 +349,7 @@ Will be used to download non-emacs packages needed by emacs packages
 
 This is a list of custom variables that allow to enable/disable features. If you want to change them, ~M-x customize-variable <custom_variable>~ will change its value in [[file:custom.el][custom.el]] allowing to maintain your own [[file:custom.el][custom.el]] file that should never be updated by me. Don't enable or disable features in this file or it will make updating it harder.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; Miscellaneous Packages
   (defgroup pokemacs nil
     "Customisation group for pokemacs"
@@ -489,7 +489,7 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'pokemacs-dictionaries
     :type 'string
     :tag "French variant")
-#+END_SRC
+#+end_src
 
 ** Set useful variables
 :PROPERTIES:
@@ -501,20 +501,20 @@ This is a list of custom variables that allow to enable/disable features. If you
 :CUSTOM_ID: init-file
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq user-init-file (or load-file-name (buffer-file-name)))
   (setq user-emacs-directory (file-name-directory user-init-file))
-#+END_SRC
+#+end_src
 
 *** Load custom file
 :PROPERTIES:
 :CUSTOM_ID: load-custom-file
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file)
-#+END_SRC
+#+end_src
 
 ** Maximize and fullscreen at start-up
 :PROPERTIES:
@@ -523,11 +523,11 @@ This is a list of custom variables that allow to enable/disable features. If you
 
 This can be opted in or out by customising ~use-maximize~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-maximize
     (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
     (add-to-list 'default-frame-alist '(fullscreen . maximized)))
-#+END_SRC
+#+end_src
 
 ** Revert early-init
 :PROPERTIES:
@@ -538,24 +538,24 @@ The default value to use for ~gc-cons-threshold~.
 If you experience freezing, decrease this.
 If you experience stuttering, increase this.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar better-gc-cons-threshold (* 511 1024 1024)) ; 64mb
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'emacs-startup-hook
             (lambda ()
               (setq gc-cons-threshold 80000000)
               (setq file-name-handler-alist file-name-handler-alist-original)
               (makunbound 'file-name-handler-alist-original)))
-#+END_SRC
+#+end_src
 
 ** GC when emacs is idle and never when using minibuffer
 :PROPERTIES:
 :CUSTOM_ID: gc-when-emacs-is-idle-and-never-when-using-minibuffer
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'emacs-startup-hook
             (lambda ()
               (if (boundp 'after-focus-change-function)
@@ -577,14 +577,14 @@ If you experience stuttering, increase this.
   (setq gc-cons-percentage 0.5)
   (run-with-idle-timer 5 t #'garbage-collect)
   (setq garbage-collection-messages t)
-#+END_SRC
+#+end_src
 
 ** Load functions
 :PROPERTIES:
 :CUSTOM_ID: load-functions
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun update-to-load-path (folder)
     "Update FOLDER and its subdirectories to `load-path'."
     (let ((base folder))
@@ -599,32 +599,32 @@ If you experience stuttering, increase this.
               (add-to-list 'load-path name)))))))
 
   (update-to-load-path (expand-file-name "lisp" user-emacs-directory))
-#+END_SRC
+#+end_src
 
 ** Change frame title format
 :PROPERTIES:
 :CUSTOM_ID: change-frame-title-format
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq frame-title-format '(buffer-file-name "%b (%f)" "%b"))
-#+END_SRC
+#+end_src
 
 ** Ask y/n instead of yes/no
 :PROPERTIES:
 :CUSTOM_ID: ask-yn-instead-of-yesno
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+#+end_src
 
 ** TODO Default values
 :PROPERTIES:
 :CUSTOM_ID: default-values
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default
    ;; Save backup files in a .backup directory
    backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
@@ -721,7 +721,7 @@ If you experience stuttering, increase this.
 
    ;; Flash the screen
    visible-bell nil)
-#+END_SRC
+#+end_src
 
  # TODO: Change ansi color COLORS "#424242" "#EF9A9A" "#C5E1A5" "#FFEE58" "#64B5F6" "#E1BEE7" "#80DEEA" "#E0E0E0"]
 
@@ -730,10 +730,10 @@ If you experience stuttering, increase this.
 :CUSTOM_ID: start-emacs-as-a-server
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'server)
   (unless (server-running-p) (server-start))
-#+END_SRC
+#+end_src
 
 ** Prettifying
 :PROPERTIES:
@@ -742,16 +742,16 @@ If you experience stuttering, increase this.
 
 Enable prettifying everywhere
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-prettify-symbols-mode t)
   (prettify-symbols-mode)
-#+END_SRC
+#+end_src
 
 When the cursor in on a prettified symbol, unprettify it
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq prettify-symbols-unprettify-at-point 1)
-#+END_SRC
+#+end_src
 
 ** Revert files when they changed
 :PROPERTIES:
@@ -760,10 +760,10 @@ When the cursor in on a prettified symbol, unprettify it
 
 This allows to let emacs revert files automatically if they were not changed directly in a buffer (log files for example)
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-auto-revert-mode t)
   (auto-revert-mode t)
-#+END_SRC
+#+end_src
 
 ** Show parenthesis
 :PROPERTIES:
@@ -772,9 +772,9 @@ This allows to let emacs revert files automatically if they were not changed dir
 
 Not the same as ~blink-matching-paren*~ that triggers when you close a parenthesis. This will show the matching parenthesis when your cursor is on an open or closed parenthesis.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (show-paren-mode 1)
-#+END_SRC
+#+end_src
 
 The available styles are
 ~'parenthesis~: show the matching parenthesis
@@ -790,49 +790,49 @@ Since this is highly user dependent (I see you @thriim), the variable ~show-pare
 :END:
 
 - Display line numbers in the fringe (disabled for now because it messes with quick-peek)
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     ;; (global-display-line-numbers-mode t)
-  #+END_SRC
+  #+end_src
 - Save the place of the cursor when exiting the buffer
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (setq save-place-forget-unreadable-files t)
     (save-place-mode 1)
-  #+END_SRC
+  #+end_src
 - Replace selection when writing
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (delete-selection-mode t)
-  #+END_SRC
+  #+end_src
 - So Long mitigates slowness due to extremely long lines.
 /Currently available in Emacs master branch only!/
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (when (fboundp 'global-so-long-mode)
       (global-so-long-mode))
-  #+END_SRC
+  #+end_src
 - Smooth scrolling
-  #+BEGIN_SRC elisp
+  #+begin_src elisp
     (unless (version< emacs-version "29")
       (pixel-scroll-precision-mode t))
-  #+END_SRC
+  #+end_src
 
 ** Add some files to text-mode
 :PROPERTIES:
 :CUSTOM_ID: add-some-files-to-text-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
   (add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
   (add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
-#+END_SRC
+#+end_src
 
 ** Delete whitespace
 :PROPERTIES:
 :CUSTOM_ID: delete-whitespace
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
+#+end_src
 
 ** Auto update packages
 :PROPERTIES:
@@ -841,7 +841,7 @@ Since this is highly user dependent (I see you @thriim), the variable ~show-pare
 
 Automatic updating of packages (you can customize ~auto-update-package-interval~ which default value is ~7 days~)
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package auto-package-update
     :defer t
     :custom
@@ -849,7 +849,7 @@ Automatic updating of packages (you can customize ~auto-update-package-interval~
     (auto-package-update-prompt-before-update t)
     (auto-package-update-delete-old-version t)
     :config (message "`auto-package-update' loaded"))
-#+END_SRC
+#+end_src
 
 ** No littering
 :PROPERTIES:
@@ -858,38 +858,38 @@ Automatic updating of packages (you can customize ~auto-update-package-interval~
 
 Stop creating files everywhere and put them all in a single place
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package no-littering
     :config (message "`no-littering' loaded"))
   (elpaca-wait)
-#+END_SRC
+#+end_src
 
 Create a ~#file#~ while waiting for it to be saved and for backup (if emacs crashes you can recover your previous session with ~M-x recover-session~)
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (auto-save-visited-mode 1)
   (setq auto-save-default t)
   (setq auto-save-timeout 60)
   (setq auto-save-interval 200)
-#+END_SRC
+#+end_src
 
 * Requirements
 :PROPERTIES:
 :CUSTOM_ID: requirements
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'cl-lib)
   (require 'package)
   (require 'mdrp-functions)
-#+END_SRC
+#+end_src
 
 * Constants and variables
 :PROPERTIES:
 :CUSTOM_ID: constants-and-variables
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defconst mdrp/sys/win32
     (eq system-type 'windows-nt)
     "Are we running on a WinTel system?")
@@ -906,7 +906,7 @@ Create a ~#file#~ while waiting for it to be saved and for backup (if emacs cras
     (cl-find-if #'executable-find (list "fdfind" "fd"))
     "The filename of the `fd' executable. On some distros it's 'fdfind' (ubuntu,
   debian, and derivatives). On most it's 'fd'.")
-#+END_SRC
+#+end_src
 
 * Packages initialization and configuration
 :PROPERTIES:
@@ -920,13 +920,13 @@ Before this part you shouldn't use any ~use-package~ function since it's not loa
 :CUSTOM_ID: emacs-startup-profiler
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package esup
     :defer t
     :config
     (setq esup-depth 0)
     (message "`esup' loaded"))
-#+END_SRC
+#+end_src
 
 * History and prescience
 :PROPERTIES:
@@ -940,13 +940,13 @@ Before this part you shouldn't use any ~use-package~ function since it's not loa
 
 Sorting and filtering of completions
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package prescient
     :init
     (setq prescient-persist-mode 1)
     :defer t
     :config (message "`prescient' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://www.emacswiki.org/emacs/SaveHist][Savehist]]
 :PROPERTIES:
@@ -955,7 +955,7 @@ Sorting and filtering of completions
 
 We're not only saving the minibuffer history but compile history too
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package savehist
     :elpaca nil
     :init
@@ -971,7 +971,7 @@ We're not only saving the minibuffer history but compile history too
     (add-to-list 'recentf-exclude no-littering-var-directory)
     (add-to-list 'recentf-exclude no-littering-etc-directory)
     (message "`savehist' loaded"))
-#+END_SRC
+#+end_src
 
 * WSL Specific
 :PROPERTIES:
@@ -980,7 +980,7 @@ We're not only saving the minibuffer history but compile history too
 
 When working in WSL emacs will believe it's in a Linux environment when it's actually not
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when (and (eq system-type 'gnu/linux)
              (string-match
               "Linux.*Microsoft.*Linux"
@@ -989,7 +989,7 @@ When working in WSL emacs will believe it's in a Linux environment when it's act
      browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
      browse-url-generic-args     '("/c" "start")
      browse-url-browser-function #'browse-url-generic))
-#+END_SRC
+#+end_src
 
 * Fonts and character encoding
 :PROPERTIES:
@@ -1003,7 +1003,7 @@ When working in WSL emacs will believe it's in a Linux environment when it's act
 
 Set the default coding system to UTF-8.This idea came from the Doom Emacs early-init.el file.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (unless mdrp/sys/win32
     (set-selection-coding-system 'utf-8)
     (prefer-coding-system 'utf-8)
@@ -1012,7 +1012,7 @@ Set the default coding system to UTF-8.This idea came from the Doom Emacs early-
     (set-terminal-coding-system 'utf-8)
     (set-keyboard-coding-system 'utf-8)
     (setq locale-coding-system 'utf-8))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/domtronn/all-the-icons.el][All the icons]] and material icons for specific range
 :PROPERTIES:
@@ -1021,31 +1021,31 @@ Set the default coding system to UTF-8.This idea came from the Doom Emacs early-
 
 In order to use this package you need to run ~M-x all-the-icons-install~ the first time your configuration is loaded
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package all-the-icons
     :if (display-graphic-p)
     :config
     (when use-all-the-icons (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons"))
     (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
     (message "`all-the-icons' loaded"))
-#+END_SRC
+#+end_src
 
 Other all-the-icons related packages:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-all-the-icons
     (use-package all-the-icons-dired
       :hook (dired-mode . all-the-icons-dired-mode)
       :config
       (message "`all-the-icons-dired' loaded")))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/iyefrat/all-the-icons-completion][All the icons completion]]
 :PROPERTIES:
 :CUSTOM_ID: all-the-icons-completion
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-all-the-icons
     (use-package all-the-icons-completion
       :init
@@ -1054,7 +1054,7 @@ Other all-the-icons related packages:
       :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
       :config
       (message "`all-the-icons-completion' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/rainstormstudio/nerd-icons.el][Nerd-icons]]
 :PROPERTIES:
@@ -1063,29 +1063,29 @@ Other all-the-icons related packages:
 
 In order to use this package you need to run ~M-x nerd-icons-install-fonts~ the first time your configuration is loaded
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package nerd-icons
     :config
     (unless use-all-the-icons (set-fontset-font t '(#xe3dA . #xf10d7) "Symbols Nerd Font Mono"))
     (message "`nerd-icons' loaded"))
-#+END_SRC
+#+end_src
 
 Other nerd-icons related packages:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (unless use-all-the-icons
     (use-package nerd-icons-dired
       :hook (dired-mode . nerd-icons-dired-mode)
       :config
       (message "`nerd-icons-dired' loaded")))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/rainstormstudio/nerd-icons-completion][Nerd-icons completion]]
 :PROPERTIES:
 :CUSTOM_ID: nerd-icons-completion
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (unless use-all-the-icons
     (use-package nerd-icons-completion
       :after (marginalia nerd-icons)
@@ -1093,14 +1093,14 @@ Other nerd-icons related packages:
       :config
       (nerd-icons-completion-mode)
       (message "`nerd-icons-completion' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/mickeynp/ligature.el][Ligatures]]
 :PROPERTIES:
 :CUSTOM_ID: ligatures
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ligature
     :defer t
     :config
@@ -1126,41 +1126,41 @@ Other nerd-icons related packages:
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t)
     (message "`ligature' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://www.emacswiki.org/emacs/AnsiColor][Ansi color]]
 :PROPERTIES:
 :CUSTOM_ID: ansi-color
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ansi-color
     :elpaca nil
     :hook
     (shell-mode . ansi-color-for-comint-mode-on)
     :config (message "`ansi-color' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacsfodder/kurecolor][Kurecolor]]
 :PROPERTIES:
 :CUSTOM_ID: kurecolor
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package kurecolor
     :config (message "`kurecolor' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/iqbalansari/emacs-emojify][Emojify]]
 :PROPERTIES:
 :CUSTOM_ID: emojify
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package emojify
     :hook (after-init . global-emojify-mode)
     :config (message "`emojify' loaded"))
-#+END_SRC
+#+end_src
 
 * Keybindings
 :PROPERTIES:
@@ -1172,7 +1172,7 @@ Other nerd-icons related packages:
 :CUSTOM_ID: general
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package general
     :demand t
     :init
@@ -1268,7 +1268,7 @@ Other nerd-icons related packages:
       )
     :config (message "`general' loaded"))
   (elpaca-wait)
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/justbur/emacs-which-key][Which-key]]
 :PROPERTIES:
@@ -1277,7 +1277,7 @@ Other nerd-icons related packages:
 
 Useful packages that allows to see the possible keys after starting a combination of keys.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package which-key
     :init (which-key-mode)
     :custom
@@ -1303,14 +1303,14 @@ Useful packages that allows to see the possible keys after starting a combinatio
           which-key-side-window-max-width 0.33
           which-key-idle-delay 0.1)
     (message "`which-key' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/Kungsgeten/selected.el][Selected]]
 :PROPERTIES:
 :CUSTOM_ID: selected
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package selected
     :defer t
     :init
@@ -1337,7 +1337,7 @@ Useful packages that allows to see the possible keys after starting a combinatio
               "C-<return>"              'hide-region-hide
               "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window"))
     :config (message "`selected' loaded"))
-#+END_SRC
+#+end_src
 
 ** DISABLED: [[https://github.com/emacsorphanage/god-mode][God mode]]
 :PROPERTIES:
@@ -1346,7 +1346,7 @@ Useful packages that allows to see the possible keys after starting a combinatio
 
 This mode allows to switch between a mode where modifier keys are not used (~C-key~ is replaced by ~key~ and ~M-key~ by ~g key~. However, in my current config I often have ~C-key key'~ bindings and I would need to rebind them to ~C-key C-key'~ to have a seemless experience with this mode and I didn't find the need for it as of now.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package god-mode
     :disabled
     :init
@@ -1375,7 +1375,7 @@ This mode allows to switch between a mode where modifier keys are not used (~C-k
            ("C-²"                     'god-mode-all)
            )
     )
-#+END_SRC
+#+end_src
 
 * General Utilities
 :PROPERTIES:
@@ -1389,35 +1389,35 @@ This part will load packages that are useful for emacs and are not specific to m
 :CUSTOM_ID: kill-ring-doesnt-kill-text-properties
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun mdrp/unpropertize-kill-ring ()
     (setq kill-ring (mapcar 'substring-no-properties kill-ring)))
 
   (add-hook 'kill-emacs-hook 'mdrp/unpropertize-kill-ring)
-#+END_SRC
+#+end_src
 
 ** Cursor
 :PROPERTIES:
 :CUSTOM_ID: cursor
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
- #+END_SRC
+ #+end_src
 
 ** [[https://github.com/emacsmirror/nlinum/blob/master/nlinum.el][Nlinum]]
 :PROPERTIES:
 :CUSTOM_ID: nlinum
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package nlinum
     :init
     (global-nlinum-mode 1)
     :config
     (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
     (message "`nlinum' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/mykyta-shyrin/cheatsheet][Cheat Sheet]]
 :PROPERTIES:
@@ -1426,11 +1426,11 @@ This part will load packages that are useful for emacs and are not specific to m
 
 When I have the time
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package cheatsheet
     :defer t
     :config (message "`cheatsheet' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/bbatsov/crux][Crux]]
 :PROPERTIES:
@@ -1444,7 +1444,7 @@ Useful commands. Notably (not all of them are crux but we put them in the crux c
 - ~M-m u/d/c~: upcase/downcase/capitalize region or word at point
 
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package crux
     :init
     (define-prefix-command 'mdrp-crux-map nil "Crux-")
@@ -1477,7 +1477,7 @@ Useful commands. Notably (not all of them are crux but we put them in the crux c
     (crux-with-region-or-point-to-eol kill-ring-save)
     (defalias 'rename-file-and-buffer #'crux-rename-file-and-buffer)
     (message "`crux' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/manateelazycat/delete-block][Delete block]]
 :PROPERTIES:
@@ -1486,7 +1486,7 @@ Useful commands. Notably (not all of them are crux but we put them in the crux c
 
 Better block deletion.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package delete-block
     :load-path "lisp/"
     :elpaca nil
@@ -1496,20 +1496,20 @@ Better block deletion.
     ("C-<backspace>"           'delete-block-backward)
     ("M-<backspace>"           'delete-block-backward)
     :config (message "`delete-block' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://framagit.org/steckerhalter/discover-my-major][Discover my major]]
 :PROPERTIES:
 :CUSTOM_ID: discover-my-major
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package discover-my-major
     :after general
     :defer t
     :general ("C-h C-m" 'discover-my-major)
     :config (message "`discover-my-major' loaded"))
-#+END_SRC
+#+end_src
 
 ** Helpful
 
@@ -1532,14 +1532,14 @@ Better block deletion.
 
 Better ~M-w~
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package easy-kill
     :defer t
     :config
     (global-set-key [remap kill-ring-save] #'easy-kill)
     (global-set-key [remap mark-sexp] #'easy-mark)
     (message "`easy-kill loaded"))
-#+END_SRC
+#+end_src
 
 ** Spell and grammar checking
 :PROPERTIES:
@@ -1551,7 +1551,7 @@ Better ~M-w~
 :CUSTOM_ID: flycheck-languagetool
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck-languagetool
     :defer t
     :elpaca (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
@@ -1566,7 +1566,7 @@ Better ~M-w~
       (setq flycheck-languagetool--text-mode nil)
       (delete 'languagetool 'flycheck-checkers))
     (message "`flycheck-languagetool' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://www.emacswiki.org/emacs/FlySpell][Flyspell]]
 :PROPERTIES:
@@ -1577,7 +1577,7 @@ Flyspell in text or programs (will only check comments and strings). You can cha
 
 Flyspell is automatically activated but you can toggle it with ~M-f t~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flyspell
     :elpaca nil
     :init
@@ -1702,14 +1702,14 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
           (if (and b e (< (point) e)) (setq rlt nil)))
         (setq ad-return-value rlt)))
     (message "`flyspell' loaded"))
-#+END_SRC
+#+end_src
 
 **** [[https://github.com/d12frosted/flyspell-correct][Flyspell correct]]
 :PROPERTIES:
 :CUSTOM_ID: flyspell-correct
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flyspell-correct
     :after flyspell
     :general
@@ -1719,7 +1719,7 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
               "C-f" 'flyspell-correct-wrapper
               )
     :config (message "`flyspell-correct' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/nschum/fringe-helper.el][Fringe helper]]
 :PROPERTIES:
@@ -1728,10 +1728,10 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
 
 Helper functions for emacs fringe bitmaps that are used by some packages used in the following configuration file.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package fringe-helper
     :config (message "`fringe-helper' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/nschum/highlight-symbol.el][Highlight symbol]]
 :PROPERTIES:
@@ -1740,7 +1740,7 @@ Helper functions for emacs fringe bitmaps that are used by some packages used in
 
 Useful package that allows to go to the next and previous symbols at point with ~M-S-<down>~ and ~M-S-<up>~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package highlight-symbol
     :defer t
       :init (highlight-symbol-mode)
@@ -1754,7 +1754,7 @@ Useful package that allows to go to the next and previous symbols at point with 
       :config
       (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
       (message "`highlight-symbol' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/abo-abo/hydra][Hydra]]
 :PROPERTIES:
@@ -1763,7 +1763,7 @@ Useful package that allows to go to the next and previous symbols at point with 
 
 Not using it to its full potential right now but only for useful dates:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hydra
     :defer t
     :custom
@@ -1784,7 +1784,7 @@ Not using it to its full potential right now but only for useful dates:
       ("l" mdrp/date-long)
       ("L" mdrp/date-long-with-time))
     (message "`hydra' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/tarsius/keycast/][Keycast]]
 :PROPERTIES:
@@ -1793,7 +1793,7 @@ Not using it to its full potential right now but only for useful dates:
 
 Needs to be manually activated. Will display all the actions made.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package keycast
     :defer t
     :commands keycast-mode
@@ -1806,7 +1806,7 @@ Needs to be manually activated. Will display all the actions made.
         (remove-hook 'pre-command-hook 'keycast--update)))
     (add-to-list 'global-mode-string '("" keycast-mode-line))
     (message "`keycast' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/magnars/multiple-cursors.el][Multiple cursors]]
 :PROPERTIES:
@@ -1815,7 +1815,7 @@ Needs to be manually activated. Will display all the actions made.
 
 Allows to have multiple cursors. There are a lot of functions provided by this mode but since I don't use this feature a lot I'd advise looking at the mode documentation. I mostly use it in conjunction with [[#selected][Selected]] (with ~>~, ~<~ and ~RET~).1
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package multiple-cursors
     :defer t
     :general
@@ -1823,7 +1823,7 @@ Allows to have multiple cursors. There are a lot of functions provided by this m
     ("C-c p" 'mc/mark-previous-like-this)
     ("C-c a" 'mc/mark-all-like-this)
     :config (message "`a loaded"))
-#+END_SRC
+#+end_src
 
 ** TODO Hide region
 :PROPERTIES:
@@ -1834,7 +1834,7 @@ TODO: hide-region-unpin doesn't work when changing buffer.
 
 (The keybind for `hide-region-pin' is located in the [[#selected][Selected]] section)
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hide-region
     :load-path "lisp/"
     :elpaca nil
@@ -1843,7 +1843,7 @@ TODO: hide-region-unpin doesn't work when changing buffer.
     :general
     ("C-c r u" 'hide-region-unpin)
     :config (message "`hide-region loaded"))
-#+END_SRC
+#+end_src
 
 ** Hide mode line
 :PROPERTIES:
@@ -1852,11 +1852,11 @@ TODO: hide-region-unpin doesn't work when changing buffer.
 
 Used by some packages
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hide-mode-line
     :defer t
     :config (message "`hide-mode-line loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace]]
 :PROPERTIES:
@@ -1865,7 +1865,7 @@ Used by some packages
 
 Simple mode to visualize blanks
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package whitespace
     :elpaca nil
     :defer t
@@ -1875,11 +1875,11 @@ Simple mode to visualize blanks
     :custom
     (whitespace-style '(face empty indentation::space tab trailing))
     :config (message "`whitespace loaded"))
-#+END_SRC
+#+end_src
 
 ** Window locking
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package locked-window-buffer-mode
     :elpaca nil
     :general ("M-l"    'locked-window-buffer-mode))
@@ -1889,7 +1889,7 @@ Simple mode to visualize blanks
     "Make the current window always display this buffer."
     :lighter "locked"
     (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
-#+END_SRC
+#+end_src
 
 * Git
 :PROPERTIES:
@@ -1903,19 +1903,19 @@ Simple mode to visualize blanks
 
 Adds keybindings when editing a commit message.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package git-commit
     :defer t
     :hook (git-commit-mode . mdrp/english-dict)
     :config (message "`git-commit' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://magit.vc/][Magit]]
 :PROPERTIES:
 :CUSTOM_ID: magit
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package magit
     :defer t
     :general
@@ -1940,7 +1940,7 @@ Adds keybindings when editing a commit message.
             (flycheck-next-error)
           (smerge-vc-next-conflict))))
     (message "`magit' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/alphapapa/magit-todos][Magit todos]]
 :PROPERTIES:
@@ -1949,7 +1949,7 @@ Adds keybindings when editing a commit message.
 
 Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-todos-keywords-list~). If you experience massive freezing when opening a magit buffer you can customize ~hl-todo-keywords-faces~ to only include your custom keywords.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-magit-todos
     (use-package magit-todos
       :defer t
@@ -1957,7 +1957,7 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
       :config
       (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
       (message "`magit-todos' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/tarsius/hl-todo][Highlight todo]]
 :PROPERTIES:
@@ -1966,12 +1966,12 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
 
 Customize ~hl-todo-keyword-faces~ to choose the keywords you want to highlights (an example is already available in [[file:custom.el][custom.el]])
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hl-todo
     :config
     (global-hl-todo-mode 1)
     (message "`hl-todo' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/dgutov/diff-hl][Diff hl]]
 :PROPERTIES:
@@ -1980,7 +1980,7 @@ Customize ~hl-todo-keyword-faces~ to choose the keywords you want to highlights 
 
 Nice mode to display on the fringe the uncommitted changes.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package diff-hl
     :defer t
     :custom
@@ -1990,7 +1990,7 @@ Nice mode to display on the fringe the uncommitted changes.
     (magit-post-refresh . diff-hl-magit-post-refresh)
     (magit-pre-refresh  . diff-hl-magit-pre-refresh)
     :config (message "`diff-hl' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacsorphanage/git-messenger][Git messenger]]
 :PROPERTIES:
@@ -1999,14 +1999,14 @@ Nice mode to display on the fringe the uncommitted changes.
 
 Show the commit at point to see what happened here. Invoke with ~M-v G~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package git-messenger
     :defer t
     :config
     (setq git-messenger:show-detail t
           git-messenger:use-magit-popup t)
     (message "`git-messenger' loaded"))
-#+END_SRC
+#+end_src
 
 ** TODO [[https://github.com/emacsmirror/git-timemachine][Git timemachine]]
 :PROPERTIES:
@@ -2017,14 +2017,14 @@ Go back in time with ~M-v <left>~ then travel through commits with ~p~, ~n~ and 
 
 TODO: Display possible commands when git-timemachine starts
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package git-timemachine
     :defer t
     :general
     (:keymaps 'magit-mode-map
               "<left>" '(git-timemachine :wk "Go back in git history"))
     :config (message "`git-timemachine' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/magit/git-modes/][Git modes]]
 :PROPERTIES:
@@ -2033,11 +2033,11 @@ TODO: Display possible commands when git-timemachine starts
 
 Major modes for editing .gitignore files, .git/config etc
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package git-modes
     :defer t
     :config (message "`git-modes' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/wandersoncferreira/code-review][Code review]]
 :PROPERTIES:
@@ -2046,24 +2046,24 @@ Major modes for editing .gitignore files, .git/config etc
 
 Some configuration is needed for this to work. See [[file:README.org::#git-hosts-and-forges][README.org Git hosts and forges]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package code-review
     :disabled t
     :config
     (setq code-review-download-dir (no-littering-expand-var-file-name "backups/"))
     (message "`code-review' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/magit/ghub][Ghub]]
 :PROPERTIES:
 :CUSTOM_ID: ghub
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ghub
     :defer t
     :config (message "`ghub' loaded"))
-#+END_SRC
+#+end_src
 
 * [[https://orgmode.org/][Org mode]]
 :PROPERTIES:
@@ -2077,7 +2077,7 @@ Org mode is, well, org mode.
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-protocol
     :elpaca nil
     :defer t
@@ -2289,19 +2289,19 @@ Org mode is, well, org mode.
      ;;    )
      )
     (message "`org-mode' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/yilkalargaw/org-auto-tangle][Org auto tangle]]
 :PROPERTIES:
 :CUSTOM_ID: org-auto-tangle
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-auto-tangle
     :defer t
     :hook (org-mode . org-auto-tangle-mode)
     :config (message "`org-auto-tangle' loaded"))
-#+END_SRC
+#+end_src
 
 ** DISABLED [[httDps://github.com/jkitchin/org-ref][Org ref]]
 :PROPERTIES:
@@ -2313,7 +2313,7 @@ Not using it anymore since I don't write articles but it may be useful
 
 :CUSTOM_ID: org-ref
 :END:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-ref
     :disabled
     :after org
@@ -2322,14 +2322,14 @@ Not using it anymore since I don't write articles but it may be useful
     ;; :custom
     ;; (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
     )
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/sabof/org-bullets][Org bullets]]
 :PROPERTIES:
 :CUSTOM_ID: org-bullets
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-bullets
     :defer t
     :after org
@@ -2337,7 +2337,7 @@ Not using it anymore since I don't write articles but it may be useful
     :custom
     (org-bullets-bullet-list '("" "" "" "" "" "" ""))
     :config (message "`org-bullets' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/shg/org-inline-pdf.el][Org inline pdf]]
 :PROPERTIES:
@@ -2346,13 +2346,13 @@ Not using it anymore since I don't write articles but it may be useful
 
 See pdf inlined when included in org files.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-inline-pdf
     :defer t
     :ensure-system-package pdf2svg
     :hook (org-mode . org-inline-pdf-mode)
     :config (message "`org-inline-pdf' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/kiwanami/emacs-calfw][Calfw]]
 :PROPERTIES:
@@ -2361,7 +2361,7 @@ See pdf inlined when included in org files.
 
 Calendar view in emacs buffer.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package calfw
     :config
     (setq cfw:org-overwrite-default-keybinding t)
@@ -2373,7 +2373,7 @@ Calendar view in emacs buffer.
           cfw:fchar-top-junction ?┯
           cfw:fchar-top-left-corner ?┏
           cfw:fchar-top-right-corner ?┓))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/kiwanami/emacs-calfw][Calfw org]]
 :PROPERTIES:
@@ -2382,7 +2382,7 @@ Calendar view in emacs buffer.
 
 This package allows to see the org calendar and adds a capture template for scheduling.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package calfw-org
     :defer t
     :after calfw
@@ -2414,7 +2414,7 @@ This package allows to see the org calendar and adds a capture template for sche
                                                     (calendar-extract-year pos)))
                   ">"))))
     (message "`calfw-org' loaded"))
-#+END_SRC
+#+end_src
 
 ** DISABLED: [[https://github.com/myuhe/org-gcal.el][Org gcal]]
 :PROPERTIES:
@@ -2423,7 +2423,7 @@ This package allows to see the org calendar and adds a capture template for sche
 
 If I have to reuse a Google calendar I may enable this package again but I don't need it right now.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; The request can be wrong depending on Google updates, evaluate this:
   ;; (concat org-gcal-auth-url
   ;;         "?client_id=" (url-hexify-string org-gcal-client-id)
@@ -2443,7 +2443,7 @@ If I have to reuse a Google calendar I may enable this package again but I don't
        )
      )
     )
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/alphapapa/org-super-agenda][Org super agenda]]
 :PROPERTIES:
@@ -2452,7 +2452,7 @@ If I have to reuse a Google calendar I may enable this package again but I don't
 
 Better agenda view for ~org-agenda~
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-super-agenda
     :defer t
     :config
@@ -2467,7 +2467,7 @@ Better agenda view for ~org-agenda~
     (org-super-agenda-mode)
     (when use-org-agenda-startup (org-agenda nil "a"))
     (message "`org-super-agenda' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/awth13/org-appear][Org appear]]
 :PROPERTIES:
@@ -2476,14 +2476,14 @@ Better agenda view for ~org-agenda~
 
 Like unprettify at point but for org invisible elements (links etc)
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-appear
     :defer t
     :hook (org-mode . org-appear-mode)
     :config
     (setq org-appear-autolinks t)
     (message "`org-appear loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/org-roam/org-roam][Org roam]]
 :PROPERTIES:
@@ -2492,7 +2492,7 @@ Like unprettify at point but for org invisible elements (links etc)
 
 The next package I need to use fully, just starting right now.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-org-roam
     (use-package org-roam
       :defer t
@@ -2515,7 +2515,7 @@ The next package I need to use fully, just starting right now.
       ;; If using org-roam-protocol
       (require 'org-roam-protocol)
       (message "`org-roam' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/alphapapa/org-make-toc][Org make toc]]
 :PROPERTIES:
@@ -2524,20 +2524,20 @@ The next package I need to use fully, just starting right now.
 
 Helper to create table of contents in org files.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-make-toc
     :defer t
     :custom
     (org-make-toc-insert-custom-ids t)
     (message "`org-make-toc' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://gitlab.com/Titan-C/org-cv][Org CV]]
 :PROPERTIES:
 :CUSTOM_ID: org-cv
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ox-awesomecv
     :load-path "lisp/org-cv/"
     :elpaca nil
@@ -2549,7 +2549,7 @@ Helper to create table of contents in org files.
     :elpaca nil
     :defer t
     :config (message "`ox-moderncv' loaded"))
-#+END_SRC
+#+end_src
 
 * [[https://github.com/emacs-lsp/lsp-mode/][LSP]]
 :PROPERTIES:
@@ -2563,7 +2563,7 @@ Minor mode acting as a client between a language server protocol and emacs.
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package lsp-mode
     :defer t
     :commands lsp
@@ -2681,14 +2681,14 @@ Minor mode acting as a client between a language server protocol and emacs.
       :major-modes '(caml-mode tuareg-mode)
       :server-id 'ocaml-lsp-server))
     (message "`lsp' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacs-lsp/lsp-ui][Lsp ui]]
 :PROPERTIES:
 :CUSTOM_ID: lsp-ui
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
   (use-package lsp-ui
     :defer t
@@ -2722,19 +2722,19 @@ Minor mode acting as a client between a language server protocol and emacs.
     ;; Whether to show code actions in sideline.
     ;; (lsp-ui-sideline-show-code-actions nil)
     :config (message "`lsp-ui' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacs-lsp/lsp-treemacs][Lsp treemacs]]
 :PROPERTIES:
 :CUSTOM_ID: lsp-treemacs
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package lsp-treemacs
     :defer t
     :after lsp
     :config (message "`lsp-treemacs' loaded"))
-#+END_SRC
+#+end_src
 
 ** TODO [[https://github.com/gagbo/consult-lsp][Consult lsp]]
 :PROPERTIES:
@@ -2743,11 +2743,11 @@ Minor mode acting as a client between a language server protocol and emacs.
 
 TODO: Not working with OCaml
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package consult-lsp
     :defer t
     :disabled)
-#+END_SRC
+#+end_src
 
 * Prog mode utilities
 :PROPERTIES:
@@ -2761,7 +2761,7 @@ TODO: Not working with OCaml
 
 Show level of indentations. Can't manage to give it the proper colour and always found it distracting so putting it on hold for now.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package highlight-indent-guides
     :disabled
     :hook (prog-mode . highlight-indent-guides-mode)
@@ -2773,7 +2773,7 @@ Show level of indentations. Can't manage to give it the proper colour and always
     (set-face-foreground 'highlight-indent-guides-character-face "white")
     (setq highlight-indent-guides-method 'bitmap)
     :config (message "`highlight-indent-guides' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/radian-software/apheleia][Apheleia]]
 :PROPERTIES:
@@ -2782,7 +2782,7 @@ Show level of indentations. Can't manage to give it the proper colour and always
 
 Asynchronous code formatting after saving files.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package apheleia
     :defer t
     :hook
@@ -2800,7 +2800,7 @@ Asynchronous code formatting after saving files.
     (setf (alist-get 'python-mode apheleia-mode-alist)
           '(isort black))
     (message "`apheleia' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacs-lsp/dap-mode][DAP]]
 :PROPERTIES:
@@ -2809,21 +2809,21 @@ Asynchronous code formatting after saving files.
 
 Debug Adapter Protocol client for emacs. Need to play a bit with it to know how to use it.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package dap-mode
     :defer t
     :after lsp-mode
     :config
     (dap-auto-configure-mode)
     (message "`dap' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/jacktasia/dumb-jump][Dumb jump]]
 :PROPERTIES:
 :CUSTOM_ID: dumb-jump
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package dumb-jump
     :defer t
     :config
@@ -2838,14 +2838,14 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
       ("l" dumb-jump-quick-look "Quick look")
       ("b" dumb-jump-back "Back"))
     (message "`dumb-jump' loaded"))
-#+END_SRC
+#+end_src
 
 ** Find-sibling
 :PROPERTIES:
 :CUSTOM_ID: find-sibling
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (unless (version< emacs-version "29")
     (setq find-sibling-rules
           '(
@@ -2921,7 +2921,7 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
 
     (general-define-key
      "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/Fuco1/fontify-face][Fontify face]]
 :PROPERTIES:
@@ -2930,12 +2930,12 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
 
 Allows to see immediately how a face will look
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package fontify-face
     :defer t
     :hook (font-lock-mode . fontify-face-mode)
     :config (message "`fontify-face' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/flycheck/flycheck][Flycheck]]
 :PROPERTIES:
@@ -2949,7 +2949,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck
     :defer t
     :init
@@ -2964,14 +2964,14 @@ On the fly syntax checking. One of the greatest package there is for making prog
           (list n reset)
         (list n t)))
     (message "`flycheck' loaded"))
-#+END_SRC
+#+end_src
 
 *** Flycheck Correct
 :PROPERTIES:
 :CUSTOM_ID: flycheck-correct
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck-correct
     :load-path "lisp/"
     :elpaca nil
@@ -2981,24 +2981,24 @@ On the fly syntax checking. One of the greatest package there is for making prog
     (:keymaps 'flycheck-mode-map
             "M-RET" 'mdrp/correct-or-newline)
     :config (message "`flycheck-correct' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/cpitclaudel/quick-peek][Quick Peek]]
 :PROPERTIES:
 :CUSTOM_ID: quick-peek
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package quick-peek
     :config (message "`quick-peek' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/flycheck/flycheck-inline][Flycheck inline]]
 :PROPERTIES:
 :CUSTOM_ID: flycheck-inline
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck-inline
     :hook (flycheck-mode . flycheck-inline-mode)
     :config
@@ -3011,27 +3011,27 @@ On the fly syntax checking. One of the greatest package there is for making prog
               (quick-peek-update ov)))
           flycheck-inline-clear-function #'quick-peek-hide)
     (message "`flycheck-inline' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/minad/consult-flycheck][Consult flycheck]]
 :PROPERTIES:
 :CUSTOM_ID: consult-flycheck
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package consult-flycheck
     :defer t
     :general
     ("C-c l" 'consult-flycheck)
     :config (message "`consult-flycheck' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://www.emacswiki.org/emacs/HideShow][Hideshow]]
 :PROPERTIES:
 :CUSTOM_ID: hideshow
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hideshow
     :defer t
     :elpaca nil
@@ -3041,7 +3041,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
     :config
     (setq hs-isearch-open t)
     (message "`hideshow' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/bbatsov/projectile][Projectile]]
 :PROPERTIES:
@@ -3050,13 +3050,13 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 Project interaction library.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package projectile
     :defer t
     :hook (prog-mode . projectile-mode)
     :general ("M-p" 'projectile-command-map)
     :config (message "`projectile' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/twlz0ne/separedit.el][Separedit]]
 :PROPERTIES:
@@ -3065,7 +3065,7 @@ Project interaction library.
 
 Allows to edit comments in a separate buffer with a chosen text-mode (default is markdown-mode). When inside a comment, hit ~C-c C-e~ to start editing it in its own buffer.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package separedit
     :defer t
     :general
@@ -3073,18 +3073,18 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
     :config
     (setq separedit-default-mode 'markdown-mode)
     (message "`separedit' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/Alexander-Miller/treemacs][Treemacs]]
 :PROPERTIES:
 :CUSTOM_ID: treemacs
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package treemacs
     :defer t
     :config (message "`treemacs' loaded"))
-#+END_SRC
+#+end_src
 
 * Windows/Frame management
 :PROPERTIES:
@@ -3096,7 +3096,7 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
 :CUSTOM_ID: disabled-uniquify
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package uniquify
     :disabled
     :config
@@ -3105,7 +3105,7 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
           uniquify-after-kill-buffer-p t
           uniquify-ignore-buffers-re "^\\*")
     (message "`uniquify' loaded"))
-#+END_SRC
+#+end_src
 
 ** DISABLED Frame
 :PROPERTIES:
@@ -3114,7 +3114,7 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
 
 Try to create frames that are nicer.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package frame
     :elpaca nil
     :config
@@ -3139,7 +3139,7 @@ Try to create frames that are nicer.
     (setq initial-frame-alist default-frame-alist)
     (message "`frame' loaded"))
 
-#+END_SRC
+#+end_src
 
 ** [[https://www.emacswiki.org/emacs/WinnerMode][Winner]]
 :PROPERTIES:
@@ -3148,7 +3148,7 @@ Try to create frames that are nicer.
 
 Allows to undo and redo changes in window configurations
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
     (use-package winner
       :elpaca nil
       :defer t
@@ -3167,7 +3167,7 @@ Allows to undo and redo changes in window configurations
       :config
       (winner-mode 1)
       (message "`winner' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/abo-abo/ace-window][Ace window]]
 :PROPERTIES:
@@ -3176,13 +3176,13 @@ Allows to undo and redo changes in window configurations
 
 ~C-x C-o~ for better window switching.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ace-window
     :config
     (setq aw-dispatch-always t)
     (set-face-attribute 'aw-leading-char-face nil :height 2.5)
     (message "`ace-window' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://codeberg.org/joostkremers/visual-fill-column][Visual fill column]]
 :PROPERTIES:
@@ -3191,7 +3191,7 @@ Allows to undo and redo changes in window configurations
 
 This mode will center the text when only one window is displayed.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-visual-fill
     (use-package visual-fill-column
       :defer t
@@ -3211,14 +3211,14 @@ This mode will center the text when only one window is displayed.
 
       (add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
       (message "`visual-fill-column' loaded")))
-#+END_SRC
+#+end_src
 
 ** Window Purpose
 :PROPERTIES:
 :CUSTOM_ID: window-purpose
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-window-purpose
     (use-package window-purpose
       :defer t
@@ -3226,7 +3226,7 @@ This mode will center the text when only one window is displayed.
       (purpose-mode)
       (purpose-x-magit-multi-on)
       (message "`window-purpose' loaded")))
-#+END_SRC
+#+end_src
 
 * Completion
 :PROPERTIES:
@@ -3249,7 +3249,7 @@ Vertico works with the default completion system instead of reimplementing a who
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package vertico
     :elpaca (vertico :files (:defaults "extensions/*"))
     :defer t
@@ -3295,7 +3295,7 @@ Vertico works with the default completion system instead of reimplementing a who
                    cand)))
     (message "`vertico' loaded"))
 
-#+END_SRC
+#+end_src
 
 *** Vertico directory
 :PROPERTIES:
@@ -3308,7 +3308,7 @@ Useful keybindings are:
 - ~DEL~ will delete the whole subdirectory or only a character if on a filename
 - ~M-DEL~ will delete the whole subdirectory or a word if on a filename
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package vertico-directory
     :after vertico
     :elpaca nil
@@ -3321,7 +3321,7 @@ Useful keybindings are:
               "M-<backspace>" 'vertico-directory-delete-word)
     ;; Tidy shadowed file names
     :config (message "`vertico-directory' loaded"))
- #+END_SRC
+ #+end_src
 
 *** TODO Vertico multiform
 :PROPERTIES:
@@ -3332,7 +3332,7 @@ This extension allows to choose the way each minibuffer will be displayed.
 
 TODO: Test all the possible minibuffers and customize them as I'd like them to be
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package vertico-multiform
     :after vertico
     :elpaca nil
@@ -3355,14 +3355,14 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
     (message "`vertico-multiform loaded"))
 
   (use-package vertico-posframe :defer t)
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/minad/consult/][Consult]]
 :PROPERTIES:
 :CUSTOM_ID: consult
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
     (use-package consult
       :defer t
       ;; Enable automatic preview at point in the *Completions* buffer. This is
@@ -3491,7 +3491,7 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
         ;;;; 4. locate-dominating-file
       ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
       (message "`consult' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/oantolin/embark][Embark]]
 :PROPERTIES:
@@ -3500,7 +3500,7 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
 
 When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will jump to the result in the corresponding file without closing the minibuffer.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package embark
     :defer t
     :general
@@ -3535,7 +3535,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     (embark-collect-mode . consult-preview-at-point-mode)
     :config
     (message "`embark-consult' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/minad/corfu][Corfu]]
 :PROPERTIES:
@@ -3544,7 +3544,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 *** Main mode
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package corfu
     :elpaca (corfu :files (:defaults "extensions/*"))
     :defer t
@@ -3601,7 +3601,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     :config
     (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
     (message "`corfu' loaded"))
-#+END_SRC
+#+end_src
 
 *** Corfu-popupinfo
 
@@ -3622,16 +3622,16 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 *** Corfu-prescient
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package corfu-prescient
     :config
     (corfu-prescient-mode 1)
     (message "`corfu-precient' loaded"))
-#+END_SRC
+#+end_src
 
 *** Kind-icon
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package kind-icon
     :after corfu
     :custom
@@ -3729,14 +3729,14 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     ;; function unless you use something similar
     ;; (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache)))
     :config (message "`kind-icon' loaded"))
-#+END_SRC
+#+end_src
 
 ** Emacs configuration for minibuffers and completion
 :PROPERTIES:
 :CUSTOM_ID: emacs-configuration-for-minibuffers-and-completion
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package emacs
     :defer t
     :elpaca nil
@@ -3767,7 +3767,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     (setq enable-recursive-minibuffers t)
     ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
     :config (message "`emacs' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/oantolin/orderless][Orderless]]
 :PROPERTIES:
@@ -3776,7 +3776,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 Better completions in minibuffers
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package orderless
     :defer t
     :custom
@@ -3789,14 +3789,14 @@ Better completions in minibuffers
     (completion-category-defaults nil)
     (completion-category-overrides '((file (styles basic partial-completion))))
     :config (message "`orderless' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/minad/cape][Cape]]
 :PROPERTIES:
 :CUSTOM_ID: cape
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package cape
     :defer t
     :init
@@ -3832,7 +3832,7 @@ Better completions in minibuffers
     :hook
     (git-commit-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword)))
     (text-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword))))
-#+END_SRC
+#+end_src
 
 
 ** [[https://github.com/minad/marginalia][Marginalia]]
@@ -3842,7 +3842,7 @@ Better completions in minibuffers
 
 Useful informations added in the minibuffer options
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package marginalia
     :after vertico
     :defer t
@@ -3852,25 +3852,25 @@ Useful informations added in the minibuffer options
     (marginalia-align-offset -1)
     (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
     :config (message "`marginalia' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/victorhge/iedit][Iedit]]
 :PROPERTIES:
 :CUSTOM_ID: iedit
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package iedit
     :defer t
     :general
     (:keymaps 'lsp-mode-map
               "C-;" nil)
     :config (message "`iedit' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/minad/tempel][Tempel]]
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; Configure Tempel
   (use-package tempel
     ;; Require trigger prefix before template name when completing.
@@ -3902,7 +3902,7 @@ Useful informations added in the minibuffer options
   ;; Optional: Add tempel-collection.
   ;; The package is young and doesn't have comprehensive coverage.
   (use-package tempel-collection)
-#+END_SRC
+#+end_src
 
 * GUI
 :PROPERTIES:
@@ -3920,7 +3920,7 @@ Useful informations added in the minibuffer options
 
 Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/screenshots][here]].
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package doom-themes
     :config
     ;; Global settings (defaults)
@@ -3938,7 +3938,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config)
     (message "`doom-themes' loaded"))
-#+END_SRC
+#+end_src
 
 ** Mode-line
 :PROPERTIES:
@@ -3952,7 +3952,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
 
 Displays a counter in the mode-line when searching or query replacing.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package anzu
     :defer t
     :init
@@ -3964,7 +3964,7 @@ Displays a counter in the mode-line when searching or query replacing.
     (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
     (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
     (message "`anzu' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/seagle0128/doom-modeline][Doom modeline]]
 :PROPERTIES:
@@ -3977,7 +3977,7 @@ Read the comments in the code if you want to understand its configuration.
 
 Some customization is available from [[file:custom.el][custom.el]], mainly ~doom-modeline-bar-width~ and ~doom-modeline-height~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package doom-modeline
     :init
     ;; If non-nil, cause imenu to see `doom-modeline' declarations.
@@ -4124,7 +4124,7 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
     (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
     (doom-modeline-mode)
     (message "`doom-modeline' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/tarsius/minions][Minions]]
 :PROPERTIES:
@@ -4133,7 +4133,7 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
 
 Implements a menu that lists enabled and disabled minor modes in the mode-line.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package minions
     :config (minions-mode)
     :custom
@@ -4142,7 +4142,7 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
     ;; (:keymaps 'minions-mode-line-minor-modes-map
     ;;           "<mode-line> <mouse-1>" 'minions-minor-modes-menu)
     :config (message "`minions' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://www.emacswiki.org/emacs/OutlineMinorMode][Outline]] (major and minor modes)
 :PROPERTIES:
@@ -4154,7 +4154,7 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
 :CUSTOM_ID: major-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package outline
     :elpaca nil
     :general
@@ -4187,20 +4187,20 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
                             (string-to-vector "+++"))
 
     (message "`outline' loaded"))
-#+END_SRC
+#+end_src
 
 *** Minor mode
 :PROPERTIES:
 :CUSTOM_ID: minor-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package outline-minor
     :elpaca nil
     :defer t
     :hook (prog-mode . outline-minor-mode)
     :config (message "`outline-minor' loaded"))
-#+END_SRC
+#+end_src
 
 *** TODO [[https://github.com/alphapapa/outshine][Outshine]]
 :PROPERTIES:
@@ -4216,7 +4216,7 @@ To declare a heading just add one or more ~*~ in a comment start:
 
 TODO: To be coherent with ~odoc~, for example, I need to update outline regexps to handle OCaml headings.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package outshine
     :defer t
     :init (defvar outline-minor-mode-prefix "\C-o")
@@ -4224,7 +4224,7 @@ TODO: To be coherent with ~odoc~, for example, I need to update outline regexps 
     :config
     (setq outshine-preserve-delimiter-whitespace nil)
     (message "`outshine' loaded"))
-#+END_SRC
+#+end_src
 
 *** Pretty outlines
 :PROPERTIES:
@@ -4233,7 +4233,7 @@ TODO: To be coherent with ~odoc~, for example, I need to update outline regexps 
 
 Nice bullets for outshine.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pretty-outlines
     :defer t
     :load-path "lisp/"
@@ -4244,7 +4244,7 @@ Nice bullets for outshine.
            (emacs-lisp-mode . pretty-outlines-add-bullets)
            )
     :config (message "`pretty-outlines' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacsmirror/rainbow-mode][Rainbow mode]]
 :PROPERTIES:
@@ -4253,12 +4253,12 @@ Nice bullets for outshine.
 
 Display colors with a background corresponding to the color
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package rainbow-mode
     :defer t
     :hook (help-mode prog-mode text-mode org-mode)
     :config (message "`rainbow-mode' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/Fanael/rainbow-delimiters][Rainbow delimiters]]
 :PROPERTIES:
@@ -4267,13 +4267,13 @@ Display colors with a background corresponding to the color
 
 Different colours for different depths of parentheses, brackets etc
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (if use-rainbow
       (use-package rainbow-delimiters
         :defer t
         :hook (prog-mode . rainbow-delimiters-mode)
         :config (message "`rainbow-delimiters' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/protesilaos/pulsar][Pulsar]]
 :PROPERTIES:
@@ -4282,7 +4282,7 @@ Different colours for different depths of parentheses, brackets etc
 
 Will pulse when the focus changes to show where the cursor is.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pulsar
     :config
     (setq pulsar-pulse-functions
@@ -4312,28 +4312,28 @@ Will pulse when the focus changes to show where the cursor is.
     (setq pulsar-highlight-face 'pulsar-yellow)
     (pulsar-global-mode 1)
     (message "`pulsar' loaded"))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/hlissner/emacs-solaire-mode][Solaire]]
 :PROPERTIES:
 :CUSTOM_ID: solaire
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-solaire
     (use-package solaire-mode
       :defer t
       :config
       (solaire-global-mode +1)
       (message "`solaire' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/emacs-dashboard/emacs-dashboard][Dashboard]]
 :PROPERTIES:
 :CUSTOM_ID: dashboard
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-dashboard
     (use-package page-break-lines
       :defer t
@@ -4361,14 +4361,14 @@ Will pulse when the focus changes to show where the cursor is.
       (dashboard-setup-startup-hook)
       (message "`dashboard' loaded"))
     (elpaca-wait))
-#+END_SRC
+#+end_src
 
 ** TODO SVG Tags
 :PROPERTIES:
 :CUSTOM_ID: svg-tags
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package svg-tag-mode
     :disabled
     :defer t
@@ -4388,14 +4388,14 @@ Will pulse when the focus changes to show where the cursor is.
     (global-svg-tag-mode)
     (message "`svg-tag-mode' loaded"))
 
-#+END_SRC
+#+end_src
 
 * [[https://github.com/emacs-eaf/emacs-application-framework][EAF]]
 :PROPERTIES:
 :CUSTOM_ID: eaf
 :END:
 
-#+BEGIN_SRC elisp
+#+begin_src elisp
   (when use-eaf
     (use-package eaf
       :load-path "lisp/emacs-application-framework"
@@ -4423,7 +4423,7 @@ Will pulse when the focus changes to show where the cursor is.
       (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
       (eaf-bind-key nil "M-q" eaf-browser-keybinding)
       (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
-#+END_SRC
+#+end_src
 
 * [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][Tree sitter]]
 :PROPERTIES:
@@ -4437,7 +4437,7 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; This package needs to be loaded to use language parsers
   (use-package tree-sitter-langs
     :defer t
@@ -4454,7 +4454,7 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
     (setq tree-sitter-debug-highlight-jump-region t)
     (global-tree-sitter-mode)
     :config (message "`tree-sitter' loaded"))
-#+END_SRC
+#+end_src
 
 ** Tree sitter folding
 :PROPERTIES:
@@ -4463,7 +4463,7 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 
 Code folding based on tree-sitter tree.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ts-fold
     :elpaca (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
     :defer t
@@ -4485,7 +4485,7 @@ Code folding based on tree-sitter tree.
     (setq ts-fold-indicators-priority 100)
     (message "`ts-fold-indicators' loaded"))
 
-#+END_SRC
+#+end_src
 
 * Programming languages
 :PROPERTIES:
@@ -4583,7 +4583,7 @@ Code folding based on tree-sitter tree.
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-markdown
     (use-package markdown-mode
       :elpaca nil
@@ -4598,26 +4598,26 @@ Code folding based on tree-sitter tree.
       :hook (gfm-mode . (lambda ()
                           (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
       :config (message "`markdown-mode' loaded")))
-#+END_SRC
+#+end_src
 
 **** [[https://github.com/ardumont/markdown-toc][Markdown toc]]
 :PROPERTIES:
 :CUSTOM_ID: markdown-toc
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-markdown
     (use-package markdown-toc
       :defer t
       :config (message "`markdown-toc' loaded")))
-#+END_SRC
+#+end_src
 
 **** [[https://github.com/joostkremers/pandoc-mode][Pandoc]]
 :PROPERTIES:
 :CUSTOM_ID: pandoc
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-pandoc
     (use-package pandoc-mode
       :ensure-system-package pandoc
@@ -4625,7 +4625,7 @@ Code folding based on tree-sitter tree.
       :hook ((markdown-mode . pandoc-mode)
              (pandoc-mode . pandoc-load-default-settings))
       :config (message "`pandoc-mode' loaded")))
-#+END_SRC
+#+end_src
 
 ** Data/Config formats
 :PROPERTIES:
@@ -4642,7 +4642,7 @@ Mode for editing config files.
 This mode will install ~taplo~ through ~cargo~ if it's not already installed to manage toml files with lsp-mode.
 
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package conf-mode
     :elpaca nil
     :defer t
@@ -4653,14 +4653,14 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
            ("\\.toml\\'" . conf-toml-mode)
            )
     :config (message "`conf-mode' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/joshwnj/json-mode][Json]]
 :PROPERTIES:
 :CUSTOM_ID: json
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package json-mode
     :defer t
     :mode (("\\.bowerrc$"     . json-mode)
@@ -4678,11 +4678,11 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
     :config
     (make-local-variable 'js-indent-level)
     (message "`json-mode' loaded"))
-#+END_SRC
+#+end_src
 
 Library for parsing and generating JSON
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package json
     :elpaca nil
     :defer t
@@ -4692,14 +4692,14 @@ Library for parsing and generating JSON
       (cdr (assoc key (json-read-file "~/.secrets/secrets.json")))
       )
     (message "`json' loaded"))
-#+END_SRC
+#+end_src
 
 *** Dune files
 :PROPERTIES:
 :CUSTOM_ID: dune-files
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package dune
     :defer t
     :mode ("^dune$" "^dune-project$")
@@ -4723,20 +4723,20 @@ Library for parsing and generating JSON
               "v" 'dune-insert-env-form
               "d" 'dune-insert-ignored-subdirs-form)
     :config (message "`dune' loaded"))
-#+END_SRC
+#+end_src
 
 *** Makefile
 :PROPERTIES:
 :CUSTOM_ID: makefile
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package make-mode
     :elpaca nil
     :defer t
     :hook (make-mode . semantic-mode)
     :config (message "`make-mode' loaded"))
-#+END_SRC
+#+end_src
 
 ** Clojure
 :PROPERTIES:
@@ -4748,25 +4748,25 @@ Library for parsing and generating JSON
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-clojure
     (use-package clojure-mode
       :defer t
       :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
       :config (message "`clojure-mode' loaded")))
-#+END_SRC
+#+end_src
 
 *** CIDER
 :PROPERTIES:
 :CUSTOM_ID: cider
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-clojure
     (use-package cider
       :defer t
       :config (message "`cider' loaded")))
-#+END_SRC
+#+end_src
 
 ** Elisp
 :PROPERTIES:
@@ -4778,20 +4778,20 @@ Library for parsing and generating JSON
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package elisp-mode
     :defer t
     :elpaca nil
     :hook (elisp-mode . semantic-mode)
     :config (message "`elisp-mode' loaded"))
-#+END_SRC
+#+end_src
 
 *** Puni
 :PROPERTIES:
 :CUSTOM_ID: puni
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package puni
     :defer t
     :hook ((clojure-mode elisp-mode) . puni-mode)
@@ -4801,26 +4801,26 @@ Library for parsing and generating JSON
     ;;  "C-<right>" nil
     ;;  "C-<left>" nil)
     )
-#+END_SRC
+#+end_src
 
 *** Package lint
 :PROPERTIES:
 :CUSTOM_ID: package-lint
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck-package
     :defer t
     :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
     :config (message "`flycheck-package' loaded"))
-#+END_SRC
+#+end_src
 
 ** Elm
 :PROPERTIES:
 :CUSTOM_ID: elm
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-elm
     (use-package elm-mode
       :defer t
@@ -4832,14 +4832,14 @@ Library for parsing and generating JSON
     (use-package haskell-mode
       :defer t
       :config (message "`haskell-mode' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/fsharp/emacs-fsharp-mode][Fsharp]]
 :PROPERTIES:
 :CUSTOM_ID: fsharp
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-fsharp
     (use-package fsharp-mode
       :defer t
@@ -4854,19 +4854,19 @@ Library for parsing and generating JSON
                ":"
                (getenv "PATH")))
       :config (message "`fsharp-mode' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/Emacs-Kotlin-Mode-Maintainers/kotlin-mode][Kotlin]]
 :PROPERTIES:
 :CUSTOM_ID: kotlin
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-kotlin
     (use-package kotlin-mode
       :defer t
       :config (message "`kotlin-mode' loaded")))
-#+END_SRC
+#+end_src
 
 ** LaTeX
 :PROPERTIES:
@@ -4875,7 +4875,7 @@ Library for parsing and generating JSON
 
 If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-buf)~ with ~(require tex)~ in ~auctex-latexmk.el~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-latex
     (use-package auctex
       :defer t
@@ -4900,14 +4900,14 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       (auctex-latexmk-setup)
       (setq auctex-latexmk-inherit-TeX-PDF-mode t)
       (message "`auctex-latexmk' loaded")))
-#+END_SRC
+#+end_src
 
 ** Michelson
 :PROPERTIES:
 :CUSTOM_ID: michelson
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-michelson
     (use-package deferred
       :defer t
@@ -4917,7 +4917,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
     (load (concat (getenv "HOME") "/dev/nl/tezos/emacs/michelson-mode.el") nil t)
     (setq michelson-client-command (concat (getenv "HOME") "/dev/nl/tezos/tezos-client"))
     (setq michelson-alphanet nil))
-#+END_SRC
+#+end_src
 
 ** OCaml
 :PROPERTIES:
@@ -4929,7 +4929,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 :CUSTOM_ID: useful-functions
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; tuareg-mode has the prettify symbols itself
   ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-basic-alist))
   ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
@@ -5001,14 +5001,14 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
             (set-window-dedicated-p (selected-window) t)
             (compilation-minor-mode t))
           (set-process-query-on-exit-flag (get-buffer-process buffer) nil))))))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/ocaml/tuareg][Main mode]]
 :PROPERTIES:
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-ocaml
     (use-package tuareg
       :defer t
@@ -5133,7 +5133,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
         (when (executable-find "ocp-indent")
           (ocp-setup-indent)))
       (message "`ocp-indent' loaded")))
-#+END_SRC
+#+end_src
 
 *** Tuareg Menhir
 :PROPERTIES:
@@ -5142,21 +5142,21 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 
 Special tuareg mode when editing ~mly~ files.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-ocaml
     (use-package tuareg-menhir
       :elpaca nil
       :defer t
       :mode ("\\.mly'" . tuareg-menhir-mode)
       :config (message "`tuareg-menhir' loaded")))
-#+END_SRC
+#+end_src
 
 *** Dune commands
 :PROPERTIES:
 :CUSTOM_ID: dune-commands
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-ocaml
     (use-package dune-minor
       :load-path "lisp/"
@@ -5164,7 +5164,7 @@ Special tuareg mode when editing ~mly~ files.
       :defer t
       :hook (tuareg-mode . dune-minor-mode)
       :config (message "`dune-minor' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/politza/pdf-tools][Pdf files]]
 :PROPERTIES:
@@ -5173,7 +5173,7 @@ Special tuareg mode when editing ~mly~ files.
 
 In order to use this package you need to run ~M-x pdf-tools-install~ the first time your configuration is loaded.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pdf-tools
     :defer t
     :mode ("\\.pdf\\'" . pdf-view-mode)
@@ -5186,19 +5186,19 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
     (setq pdf-view-use-scaling t
           pdf-view-use-imagemagick nil)
     (message "`pdf-tools' loaded"))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/nicolaisingh/saveplace-pdf-view][Saveplace in pdf]]
 :PROPERTIES:
 :CUSTOM_ID: saveplace-in-pdf
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package saveplace-pdf-view
     :defer t
     :after pdf-view
     :config (message "`saveplace-pdf-view' loaded"))
-#+END_SRC
+#+end_src
 
 ** Python
 :PROPERTIES:
@@ -5210,7 +5210,7 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-python
     (use-package python
       :defer t
@@ -5232,7 +5232,7 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
        (t
         (setq python-shell-interpreter "python")))
       (message "`python' loaded")))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/jorgenschaefer/pyvenv][Pyvenv]]
 :PROPERTIES:
@@ -5242,7 +5242,7 @@ Required to easily switch virtual envs via the menu bar or with ~pyvenv-workon~
 
 Setting the ~WORKON_HOME~ environment variable points at where the envs are located.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-python
     (use-package pyvenv
       :defer t
@@ -5256,7 +5256,7 @@ Setting the ~WORKON_HOME~ environment variable points at where the envs are loca
       (add-hook 'pyvenv-post-activate-hooks (lambda ()
                                               (pyvenv-restart-python)))
       (message "`pyvenv' loaded")))
-#+END_SRC
+#+end_src
 
 *** [[https://github.com/emacs-lsp/lsp-pyright][Lsp pyright]]
 :PROPERTIES:
@@ -5267,7 +5267,7 @@ Language server for Python
 
 Read the docs for the different variables set in the config.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-python
     (use-package lsp-pyright
       :defer t
@@ -5279,7 +5279,7 @@ Read the docs for the different variables set in the config.
             lsp-pyright-use-library-code-for-types t
             lsp-pyright-venv-path "~/miniconda3/envs")
       (message "`lsp-pyright' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/reasonml-editor/reason-mode][Reason]]
 :PROPERTIES:
@@ -5288,7 +5288,7 @@ Read the docs for the different variables set in the config.
 
 Some people use this, not my responsibility.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-reason
     (defun shell-cmd (cmd)
       "Returns the stdout output of a shell command or nil if the command returned
@@ -5324,14 +5324,14 @@ Some people use this, not my responsibility.
          (add-hook 'before-save-hook 'refmt-before-save)
          (merlin-mode)))
       (message "`reason-mode' loaded")))
-#+END_SRC
+#+end_src
 
 ** [[https://github.com/brotzeit/rustic][Rustic]]
 :PROPERTIES:
 :CUSTOM_ID: rust
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-rust
     (use-package rustic
       :mode ((rx ".rs" string-end) . rustic-mode)
@@ -5440,7 +5440,7 @@ Some people use this, not my responsibility.
       ;; (defun my/rust-mode-outline-regexp-setup ()
       ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
       (message "`rustic' loaded")))
-#+END_SRC
+#+end_src
 
 ** Web modes
 :PROPERTIES:
@@ -5452,38 +5452,38 @@ Some people use this, not my responsibility.
 :CUSTOM_ID: main-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-web
     (use-package web-mode
       :defer t
       :mode "\\.php\\'"
       :config (message "`web-mode' loaded")))
-#+END_SRC
+#+end_src
 
 *** CSS mode
 :PROPERTIES:
 :CUSTOM_ID: css-mode
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when use-web
     (use-package css-mode
       :elpaca nil
       :defer t
       :mode "\\.css\\'"
       :config (message "`css-mode' loaded")))
-#+END_SRC
+#+end_src
 
 *** Simple HTTPD
 :PROPERTIES:
 :CUSTOM_ID: simple-httpd
 :END:
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package simple-httpd
     :defer t
     :config (message "`simple-httpd' loaded"))
-#+END_SRC
+#+end_src
 
 * End
 :PROPERTIES:
@@ -5492,7 +5492,7 @@ Some people use this, not my responsibility.
 
 After everything has been done, load [[file:post-custom.el][post-custom.el]] to override some keybindings and close [[file:init.el][init.el]].
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
   (load post-custom-file)
   ;; Load personal configuration for org mode
@@ -5504,4 +5504,4 @@ After everything has been done, load [[file:post-custom.el][post-custom.el]] to 
   (provide 'init)
 
     ;;; init.el ends here
-#+END_SRC
+#+end_src
