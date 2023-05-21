@@ -218,6 +218,12 @@ You need to initialise the ~ts-fold~ submodule until it is available on Melpa.
 
 Just start emacs and let it install all the packages and dependencies.
 
+** Fonts
+
+#+begin_src emacs-lisp
+  sudo apt install fonts-firacode fonts-material-design-icons-iconfont
+#+end_src
+
 ** Configure packages
 :PROPERTIES:
 :CUSTOM_ID: configure-packages

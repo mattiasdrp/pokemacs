@@ -1080,8 +1080,7 @@ Other nerd-icons related packages:
       (message "`nerd-icons-dired' loaded")))
 #+END_SRC
 
-*** [[https://github.com/rainstormstudio/nerd-icons-completion
-][Nerd-icons completion]]
+*** [[https://github.com/rainstormstudio/nerd-icons-completion][Nerd-icons completion]]
 :PROPERTIES:
 :CUSTOM_ID: nerd-icons-completion
 :END:
