@@ -3151,7 +3151,6 @@ Allows to undo and redo changes in window configurations
 #+begin_src emacs-lisp
     (use-package winner
       :elpaca nil
-      :defer t
       :custom
       (winner-boring-buffers
        '("*Completions*"

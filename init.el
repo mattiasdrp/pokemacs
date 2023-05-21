@@ -1926,7 +1926,6 @@ have one rule for each file type."
 
 (use-package winner
   :elpaca nil
-  :defer t
   :custom
   (winner-boring-buffers
    '("*Completions*"
