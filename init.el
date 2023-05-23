@@ -229,7 +229,7 @@ or nil if you don't want to use an english dictionary"
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
-(defvar better-gc-cons-threshold (* 511 1024 1024)) ; 64mb
+(defvar better-gc-cons-threshold (* 128 1024 1024)) ; 128mb
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -255,7 +255,7 @@ or nil if you don't want to use an english dictionary"
             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 (setq gc-cons-threshold better-gc-cons-threshold)
-(setq gc-cons-percentage 0.5)
+(setq gc-cons-percentage 0.1)
 (run-with-idle-timer 5 t #'garbage-collect)
 (setq garbage-collection-messages t)
 
@@ -2162,29 +2162,29 @@ have one rule for each file type."
    consult-bookmark consult-recent-file consult-xref
    consult--source-bookmark consult--source-recent-file
    consult--source-project-recent-file
-   :preview-key 'any)
+   :preview-key '(:debounce 0.5 "M-."))
 
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
+   ;; Optionally configure the narrowing key.
+   ;; Both < and C-+ work reasonably well.
+   (setq consult-narrow-key "<") ;; (kbd "C-+")
 
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+   ;; Optionally make narrowing help available in the minibuffer.
+   ;; You may want to use `embark-prefix-help-command' or which-key instead.
+   ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
 
-  ;; By default `consult-project-function' uses `project-root' from project.el.
-  ;; Optionally configure a different project root function.
-  ;; There are multiple reasonable alternatives to chose from.
+   ;; By default `consult-project-function' uses `project-root' from project.el.
+   ;; Optionally configure a different project root function.
+   ;; There are multiple reasonable alternatives to chose from.
     ;;;; 1. project.el (the default)
-  ;; (setq consult-project-function #'consult--default-project--function)
+   ;; (setq consult-project-function #'consult--default-project--function)
     ;;;; 2. projectile.el (projectile-project-root)
-  (autoload 'projectile-project-root "projectile")
-  (setq consult-project-function (lambda (_) (projectile-project-root)))
+   (autoload 'projectile-project-root "projectile")
+   (setq consult-project-function (lambda (_) (projectile-project-root)))
     ;;;; 3. vc.el (vc-root-dir)
-  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
     ;;;; 4. locate-dominating-file
-  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  (message "`consult' loaded"))
+   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+   (message "`consult' loaded"))
 
 (use-package embark
   :defer t
