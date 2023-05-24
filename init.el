@@ -644,8 +644,6 @@ debian, and derivatives). On most it's 'fd'.")
    [f3]                      'next-match
    [(shift f3)]              'prev-match
    [f4]                      'goto-line
-   [f5]                      'compile
-   [f6]                      'recompile
    [f7]                      'next-error
    [f8]                      'normal-mode
    )
@@ -827,9 +825,10 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package easy-kill
   :defer t
+  :general
+  ([remap kill-ring-save] 'easy-kill)
+  ([remap mark-sexp] 'easy-mark)
   :config
-  (global-set-key [remap kill-ring-save] #'easy-kill)
-  (global-set-key [remap mark-sexp] #'easy-mark)
   (message "`easy-kill loaded"))
 
 (use-package flycheck-languagetool
@@ -1876,8 +1875,27 @@ have one rule for each file type."
 (use-package projectile
   :defer t
   :hook (prog-mode . projectile-mode)
-  :general ("M-p" 'projectile-command-map)
-  :config (message "`projectile' loaded"))
+  :general
+  ("M-p"  'projectile-command-map)
+  ("<f5>" 'projectile-compile-project)
+  ("<f6>" 'mdrp/recompile)
+  :config
+  (defun mdrp/recompile ()
+    "Run project configure command.
+
+Normally you'll be prompted for a compilation command, unless
+variable `compilation-read-command'.  You can force the prompt
+with a prefix ARG."
+    (interactive)
+    (let ((command (projectile-compilation-command (projectile-compilation-dir)))
+          (command-map (if (projectile--cache-project-commands-p) projectile-compilation-cmd-map))
+          (compilation-read-command nil))
+      (projectile--run-project-cmd command command-map
+                                   :show-prompt nil
+                                   :prompt-prefix nil
+                                   :save-buffers t
+                                   :use-comint-mode projectile-configure-use-comint-mode)))
+  (message "`projectile' loaded"))
 
 (use-package separedit
   :defer t
