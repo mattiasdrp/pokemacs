@@ -2753,6 +2753,18 @@ TODO: Not working with OCaml
 :CUSTOM_ID: prog-mode-utilities
 :END:
 
+** Prog-mode
+
+#+begin_src emacs-lisp
+  (use-package prog-mode
+    :elpaca nil
+    :init
+    (defun mdrp/clear-compilation-finish-functions ()
+      (setq compilation-finish-functions nil))
+    :hook
+    (prog-mode . mdrp/clear-compilation-finish-functions))
+#+end_src
+
 ** DISABLED: [[https://github.com/DarthFennec/highlight-indent-guides][Highlight indent guides]]
 :PROPERTIES:
 :CUSTOM_ID: disabled-highlight-indent-guides
@@ -5355,16 +5367,13 @@ Some people use this, not my responsibility.
       :ensure-system-package
       ((taplo . "cargo install taplo-cli")
        (rustfmt . "cargo install rustfmt"))
-      ;; :hook
-      ;; (rustic-mode-local-vars . tree-sitter 'append)
+      :hook
+      (rustic-mode . mdrp/set-rustic-compilation-mode)
       :general
       (:keymaps 'rustic-mode-map
                 "C-c s" 'lsp-rust-analyzer-status
                 "C-M-;" 'mdrp/rust-doc-comment-dwim-following
-                "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing
-                "<f5>" 'rustic-compile
-                "<f6>" 'rustic-recompile
-                )
+                "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing)
       :init
       (let ((mode '("\\.rs\\'" . rust-mode)))
         (when (member mode auto-mode-alist)
@@ -5442,8 +5451,50 @@ Some people use this, not my responsibility.
       (defun mdrp/rust-doc-comment-dwim-enclosing ()
         (interactive)
         (mdrp/rust-doc-comment-dwim "! "))
+
       :config
-      ;; Conflicts with (and is redundant with) ligatures
+      (define-compilation-mode mdrp/rustic-compilation-mode "compilation"
+        "Rust compilation mode.
+
+  Error matching regexes from compile.el are removed."
+        (setq-local compilation-message-face 'rustic-message)
+        (setq-local compilation-error-face   'rustic-compilation-error)
+        (setq-local compilation-warning-face 'rustic-compilation-warning)
+        (setq-local compilation-info-face    'rustic-compilation-info)
+        (setq-local compilation-column-face  'rustic-compilation-column)
+        (setq-local compilation-line-face    'rustic-compilation-line)
+
+        (setq-local xterm-color-names-bright rustic-ansi-faces)
+        (setq-local xterm-color-names rustic-ansi-faces)
+
+        (setq-local compilation-error-regexp-alist-alist nil)
+        (add-to-list 'compilation-error-regexp-alist-alist
+                     (cons 'rustic-error rustic-compilation-error))
+        (add-to-list 'compilation-error-regexp-alist-alist
+                     (cons 'rustic-warning rustic-compilation-warning))
+        (add-to-list 'compilation-error-regexp-alist-alist
+                     (cons 'rustic-info rustic-compilation-info))
+        (add-to-list 'compilation-error-regexp-alist-alist
+                     (cons 'rustic-panic rustic-compilation-panic))
+
+        (setq-local compilation-error-regexp-alist nil)
+        (add-to-list 'compilation-error-regexp-alist 'rustic-error)
+        (add-to-list 'compilation-error-regexp-alist 'rustic-warning)
+        (add-to-list 'compilation-error-regexp-alist 'rustic-info)
+        (add-to-list 'compilation-error-regexp-alist 'rustic-panic)
+
+        (add-hook 'compilation-filter-hook #'rustic-insert-errno-button nil t)
+
+        (setq-local rustic-compilation-workspace (rustic-buffer-workspace)))
+
+      (defun mdrp/function-rustic-compilation-mode (buf _str)
+        (with-current-buffer buf
+          (mdrp/rustic-compilation-mode)
+          (compilation-auto-jump buf (match-beginning 0))))
+
+      (defun mdrp/set-rustic-compilation-mode ()
+        (add-to-list 'compilation-finish-functions 'mdrp/function-rustic-compilation-mode))
+
       (setq rust-prettify-symbols-alist nil)
       ;; Allign to `.`
       (setq rustic-indent-method-chain t)
