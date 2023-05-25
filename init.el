@@ -3542,12 +3542,12 @@ with a prefix ARG."
     ;; :hook
     ;; (rustic-mode-local-vars . tree-sitter 'append)
     :general
-    (:keymaps 'rust-mode-map
+    (:keymaps 'rustic-mode-map
               "C-c s" 'lsp-rust-analyzer-status
               "C-M-;" 'mdrp/rust-doc-comment-dwim-following
               "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing
-              [remap compile] 'rustic-compile
-              [remap recompile] 'rustic-recompile
+              "<f5>" 'rustic-compile
+              "<f6>" 'rustic-recompile
               )
     :init
     (let ((mode '("\\.rs\\'" . rust-mode)))
