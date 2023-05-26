@@ -221,7 +221,7 @@ Just start emacs and let it install all the packages and dependencies.
 ** Fonts
 
 #+begin_src emacs-lisp
-  sudo apt install fonts-firacode fonts-material-design-icons-iconfont
+  sudo apt install fonts-firacode fonts-material-design-icons-iconfont texlive-fonts-extra
 #+end_src
 
 ** Configure packages
@@ -232,6 +232,7 @@ Just start emacs and let it install all the packages and dependencies.
 After everything is installed you need to run these two commands just once.
 
 - ~M-x all-the-icons-install-fonts~
+- ~M-x nerd-icons-install-fonts~
 - ~M-x pdf-tools-install~
 
 ** Git hosts and forges
