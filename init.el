@@ -325,9 +325,6 @@ or nil if you don't want to use an english dictionary"
  ;; Show Keystrokes in Progress Instantly
  echo-keystrokes 0.1
 
- ;; No frame title
- frame-title-format nil
-
  vc-follow-symlinks t
  ;; Turn font lock mode for all modes that allow it
  ;; TODO: Specify a list when we'll start using tree-sitter
@@ -515,7 +512,8 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package nerd-icons
   :config
-  (unless use-all-the-icons (set-fontset-font t '(#xe3dA . #xf10d7) "Symbols Nerd Font Mono"))
+  (unless use-all-the-icons (set-fontset-font t '(#x25d0 . #xf10d7) "Symbols Nerd Font Mono"))
+  (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
   (message "`nerd-icons' loaded"))
 
 (unless use-all-the-icons
@@ -1118,13 +1116,36 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package diff-hl
   :defer t
+  :hook
+  (find-file    . diff-hl-mode)
+  (vc-dir-mode  . diff-hl-dir-mode)
+  (dired-mode   . diff-hl-dired-mode)
+  (diff-hl-mode . diff-hl-flydiff-mode)
+  (magit-post-refresh . diff-hl-magit-post-refresh)
+  (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+  (diff-hl-mode . mdrp/nil-background-diff-hl-faces)
+  :init
+  (defun mdrp/nil-background-diff-hl-faces ()
+    (mapc (lambda (face) (set-face-background face nil))
+    '(diff-hl-insert diff-hl-delete diff-hl-change)))
   :custom
   (global-diff-hl-mode 1)
   (diff-hl-side 'right)
-  :hook
-  (magit-post-refresh . diff-hl-magit-post-refresh)
-  (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-  :config (message "`diff-hl' loaded"))
+  :config
+  (defadvice! +vc-gutter-define-thin-bitmaps-a (&rest args)
+    :override #'diff-hl-define-bitmaps
+    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
+    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
+  (defun +vc-gutter-type-face-fn (type _pos)
+    (intern (format "diff-hl-%s" type)))
+  (defun +vc-gutter-type-at-pos-fn (type _pos)
+    (if (eq type 'delete)
+        'diff-hl-bmp-delete
+      'diff-hl-bmp-middle))
+  (advice-add #'diff-hl-fringe-bmp-from-pos  :override #'+vc-gutter-type-at-pos-fn)
+  (advice-add #'diff-hl-fringe-bmp-from-type :override #'+vc-gutter-type-at-pos-fn)
+  (setq diff-hl-draw-borders nil)
+  (message "`diff-hl' loaded"))
 
 (use-package git-messenger
   :defer t
@@ -1201,6 +1222,9 @@ debian, and derivatives). On most it's 'fd'.")
             "C-c C-a"                 nil
             "C-<return>"              'org-meta-return
             "M-C-<return>"            'org-insert-heading-respect-content)
+  (:keymaps 'org-src-mode-map
+            "C-c C-c"                 'org-edit-src-exit)
+
   :init
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
@@ -1224,8 +1248,11 @@ debian, and derivatives). On most it's 'fd'.")
   (org-directory "~/org/")
   ;; Babel
   (org-confirm-babel-evaluate nil)
+  (org-insert-heading-respect-content t)
+  (org-special-ctrl-a/e t)
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
+  (org-hide-block-startup t)
   ;; Rest
   (org-ellipsis " ▾")
   (org-adapt-indentation nil)
@@ -1284,13 +1311,12 @@ debian, and derivatives). On most it's 'fd'.")
     (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
     (syntax-propertize (point-max)))
 
-  (add-hook 'org-mod-hook #'org-setup-<>-syntax-fix)
+  (add-hook 'org-mode-hook #'org-setup-<>-syntax-fix)
 
   (setq org-agenda-custom-commands
         '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
            ((org-agenda-span 'month)
-            (org-agenda-show-all-dates nil)
-            ))))
+            (org-agenda-show-all-dates nil)))))
   (calendar-set-date-style 'iso)
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -1311,8 +1337,7 @@ debian, and derivatives). On most it's 'fd'.")
               (push '("- [-]" . "") prettify-symbols-alist)
               (push '("+ [-]" . "") prettify-symbols-alist)
               (push '("* [-]" . "") prettify-symbols-alist)
-              (prettify-symbols-mode)
-              ))
+              (prettify-symbols-mode)))
   (setq org-capture-templates
         `(
           ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
@@ -1322,21 +1347,20 @@ debian, and derivatives). On most it's 'fd'.")
           ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
            "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
           ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
-          ))
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
   (custom-theme-set-faces
    'user
    '(org-block ((t (:inherit fixed-pitch))))
    '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
-   '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
-   '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
+   '(org-document-title ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#c678dd"))))
+   '(org-level-1 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#51afef"))))
+   '(org-level-2 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#c678dd"))))
    '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
-   '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight bold :foreground "#7cc3f3"))))
-   '(org-level-5 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
-   '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
+   '(org-level-4 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#7cc3f3"))))
+   '(org-level-5 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
+   '(org-level-6 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
+   '(org-level-7 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
+   '(org-level-8 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
    '(org-property-value ((t (:inherit fixed-pitch))) t)
    '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
    '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
@@ -1366,6 +1390,19 @@ debian, and derivatives). On most it's 'fd'.")
    )
   (message "`org-mode' loaded"))
 
+(use-package org-modern
+  :after org
+  :init (global-org-modern-mode)
+  :custom
+  (org-modern-star '("" "" "" "" "" "" ""))
+  (org-modern-progress '("○" "◔" "◐" "◕" "●"))
+  (org-modern-block-fringe 3)
+  :config
+  (custom-theme-set-faces
+   'user
+   '(org-modern-statistics ((t (:height 1.6)))))
+  (message "`org-modern' loaded"))
+
 (use-package org-auto-tangle
   :defer t
   :hook (org-mode . org-auto-tangle-mode)
@@ -1379,14 +1416,6 @@ debian, and derivatives). On most it's 'fd'.")
   ;; :custom
   ;; (org-latex-pdf-process (list "latexmk -xelatex -shell-escape -bibtex -f -pdf %f"))
   )
-
-(use-package org-bullets
-  :defer t
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("" "" "" "" "" "" ""))
-  :config (message "`org-bullets' loaded"))
 
 (use-package org-inline-pdf
   :defer t
@@ -1501,7 +1530,17 @@ debian, and derivatives). On most it's 'fd'.")
     (org-roam-db-autosync-mode)
     ;; If using org-roam-protocol
     (require 'org-roam-protocol)
-    (message "`org-roam' loaded")))
+    (message "`org-roam' loaded"))
+
+  (use-package org-roam-ui
+    :defer t
+    :after org-roam
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t)
+    (message "`org-roam-ui' loaded")))
 
 (use-package org-make-toc
   :defer t
@@ -1830,12 +1869,17 @@ have one rule for each file type."
   :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
   :general
   (:keymaps 'mdrp-fly-map
-            "p" 'flycheck-prev-error)        :config
+            "p" 'flycheck-prev-error)
+  :custom
+  (flycheck-indication-mode 'right-fringe)
+  :config
   (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
         (list n reset)
       (list n t)))
+  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    [16 48 112 240 112 48 16] nil nil 'center)
   (message "`flycheck' loaded"))
 
 (use-package flycheck-correct
@@ -1935,8 +1979,8 @@ with a prefix ARG."
           ;; (min-width  . 1) '(width  . 81)
           ;; (vertical-scroll-bars)
           (internal-border-width . 0)
-          (left-fringe . 1)
-          (right-fringe . 1)
+          (left-fringe . 8)
+          (right-fringe . 8)
           (tool-bar-lines . 0)
           (menu-bar-lines . 0)))
   (when (fboundp 'tool-bar-mode)
@@ -1986,7 +2030,9 @@ with a prefix ARG."
     (defun mdrp/visual-fill-one-window ()
       (global-visual-fill-column-mode -1)
       (if (window-full-width-p)
-          (global-visual-fill-column-mode 1)
+          (progn
+            (global-visual-fill-column-mode 1)
+            (set-window-fringes (selected-window) 8 8 nil nil))
         (global-visual-fill-column-mode -1)
         )
       )
@@ -2424,6 +2470,11 @@ with a prefix ARG."
   :defer t
   :elpaca nil
   :init
+  ;; FRINGE
+  ;; UI: the gutter looks less cramped with some space between it and  buffer.
+  (setq-default fringes-outside-margins t)
+
+
   ;; Try to indent and if already indented, complete
   (setq tab-always-indent 'complete)
   ;; Add prompt indicator to `completing-read-multiple'.
@@ -2941,6 +2992,8 @@ with a prefix ARG."
   (c++-mode    . ts-fold-mode)
   (python-mode . ts-fold-mode)
   (rustic-mode . ts-fold-mode)
+  :custom
+  (ts-fold-replacement "  [...]  ")
   :config (message "`ts-fold' loaded"))
 
 (use-package ts-fold-indicators
@@ -3545,7 +3598,7 @@ with a prefix ARG."
   (use-package rustic
     :mode ((rx ".rs" string-end) . rustic-mode)
     :ensure-system-package
-    ((taplo . "cargo install taplo-cli")
+    ((taplo . "cargo install taplo-cli --features lsp")
      (rustfmt . "cargo install rustfmt"))
     :hook
     (rustic-mode . mdrp/set-rustic-compilation-mode)
@@ -3633,40 +3686,8 @@ with a prefix ARG."
       (mdrp/rust-doc-comment-dwim "! "))
 
     :config
-    (define-compilation-mode mdrp/rustic-compilation-mode "compilation"
-      "Rust compilation mode.
-
-Error matching regexes from compile.el are removed."
-      (setq-local compilation-message-face 'rustic-message)
-      (setq-local compilation-error-face   'rustic-compilation-error)
-      (setq-local compilation-warning-face 'rustic-compilation-warning)
-      (setq-local compilation-info-face    'rustic-compilation-info)
-      (setq-local compilation-column-face  'rustic-compilation-column)
-      (setq-local compilation-line-face    'rustic-compilation-line)
-
-      (setq-local xterm-color-names-bright rustic-ansi-faces)
-      (setq-local xterm-color-names rustic-ansi-faces)
-
-      (setq-local compilation-error-regexp-alist-alist nil)
-      (add-to-list 'compilation-error-regexp-alist-alist
-                   (cons 'rustic-error rustic-compilation-error))
-      (add-to-list 'compilation-error-regexp-alist-alist
-                   (cons 'rustic-warning rustic-compilation-warning))
-      (add-to-list 'compilation-error-regexp-alist-alist
-                   (cons 'rustic-info rustic-compilation-info))
-      (add-to-list 'compilation-error-regexp-alist-alist
-                   (cons 'rustic-panic rustic-compilation-panic))
-
-      (setq-local compilation-error-regexp-alist nil)
-      (add-to-list 'compilation-error-regexp-alist 'rustic-error)
-      (add-to-list 'compilation-error-regexp-alist 'rustic-warning)
-      (add-to-list 'compilation-error-regexp-alist 'rustic-info)
-      (add-to-list 'compilation-error-regexp-alist 'rustic-panic)
-
-      (add-hook 'compilation-filter-hook #'rustic-insert-errno-button nil t)
-
-      (setq-local rustic-compilation-workspace (rustic-buffer-workspace)))
-
+    (define-derived-mode mdrp/rustic-compilation-mode rustic-compilation-mode "compilation"
+      "A wrapper for `rustic-compilation-mode'.")
     (defun mdrp/function-rustic-compilation-mode (buf _str)
       (with-current-buffer buf
         (mdrp/rustic-compilation-mode)
@@ -3704,6 +3725,7 @@ Error matching regexes from compile.el are removed."
 
 (use-package simple-httpd
   :defer t
+  :elpaca nil
   :config (message "`simple-httpd' loaded"))
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
