@@ -233,30 +233,28 @@ or nil if you don't want to use an english dictionary"
 
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold 80000000)
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (if (boundp 'after-focus-change-function)
-                (add-function :after after-focus-change-function
-                              (lambda ()
-                                (unless (frame-focus-state)
-                                  (garbage-collect))))
-              (add-hook 'after-focus-change-function 'garbage-collect))
-            (defun gc-minibuffer-setup-hook ()
-              (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (if (boundp 'after-focus-change-function)
+;;                 (add-function :after after-focus-change-function
+;;                               (lambda ()
+;;                                 (unless (frame-focus-state)
+;;                                   (garbage-collect))))
+;;               (add-hook 'after-focus-change-function 'garbage-collect))
+;;             (defun gc-minibuffer-setup-hook ()
+;;               (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
 
-            (defun gc-minibuffer-exit-hook ()
-              (garbage-collect)
-              (setq gc-cons-threshold better-gc-cons-threshold))
+;;             (defun gc-minibuffer-exit-hook ()
+;;               (garbage-collect)
+;;               (setq gc-cons-threshold better-gc-cons-threshold))
 
-            (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-            (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
+;;             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+;;             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 (setq gc-cons-threshold better-gc-cons-threshold)
 (setq gc-cons-percentage 0.1)
-(run-with-idle-timer 5 t #'garbage-collect)
 (setq garbage-collection-messages t)
 
 (defun update-to-load-path (folder)
@@ -441,6 +439,14 @@ or nil if you don't want to use an english dictionary"
   (cl-find-if #'executable-find (list "fdfind" "fd"))
   "The filename of the `fd' executable. On some distros it's 'fdfind' (ubuntu,
 debian, and derivatives). On most it's 'fd'.")
+
+(use-package gcmh
+  :demand t
+  :custom
+  (gcmh-idle-delay 'auto)  ; default is 15s
+  (gcmh-auto-idle-delay-factor 10)
+  (gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+  :config (gcmh-mode 1))
 
 (use-package esup
   :defer t
@@ -1203,6 +1209,8 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`mixed-pitch' loaded"))
 
 (use-package ob-rust :defer t)
+(use-package ob-racket
+  :elpaca (:type git :host github :repo "hasu/emacs-ob-racket"))
 
 (use-package org
   :defer t
@@ -1322,9 +1330,10 @@ debian, and derivatives). On most it's 'fd'.")
    'org-babel-load-languages
    '(
      (emacs-lisp . t)
-     (rust . t)
-     (ocaml . t)
      (latex . t)
+     (ocaml . t)
+     (racket . t)
+     (rust . t)
      (shell . t)))
   (add-hook 'org-mode-hook
             (lambda ()
@@ -1560,6 +1569,34 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :config (message "`ox-moderncv' loaded"))
 
+;; Taken from doomemacs
+
+(defvar mdrp/lsp--default-read-process-output-max nil)
+(defvar mdrp/lsp--default-gcmh-high-cons-threshold nil)
+(defvar mdrp/lsp--optimization-init-p nil)
+
+(define-minor-mode mdrp/lsp-optimization-mode
+  "Deploys universal GC and IPC optimizations for `lsp-mode' and `eglot'."
+  :global t
+  :init-value nil
+  (if (not mdrp/lsp-optimization-mode)
+      (setq-default read-process-output-max mdrp/lsp--default-read-process-output-max
+                    gcmh-high-cons-threshold mdrp/lsp--default-gcmh-high-cons-threshold
+                    mdrp/lsp--optimization-init-p nil)
+    ;; Only apply these settings once!
+    (unless mdrp/lsp--optimization-init-p
+      (setq mdrp/lsp--default-read-process-output-max (default-value 'read-process-output-max)
+            mdrp/lsp--default-gcmh-high-cons-threshold (default-value 'gcmh-high-cons-threshold))
+      (setq-default read-process-output-max (* 1024 1024))
+      ;; REVIEW LSP causes a lot of allocations, with or without the native JSON
+      ;;        library, so we up the GC threshold to stave off GC-induced
+      ;;        slowdowns/freezes. Doom uses `gcmh' to enforce its GC strategy,
+      ;;        so we modify its variables rather than `gc-cons-threshold'
+      ;;        directly.
+      (setq-default gcmh-high-cons-threshold (* 2 mdrp/lsp--default-gcmh-high-cons-threshold))
+      (gcmh-set-high-threshold)
+      (setq mdrp/lsp--optimization-init-p t))))
+
 (use-package lsp-mode
   :defer t
   :commands lsp
@@ -1575,7 +1612,8 @@ debian, and derivatives). On most it's 'fd'.")
   (setq-local completion-at-point-functions
               (list (cape-capf-buster #'lsp-completion-at-point)))
 
-  :hook ((lsp-completion-mode . minad/lsp-mode-setup-completion)
+  :hook ((lsp-mode . mdrp/lsp-optimization-mode)
+         (lsp-completion-mode . minad/lsp-mode-setup-completion)
          (tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
          (clojure-mode . lsp-deferred)
@@ -3066,6 +3104,12 @@ with a prefix ARG."
   :type 'boolean
   :tag " Python")
 
+(defcustom use-racket nil
+  "If non-nil, uses the Racket packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag "󰘧 Racket")
+
 (defcustom use-reason nil
   "If non-nil, uses the Reason packages."
   :group 'pokemacs-languages
@@ -3077,6 +3121,12 @@ with a prefix ARG."
   :group 'pokemacs-languages
   :type 'boolean
   :tag " Rust")
+
+(defcustom use-sicp nil
+  "If non-nil, uses the sicp related packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag "󰘧 SICP")
 
 (defcustom use-web nil
   "If non-nil, uses the web packages."
@@ -3246,28 +3296,88 @@ with a prefix ARG."
     :config (message "`kotlin-mode' loaded")))
 
 (when use-latex
-  (use-package auctex
-    :defer t
+  (use-package tex-site
+    :elpaca auctex
     :mode ("\\.tex\\'" . latex-mode)
-    :config
-    (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+    :hook
+    (LaTeX-mode . LaTeX-math-mode)
+    (LaTeX-mode . TeX-PDF-mode)
+    (LaTeX-mode . flyspell-mode)
+    (LaTeX-mode . flycheck-mode)
+    (LaTeX-mode . LaTeX-math-mode)
+    :init
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
-    (setq-default TeX-master nil)
-    (turn-on-reftex)
+    (setq-default TeX-master 'dwim)
     (setq reftex-plug-into-AUCTeX t)
-    (reftex-isearch-minor-mode)
     (setq TeX-PDF-mode t)
+    (setq TeX-source-correlate-mode t)
     (setq TeX-source-correlate-method 'synctex)
     (setq TeX-source-correlate-start-server t)
+    (setq TeX-electric-sub-and-superscript t)
+    :config
+    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+          TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+          TeX-source-correlate-start-server t) ;; not sure if last line is neccessary
+    ;; to have the buffer refresh after compilation,
+    ;; very important so that PDFView refesh itself after comilation
+    (add-hook 'TeX-after-compilation-finished-functions
+              #'TeX-revert-document-buffer)
+    (reftex-isearch-minor-mode)
     (message "`tex-site' loaded"))
 
+  (use-package preview
+    :elpaca nil
+    :hook (LaTeX-mode . LaTeX-preview-setup)
+    :config
+    (setq-default preview-scale 1.4
+                  preview-scale-function
+                  (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale)))
+    ;; Don't cache preamble, it creates issues with SyncTeX. Let users enable
+    ;; caching if they have compilation times that long.
+    (setq preview-auto-cache-preamble nil)
+    :general
+    (:keymaps 'LaTeX-mode-map
+              "p" #'preview-at-point
+              "P" #'preview-clearout-at-point))
+
+  (use-package cdlatex
+    :hook
+    (LaTeX-mode . cdlatex-mode)
+    (org-mode . org-cdlatex-mode)
+    :config
+    ;; Use \( ... \) instead of $ ... $.
+    (setq cdlatex-use-dollar-to-ensure-math nil)
+    ;; Disabling keys that have overlapping functionality with other parts of Doom.
+    :general
+    (:keymaps 'cdlatex-mode-map
+              ;; Smartparens takes care of inserting closing delimiters, and if you
+              ;; don't use smartparens you probably don't want these either.
+              "$" nil
+              "(" nil
+              "{" nil
+              "[" nil
+              "|" nil
+              "<" nil
+              ;; AUCTeX takes care of auto-inserting {} on _^ if you want, with
+              ;; `TeX-electric-sub-and-superscript'.
+              "^" nil
+              "_" nil
+              ;; AUCTeX already provides this with `LaTeX-insert-item'.
+              [(control return)] nil))
+
+
   (use-package auctex-latexmk
-    :defer t
-    :after auctex
+    :hook
+    (LaTeX-mode . (lambda ()
+                    (add-to-list 'TeX-command-list
+                                 '("latexmk" "(run-latexmk)"
+                                   TeX-run-function nil t :help "Run latexmk") t)
+                    (setq TeX-command-default "latexmk")))
+    :init
+    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
     :config
     (auctex-latexmk-setup)
-    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
     (message "`auctex-latexmk' loaded")))
 
 (when use-michelson
@@ -3558,6 +3668,10 @@ with a prefix ARG."
           lsp-pyright-venv-path "~/miniconda3/envs")
     (message "`lsp-pyright' loaded")))
 
+(when use-racket
+  (use-package racket-mode
+    :defer t))
+
 (when use-reason
   (defun shell-cmd (cmd)
     "Returns the stdout output of a shell command or nil if the command returned
@@ -3709,6 +3823,9 @@ with a prefix ARG."
     ;; (defun my/rust-mode-outline-regexp-setup ()
     ;;   (setq-local outline-regexp "///[;]\\{1,8\\}[^ \t]"))
     (message "`rustic' loaded")))
+
+(when use-sicp
+  (use-package sicp))
 
 (when use-web
   (use-package web-mode
