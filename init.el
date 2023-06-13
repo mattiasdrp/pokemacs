@@ -692,6 +692,7 @@ debian, and derivatives). On most it's 'fd'.")
   (which-key-setup-side-window-bottom)
   (setq which-key-sort-order 'which-key-key-order-alpha
         which-key-side-window-max-width 0.33
+        which-key-show-early-on-C-h t
         which-key-idle-delay 0.1)
   (message "`which-key' loaded"))
 
@@ -2394,10 +2395,12 @@ with a prefix ARG."
   :hook (corfu-mode . corfu-popupinfo-mode)
   :general
   (:keymaps 'corfu-popupinfo-map
+            "M-h" 'corfu-popupinfo-toggle
             "M-<up>" 'scroll-other-window-down
             "M-<down>"   'scroll-other-window)
   :custom
-  (corfu-popupinfo-delay '(0.5 . 0.5))
+  (corfu-echo-delay nil) ;; Disable automatic echo and popup
+  (corfu-popupinfo-delay nil)
   (corfu-popupinfo-min-width 80)
   (corfu-popupinfo-max-width 80))
 
