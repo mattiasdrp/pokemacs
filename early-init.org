@@ -4,6 +4,7 @@
 #+language: en_US
 #+property: header-args :results silent :exports code :tangle yes
 
+#+AUTO_TANGLE: t
 #+keywords: Emacs
 
 Literate configuration for [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Early-Init-File.html][early-init.el]].
@@ -125,17 +126,27 @@ Every file opened and loaded by Emacs will run through this list to check for a 
 It will be faster to disable them here before they've been initialized.
 
 #+BEGIN_SRC emacs-lisp
-  (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(menu-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist)
-  (setq initial-frame-alist default-frame-alist)
+  (setq default-frame-alist
+        '(
+          ;; (min-height . 1) '(height . 45)
+          ;; (min-width  . 1) '(width  . 81)
+          ;; (vertical-scroll-bars)
+          (internal-border-width . 0)
+          (left-fringe . 8)
+          (right-fringe . 8)
+          (tool-bar-lines . 0)
+          (menu-bar-lines . 0)))
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1))
   (when (fboundp 'menu-bar-mode)
     (menu-bar-mode -1))
   (when (fboundp 'scroll-bar-mode)
-    (scroll-bar-mode -1)
-#+END_SRC
+    (scroll-bar-mode -1))
+
+  ;; Default frame settings
+  (setq initial-frame-alist default-frame-alist)
+
+  #+END_SRC
 
 * Initial mode
 
