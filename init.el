@@ -19,7 +19,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(defvar elpaca-installer-version 0.4)
+(defvar elpaca-installer-version 0.5)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -1127,7 +1127,7 @@ debian, and derivatives). On most it's 'fd'.")
   (find-file    . diff-hl-mode)
   (vc-dir-mode  . diff-hl-dir-mode)
   (dired-mode   . diff-hl-dired-mode)
-  (diff-hl-mode . diff-hl-flydiff-mode)
+  ;; (diff-hl-mode . diff-hl-flydiff-mode)
   (magit-post-refresh . diff-hl-magit-post-refresh)
   (magit-pre-refresh  . diff-hl-magit-pre-refresh)
   (diff-hl-mode . mdrp/nil-background-diff-hl-faces)
@@ -2372,7 +2372,7 @@ with a prefix ARG."
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
   (corfu-quit-no-match t)
-  (corfu-auto-prefix 0)
+  (corfu-auto-prefix 1)
   (corfu-auto-delay 0)
   (corfu-separator ?\s)
   (corfu-preview-current 'insert)
