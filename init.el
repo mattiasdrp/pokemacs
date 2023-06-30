@@ -1078,6 +1078,26 @@ debian, and derivatives). On most it's 'fd'.")
   :lighter "locked"
   (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
 
+(use-package dired
+  :elpaca nil
+  :general
+  (:keymaps 'dired-mode-map
+            "DEL" 'dired-up-directory))
+
+(use-package dirvish
+  :demand t
+  :config (dirvish-override-dired-mode))
+
+(use-package dwim-shell-command
+  :elpaca (dwim-shell-command :files (:defaults "*.el"))
+  :general
+  ([remap shell-command]   'dwim-shell-command)
+  (:keymaps 'dired-mode-map
+            [remap dired-do-async-shell-command] 'dwim-shell-command
+            [remap dired-do-shell-command]       'dwim-shell-command
+            [remap dired-smart-shell-command]    'dwim-shell-command)
+  :config (require 'dwim-shell-commands))
+
 (use-package git-commit
   :defer t
   :hook (git-commit-mode . mdrp/english-dict)
@@ -1257,7 +1277,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-directory "~/org/")
   ;; Babel
   (org-confirm-babel-evaluate nil)
-  (org-insert-heading-respect-content t)
+  (org-insert-heading-respect-content nil)
   (org-special-ctrl-a/e t)
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
@@ -1956,6 +1976,9 @@ have one rule for each file type."
 (use-package hideshow
   :defer t
   :elpaca nil
+  :hook (prog-mode . (lambda ()
+                       (unless (eq major-mode 'tree-sitter-query-mode)
+                         (hs-minor-mode))))
   :commands (hs-minor-mode
              hs-toggle-hiding)
   :diminish hs-minor-mode
@@ -2008,30 +2031,6 @@ with a prefix ARG."
         uniquify-after-kill-buffer-p t
         uniquify-ignore-buffers-re "^\\*")
   (message "`uniquify' loaded"))
-
-(use-package frame
-  :elpaca nil
-  :config
-  (setq default-frame-alist
-        '(
-          ;; (min-height . 1) '(height . 45)
-          ;; (min-width  . 1) '(width  . 81)
-          ;; (vertical-scroll-bars)
-          (internal-border-width . 0)
-          (left-fringe . 8)
-          (right-fringe . 8)
-          (tool-bar-lines . 0)
-          (menu-bar-lines . 0)))
-  (when (fboundp 'tool-bar-mode)
-    (tool-bar-mode -1))
-  (when (fboundp 'menu-bar-mode)
-    (menu-bar-mode -1))
-  (when (fboundp 'scroll-bar-mode)
-    (scroll-bar-mode -1))
-
-  ;; Default frame settings
-  (setq initial-frame-alist default-frame-alist)
-  (message "`frame' loaded"))
 
 (use-package winner
   :elpaca nil
@@ -3338,11 +3337,11 @@ with a prefix ARG."
                   (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale)))
     ;; Don't cache preamble, it creates issues with SyncTeX. Let users enable
     ;; caching if they have compilation times that long.
-    (setq preview-auto-cache-preamble nil)
-    :general
-    (:keymaps 'LaTeX-mode-map
-              "p" #'preview-at-point
-              "P" #'preview-clearout-at-point))
+    (setq preview-auto-cache-preamble nil))
+  ;; :general
+  ;;   (:keymaps 'LaTeX-mode-map
+  ;;             "p" #'preview-at-point
+  ;;             "P" #'preview-clearout-at-point))
 
   (use-package cdlatex
     :hook
@@ -3356,6 +3355,7 @@ with a prefix ARG."
     (:keymaps 'cdlatex-mode-map
               ;; Smartparens takes care of inserting closing delimiters, and if you
               ;; don't use smartparens you probably don't want these either.
+              "TAB" nil
               "$" nil
               "(" nil
               "{" nil

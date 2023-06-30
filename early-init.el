@@ -22,7 +22,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold most-positive-fixnum)
 
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
@@ -57,9 +57,25 @@
 
 (setq site-run-file nil)
 
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-mode . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(setq default-frame-alist
+      '(
+        ;; (min-height . 1) '(height . 45)
+        ;; (min-width  . 1) '(width  . 81)
+        ;; (vertical-scroll-bars)
+        (internal-border-width . 0)
+        (left-fringe . 8)
+        (right-fringe . 8)
+        (tool-bar-lines . 0)
+        (menu-bar-lines . 0)))
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
+
+;; Default frame settings
+(setq initial-frame-alist default-frame-alist)
 
 (customize-set-variable 'initial-major-mode 'fundamental-mode)
 

@@ -1529,9 +1529,8 @@ Better block deletion.
     ([remap describe-symbol] 'helpful-symbol)
     ("C-h F" 'helpful-function)
     ("C-h C" 'helpful-command))
-
-
 #+end_src
+
 ** [[https://github.com/leoliu/easy-kill][Easy-kill]]
 :PROPERTIES:
 :CUSTOM_ID: easy-kill
@@ -1899,6 +1898,40 @@ Simple mode to visualize blanks
     (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
 #+end_src
 
+* Dired/Shell
+
+** Dired
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :elpaca nil
+    :general
+    (:keymaps 'dired-mode-map
+              "DEL" 'dired-up-directory))
+#+end_src
+
+** [[https://github.com/alexluigit/dirvish/][Dirvish]]
+
+#+begin_src emacs-lisp
+  (use-package dirvish
+    :demand t
+    :config (dirvish-override-dired-mode))
+#+end_src
+
+** Dwim shell commands
+
+#+begin_src emacs-lisp
+  (use-package dwim-shell-command
+    :elpaca (dwim-shell-command :files (:defaults "*.el"))
+    :general
+    ([remap shell-command]   'dwim-shell-command)
+    (:keymaps 'dired-mode-map
+              [remap dired-do-async-shell-command] 'dwim-shell-command
+              [remap dired-do-shell-command]       'dwim-shell-command
+              [remap dired-smart-shell-command]    'dwim-shell-command)
+    :config (require 'dwim-shell-commands))
+#+end_src
+
 * Git
 :PROPERTIES:
 :CUSTOM_ID: git
@@ -2184,7 +2217,7 @@ Org mode is, well, org mode.
     (org-directory "~/org/")
     ;; Babel
     (org-confirm-babel-evaluate nil)
-    (org-insert-heading-respect-content t)
+    (org-insert-heading-respect-content nil)
     (org-special-ctrl-a/e t)
     (org-src-fontify-natively t)
     (org-src-tab-acts-natively t)
@@ -3131,6 +3164,9 @@ On the fly syntax checking. One of the greatest package there is for making prog
   (use-package hideshow
     :defer t
     :elpaca nil
+    :hook (prog-mode . (lambda ()
+                         (unless (eq major-mode 'tree-sitter-query-mode)
+                           (hs-minor-mode))))
     :commands (hs-minor-mode
                hs-toggle-hiding)
     :diminish hs-minor-mode
@@ -3220,40 +3256,6 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
           uniquify-after-kill-buffer-p t
           uniquify-ignore-buffers-re "^\\*")
     (message "`uniquify' loaded"))
-#+end_src
-
-** Frame
-:PROPERTIES:
-:CUSTOM_ID: disabled-frame
-:END:
-
-Try to create frames that are nicer.
-
-#+begin_src emacs-lisp
-  (use-package frame
-    :elpaca nil
-    :config
-    (setq default-frame-alist
-          '(
-            ;; (min-height . 1) '(height . 45)
-            ;; (min-width  . 1) '(width  . 81)
-            ;; (vertical-scroll-bars)
-            (internal-border-width . 0)
-            (left-fringe . 8)
-            (right-fringe . 8)
-            (tool-bar-lines . 0)
-            (menu-bar-lines . 0)))
-    (when (fboundp 'tool-bar-mode)
-      (tool-bar-mode -1))
-    (when (fboundp 'menu-bar-mode)
-      (menu-bar-mode -1))
-    (when (fboundp 'scroll-bar-mode)
-      (scroll-bar-mode -1))
-
-    ;; Default frame settings
-    (setq initial-frame-alist default-frame-alist)
-    (message "`frame' loaded"))
-
 #+end_src
 
 ** [[https://www.emacswiki.org/emacs/WinnerMode][Winner]]
@@ -5053,11 +5055,11 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
                     (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale)))
       ;; Don't cache preamble, it creates issues with SyncTeX. Let users enable
       ;; caching if they have compilation times that long.
-      (setq preview-auto-cache-preamble nil)
-      :general
-      (:keymaps 'LaTeX-mode-map
-                "p" #'preview-at-point
-                "P" #'preview-clearout-at-point))
+      (setq preview-auto-cache-preamble nil))
+    ;; :general
+    ;;   (:keymaps 'LaTeX-mode-map
+    ;;             "p" #'preview-at-point
+    ;;             "P" #'preview-clearout-at-point))
 
     (use-package cdlatex
       :hook
@@ -5071,6 +5073,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       (:keymaps 'cdlatex-mode-map
                 ;; Smartparens takes care of inserting closing delimiters, and if you
                 ;; don't use smartparens you probably don't want these either.
+                "TAB" nil
                 "$" nil
                 "(" nil
                 "{" nil
