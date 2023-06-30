@@ -1277,7 +1277,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-directory "~/org/")
   ;; Babel
   (org-confirm-babel-evaluate nil)
-  (org-insert-heading-respect-content t)
+  (org-insert-heading-respect-content nil)
   (org-special-ctrl-a/e t)
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
