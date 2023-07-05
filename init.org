@@ -2024,6 +2024,7 @@ Nice mode to display on the fringe the uncommitted changes.
 #+begin_src emacs-lisp
   (use-package diff-hl
     :defer t
+    :disabled
     :hook
     (find-file    . diff-hl-mode)
     (vc-dir-mode  . diff-hl-dir-mode)

@@ -1143,6 +1143,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package diff-hl
   :defer t
+  :disabled
   :hook
   (find-file    . diff-hl-mode)
   (vc-dir-mode  . diff-hl-dir-mode)
