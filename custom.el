@@ -54,6 +54,7 @@
  '(use-elm t)
  '(use-fsharp t)
  '(use-god nil)
+ '(use-header-line t)
  '(use-kotlin t)
  '(use-latex t)
  '(use-magit-todos t)

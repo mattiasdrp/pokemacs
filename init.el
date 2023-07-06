@@ -170,6 +170,12 @@ Similar to Vim's separation of command/insert modes"
   :type 'boolean
   :tag " Icons")
 
+(defcustom use-header-line nil
+  "Use the header-line as the mode-line."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag "〜 Header-line")
+
 (defcustom use-maximize nil
   "If non-nil, maximize Emacs at startup."
   :group 'pokemacs-appearance
@@ -236,26 +242,9 @@ or nil if you don't want to use an english dictionary"
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (if (boundp 'after-focus-change-function)
-;;                 (add-function :after after-focus-change-function
-;;                               (lambda ()
-;;                                 (unless (frame-focus-state)
-;;                                   (garbage-collect))))
-;;               (add-hook 'after-focus-change-function 'garbage-collect))
-;;             (defun gc-minibuffer-setup-hook ()
-;;               (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
-
-;;             (defun gc-minibuffer-exit-hook ()
-;;               (garbage-collect)
-;;               (setq gc-cons-threshold better-gc-cons-threshold))
-
-;;             (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
-;;             (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 (setq gc-cons-threshold better-gc-cons-threshold)
 (setq gc-cons-percentage 0.1)
-(setq garbage-collection-messages t)
+(setq garbage-collection-messages nil)
 
 (defun update-to-load-path (folder)
   "Update FOLDER and its subdirectories to `load-path'."
@@ -986,9 +975,6 @@ debian, and derivatives). On most it's 'fd'.")
             )
   :config (message "`flyspell-correct' loaded"))
 
-(use-package fringe-helper
-  :config (message "`fringe-helper' loaded"))
-
 (use-package highlight-symbol
   :defer t
     :init (highlight-symbol-mode)
@@ -1140,40 +1126,6 @@ debian, and derivatives). On most it's 'fd'.")
   :config
   (global-hl-todo-mode 1)
   (message "`hl-todo' loaded"))
-
-(use-package diff-hl
-  :defer t
-  :disabled
-  :hook
-  (find-file    . diff-hl-mode)
-  (vc-dir-mode  . diff-hl-dir-mode)
-  (dired-mode   . diff-hl-dired-mode)
-  ;; (diff-hl-mode . diff-hl-flydiff-mode)
-  (magit-post-refresh . diff-hl-magit-post-refresh)
-  (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-  (diff-hl-mode . mdrp/nil-background-diff-hl-faces)
-  :init
-  (defun mdrp/nil-background-diff-hl-faces ()
-    (mapc (lambda (face) (set-face-background face nil))
-    '(diff-hl-insert diff-hl-delete diff-hl-change)))
-  :custom
-  (global-diff-hl-mode 1)
-  (diff-hl-side 'right)
-  :config
-  (defadvice! +vc-gutter-define-thin-bitmaps-a (&rest args)
-    :override #'diff-hl-define-bitmaps
-    (define-fringe-bitmap 'diff-hl-bmp-middle [224] nil nil '(center repeated))
-    (define-fringe-bitmap 'diff-hl-bmp-delete [240 224 192 128] nil nil 'top))
-  (defun +vc-gutter-type-face-fn (type _pos)
-    (intern (format "diff-hl-%s" type)))
-  (defun +vc-gutter-type-at-pos-fn (type _pos)
-    (if (eq type 'delete)
-        'diff-hl-bmp-delete
-      'diff-hl-bmp-middle))
-  (advice-add #'diff-hl-fringe-bmp-from-pos  :override #'+vc-gutter-type-at-pos-fn)
-  (advice-add #'diff-hl-fringe-bmp-from-type :override #'+vc-gutter-type-at-pos-fn)
-  (setq diff-hl-draw-borders nil)
-  (message "`diff-hl' loaded"))
 
 (use-package git-messenger
   :defer t
@@ -1513,10 +1465,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-gcal-fetch-file-alist
    `(
      (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
-     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")
-     )
-   )
-  )
+     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org"))))
 
 (use-package org-super-agenda
   :defer t
@@ -1667,7 +1616,10 @@ debian, and derivatives). On most it's 'fd'.")
   :custom
   (lsp-log-io nil)
   (lsp-headerline-breadcrumb-enable t)
-  (lsp-headerline-breadcrumb-segments '(project path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-segments
+   (if use-header-line
+       '(project file)
+     '(project path-up-to-project file symbols)))
   (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
   (lsp-modeline-code-actions-enable nil)
   (lsp-keymap-prefix "M-l")
@@ -1931,15 +1883,13 @@ have one rule for each file type."
   (:keymaps 'mdrp-fly-map
             "p" 'flycheck-prev-error)
   :custom
-  (flycheck-indication-mode 'right-fringe)
+  (flycheck-indication-mode 'left-fringe)
   :config
   (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
         (list n reset)
       (list n t)))
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-    [16 48 112 240 112 48 16] nil nil 'center)
   (message "`flycheck' loaded"))
 
 (use-package flycheck-correct
@@ -2072,9 +2022,7 @@ with a prefix ARG."
           (progn
             (global-visual-fill-column-mode 1)
             (set-window-fringes (selected-window) 8 8 nil nil))
-        (global-visual-fill-column-mode -1)
-        )
-      )
+        (global-visual-fill-column-mode -1)))
 
     (add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
     (message "`visual-fill-column' loaded")))
@@ -2513,7 +2461,7 @@ with a prefix ARG."
   :init
   ;; FRINGE
   ;; UI: the gutter looks less cramped with some space between it and  buffer.
-  (setq-default fringes-outside-margins t)
+  (setq-default fringes-outside-margins nil)
 
 
   ;; Try to indent and if already indented, complete
@@ -2756,10 +2704,10 @@ with a prefix ARG."
   (doom-modeline-minor-modes t)
 
   ;; Whether display the mu4e notifications
-  (doom-modeline-mu4e t)
+  (doom-modeline-mu4e nil)
 
   ;; Whether display the GitHub notifications. It requires `ghub' package.
-  (doom-modeline-github t)
+  (doom-modeline-github nil)
 
   ;; The interval of checking GitHub.
   (doom-modeline-github-interval 30)
@@ -2789,12 +2737,12 @@ with a prefix ARG."
   :config
   ;; Define your custom doom-modeline
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
-                              '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-                              '(misc-info persp-name grip github mu4e debug minor-modes major-mode process vcs checker))
+    '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
+    '(misc-info persp-name grip debug minor-modes major-mode process vcs checker))
 
   (doom-modeline-def-modeline 'mdrp/lsp-line
-                              '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-                              '(misc-info persp-name grip github mu4e debug minor-modes major-mode process vcs checker))
+    '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
+    '(misc-info persp-name grip debug minor-modes major-mode process vcs checker))
 
   ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
   (setq doom-modeline-fn-alist
@@ -2802,20 +2750,33 @@ with a prefix ARG."
           (--map
            (cons (remove-pos-from-symbol (car it)) (cdr it))
            doom-modeline-fn-alist)
-        doom-modeline-fn-alist))
+          doom-modeline-fn-alist))
+
+  (defun mdrp/mode-line-to-header-line ()
+    (when use-header-line
+      (setq header-line-format mode-line-format)
+      (setq mode-line-format nil)))
 
   ;; Add to `doom-modeline-mode-hook` or other hooks
   (defun mdrp/setup-no-lsp-doom-modeline ()
     (message "doom no lsp modeline change")
-    (doom-modeline-set-modeline 'mdrp/no-lsp-line 'default))
+    (doom-modeline-set-modeline 'mdrp/no-lsp-line 'default)
+    (mdrp/mode-line-to-header-line))
 
   (defun mdrp/setup-lsp-doom-modeline ()
     (message "doom lsp modeline change")
-    (doom-modeline-set-modeline 'mdrp/lsp-line nil))
+    (doom-modeline-set-modeline 'mdrp/lsp-line nil)
+    (mdrp/mode-line-to-header-line))
 
+  ;; Redefine all the mouse interactions of the modeline to the headerline
   (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
   (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
   (doom-modeline-mode)
+  (when use-header-line
+    (define-key mode-line-major-mode-keymap [header-line]
+                (lookup-key mode-line-major-mode-keymap [mode-line]))
+    (define-key mode-line-minor-mode-keymap [header-line]
+                (lookup-key mode-line-minor-mode-keymap [mode-line])))
   (message "`doom-modeline' loaded"))
 
 (use-package minions
