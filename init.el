@@ -34,6 +34,7 @@
   (add-to-list 'load-path (if (file-exists-p build) build repo))
   (unless (file-exists-p repo)
     (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
         (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
                  ((zerop (call-process "git" nil buffer t "clone"
@@ -45,7 +46,7 @@
                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
                  ((require 'elpaca))
                  ((elpaca-generate-autoloads "elpaca" repo)))
-            (kill-buffer buffer)
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
           (error "%s" (with-current-buffer buffer (buffer-string))))
       ((error) (warn "%s" err) (delete-directory repo 'recursive))))
   (unless (require 'elpaca-autoloads nil t)
@@ -72,9 +73,9 @@
    use-package-enable-imenu-support t))
 
 (elpaca bind-key)
-(elpaca use-package)
 
 (use-package use-package-ensure-system-package
+  :elpaca nil
   :config (message "`use-package-ensure-system-package' loaded"))
 
 (setq byte-compile-warnings '(cl-functions))
@@ -229,7 +230,7 @@ or nil if you don't want to use an english dictionary"
 (setq user-emacs-directory (file-name-directory user-init-file))
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file)
+(load custom-file 'noerror)
 
 (when use-maximize
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
@@ -1096,13 +1097,11 @@ debian, and derivatives). On most it's 'fd'.")
   ("M-n"    'mdrp/smerge-or-flycheck-next)
   (:keymaps 'smerge-mode-map
             "M-m"                 'smerge-keep-mine
-            "M-o"                 'smerge-keep-other
-            )
+            "M-o"                 'smerge-keep-other)
   (:keymaps 'magit-mode-map
             "g"             'magit-status
             "G"             'git-messenger:popup-message
-            "M-g"           'magit-dispatch
-            )
+            "M-g"           'magit-dispatch)
   :config
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
@@ -1582,7 +1581,10 @@ debian, and derivatives). On most it's 'fd'.")
   (add-hook 'orderless-style-dispatchers #'minad/orderless-dispatch-prefixes-first)
   (setq-local completion-at-point-functions
               (list (cape-capf-buster #'lsp-completion-at-point)))
-
+  (defconst mdrp-lsp-mode-breadcrumb-segments
+    (if use-header-line
+        '(project file)
+      '(project path-up-to-project file symbols)))
   :hook ((lsp-mode . mdrp/lsp-optimization-mode)
          (lsp-completion-mode . minad/lsp-mode-setup-completion)
          (tuareg-mode . lsp-deferred)
@@ -1616,10 +1618,7 @@ debian, and derivatives). On most it's 'fd'.")
   :custom
   (lsp-log-io nil)
   (lsp-headerline-breadcrumb-enable t)
-  (lsp-headerline-breadcrumb-segments
-   (if use-header-line
-       '(project file)
-     '(project path-up-to-project file symbols)))
+  (lsp-headerline-breadcrumb-segments mdrp-lsp-mode-breadcrumb-segments)
   (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
   (lsp-modeline-code-actions-enable nil)
   (lsp-keymap-prefix "M-l")
@@ -2765,8 +2764,10 @@ with a prefix ARG."
 
   (defun mdrp/setup-lsp-doom-modeline ()
     (message "doom lsp modeline change")
+    (lsp-headerline-breadcrumb-mode -1)
     (doom-modeline-set-modeline 'mdrp/lsp-line nil)
-    (mdrp/mode-line-to-header-line))
+    (mdrp/mode-line-to-header-line)
+    (lsp-headerline-breadcrumb-mode 1))
 
   ;; Redefine all the mouse interactions of the modeline to the headerline
   (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
@@ -3331,8 +3332,8 @@ with a prefix ARG."
               ;; AUCTeX already provides this with `LaTeX-insert-item'.
               [(control return)] nil))
 
-
   (use-package auctex-latexmk
+    :defer t
     :hook
     (LaTeX-mode . (lambda ()
                     (add-to-list 'TeX-command-list
