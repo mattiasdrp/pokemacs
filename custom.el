@@ -108,7 +108,7 @@
  '(lsp-lens-face ((t (:family "Fira Code" :foundry "CTDB" :inherit lsp-details-face))))
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
- '(mode-line-inactive ((nil :family "Fira Code" :height 140)))
+ '(mode-line-inactive ((nil :family "Fira Code")))
  '(org-block ((t (:inherit fixed-pitch))))
  '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
  '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))

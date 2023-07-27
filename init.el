@@ -2635,7 +2635,7 @@ with a prefix ARG."
   ;; The limit of the window width.
   ;; If `window-width' is smaller than the limit, some information won't be
   ;; displayed. It can be an integer or a float number. `nil' means no limit.
-  (doom-modeline-window-width-limit nil)
+  (doom-modeline-window-width-limit 85)
 
   ;; How to detect the project root.
   ;; nil means to use `default-directory'.
