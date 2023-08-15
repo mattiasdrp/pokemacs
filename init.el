@@ -1163,6 +1163,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ox
   :elpaca nil
   :defer t
+  :mode ("\\.org\\'" . org-mode)
   :init
   (defun mdrp/filter-timestamp (trans back _comm)
     "Remove <> around time-stamps."
@@ -1172,7 +1173,6 @@ debian, and derivatives). On most it's 'fd'.")
       (`latex
        (replace-regexp-in-string "[<>]" "" trans))))
 
-  :mode ("\\.org\\'" . org-mode)
   :config
   (add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
   (message "`ox' loaded"))
@@ -1182,6 +1182,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`mixed-pitch' loaded"))
 
 (use-package ob-rust :defer t)
+
 (use-package ob-racket
   :elpaca (:type git :host github :repo "hasu/emacs-ob-racket"))
 
@@ -1190,7 +1191,7 @@ debian, and derivatives). On most it's 'fd'.")
   :elpaca nil
   :mode ("\\.org\\'" . org-mode)
   :hook (org-mode . mixed-pitch-mode)
-
+  :after ob-racket
   :general
   ("M-o" 'mdrp-org-map)
   ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
@@ -1530,13 +1531,13 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ox-awesomecv
   :load-path "lisp/org-cv/"
   :elpaca nil
-  :defer t
+  :after org
   :config (message "`ox-awesomecv' loaded"))
 
 (use-package ox-moderncv
   :load-path "lisp/org-cv/"
   :elpaca nil
-  :defer t
+  :after org
   :config (message "`ox-moderncv' loaded"))
 
 ;; Taken from doomemacs
