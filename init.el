@@ -57,6 +57,8 @@
 (elpaca `(,@elpaca-order))
 
 ;; Install use-package support
+(elpaca bind-key)
+
 (elpaca elpaca-use-package
         ;; Enable :elpaca use-package keyword.
         (elpaca-use-package-mode)
@@ -71,8 +73,6 @@
    use-package-expand-minimally t
    use-package-compute-statistics t
    use-package-enable-imenu-support t))
-
-(elpaca bind-key)
 
 (use-package use-package-ensure-system-package
   :elpaca nil
@@ -314,6 +314,7 @@ or nil if you don't want to use an english dictionary"
  echo-keystrokes 0.1
 
  vc-follow-symlinks t
+
  ;; Turn font lock mode for all modes that allow it
  ;; TODO: Specify a list when we'll start using tree-sitter
  font-lock-global-modes t
@@ -1507,6 +1508,50 @@ debian, and derivatives). On most it's 'fd'.")
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
     (org-roam-db-autosync-mode)
+    (setq org-roam-capture-templates
+          '(
+            ("d" "default" plain
+             "%?"
+             :if-new (file+head "defaut/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :defaut:\n#+date: %U\n")
+             :unnarrowed t)
+            ("b" "livre" plain
+             "\n* Source\n\nAuteur: %^{Author}\nTitre: ${title}\nAnnée: %^{Year}\n\n* Résumé\n\n%?"
+             :if-new (file+head "art/livre/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :art::livre:\n#+date: %U\n")
+             :unnarrowed t)
+            ("b" "film" plain
+             "\n* Source\n\nRéalisateur: %^{Author}\nTitre: ${title}\nAnnée: %^{Year}\n\n* Résumé\n\n%?"
+             :if-new (file+head "art/cinema/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :art::film:\n#+date: %U\n")
+             :unnarrowed t)
+            ("i" "informatique" plain "%?"
+             :if-new
+             (file+head "science/informatique/%<%Y%m%d%H%M%S>-${slug}.org.org" "#+title: ${title}\n#+filetags: :informatique:\n#+date: %U\n")
+             :immediate-finish t
+             :unnarrowed t)
+            ("l" "langage" plain
+             "* Characteristics\n\n- Famille: %?\n- Inspirations: \n\n* Référence:\n\n"
+             :if-new (file+head "science/informatique/langages/${title}.org" "#+title: ${title}\n#+filetags: :langage:\n#+date: %U\n")
+             :unnarrowed t)
+            ("p" "projet" plain
+             "* Objectifs\n\n%?\n\n* Tâches\n\n** TODO Ajouter de nouvelles tâches\n\n* Dates\n\n"
+             :if-new (file+head "projets/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :projet:")
+             :unnarrowed t)
+            ("s" "sciences" plain "%?"
+             :if-new
+             (file+head "sciences/${title}.org" "#+title: ${title}\n#+filetags: :sciences:\n#+filetags: :science:#+date: %U\n")
+             :immediate-finish t
+             :unnarrowed t)))
+    (cl-defmethod org-roam-node-type ((node org-roam-node))
+      "Return the TYPE of NODE."
+      (condition-case nil
+          (file-name-nondirectory
+           (directory-file-name
+            (file-name-directory
+             (file-relative-name (org-roam-node-file node) org-roam-directory))))
+        (error "")))
+    (setq org-roam-node-display-template
+          (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
+
     ;; If using org-roam-protocol
     (require 'org-roam-protocol)
     (message "`org-roam' loaded"))
@@ -1569,6 +1614,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package lsp-mode
   :defer t
+  :after projectile
   :commands lsp
   :init
   (defun minad/orderless-dispatch-prefixes-first (_pattern index _total)
@@ -1589,6 +1635,7 @@ debian, and derivatives). On most it's 'fd'.")
          (lsp-completion-mode . minad/lsp-mode-setup-completion)
          (tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
+         (cc-mode . lsp-deferred)
          (clojure-mode . lsp-deferred)
          (clojurescript-mode-hook . lsp-deferred)
          (clojurec-mode-hook . lsp-deferred)
@@ -1641,7 +1688,7 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
-
+  (lsp-ui-peek-find-references nil (list :folders (vector (projectile-project-root))))
   :config
   (defvar mdrp/type-map
     (let ((keymap (make-sparse-keymap)))
@@ -1755,17 +1802,19 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package apheleia
   :defer t
   :hook
-  (tuareg-mode  . apheleia-mode)
+  (c-mode       . apheleia-mode)
+  (c++-mode     . apheleia-mode)
   (caml-mode    . apheleia-mode)
   (elm-mode     . apheleia-mode)
-  (python-mode  . apheleia-mode)
-  (elm-mode     . apheleia-mode)
+  (java-mode    . apheleia-mode)
   (fsharp-mode  . apheleia-mode)
   (kotlin-mode  . apheleia-mode)
+  (python-mode  . apheleia-mode)
   (rustic-mode  . apheleia-mode)
+  (tuareg-mode  . apheleia-mode)
   :config
   (setf (alist-get 'isort apheleia-formatters)
-      '("isort" "--stdout" "-"))
+        '("isort" "--stdout" "-"))
   (setf (alist-get 'python-mode apheleia-mode-alist)
         '(isort black))
   (message "`apheleia' loaded"))
@@ -1773,6 +1822,14 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package dap-mode
   :defer t
   :after lsp-mode
+  :general
+  (:keymaps 'lsp-mode-map
+            "<f5>" 'dap-debug
+            "M-<f5>" 'dap-hydra)
+  :hook ((dap-mode . dap-ui-mode)
+         (dap-session-created . (lambda (&_rest) (dap-hydra)))
+         (dap-terminated . (lambda (&_rest) (dap-hydra/nil))))
+
   :config
   (dap-auto-configure-mode)
   (message "`dap' loaded"))
@@ -1796,7 +1853,9 @@ debian, and derivatives). On most it's 'fd'.")
   (setq find-sibling-rules
         '(
           ("\\([^/]+\\)\\.org\\'" "\\1.el")
-          ("\\([^/]+\\)\\.el\\'" "\\1.org")))
+          ("\\([^/]+\\)\\.el\\'" "\\1.org")
+          ("\\([^/]+\\)\\.c\\'" "\\1.h")
+          ("\\([^/]+\\)\\.h\\'" "\\1.c")))
 
   (defcustom create-sibling-rules nil
     "Rules for creating \"sibling\" files.
@@ -1937,7 +1996,7 @@ have one rule for each file type."
   (message "`hideshow' loaded"))
 
 (use-package projectile
-  :defer t
+  :demand t
   :hook (prog-mode . projectile-mode)
   :general
   ("M-p"  'projectile-command-map)
@@ -2272,7 +2331,6 @@ with a prefix ARG."
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :after (embark consult)
-  :elpaca nil
   :defer t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode)
@@ -2561,6 +2619,7 @@ with a prefix ARG."
   ;; Require trigger prefix before template name when completing.
   :general
   ("M-+" 'tempel-complete) ;; Alternative tempel-expand
+  ("M-SPC" 'tempel-complete) ;; Alternative tempel-expand
   ("M-*" 'tempel-insert)
   :init
   ;; Setup completion at point
@@ -2582,7 +2641,8 @@ with a prefix ARG."
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-  (global-tempel-abbrev-mode))
+  ;; (global-tempel-abbrev-mode)
+  )
 
 ;; Optional: Add tempel-collection.
 ;; The package is young and doesn't have comprehensive coverage.
@@ -2970,6 +3030,41 @@ with a prefix ARG."
     (eaf-bind-key nil "M-q" eaf-browser-keybinding)
     (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
+(use-package treesit
+  :disabled
+  :elpaca nil
+  :init
+  (setq treesit-language-source-alist
+        '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+          (css "https://github.com/tree-sitter/tree-sitter-css")
+          (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+          (html "https://github.com/tree-sitter/tree-sitter-html")
+          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+          (json "https://github.com/tree-sitter/tree-sitter-json")
+          (make "https://github.com/alemuller/tree-sitter-make")
+          (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+          (org "https://github.com/tree-sitter/tree-sitter-ocaml")
+          (ocaml "https://github.com/tree-sitter/tree-sitter-ocaml")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
+          (rust "https://github.com/tree-sitter/tree-sitter-rust")
+          (toml "https://github.com/tree-sitter/tree-sitter-toml")
+          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  :config
+  (defconst treesit-install-out-dir (no-littering-expand-etc-file-name "treesit-install"))
+  (defun treesit-install-all-languages ()
+    (interactive)
+    (mapc (lambda (lang)
+            (treesit-install-language-grammar lang treesit-install-out-dir))
+          (mapcar #'car treesit-language-source-alist))))
+
+(use-package treesit-auto
+  :disabled
+  :after treesit
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (global-treesit-auto-mode))
+
 ;; This package needs to be loaded to use language parsers
 (use-package tree-sitter-langs
   :defer t
@@ -2992,6 +3087,7 @@ with a prefix ARG."
   :defer t
   :hook
   (tuareg-mode . ts-fold-mode)
+  (c-mode    . ts-fold-mode)
   (c++-mode    . ts-fold-mode)
   (python-mode . ts-fold-mode)
   (rustic-mode . ts-fold-mode)
@@ -3038,6 +3134,12 @@ with a prefix ARG."
   :group 'pokemacs-languages
   :type 'boolean
   :tag " Kotlin")
+
+(defcustom use-java nil
+  "If non-nil, uses the Java packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Java")
 
 (defcustom use-latex nil
   "If non-nil, uses the LaTeX packages."
@@ -3196,6 +3298,60 @@ with a prefix ARG."
   :hook (make-mode . semantic-mode)
   :config (message "`make-mode' loaded"))
 
+(use-package cc-mode
+  :elpaca nil
+  :general
+  (:keymaps 'c-mode-map
+            "C-c C-a" nil))
+
+(use-package ccls
+  :after projectile
+  :demand t
+  :hook ((c-mode c++-mode objc-mode cuda-mode) . (lambda () (require 'ccls) (lsp)))
+  :config
+  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
+  (defun ccls/callee () (interactive) (lsp-ui-peek-find-custom "$ccls/call" '(:callee t)))
+  (defun ccls/caller () (interactive) (lsp-ui-peek-find-custom "$ccls/call"))
+  (defun ccls/vars (kind) (lsp-ui-peek-find-custom "$ccls/vars" `(:kind ,kind)))
+  (defun ccls/base (levels) (lsp-ui-peek-find-custom "$ccls/inheritance" `(:levels ,levels)))
+  (defun ccls/derived (levels) (lsp-ui-peek-find-custom "$ccls/inheritance" `(:levels ,levels :derived t)))
+  (defun ccls/member (kind) (interactive) (lsp-ui-peek-find-custom "$ccls/member" `(:kind ,kind)))
+
+  ;; References w/ Role::Role
+  (defun ccls/references-read () (interactive)
+         (lsp-ui-peek-find-custom "textDocument/references"
+                                  (plist-put (lsp--text-document-position-params) :role 8)))
+
+  ;; References w/ Role::Write
+  (defun ccls/references-write ()
+    (interactive)
+    (lsp-ui-peek-find-custom "textDocument/references"
+                             (plist-put (lsp--text-document-position-params) :role 16)))
+
+  ;; References w/ Role::Dynamic bit (macro expansions)
+  (defun ccls/references-macro () (interactive)
+         (lsp-ui-peek-find-custom "textDocument/references"
+                                  (plist-put (lsp--text-document-position-params) :role 64)))
+
+  ;; References w/o Role::Call bit (e.g. where functions are taken addresses)
+  (defun ccls/references-not-call () (interactive)
+         (lsp-ui-peek-find-custom "textDocument/references"
+                                  (plist-put (lsp--text-document-position-params) :excludeRole 32)))
+
+  ;; ccls/vars ccls/base ccls/derived ccls/members have a parameter while others are interactive.
+  ;; (ccls/base 1) direct bases
+  ;; (ccls/derived 1) direct derived
+  ;; (ccls/member 2) => 2 (Type) => nested classes / types in a namespace
+  ;; (ccls/member 3) => 3 (Func) => member functions / functions in a namespace
+  ;; (ccls/member 0) => member variables / variables in a namespace
+  ;; (ccls/vars 1) => field
+  ;; (ccls/vars 2) => local variable
+  ;; (ccls/vars 3) => field or local variable. 3 = 1 | 2
+  ;; (ccls/vars 4) => parameter
+
+  ;; References whose filenames are under this project
+  (message "`ccls' loaded"))
+
 (when use-clojure
   (use-package clojure-mode
     :defer t
@@ -3259,6 +3415,12 @@ with a prefix ARG."
   (use-package kotlin-mode
     :defer t
     :config (message "`kotlin-mode' loaded")))
+
+(when use-java
+  (use-package lsp-java
+    :hook
+    (java-mode . lsp)
+    (java-mode . (lambda () (abbrev-mode -1)))))
 
 (when use-latex
   (use-package tex-site

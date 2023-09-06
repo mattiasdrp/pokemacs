@@ -21,7 +21,8 @@
  '(cursor-intangible-mode t t)
  '(cursor-type t)
  '(describe-char-unidata-list
-   '(name old-name general-category decomposition decimal-digit-value digit-value numeric-value))
+   '(name old-name general-category decomposition decimal-digit-value digit-value
+          numeric-value))
  '(doom-modeline-height 12)
  '(doom-themes-enable-bold t)
  '(doom-themes-enable-italic t)
@@ -29,23 +30,23 @@
  '(electric-indent-mode t)
  '(fill-column 80)
  '(flycheck-languagetool-server-jar
-   (concat
-    (getenv "HOME")
-    "/.emacs.d/LanguageTool-6.1/languagetool-server.jar"))
+   (concat (getenv "HOME") "/.emacs.d/LanguageTool-6.1/languagetool-server.jar"))
  '(hl-todo-keyword-faces
-   '(("TODO" warning bold)
-     ("FIXME" error bold)
+   '(("TODO" warning bold) ("FIXME" error bold)
      ("REVIEW" font-lock-keyword-face bold)
-     ("DEPRECATED" font-lock-doc-face bold)
-     ("NOTE" success bold)
+     ("DEPRECATED" font-lock-doc-face bold) ("NOTE" success bold)
      ("XXXX*" font-lock-constant-face bold)))
- '(lsp-auto-guess-root t)
+ '(lsp-auto-guess-root nil)
+ '(lsp-java-completion-lazy-resolve-text-edit-enabled t)
+ '(lsp-java-format-enabled nil)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(pokemacs-theme 'doom-solarized-dark)
  '(pokemacs/english-dict "GB")
  '(pokemacs/french-dict "FR")
  '(safe-local-variable-values
-   '((projectile-project-root-functions projectile-root-top-down projectile-root-bottom-up projectile-root-top-down-recurring)))
+   '((projectile-project-root-functions projectile-root-top-down
+                                        projectile-root-bottom-up
+                                        projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
  '(use-all-the-icons nil)
  '(use-clojure t)
@@ -55,6 +56,7 @@
  '(use-fsharp t)
  '(use-god nil)
  '(use-header-line t)
+ '(use-java t)
  '(use-kotlin t)
  '(use-latex t)
  '(use-magit-todos t)
@@ -66,8 +68,8 @@
  '(use-org-roam t)
  '(use-pandoc t)
  '(use-python t)
- '(use-rainbow t)
  '(use-racket t)
+ '(use-rainbow t)
  '(use-reason nil)
  '(use-rust t)
  '(use-sicp t)
@@ -78,23 +80,14 @@
  '(use-web t)
  '(use-window-purpose nil)
  '(vertico-multiform-categories
-   '((imenu buffer)
-     (file
-      (vertico-sort-function . sort-directories-first))
-     (corfu
-      (vertico-sort-function . vertico-sort-alpha))
-     (symbol
-      (vertico-sort-function . vertico-sort-history-length-alpha))))
+   '((imenu buffer) (file (vertico-sort-function . sort-directories-first))
+     (corfu (vertico-sort-function . vertico-sort-alpha))
+     (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
  '(vertico-multiform-commands
-   '((consult-imenu buffer)
-     (consult-line buffer)
-     (execute-extended-command mouse)
-     (find-file
-      (vertico-sort-function . sort-directories-first))
-     (insert-char
-      (vertico-sort-function . sort-characters))
-     (describe-symbol
-      (vertico-sort-override-function . vertico-sort-alpha))))
+   '((consult-imenu buffer) (consult-line buffer) (execute-extended-command mouse)
+     (find-file (vertico-sort-function . sort-directories-first))
+     (insert-char (vertico-sort-function . sort-characters))
+     (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
  '(warning-suppress-types '((comp)))
  '(x-stretch-cursor nil))
 
@@ -120,7 +113,8 @@
  '(org-level-6 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
  '(org-level-7 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
  '(org-level-8 ((t (:inherit variable-pitch :height 1.0 :weight bold))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-modern-statistics ((t (:height 1.6))))
+ '(org-property-value ((t (:inherit fixed-pitch))))
  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
  '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
