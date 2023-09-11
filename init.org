@@ -2924,7 +2924,6 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
     :after lsp-mode
     :general
     (:keymaps 'lsp-mode-map
-              "<f5>" 'dap-debug
               "M-<f5>" 'dap-hydra)
     :hook ((dap-mode . dap-ui-mode)
            (dap-session-created . (lambda (&_rest) (dap-hydra)))

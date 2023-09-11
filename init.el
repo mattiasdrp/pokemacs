@@ -1825,7 +1825,6 @@ debian, and derivatives). On most it's 'fd'.")
   :after lsp-mode
   :general
   (:keymaps 'lsp-mode-map
-            "<f5>" 'dap-debug
             "M-<f5>" 'dap-hydra)
   :hook ((dap-mode . dap-ui-mode)
          (dap-session-created . (lambda (&_rest) (dap-hydra)))
