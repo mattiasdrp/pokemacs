@@ -310,10 +310,12 @@ or nil if you don't want to use an english dictionary"
  ;; Don't lock files, I know what I'm doing
  create-lockfiles nil
 
+ ;; If two dired are opened with two different locations
+ ;; copy command will copy from one to the other
+ dired-dwim-target t
+
  ;; Show Keystrokes in Progress Instantly
  echo-keystrokes 0.1
-
- vc-follow-symlinks t
 
  ;; Turn font lock mode for all modes that allow it
  ;; TODO: Specify a list when we'll start using tree-sitter
@@ -352,11 +354,18 @@ or nil if you don't want to use an english dictionary"
  ;; I don't need scroll bars
  scroll-bar-mode nil
 
+ tab-width 2
+
  ;; Long lines will span on a continuation line (makes the whole line visible)
  truncate-lines nil
 
+ ;; Save undos even when closing emacs
+ undo-tree-auto-save-history t
+
  ;; yes or no replace by y or n everywhere
  use-short-answers t
+
+ vc-follow-symlinks t
 
  ;; Flash the screen
  visible-bell nil)
@@ -2621,6 +2630,8 @@ with a prefix ARG."
   ("M-+" 'tempel-complete) ;; Alternative tempel-expand
   ("M-SPC" 'tempel-complete) ;; Alternative tempel-expand
   ("M-*" 'tempel-insert)
+  (:keymaps 'tempel-map
+            "RET" 'tempel-next)
   :init
   ;; Setup completion at point
   (defun tempel-setup-capf ()
@@ -3591,12 +3602,30 @@ with a prefix ARG."
         (set-process-query-on-exit-flag (get-buffer-process buffer) nil))))))
 
 (when use-ocaml
+
+  (defcustom mdrp/ocaml-templates
+    '(
+      (af "assert false;" n>)
+      (pp "Printf.printf \"" p "\" " p ";" n> q)
+      (pe "Printf.eprintf \"" p "\" " p ";" n> q)
+      (pf "Printf.fprintf " p " \"" p "\" " p ";" n> q)
+      (fp "Format.printf \"" p "\" " p ";" n> q)
+      (fe "Format.eprintf \"" p "\" " p ";" n> q)
+      (ff "Format.fprintf " p " \"" p "\" " p ";" n> q)
+      (if "if " p n> "then begin" n> p n> "end" n> "else begin" n> p n> "end" q)
+      (loc "Format.eprintf \"%s@.\" __LOC__ ;" n> q))
+    "Templates for OCaml used by Tempel."
+    :group 'pokemacs-languages
+    :type '(repeat sexp)
+    :tag " OCaml Templates")
+
   (use-package tuareg
     :defer t
     :ensure-system-package
     ((ocamllsp . "opam install ocaml-lsp-server")
      (ocamlformat . "opam install ocamlformat")
      (ocaml-print-intf . "opam install ocaml-print-intf"))
+    :after tempel
     :mode ("\\.ml\\'" . tuareg-mode)
     ;; The following line can be used instead of :ensure t to load
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -3610,6 +3639,8 @@ with a prefix ARG."
               "C-c w"   'mdrp/dune-watch
               )
     :config
+    (defvar-local mdrp/ocaml-templates-local mdrp/ocaml-templates "OCaml Templates")
+    (add-to-list 'tempel-template-sources 'mdrp/ocaml-templates)
     (defun mdrp/map (l)
       (-map (lambda (x) (list
                     (concat "\\([^/]+\\)" (regexp-quote (car x)))
@@ -3972,6 +4003,9 @@ with a prefix ARG."
   :defer t
   :elpaca nil
   :config (message "`simple-httpd' loaded"))
+
+(use-package web-beautify
+  :elpaca (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
