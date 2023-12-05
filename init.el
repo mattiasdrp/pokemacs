@@ -19,13 +19,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(defvar elpaca-installer-version 0.5)
+(defvar elpaca-installer-version 0.6)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
                               :ref nil
-                              :files (:defaults (:exclude "extensions"))
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                               :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
@@ -1643,18 +1643,19 @@ debian, and derivatives). On most it's 'fd'.")
       '(project path-up-to-project file symbols)))
   :hook ((lsp-mode . mdrp/lsp-optimization-mode)
          (lsp-completion-mode . minad/lsp-mode-setup-completion)
-         (tuareg-mode . lsp-deferred)
          (caml-mode . lsp-deferred)
          (cc-mode . lsp-deferred)
          (clojure-mode . lsp-deferred)
+         (conf-toml-mode . lsp-deferred)
          (clojurescript-mode-hook . lsp-deferred)
          (clojurec-mode-hook . lsp-deferred)
          (elm-mode . lsp-deferred)
-         (rustic-mode . lsp-deferred)
-         (conf-toml-mode . lsp-deferred)
-         (kotlin-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
-         (python-mode . lsp-deferred))
+         (kotlin-mode . lsp-deferred)
+         (python-mode . lsp-deferred)
+         (enh-ruby-mode . lsp-deferred)
+         (rustic-mode . lsp-deferred)
+         (tuareg-mode . lsp-deferred))
   :general
   (:keymaps 'lsp-mode-map
             "C-c C-t" 'lsp-describe-thing-at-point
@@ -1812,21 +1813,23 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package apheleia
   :defer t
   :hook
-  (c-mode       . apheleia-mode)
-  (c++-mode     . apheleia-mode)
-  (caml-mode    . apheleia-mode)
-  (elm-mode     . apheleia-mode)
-  (java-mode    . apheleia-mode)
-  (fsharp-mode  . apheleia-mode)
-  (kotlin-mode  . apheleia-mode)
-  (python-mode  . apheleia-mode)
-  (rustic-mode  . apheleia-mode)
-  (tuareg-mode  . apheleia-mode)
+  (c-mode        . apheleia-mode)
+  (c++-mode      . apheleia-mode)
+  (caml-mode     . apheleia-mode)
+  (elm-mode      . apheleia-mode)
+  (java-mode     . apheleia-mode)
+  (fsharp-mode   . apheleia-mode)
+  (kotlin-mode   . apheleia-mode)
+  (python-mode   . apheleia-mode)
+  (enh-ruby-mode . apheleia-mode)
+  (rustic-mode   . apheleia-mode)
+  (tuareg-mode   . apheleia-mode)
   :config
   (setf (alist-get 'isort apheleia-formatters)
         '("isort" "--stdout" "-"))
   (setf (alist-get 'python-mode apheleia-mode-alist)
         '(isort black))
+  (push '(enh-ruby-mode . rubocop) apheleia-mode-alist)
   (message "`apheleia' loaded"))
 
 (use-package dap-mode
@@ -3042,38 +3045,14 @@ with a prefix ARG."
     (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
 (use-package treesit
-  :disabled
-  :elpaca nil
-  :init
-  (setq treesit-language-source-alist
-        '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-          (css "https://github.com/tree-sitter/tree-sitter-css")
-          (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-          (html "https://github.com/tree-sitter/tree-sitter-html")
-          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-          (json "https://github.com/tree-sitter/tree-sitter-json")
-          (make "https://github.com/alemuller/tree-sitter-make")
-          (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-          (org "https://github.com/tree-sitter/tree-sitter-ocaml")
-          (ocaml "https://github.com/tree-sitter/tree-sitter-ocaml")
-          (python "https://github.com/tree-sitter/tree-sitter-python")
-          (rust "https://github.com/tree-sitter/tree-sitter-rust")
-          (toml "https://github.com/tree-sitter/tree-sitter-toml")
-          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-  :config
-  (defconst treesit-install-out-dir (no-littering-expand-etc-file-name "treesit-install"))
-  (defun treesit-install-all-languages ()
-    (interactive)
-    (mapc (lambda (lang)
-            (treesit-install-language-grammar lang treesit-install-out-dir))
-          (mapcar #'car treesit-language-source-alist))))
+  :elpaca nil)
 
 (use-package treesit-auto
-  :disabled
   :after treesit
   :custom
   (treesit-auto-install 'prompt)
   :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
 ;; This package needs to be loaded to use language parsers
@@ -3193,6 +3172,12 @@ with a prefix ARG."
   :group 'pokemacs-languages
   :type 'boolean
   :tag " ReasonML")
+
+(defcustom use-ruby t
+  "If non-nil, uses the Ruby packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Ruby")
 
 (defcustom use-rust nil
   "If non-nil, uses the rust packages."
@@ -3866,6 +3851,34 @@ with a prefix ARG."
        (add-hook 'before-save-hook 'refmt-before-save)
        (merlin-mode)))
     (message "`reason-mode' loaded")))
+
+(when use-ruby
+  (use-package enh-ruby-mode
+    :mode (("Appraisals\\'" . enh-ruby-mode)
+           ("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
+           ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\|pryrc\\)\\'" . enh-ruby-mode))
+    :after lsp-mode
+    :hook (enh-ruby-mode . lsp-deferred)
+    :interpreter "ruby"
+    :init
+    (setq enh-ruby-deep-indent-paren nil
+          enh-ruby-hanging-paren-deep-indent-level 2)
+    :custom
+    (ruby-insert-encoding-magic-comment nil "Not needed in Ruby 2")
+
+    :ensure-system-package (solargraph . "gem install --user-install solargraph"))
+
+  (use-package rbenv
+    :defer t)
+
+  (use-package inf-ruby)
+
+  (use-package seeing-is-believing
+    :hook (enh-ruby-mode . seeing-is-believing)
+    :general
+    (:keymaps 'enh-ruby-mode-map
+              "C-c s" 'seeing-is-believing-run
+              "C-c c" 'seeing-is-believing-clear)))
 
 (when use-rust
   (use-package rustic
