@@ -1686,6 +1686,7 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-completion-enable t)
   (lsp-enable-imenu t)
   (lsp-enable-snippet nil)
+  (lsp-enable-dap-auto-configure nil)
   (lsp-disabled-clients '((python-mode . pyls)))
 
   ;; Rust-analyzer is the almost official lsp server for Rust
@@ -1834,7 +1835,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package dap-mode
   :defer t
-  :after lsp-mode
   :general
   (:keymaps 'lsp-mode-map
             "M-<f5>" 'dap-hydra)
@@ -1843,7 +1843,7 @@ debian, and derivatives). On most it's 'fd'.")
          (dap-terminated . (lambda (&_rest) (dap-hydra/nil))))
 
   :config
-  (dap-auto-configure-mode)
+  (setq dap-auto-configure-features '(sessions locals controls tooltip))
   (message "`dap' loaded"))
 
 (use-package dumb-jump
