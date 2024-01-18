@@ -46,6 +46,7 @@ Literate configuration for init.el.
 - [[#requirements][Requirements]]
 - [[#constants-and-variables][Constants and variables]]
 - [[#packages-initialization-and-configuration][Packages initialization and configuration]]
+- [[#gcmh][GCMH]]
   - [[#emacs-startup-profiler][Emacs startup profiler]]
 - [[#history-and-prescience][History and prescience]]
   - [[#prescient][Prescient]]
@@ -55,13 +56,15 @@ Literate configuration for init.el.
   - [[#set-environment-to-utf-8][Set Environment to UTF-8]]
   - [[#all-the-icons-and-material-icons-for-specific-range][All the icons and material icons for specific range]]
     - [[#all-the-icons-completion][All the icons completion]]
+  - [[#nerd-icons][Nerd-icons]]
+    - [[#nerd-icons-completion][Nerd-icons completion]]
   - [[#ligatures][Ligatures]]
   - [[#ansi-color][Ansi color]]
   - [[#kurecolor][Kurecolor]]
   - [[#emojify][Emojify]]
 - [[#keybindings][Keybindings]]
   - [[#general][General]]
-  - [[#which-key][Which key]]
+  - [[#which-key][Which-key]]
   - [[#selected][Selected]]
   - [[#disabled-god-mode][DISABLED: God mode]]
 - [[#general-utilities][General Utilities]]
@@ -72,6 +75,7 @@ Literate configuration for init.el.
   - [[#crux][Crux]]
   - [[#delete-block][Delete block]]
   - [[#discover-my-major][Discover my major]]
+  - [[#helpful][Helpful]]
   - [[#easy-kill][Easy-kill]]
   - [[#spell-and-grammar-checking][Spell and grammar checking]]
     - [[#flycheck-languagetool][Flycheck Languagetool]]
@@ -85,22 +89,25 @@ Literate configuration for init.el.
   - [[#hide-mode-line][Hide mode line]]
   - [[#whitespace][Whitespace]]
   - [[#window-locking][Window locking]]
+- [[#diredshell][Dired/Shell]]
+  - [[#dired][Dired]]
+  - [[#dirvish][Dirvish]]
+  - [[#dwim-shell-commands][Dwim shell commands]]
 - [[#git][Git]]
   - [[#git-commit][Git commit]]
   - [[#magit][Magit]]
   - [[#magit-todos][Magit todos]]
   - [[#highlight-todo][Highlight todo]]
-  - [[#diff-hl][Diff hl]]
   - [[#git-messenger][Git messenger]]
   - [[#git-timemachine][Git timemachine]]
   - [[#git-modes][Git modes]]
   - [[#code-review][Code review]]
   - [[#ghub][Ghub]]
-- [[#org-mode][Org-mode]]
+- [[#org-mode][Org mode]]
   - [[#main-mode][Main mode]]
+  - [[#org-modern][Org modern]]
   - [[#org-auto-tangle][Org auto tangle]]
-  - [[#disabled-org-ref][DISABLED: Org ref]]
-  - [[#org-bullets][Org bullets]]
+  - [[#disabled-org-ref][DISABLED Org ref]]
   - [[#org-inline-pdf][Org inline pdf]]
   - [[#calfw][Calfw]]
   - [[#calfw-org][Calfw org]]
@@ -109,27 +116,25 @@ Literate configuration for init.el.
   - [[#org-appear][Org appear]]
   - [[#org-roam][Org roam]]
   - [[#org-make-toc][Org make toc]]
-  - [[#org-cv][Org cv]]
-- [[#markdown][Markdown]]
-  - [[#main-mode][Main mode]]
-  - [[#markdown-toc][Markdown toc]]
-  - [[#pandoc][Pandoc]]
-- [[#lsp][Lsp]]
-  - [[#main-mode][Main mode]]
+  - [[#org-cv][Org CV]]
+- [[#lsp][LSP]]
+  - [[#main-mode-0][Main mode]]
   - [[#lsp-ui][Lsp ui]]
   - [[#lsp-treemacs][Lsp treemacs]]
   - [[#consult-lsp][Consult lsp]]
 - [[#prog-mode-utilities][Prog mode utilities]]
+  - [[#prog-mode][Prog-mode]]
   - [[#disabled-highlight-indent-guides][DISABLED: Highlight indent guides]]
   - [[#apheleia][Apheleia]]
-  - [[#dap][Dap]]
+  - [[#dap][DAP]]
+    - [[#main-mode-1][Main mode]]
   - [[#dumb-jump][Dumb jump]]
-  - [[#find-sibling][Find sibling]]
+  - [[#find-sibling][Find-sibling]]
   - [[#fontify-face][Fontify face]]
   - [[#flycheck][Flycheck]]
-    - [[#main-mode][Main mode]]
+    - [[#main-mode-2][Main mode]]
     - [[#flycheck-correct][Flycheck Correct]]
-    - [[#quick-peek][Quick peek]]
+    - [[#quick-peek][Quick Peek]]
     - [[#flycheck-inline][Flycheck inline]]
     - [[#consult-flycheck][Consult flycheck]]
   - [[#hideshow][Hideshow]]
@@ -138,23 +143,22 @@ Literate configuration for init.el.
   - [[#treemacs][Treemacs]]
 - [[#windowsframe-management][Windows/Frame management]]
   - [[#disabled-uniquify][DISABLED Uniquify]]
-  - [[#disabled-frame][DISABLED Frame]]
   - [[#winner][Winner]]
-  - [[#ace-window][Ace-window]]
+  - [[#ace-window][Ace window]]
   - [[#visual-fill-column][Visual fill column]]
   - [[#window-purpose][Window Purpose]]
 - [[#completion][Completion]]
   - [[#vertico][Vertico]]
-    - [[#main-mode][Main mode]]
+    - [[#main-mode-3][Main mode]]
     - [[#vertico-directory][Vertico directory]]
     - [[#vertico-multiform][Vertico multiform]]
   - [[#consult][Consult]]
   - [[#embark][Embark]]
   - [[#corfu][Corfu]]
-    - [[#main-mode][Main mode]]
-    - [[#corfu-popupinfo][Corfu popupinfo]]
-    - [[#corfu-prescient][Corfu prescient]]
-    - [[#kind-icon][Kind icon]]
+    - [[#main-mode-4][Main mode]]
+    - [[#corfu-popupinfo][Corfu-popupinfo]]
+    - [[#corfu-prescient][Corfu-prescient]]
+    - [[#kind-icon][Kind-icon]]
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
   - [[#orderless][Orderless]]
   - [[#cape][Cape]]
@@ -164,7 +168,7 @@ Literate configuration for init.el.
 - [[#gui][GUI]]
   - [[#themes-etc][Themes etc]]
     - [[#doom-theme][Doom theme]]
-  - [[#mode-line][Mode line]]
+  - [[#mode-line][Mode-line]]
     - [[#anzu][Anzu]]
     - [[#doom-modeline][Doom modeline]]
     - [[#minions][Minions]]
@@ -179,45 +183,62 @@ Literate configuration for init.el.
   - [[#solaire][Solaire]]
   - [[#dashboard][Dashboard]]
   - [[#svg-tags][SVG Tags]]
-- [[#eaf][Eaf]]
+- [[#eaf][EAF]]
 - [[#tree-sitter][Tree sitter]]
-  - [[#main-mode][Main mode]]
-  - [[#tree-sitter-folding][Tree sitter folding]]
+  - [[#treesit][Treesit]]
+    - [[#main-mode-5][Main Mode]]
+    - [[#treesit-auto][Treesit-auto]]
+  - [[#tree-sitter-elisp][Tree sitter elisp]]
+    - [[#main-mode-6][Main mode]]
+    - [[#tree-sitter-folding][Tree sitter folding]]
 - [[#programming-languages][Programming languages]]
+  - [[#enabledisable-packages-related-to-languages][Enable/Disable packages related to languages]]
+  - [[#markdown][Markdown]]
+    - [[#main-mode-7][Main mode]]
+    - [[#markdown-toc][Markdown toc]]
+    - [[#pandoc][Pandoc]]
   - [[#dataconfig-formats][Data/Config formats]]
     - [[#conf-mode][Conf mode]]
     - [[#json][Json]]
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
+  - [[#cc][C/C++]]
+    - [[#main-mode-8][Main mode]]
+    - [[#ccls][CCLS]]
   - [[#clojure][Clojure]]
-    - [[#main-mode][Main mode]]
+    - [[#main-mode-9][Main mode]]
     - [[#cider][CIDER]]
   - [[#elisp][Elisp]]
-    - [[#main-mode][Main mode]]
+    - [[#main-mode-10][Main mode]]
     - [[#puni][Puni]]
     - [[#package-lint][Package lint]]
   - [[#elm][Elm]]
   - [[#fsharp][Fsharp]]
   - [[#kotlin][Kotlin]]
+  - [[#java][Java]]
   - [[#latex][LaTeX]]
   - [[#michelson][Michelson]]
   - [[#ocaml][OCaml]]
     - [[#useful-functions][Useful functions]]
-    - [[#main-mode][Main mode]]
+    - [[#main-mode-11][Main mode]]
     - [[#tuareg-menhir][Tuareg Menhir]]
     - [[#dune-commands][Dune commands]]
-  - [[#pdf-files][Pdf-files]]
-    - [[#saveplace-in-pdf][Saveplace-in-pdf]]
+  - [[#pdf-files][Pdf files]]
+    - [[#saveplace-in-pdf][Saveplace in pdf]]
   - [[#python][Python]]
-    - [[#main-mode][Main mode]]
+    - [[#main-mode-12][Main mode]]
     - [[#pyvenv][Pyvenv]]
     - [[#lsp-pyright][Lsp pyright]]
+  - [[#racket][Racket]]
   - [[#reason][Reason]]
-  - [[#rustic][Rustic]]
+  - [[#ruby][Ruby]]
+  - [[#rust][Rust]]
+  - [[#sicp][SICP]]
   - [[#web-modes][Web modes]]
-    - [[#main-mode][Main-mode]]
+    - [[#main-mode-13][Main mode]]
     - [[#css-mode][CSS mode]]
     - [[#simple-httpd][Simple HTTPD]]
+    - [[#beautify][Beautify]]
 - [[#end][End]]
 :END:
 
@@ -261,12 +282,13 @@ Literate configuration for init.el.
 :END:
 
 #+begin_src emacs-lisp
+  (setq elpaca-core-date '(20240116)) ;; This version of Emacs was built on 2024-01-16
   (defvar elpaca-installer-version 0.6)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil
+                                :ref feat/comp-site-lisp
                                 :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                                 :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
@@ -910,6 +932,9 @@ Create a ~#file#~ while waiting for it to be saved and for backup (if emacs cras
 Before this part you shouldn't use any ~use-package~ function since it's not loaded yet.
 
 * GCMH
+:PROPERTIES:
+:CUSTOM_ID: gcmh
+:END:
 
 #+begin_src emacs-lisp
   (use-package gcmh
@@ -1518,6 +1543,9 @@ Better block deletion.
 #+end_src
 
 ** Helpful
+:PROPERTIES:
+:CUSTOM_ID: helpful
+:END:
 
 #+begin_src emacs-lisp
   (use-package helpful
@@ -1873,6 +1901,9 @@ Simple mode to visualize blanks
 #+end_src
 
 ** Window locking
+:PROPERTIES:
+:CUSTOM_ID: window-locking
+:END:
 
 #+begin_src emacs-lisp
   (use-package locked-window-buffer-mode
@@ -1887,8 +1918,14 @@ Simple mode to visualize blanks
 #+end_src
 
 * Dired/Shell
+:PROPERTIES:
+:CUSTOM_ID: diredshell
+:END:
 
 ** Dired
+:PROPERTIES:
+:CUSTOM_ID: dired
+:END:
 
 #+begin_src emacs-lisp
   (use-package dired
@@ -1899,6 +1936,9 @@ Simple mode to visualize blanks
 #+end_src
 
 ** [[https://github.com/alexluigit/dirvish/][Dirvish]]
+:PROPERTIES:
+:CUSTOM_ID: dirvish
+:END:
 
 #+begin_src emacs-lisp
   (use-package dirvish
@@ -1907,6 +1947,9 @@ Simple mode to visualize blanks
 #+end_src
 
 ** Dwim shell commands
+:PROPERTIES:
+:CUSTOM_ID: dwim-shell-commands
+:END:
 
 #+begin_src emacs-lisp
   (use-package dwim-shell-command
@@ -1995,6 +2038,7 @@ Customize ~hl-todo-keyword-faces~ to choose the keywords you want to highlights 
 
 #+begin_src emacs-lisp
   (use-package hl-todo
+    :elpaca (:depth nil)
     :config
     (global-hl-todo-mode 1)
     (message "`hl-todo' loaded"))
@@ -2308,6 +2352,9 @@ Org mode is, well, org mode.
 #+end_src
 
 ** [[https://github.com/minad/org-modern][Org modern]]
+:PROPERTIES:
+:CUSTOM_ID: org-modern
+:END:
 
 #+begin_src emacs-lisp
   (use-package org-modern
@@ -2629,7 +2676,7 @@ Minor mode acting as a client between a language server protocol and emacs.
 
 ** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-0
 :END:
 
 #+begin_src emacs-lisp
@@ -2860,6 +2907,9 @@ TODO: Not working with OCaml
 :END:
 
 ** Prog-mode
+:PROPERTIES:
+:CUSTOM_ID: prog-mode
+:END:
 
 #+begin_src emacs-lisp
   (use-package prog-mode
@@ -2929,6 +2979,9 @@ Asynchronous code formatting after saving files.
 :END:
 
 *** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode-1
+:END:
 Debug Adapter Protocol client for emacs. Need to play a bit with it to know how to use it.
 
 #+begin_src emacs-lisp
@@ -3076,7 +3129,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-2
 :END:
 
 #+begin_src emacs-lisp
@@ -3366,7 +3419,7 @@ Vertico works with the default completion system instead of reimplementing a who
 
 *** [[https://github.com/minad/vertico][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-3
 :END:
 
 #+begin_src emacs-lisp
@@ -3662,6 +3715,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 :END:
 
 *** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode-4
+:END:
 
 #+begin_src emacs-lisp
   (use-package corfu
@@ -3707,8 +3763,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     (corfu-auto-prefix 1)
     (corfu-auto-delay 0)
     (corfu-separator ?\s)
+    ;; (corfu-quit-at-boundary nil)
+    (corfu-on-exact-match nil)
     (corfu-preview-current 'insert)
-    (corfu-preselect-first t)
     (corfu-echo-documentation t)
     (corfu-preview-current nil)    ;; Disable current candidate preview
     (corfu-preselect-first nil)    ;; Disable candidate preselection
@@ -3723,6 +3780,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+end_src
 
 *** Corfu-popupinfo
+:PROPERTIES:
+:CUSTOM_ID: corfu-popupinfo
+:END:
 
 #+begin_src emacs-lisp
   (use-package corfu-popupinfo
@@ -3742,6 +3802,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+end_src
 
 *** Corfu-prescient
+:PROPERTIES:
+:CUSTOM_ID: corfu-prescient
+:END:
 
 #+begin_src emacs-lisp
   (use-package corfu-prescient
@@ -3751,6 +3814,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+end_src
 
 *** Kind-icon
+:PROPERTIES:
+:CUSTOM_ID: kind-icon
+:END:
 
 #+begin_src emacs-lisp
   (use-package kind-icon
@@ -3953,8 +4019,8 @@ Better completions in minibuffers
     ;; Defining capf for specific modes
     (defalias 'cape-?dict+keyword
       (if (or pokemacs/english-dict pokemacs/french-dict)
-          (cape-super-capf #'cape-dict #'cape-keyword)
-        (cape-super-capf #'cape-keyword)))
+          (cape-capf-super #'cape-dict #'cape-keyword)
+        (cape-capf-super #'cape-keyword)))
     :hook
     (git-commit-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword)))
     (text-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword))))
@@ -3995,6 +4061,9 @@ Useful informations added in the minibuffer options
 #+end_src
 
 ** [[https://github.com/minad/tempel][Tempel]]
+:PROPERTIES:
+:CUSTOM_ID: tempel
+:END:
 
 #+begin_src emacs-lisp
   ;; Configure Tempel
@@ -4038,6 +4107,7 @@ Useful informations added in the minibuffer options
 :PROPERTIES:
 :CUSTOM_ID: gui
 :END:
+
 ** Themes etc
 :PROPERTIES:
 :CUSTOM_ID: themes-etc
@@ -4576,8 +4646,14 @@ Will pulse when the focus changes to show where the cursor is.
 :END:
 
 ** Treesit
+:PROPERTIES:
+:CUSTOM_ID: treesit
+:END:
 
 *** Main Mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode-5
+:END:
 
 #+begin_src emacs-lisp
   (use-package treesit
@@ -4585,6 +4661,9 @@ Will pulse when the focus changes to show where the cursor is.
 #+end_src
 
 *** Treesit-auto
+:PROPERTIES:
+:CUSTOM_ID: treesit-auto
+:END:
 
 #+begin_src emacs-lisp
   (use-package treesit-auto
@@ -4597,12 +4676,15 @@ Will pulse when the focus changes to show where the cursor is.
 #+end_src
 
 ** Tree sitter elisp
+:PROPERTIES:
+:CUSTOM_ID: tree-sitter-elisp
+:END:
 
 Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP use incremental compilation to give useful informations about programs, tree-sitter use incremental parsing of current buffer to help with syntax highlighting, code folding etc.
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-6
 :END:
 
 #+begin_src emacs-lisp
@@ -4664,6 +4746,9 @@ Code folding based on tree-sitter tree.
 :END:
 
 ** Enable/Disable packages related to languages
+:PROPERTIES:
+:CUSTOM_ID: enabledisable-packages-related-to-languages
+:END:
 
 #+begin_src emacs-lisp
   (defgroup pokemacs-languages nil
@@ -4775,7 +4860,7 @@ Code folding based on tree-sitter tree.
 
 **** [[https://github.com/jrblevin/markdown-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-7
 :END:
 
 #+begin_src emacs-lisp
@@ -4934,8 +5019,14 @@ Library for parsing and generating JSON
 #+end_src
 
 ** C/C++
+:PROPERTIES:
+:CUSTOM_ID: cc
+:END:
 
 *** Main mode
+:PROPERTIES:
+:CUSTOM_ID: main-mode-8
+:END:
 
 #+begin_src emacs-lisp
   (use-package cc-mode
@@ -4946,6 +5037,9 @@ Library for parsing and generating JSON
 #+end_src
 
 *** [[https://github.com/MaskRay/ccls][CCLS]]
+:PROPERTIES:
+:CUSTOM_ID: ccls
+:END:
 
 #+begin_src emacs-lisp
   (use-package ccls
@@ -5005,7 +5099,7 @@ Library for parsing and generating JSON
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-9
 :END:
 
 #+begin_src emacs-lisp
@@ -5035,7 +5129,7 @@ Library for parsing and generating JSON
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-10
 :END:
 
 #+begin_src emacs-lisp
@@ -5086,7 +5180,7 @@ Library for parsing and generating JSON
       :defer t
       :general
       (:keymaps 'elm-mode-map
-       "<backtab>" 'elm-indent-cycle)
+       "<tab>" 'elm-indent-cycle)
       :config (message "`elm-mode' loaded"))
 
     (use-package haskell-mode
@@ -5129,6 +5223,9 @@ Library for parsing and generating JSON
 #+end_src
 
 ** Java
+:PROPERTIES:
+:CUSTOM_ID: java
+:END:
 
 #+begin_src emacs-lisp
   (when use-java
@@ -5148,7 +5245,16 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 #+begin_src emacs-lisp
   (when use-latex
     (use-package tex-site
-      :elpaca auctex
+      :elpaca (auctex :pre-build
+                      (("./autogen.sh")
+                       ("./configure"
+                        "--without-texmf-dir"
+                        "--with-packagelispdir=./"
+                        "--with-packagedatadir=./")
+                       ("make"))
+                      :build (:not elpaca--compile-info) ;; Make will take care of this step
+                      :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
+                      :version (lambda (_) (require 'tex-site) AUCTeX-version))
       :mode ("\\.tex\\'" . latex-mode)
       :hook
       (LaTeX-mode . LaTeX-math-mode)
@@ -5336,7 +5442,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 
 *** [[https://github.com/ocaml/tuareg][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-11
 :END:
 
 #+begin_src emacs-lisp
@@ -5558,7 +5664,7 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 
 *** [[https://gitlab.com/python-mode-devs/python-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-12
 :END:
 
 #+begin_src emacs-lisp
@@ -5633,6 +5739,9 @@ Read the docs for the different variables set in the config.
 #+end_src
 
 ** Racket
+:PROPERTIES:
+:CUSTOM_ID: racket
+:END:
 
 #+begin_src emacs-lisp
   (when use-racket
@@ -5687,6 +5796,9 @@ Some people use this, not my responsibility.
 #+end_src
 
 ** Ruby
+:PROPERTIES:
+:CUSTOM_ID: ruby
+:END:
 
 #+begin_src emacs-lisp
   (when use-ruby
@@ -5844,6 +5956,9 @@ Some people use this, not my responsibility.
 #+end_src
 
 ** SICP
+:PROPERTIES:
+:CUSTOM_ID: sicp
+:END:
 
 #+begin_src emacs-lisp
   (when use-sicp
@@ -5857,7 +5972,7 @@ Some people use this, not my responsibility.
 
 *** [[https://github.com/fxbois/web-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode
+:CUSTOM_ID: main-mode-13
 :END:
 
 #+begin_src emacs-lisp
@@ -5895,6 +6010,9 @@ Some people use this, not my responsibility.
 #+end_src
 
 *** Beautify
+:PROPERTIES:
+:CUSTOM_ID: beautify
+:END:
 
 #+begin_src emacs-lisp
   (use-package web-beautify

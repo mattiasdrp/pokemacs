@@ -19,12 +19,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
+(setq elpaca-core-date '(20240116)) ;; This version of Emacs was built on 2024-01-16
 (defvar elpaca-installer-version 0.6)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil
+                              :ref feat/comp-site-lisp
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                               :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
@@ -1132,6 +1133,7 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`magit-todos' loaded")))
 
 (use-package hl-todo
+  :elpaca (:depth nil)
   :config
   (global-hl-todo-mode 1)
   (message "`hl-todo' loaded"))
@@ -2392,8 +2394,9 @@ with a prefix ARG."
   (corfu-auto-prefix 1)
   (corfu-auto-delay 0)
   (corfu-separator ?\s)
+  ;; (corfu-quit-at-boundary nil)
+  (corfu-on-exact-match nil)
   (corfu-preview-current 'insert)
-  (corfu-preselect-first t)
   (corfu-echo-documentation t)
   (corfu-preview-current nil)    ;; Disable current candidate preview
   (corfu-preselect-first nil)    ;; Disable candidate preselection
@@ -2603,8 +2606,8 @@ with a prefix ARG."
   ;; Defining capf for specific modes
   (defalias 'cape-?dict+keyword
     (if (or pokemacs/english-dict pokemacs/french-dict)
-        (cape-super-capf #'cape-dict #'cape-keyword)
-      (cape-super-capf #'cape-keyword)))
+        (cape-capf-super #'cape-dict #'cape-keyword)
+      (cape-capf-super #'cape-keyword)))
   :hook
   (git-commit-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword)))
   (text-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword))))
@@ -3385,7 +3388,7 @@ with a prefix ARG."
     :defer t
     :general
     (:keymaps 'elm-mode-map
-     "<backtab>" 'elm-indent-cycle)
+     "<tab>" 'elm-indent-cycle)
     :config (message "`elm-mode' loaded"))
 
   (use-package haskell-mode
@@ -3420,7 +3423,16 @@ with a prefix ARG."
 
 (when use-latex
   (use-package tex-site
-    :elpaca auctex
+    :elpaca (auctex :pre-build
+                    (("./autogen.sh")
+                     ("./configure"
+                      "--without-texmf-dir"
+                      "--with-packagelispdir=./"
+                      "--with-packagedatadir=./")
+                     ("make"))
+                    :build (:not elpaca--compile-info) ;; Make will take care of this step
+                    :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
+                    :version (lambda (_) (require 'tex-site) AUCTeX-version))
     :mode ("\\.tex\\'" . latex-mode)
     :hook
     (LaTeX-mode . LaTeX-math-mode)
