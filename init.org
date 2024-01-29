@@ -35,6 +35,7 @@ Literate configuration for init.el.
   - [[#ask-yn-instead-of-yesno][Ask y/n instead of yes/no]]
   - [[#default-values][Default values]]
   - [[#start-emacs-as-a-server][Start emacs as a server]]
+  - [[#repeat-mode][Repeat-mode]]
   - [[#prettifying][Prettifying]]
   - [[#revert-files-when-they-changed][Revert files when they changed]]
   - [[#show-parenthesis][Show parenthesis]]
@@ -288,7 +289,7 @@ Literate configuration for init.el.
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref feat/comp-site-lisp
+                                :ref nil
                                 :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                                 :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
@@ -749,6 +750,16 @@ If you experience stuttering, increase this.
 #+begin_src emacs-lisp
   (require 'server)
   (unless (server-running-p) (server-start))
+#+end_src
+
+** Repeat-mode
+:PROPERTIES:
+:CUSTOM_ID: repeat-mode
+:END:
+
+#+begin_src emacs-lisp
+  ;; Allows to repeat just one key to allow shorter key sequences
+  (repeat-mode t)
 #+end_src
 
 ** Prettifying
@@ -3958,7 +3969,29 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     ;; Enable recursive minibuffers
     (setq enable-recursive-minibuffers t)
     ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
-    :config (message "`emacs' loaded"))
+    (defun mdrp/highlight-selected-window (_)
+      "Highlight selected window with a different background color."
+      (with-current-buffer (window-buffer (selected-window))
+        (buffer-face-set `(:background ,(face-attribute 'match :background)))
+        (run-with-timer 0.1 nil #'buffer-face-set 'default)))
+    (advice-add 'windmove-left :after #'mdrp/highlight-selected-window)
+    (advice-add 'windmove-right :after #'mdrp/highlight-selected-window)
+    (advice-add 'windmove-up :after #'mdrp/highlight-selected-window)
+    (advice-add 'windmove-down :after #'mdrp/highlight-selected-window)
+    :config
+    (defvar window-navigation-repeat-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "<left>") #'windmove-left)
+        (define-key map (kbd "<right>") #'windmove-right)
+        (define-key map (kbd "<up>") #'windmove-up)
+        (define-key map (kbd "<down>") #'windmove-down)
+        map)
+      "Keymap to repeat window navigation key sequences.  Used in `repeat-mode'.")
+    (put 'windmove-left 'repeat-map 'window-navigation-repeat-map)
+    (put 'windmove-right 'repeat-map 'window-navigation-repeat-map)
+    (put 'windmove-up 'repeat-map 'window-navigation-repeat-map)
+    (put 'windmove-down 'repeat-map 'window-navigation-repeat-map)
+    (message "`emacs' loaded"))
 #+end_src
 
 ** [[https://github.com/oantolin/orderless][Orderless]]

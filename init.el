@@ -25,7 +25,7 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref feat/comp-site-lisp
+                              :ref nil
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
                               :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
@@ -373,6 +373,9 @@ or nil if you don't want to use an english dictionary"
 
 (require 'server)
 (unless (server-running-p) (server-start))
+
+;; Allows to repeat just one key to allow shorter key sequences
+(repeat-mode t)
 
 (global-prettify-symbols-mode t)
 (prettify-symbols-mode)
@@ -2561,7 +2564,29 @@ with a prefix ARG."
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t)
   ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
-  :config (message "`emacs' loaded"))
+  (defun mdrp/highlight-selected-window (_)
+    "Highlight selected window with a different background color."
+    (with-current-buffer (window-buffer (selected-window))
+      (buffer-face-set `(:background ,(face-attribute 'match :background)))
+      (run-with-timer 0.1 nil #'buffer-face-set 'default)))
+  (advice-add 'windmove-left :after #'mdrp/highlight-selected-window)
+  (advice-add 'windmove-right :after #'mdrp/highlight-selected-window)
+  (advice-add 'windmove-up :after #'mdrp/highlight-selected-window)
+  (advice-add 'windmove-down :after #'mdrp/highlight-selected-window)
+  :config
+  (defvar window-navigation-repeat-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "<left>") #'windmove-left)
+      (define-key map (kbd "<right>") #'windmove-right)
+      (define-key map (kbd "<up>") #'windmove-up)
+      (define-key map (kbd "<down>") #'windmove-down)
+      map)
+    "Keymap to repeat window navigation key sequences.  Used in `repeat-mode'.")
+  (put 'windmove-left 'repeat-map 'window-navigation-repeat-map)
+  (put 'windmove-right 'repeat-map 'window-navigation-repeat-map)
+  (put 'windmove-up 'repeat-map 'window-navigation-repeat-map)
+  (put 'windmove-down 'repeat-map 'window-navigation-repeat-map)
+  (message "`emacs' loaded"))
 
 (use-package orderless
   :defer t
