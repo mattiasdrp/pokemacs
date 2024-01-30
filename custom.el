@@ -39,6 +39,7 @@
  '(lsp-auto-guess-root nil)
  '(lsp-java-completion-lazy-resolve-text-edit-enabled t)
  '(lsp-java-format-enabled nil)
+ '(pokemacs-repeat-timeout 0.5)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(pokemacs-theme 'doom-solarized-dark)
  '(pokemacs/english-dict "GB")

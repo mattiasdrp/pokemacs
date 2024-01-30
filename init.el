@@ -153,6 +153,19 @@ Similar to Vim's separation of command/insert modes"
   :type 'boolean
   :tag "󰡃 Window Purpose")
 
+;; Custom values
+
+(defgroup pokemacs-values nil
+  "Pokemacs values options."
+  :group 'pokemacs
+  :tag "Values")
+
+(defcustom pokemacs-repeat-timeout 0.5
+  "Time before repeat-mode exits."
+  :group 'pokemacs-values
+  :type 'integer
+  :tag "Repeat")
+
 ;; Themes
 
 (defgroup pokemacs-appearance nil
@@ -375,7 +388,16 @@ or nil if you don't want to use an english dictionary"
 (unless (server-running-p) (server-start))
 
 ;; Allows to repeat just one key to allow shorter key sequences
-(repeat-mode t)
+(use-package repeat
+  :elpaca nil
+  :demand nil
+  :defer nil
+  :init (repeat-mode t)
+  :config
+  (setopt repeat-exit-timeout nil)
+  (defun mdrp/set-repeat-exit-timeout (list)
+    (dolist (command list)
+      (put command 'repeat-exit-timeout pokemacs-repeat-timeout))))
 
 (global-prettify-symbols-mode t)
 (prettify-symbols-mode)
@@ -621,11 +643,7 @@ debian, and derivatives). On most it's 'fd'.")
    "C-<tab>"                 'dabbrev-expand
    "C-n"                     'next-error
    "C-p"                     'previous-error
-   ;; windmove
-   "C-x <left>"              'windmove-left
-   "C-x <right>"             'windmove-right
-   "C-x <up>"                'windmove-up
-   "C-x <down>"              'windmove-down
+
    "C-x C-o"                 'ace-window
 
    ;; rotate buffers and window arrangements
@@ -2574,19 +2592,24 @@ with a prefix ARG."
   (advice-add 'windmove-up :after #'mdrp/highlight-selected-window)
   (advice-add 'windmove-down :after #'mdrp/highlight-selected-window)
   :config
-  (defvar window-navigation-repeat-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "<left>") #'windmove-left)
-      (define-key map (kbd "<right>") #'windmove-right)
-      (define-key map (kbd "<up>") #'windmove-up)
-      (define-key map (kbd "<down>") #'windmove-down)
-      map)
-    "Keymap to repeat window navigation key sequences.  Used in `repeat-mode'.")
-  (put 'windmove-left 'repeat-map 'window-navigation-repeat-map)
-  (put 'windmove-right 'repeat-map 'window-navigation-repeat-map)
-  (put 'windmove-up 'repeat-map 'window-navigation-repeat-map)
-  (put 'windmove-down 'repeat-map 'window-navigation-repeat-map)
   (message "`emacs' loaded"))
+
+(use-package windmove
+  :elpaca nil
+  :general
+  ;; windmove
+  ("C-x <left>"              'windmove-left)
+  ("C-x <right>"             'windmove-right)
+  ("C-x <up>"                'windmove-up)
+  ("C-x <down>"              'windmove-down)
+  :bind
+  (:repeat-map mdrp/windmove-navigation-repeat-map
+               ("<left>" . 'windmove-left)
+               ("<right>" . 'windmove-right)
+               ("<up>" . 'windmove-up)
+               ("<down>" . 'windmove-down))
+  :config
+  (mdrp/set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
 
 (use-package orderless
   :defer t
