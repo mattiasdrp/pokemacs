@@ -138,6 +138,7 @@ Literate configuration for init.el.
     - [[#quick-peek][Quick Peek]]
     - [[#flycheck-inline][Flycheck inline]]
     - [[#consult-flycheck][Consult flycheck]]
+    - [[#flycheck-rust][Flycheck Rust]]
   - [[#hideshow][Hideshow]]
   - [[#projectile][Projectile]]
   - [[#separedit][Separedit]]
@@ -161,6 +162,7 @@ Literate configuration for init.el.
     - [[#corfu-prescient][Corfu-prescient]]
     - [[#kind-icon][Kind-icon]]
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
+  - [[#windmove][Windmove]]
   - [[#orderless][Orderless]]
   - [[#cape][Cape]]
   - [[#marginalia][Marginalia]]
@@ -2992,6 +2994,7 @@ Asynchronous code formatting after saving files.
     (python-mode   . apheleia-mode)
     (enh-ruby-mode . apheleia-mode)
     (rustic-mode   . apheleia-mode)
+    (rust-ts-mode  . apheleia-mode)
     (tuareg-mode   . apheleia-mode)
     :config
     (setf (alist-get 'isort apheleia-formatters)
@@ -3239,6 +3242,16 @@ On the fly syntax checking. One of the greatest package there is for making prog
     :general
     ("C-c l" 'consult-flycheck)
     :config (message "`consult-flycheck' loaded"))
+#+end_src
+
+*** [[https://github.com/flycheck/flycheck-rust][Flycheck Rust]]
+:PROPERTIES:
+:CUSTOM_ID: flycheck-rust
+:END:
+
+#+begin_src emacs-lisp
+  (use-package flycheck-rust
+    :hook (flycheck-mode . (lambda () (flycheck-rust-setup))))
 #+end_src
 
 ** [[https://www.emacswiki.org/emacs/HideShow][Hideshow]]
@@ -4001,6 +4014,9 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+end_src
 
 ** Windmove
+:PROPERTIES:
+:CUSTOM_ID: windmove
+:END:
 
 #+begin_src emacs-lisp
   (use-package windmove

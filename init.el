@@ -1847,6 +1847,7 @@ debian, and derivatives). On most it's 'fd'.")
   (python-mode   . apheleia-mode)
   (enh-ruby-mode . apheleia-mode)
   (rustic-mode   . apheleia-mode)
+  (rust-ts-mode  . apheleia-mode)
   (tuareg-mode   . apheleia-mode)
   :config
   (setf (alist-get 'isort apheleia-formatters)
@@ -2016,6 +2017,9 @@ have one rule for each file type."
   :general
   ("C-c l" 'consult-flycheck)
   :config (message "`consult-flycheck' loaded"))
+
+(use-package flycheck-rust
+  :hook (flycheck-mode . (lambda () (flycheck-rust-setup))))
 
 (use-package hideshow
   :defer t
