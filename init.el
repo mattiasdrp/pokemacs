@@ -1725,6 +1725,7 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-rust-analyzer-display-reborrow-hints nil)
   (lsp-ui-peek-find-references nil (list :folders (vector (projectile-project-root))))
   :config
+
   (defvar mdrp/type-map
     (let ((keymap (make-sparse-keymap)))
       (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
@@ -1761,14 +1762,17 @@ debian, and derivatives). On most it's 'fd'.")
           (message "Copied %s to kill-ring" contents)
           (kill-new contents)
           ))))
+
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
   (lsp-enable-which-key-integration t)
+
   (lsp-register-client
    (make-lsp-client
     :new-connection (lsp-stdio-connection
                      '("opam" "exec" "--" "ocamllsp"))
     :major-modes '(caml-mode tuareg-mode)
     :server-id 'ocaml-lsp-server))
+
   (message "`lsp' loaded"))
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
@@ -3116,7 +3120,7 @@ with a prefix ARG."
   :config (message "`tree-sitter-langs' loaded"))
 
 (use-package tree-sitter
-  :defer t
+  :demand t
   :hook
   (tree-sitter-after-on . tree-sitter-hl-mode)
   :config
@@ -3128,6 +3132,7 @@ with a prefix ARG."
   :config (message "`tree-sitter' loaded"))
 
 (use-package ts-fold
+  :disabled
   :elpaca (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
   :defer t
   :hook
@@ -3141,6 +3146,7 @@ with a prefix ARG."
   :config (message "`ts-fold' loaded"))
 
 (use-package ts-fold-indicators
+  :disabled
   :load-path "lisp/ts-fold/"
   :elpaca nil
   :defer t
@@ -3616,40 +3622,6 @@ with a prefix ARG."
       (set-window-point (get-buffer-window buffer) (point))
       (message "Window Point %S" (window-point (get-buffer-window buffer))))))
 
-(defvar mdrp/dune-history nil
-  "The history list for dune watch builds.")
-
-;; TODO: This function should be its own package
-(defun mdrp/dune-watch ()
-  "Will call dune build -w BUILD on an async process."
-  (interactive)
-  (cond
-   ((and-let* ((window (get-buffer-window "*dune watch*")))
-      (aw-switch-to-window window)))
-   ((and-let* ((buffer (get-buffer "*dune watch*")))
-      (with-current-buffer buffer
-        (with-selected-window
-            (display-buffer-at-bottom (current-buffer)
-                                      '((window-height . 0.2)))
-          (set-window-dedicated-p (selected-window) t)
-          (compilation-minor-mode t)))))
-   ((let ((build (read-from-minibuffer "Build name: " nil nil nil 'mdrp/dune-history))
-          (buffer (get-buffer-create "*dune watch*"))
-          (inhibit-read-only t))
-      (with-current-buffer buffer
-        (projectile-run-async-shell-command-in-root (concat "dune build -w " build) buffer)
-        ;; Make this process non blocking for killing
-        ;; (defun mdrp/erase-and-fill-buffer-no-lambda ()
-        ;;   "Wrapper to avoid using lambda"
-        ;;   (mdrp/erase-and-fill-buffer buffer))
-        ;; (add-hook 'after-save-hook #'mdrp/erase-and-fill-buffer-no-lambda)
-        (with-selected-window
-            (display-buffer-at-bottom (current-buffer)
-                                      '((window-height . 0.2)))
-          (set-window-dedicated-p (selected-window) t)
-          (compilation-minor-mode t))
-        (set-process-query-on-exit-flag (get-buffer-process buffer) nil))))))
-
 (when use-ocaml
 
   (defcustom mdrp/ocaml-templates
@@ -3728,9 +3700,8 @@ with a prefix ARG."
         (add-hook 'post-command-hook 'mdrp/update-load-path-opam)
         ))
     (unless (version< emacs-version "29")
-      (message" unbind c-c c-a")
-      (general-unbind tuareg-mode-map
-        "C-c C-a")
+      (message "unbind c-c c-a")
+      (general-unbind tuareg-mode-map "C-c C-a")
       (let* ((l '(
                   (".mli" . ".ml")
                   (".mli" . ".mll")
@@ -3809,6 +3780,12 @@ with a prefix ARG."
     :defer t
     :hook (tuareg-mode . dune-minor-mode)
     :config (message "`dune-minor' loaded")))
+
+(use-package ocaml-utils-mode
+  :elpaca (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
+  :hook (tuareg-mode . ocaml-utils-mode)
+  ;; :load-path "~/ocaml-utils-mode/"
+  )
 
 (use-package pdf-tools
   :defer t
