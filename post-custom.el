@@ -18,7 +18,7 @@
 ;;; Code:
 
 (use-package smtpmail
-  :elpaca nil
+  :ensure nil
   :ensure-system-package msmtp)
 
 (load-file (expand-file-name "~/mu4e/mu4e.el"))

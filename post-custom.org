@@ -146,7 +146,7 @@ For WSL see [[https://www.39digits.com/signed-git-commits-on-wsl2-using-visual-s
 
 #+BEGIN_SRC emacs-lisp
   (use-package smtpmail
-    :elpaca nil
+    :ensure nil
     :ensure-system-package msmtp)
 
   (load-file (expand-file-name "~/mu4e/mu4e.el"))

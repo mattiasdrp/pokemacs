@@ -19,37 +19,37 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(setq elpaca-core-date '(20240116)) ;; This version of Emacs was built on 2024-01-16
+(setq elpaca-core-date '(20240227))
 (defvar elpaca-installer-version 0.6)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
+      :ref nil
+      :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+      :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
+ (build (expand-file-name "elpaca/" elpaca-builds-directory))
+ (order (cdr elpaca-order))
+ (default-directory repo))
   (add-to-list 'load-path (if (file-exists-p build) build repo))
   (unless (file-exists-p repo)
     (make-directory repo t)
     (when (< emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
-        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (call-process "git" nil buffer t "clone"
-                                       (plist-get order :repo) repo)))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                                       (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
-            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-          (error "%s" (with-current-buffer buffer (buffer-string))))
-      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+     ((zerop (call-process "git" nil buffer t "clone"
+         (plist-get order :repo) repo)))
+     ((zerop (call-process "git" nil buffer t "checkout"
+         (or (plist-get order :ref) "--"))))
+     (emacs (concat invocation-directory invocation-name))
+     ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+         "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+     ((require 'elpaca))
+     ((elpaca-generate-autoloads "elpaca" repo)))
+      (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+    (error "%s" (with-current-buffer buffer (buffer-string))))
+((error) (warn "%s" err) (delete-directory repo 'recursive))))
   (unless (require 'elpaca-autoloads nil t)
     (require 'elpaca)
     (elpaca-generate-autoloads "elpaca" repo)
@@ -61,9 +61,9 @@
 (elpaca bind-key)
 
 (elpaca elpaca-use-package
-        ;; Enable :elpaca use-package keyword.
+        ;; Enable :ensure use-package keyword.
         (elpaca-use-package-mode)
-        ;; Assume :elpaca t unless otherwise specified.
+        ;; Assume :ensure t unless otherwise specified.
         (setq elpaca-use-package-by-default t))
 
 (elpaca-wait)
@@ -76,7 +76,7 @@
    use-package-enable-imenu-support t))
 
 (use-package use-package-ensure-system-package
-  :elpaca nil
+  ;; :ensure nil
   :config (message "`use-package-ensure-system-package' loaded"))
 
 (setq byte-compile-warnings '(cl-functions))
@@ -389,7 +389,7 @@ or nil if you don't want to use an english dictionary"
 
 ;; Allows to repeat just one key to allow shorter key sequences
 (use-package repeat
-  :elpaca nil
+  :ensure nil
   :demand nil
   :defer nil
   :init (repeat-mode t)
@@ -487,7 +487,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`prescient' loaded"))
 
 (use-package savehist
-  :elpaca nil
+  :ensure nil
   :init
   (savehist-mode t)
   ;; Remember recently opened files
@@ -589,7 +589,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`ligature' loaded"))
 
 (use-package ansi-color
-  :elpaca nil
+  :ensure nil
   :hook
   (shell-mode . ansi-color-for-comint-mode-on)
   :config (message "`ansi-color' loaded"))
@@ -827,7 +827,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package delete-block
   :load-path "lisp/"
-  :elpaca nil
+  :ensure nil
   :defer t
   :general
   ("C-d"                     'delete-block-forward)
@@ -860,7 +860,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package flycheck-languagetool
   :defer t
-  :elpaca (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
+  :ensure (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
   :hook ((text-mode . flycheck-languagetool-setup)
          (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
                        (require 'flycheck-languagetool)
@@ -874,7 +874,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`flycheck-languagetool' loaded"))
 
 (use-package flyspell
-  :elpaca nil
+  :ensure nil
   :init
   (defconst aspell-dicts-dumps
     (file-name-as-directory (no-littering-expand-etc-file-name "aspell-dicts-dumps/")))
@@ -1066,7 +1066,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hide-region
   :load-path "lisp/"
-  :elpaca nil
+  :ensure nil
   :commands hide-region-pin
   :defer t
   :general
@@ -1078,7 +1078,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`hide-mode-line loaded"))
 
 (use-package whitespace
-  :elpaca nil
+  :ensure nil
   :defer t
   :hook
   (prog-mode . whitespace-mode)
@@ -1088,7 +1088,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`whitespace loaded"))
 
 (use-package locked-window-buffer-mode
-  :elpaca nil
+  :ensure nil
   :general ("M-l"    'locked-window-buffer-mode))
 
 
@@ -1098,7 +1098,7 @@ debian, and derivatives). On most it's 'fd'.")
   (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
 
 (use-package dired
-  :elpaca nil
+  :ensure nil
   :general
   (:keymaps 'dired-mode-map
             "DEL" 'dired-up-directory))
@@ -1108,7 +1108,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (dirvish-override-dired-mode))
 
 (use-package dwim-shell-command
-  :elpaca (dwim-shell-command :files (:defaults "*.el"))
+  :ensure (dwim-shell-command :files (:defaults "*.el"))
   :general
   ([remap shell-command]   'dwim-shell-command)
   (:keymaps 'dired-mode-map
@@ -1154,7 +1154,7 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`magit-todos' loaded")))
 
 (use-package hl-todo
-  :elpaca (:depth nil)
+  :ensure (:depth nil)
   :config
   (global-hl-todo-mode 1)
   (message "`hl-todo' loaded"))
@@ -1188,13 +1188,13 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`ghub' loaded"))
 
 (use-package org-protocol
-  :elpaca nil
+  :ensure nil
   :defer t
   :config
   (message "`org-protocol' loaded"))
 
 (use-package ox
-  :elpaca nil
+  :ensure nil
   :defer t
   :mode ("\\.org\\'" . org-mode)
   :init
@@ -1217,11 +1217,11 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ob-rust :defer t)
 
 (use-package ob-racket
-  :elpaca (:type git :host github :repo "hasu/emacs-ob-racket"))
+  :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
 (use-package org
   :defer t
-  :elpaca nil
+  :ensure nil
   :mode ("\\.org\\'" . org-mode)
   :hook (org-mode . mixed-pitch-mode)
   :after ob-racket
@@ -1454,7 +1454,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package calfw-org
   :defer t
   :after calfw
-  :elpaca nil
+  :ensure nil
   :init
   (define-prefix-command 'mdrp-calfw-map nil "Cal-")
   :general
@@ -1607,13 +1607,13 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package ox-awesomecv
   :load-path "lisp/org-cv/"
-  :elpaca nil
+  :ensure nil
   :after org
   :config (message "`ox-awesomecv' loaded"))
 
 (use-package ox-moderncv
   :load-path "lisp/org-cv/"
-  :elpaca nil
+  :ensure nil
   :after org
   :config (message "`ox-moderncv' loaded"))
 
@@ -1819,7 +1819,7 @@ debian, and derivatives). On most it's 'fd'.")
   :disabled)
 
 (use-package prog-mode
-  :elpaca nil
+  :ensure nil
   :init
   (defun mdrp/clear-compilation-finish-functions ()
     (setq compilation-finish-functions nil))
@@ -1992,7 +1992,7 @@ have one rule for each file type."
 
 (use-package flycheck-correct
   :load-path "lisp/"
-  :elpaca nil
+  :ensure nil
   :defer t
   :hook flycheck-mode
   :general
@@ -2027,7 +2027,7 @@ have one rule for each file type."
 
 (use-package hideshow
   :defer t
-  :elpaca nil
+  :ensure nil
   :hook (prog-mode . (lambda ()
                        (unless (eq major-mode 'tree-sitter-query-mode)
                          (hs-minor-mode))))
@@ -2085,7 +2085,7 @@ with a prefix ARG."
   (message "`uniquify' loaded"))
 
 (use-package winner
-  :elpaca nil
+  :ensure nil
   :custom
   (winner-boring-buffers
    '("*Completions*"
@@ -2137,7 +2137,7 @@ with a prefix ARG."
     (message "`window-purpose' loaded")))
 
 (use-package vertico
-  :elpaca (vertico :files (:defaults "extensions/*"))
+  :ensure (vertico :files (:defaults "extensions/*"))
   :defer t
   :after general
   :init
@@ -2183,7 +2183,7 @@ with a prefix ARG."
 
 (use-package vertico-directory
   :after vertico
-  :elpaca nil
+  :ensure nil
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
   ;; More convenient directory navigation commands
   :general
@@ -2196,7 +2196,7 @@ with a prefix ARG."
 
 (use-package vertico-multiform
   :after vertico
-  :elpaca nil
+  :ensure nil
   :defer t
   :custom
   (vertico-buffer-display-action '(display-buffer-in-side-window
@@ -2381,7 +2381,7 @@ with a prefix ARG."
   (message "`embark-consult' loaded"))
 
 (use-package corfu
-  :elpaca (corfu :files (:defaults "extensions/*"))
+  :ensure (corfu :files (:defaults "extensions/*"))
   :defer t
   :init
   ;; Function definitions
@@ -2439,7 +2439,7 @@ with a prefix ARG."
   (message "`corfu' loaded"))
 
 (use-package corfu-popupinfo
-  :elpaca nil
+  :ensure nil
   :after corfu
   :hook (corfu-mode . corfu-popupinfo-mode)
   :general
@@ -2558,7 +2558,7 @@ with a prefix ARG."
 
 (use-package emacs
   :defer t
-  :elpaca nil
+  :ensure nil
   :init
   ;; FRINGE
   ;; UI: the gutter looks less cramped with some space between it and  buffer.
@@ -2603,7 +2603,7 @@ with a prefix ARG."
   (message "`emacs' loaded"))
 
 (use-package windmove
-  :elpaca nil
+  :ensure nil
   :general
   ;; windmove
   ("C-x <left>"              'windmove-left)
@@ -2823,8 +2823,8 @@ with a prefix ARG."
   ;; remove the modes from `doom-modeline-continuous-word-count-modes'.
   (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
 
-  ;; If non-nil, only display one number for checker information if applicable.
-  (doom-modeline-checker-simple-format nil)
+  ;; If non-nil, only display one number for check information if applicable.
+  (doom-modeline-check-simple-format nil)
 
   ;; The maximum number displayed for notifications.
   (doom-modeline-number-limit 99)
@@ -2870,11 +2870,11 @@ with a prefix ARG."
   ;; Define your custom doom-modeline
   (doom-modeline-def-modeline 'mdrp/no-lsp-line
     '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-    '(misc-info persp-name grip debug minor-modes major-mode process vcs checker))
+    '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
 
   (doom-modeline-def-modeline 'mdrp/lsp-line
     '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-    '(misc-info persp-name grip debug minor-modes major-mode process vcs checker))
+    '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
 
   ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
   (setq doom-modeline-fn-alist
@@ -2923,7 +2923,7 @@ with a prefix ARG."
   :config (message "`minions' loaded"))
 
 (use-package outline
-  :elpaca nil
+  :ensure nil
   :general
   ("C-o" 'cm-map)
   (:keymaps 'cm-map
@@ -2956,7 +2956,7 @@ with a prefix ARG."
   (message "`outline' loaded"))
 
 (use-package outline-minor
-  :elpaca nil
+  :ensure nil
   :defer t
   :hook (prog-mode . outline-minor-mode)
   :config (message "`outline-minor' loaded"))
@@ -2972,7 +2972,7 @@ with a prefix ARG."
 (use-package pretty-outlines
   :defer t
   :load-path "lisp/"
-  :elpaca nil
+  :ensure nil
   :hook (
          (outline-mode . pretty-outlines-set-display-table)
          (outline-minor-mode . pretty-outlines-set-display-table)
@@ -3078,7 +3078,7 @@ with a prefix ARG."
 (when use-eaf
   (use-package eaf
     :load-path "lisp/emacs-application-framework"
-    :elpaca nil
+    :ensure nil
     :defer t
     :custom
     ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
@@ -3104,7 +3104,7 @@ with a prefix ARG."
     (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
 (use-package treesit
-  :elpaca nil)
+  :ensure nil)
 
 (use-package treesit-auto
   :after treesit
@@ -3133,7 +3133,7 @@ with a prefix ARG."
 
 (use-package ts-fold
   :disabled
-  :elpaca (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
+  :ensure (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
   :defer t
   :hook
   (tuareg-mode . ts-fold-mode)
@@ -3148,7 +3148,7 @@ with a prefix ARG."
 (use-package ts-fold-indicators
   :disabled
   :load-path "lisp/ts-fold/"
-  :elpaca nil
+  :ensure nil
   :defer t
   :hook
   (tree-sitter-after-on . ts-fold-indicators-mode)
@@ -3260,7 +3260,7 @@ with a prefix ARG."
 
 (when use-markdown
   (use-package markdown-mode
-    :elpaca nil
+    :ensure nil
     :defer t
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'"       . markdown-mode)
@@ -3287,7 +3287,7 @@ with a prefix ARG."
     :config (message "`pandoc-mode' loaded")))
 
 (use-package conf-mode
-  :elpaca nil
+  :ensure nil
   :defer t
   :mode (
          ("/\\.merlin\\'" . conf-mode)
@@ -3316,7 +3316,7 @@ with a prefix ARG."
   (message "`json-mode' loaded"))
 
 (use-package json
-  :elpaca nil
+  :ensure nil
   :defer t
   :config
   (defun get-secrets-config-value (key)
@@ -3350,13 +3350,13 @@ with a prefix ARG."
   :config (message "`dune' loaded"))
 
 (use-package make-mode
-  :elpaca nil
+  :ensure nil
   :defer t
   :hook (make-mode . semantic-mode)
   :config (message "`make-mode' loaded"))
 
 (use-package cc-mode
-  :elpaca nil
+  :ensure nil
   :general
   (:keymaps 'c-mode-map
             "C-c C-a" nil))
@@ -3422,7 +3422,7 @@ with a prefix ARG."
 
 (use-package elisp-mode
   :defer t
-  :elpaca nil
+  :ensure nil
   :hook (elisp-mode . semantic-mode)
   :config (message "`elisp-mode' loaded"))
 
@@ -3481,7 +3481,7 @@ with a prefix ARG."
 
 (when use-latex
   (use-package tex-site
-    :elpaca (auctex :pre-build
+    :ensure (auctex :pre-build
                     (("./autogen.sh")
                      ("./configure"
                       "--without-texmf-dir"
@@ -3520,7 +3520,7 @@ with a prefix ARG."
     (message "`tex-site' loaded"))
 
   (use-package preview
-    :elpaca nil
+    :ensure nil
     :hook (LaTeX-mode . LaTeX-preview-setup)
     :config
     (setq-default preview-scale 1.4
@@ -3768,7 +3768,7 @@ with a prefix ARG."
 
 (when use-ocaml
   (use-package tuareg-menhir
-    :elpaca nil
+    :ensure nil
     :defer t
     :mode ("\\.mly'" . tuareg-menhir-mode)
     :config (message "`tuareg-menhir' loaded")))
@@ -3776,13 +3776,13 @@ with a prefix ARG."
 (when use-ocaml
   (use-package dune-minor
     :load-path "lisp/"
-    :elpaca nil
+    :ensure nil
     :defer t
     :hook (tuareg-mode . dune-minor-mode)
     :config (message "`dune-minor' loaded")))
 
 (use-package ocaml-utils-mode
-  :elpaca (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
+  :ensure (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
   :hook (tuareg-mode . ocaml-utils-mode)
   ;; :load-path "~/ocaml-utils-mode/"
   )
@@ -4048,18 +4048,18 @@ with a prefix ARG."
 
 (when use-web
   (use-package css-mode
-    :elpaca nil
+    :ensure nil
     :defer t
     :mode "\\.css\\'"
     :config (message "`css-mode' loaded")))
 
 (use-package simple-httpd
   :defer t
-  :elpaca nil
+  :ensure nil
   :config (message "`simple-httpd' loaded"))
 
 (use-package web-beautify
-  :elpaca (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
+  :ensure (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)

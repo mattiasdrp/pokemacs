@@ -285,37 +285,37 @@ Literate configuration for init.el.
 :END:
 
 #+begin_src emacs-lisp
-  (setq elpaca-core-date '(20240116)) ;; This version of Emacs was built on 2024-01-16
+  (setq elpaca-core-date '(20240227))
   (defvar elpaca-installer-version 0.6)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                                :ref nil
-                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                                :build (:not elpaca--activate-package)))
+        :ref nil
+        :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+        :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-         (build (expand-file-name "elpaca/" elpaca-builds-directory))
-         (order (cdr elpaca-order))
-         (default-directory repo))
+   (build (expand-file-name "elpaca/" elpaca-builds-directory))
+   (order (cdr elpaca-order))
+   (default-directory repo))
     (add-to-list 'load-path (if (file-exists-p build) build repo))
     (unless (file-exists-p repo)
       (make-directory repo t)
       (when (< emacs-major-version 28) (require 'subr-x))
       (condition-case-unless-debug err
-          (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                   ((zerop (call-process "git" nil buffer t "clone"
-                                         (plist-get order :repo) repo)))
-                   ((zerop (call-process "git" nil buffer t "checkout"
-                                         (or (plist-get order :ref) "--"))))
-                   (emacs (concat invocation-directory invocation-name))
-                   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                         "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                   ((require 'elpaca))
-                   ((elpaca-generate-autoloads "elpaca" repo)))
-              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-            (error "%s" (with-current-buffer buffer (buffer-string))))
-        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+    (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+       ((zerop (call-process "git" nil buffer t "clone"
+           (plist-get order :repo) repo)))
+       ((zerop (call-process "git" nil buffer t "checkout"
+           (or (plist-get order :ref) "--"))))
+       (emacs (concat invocation-directory invocation-name))
+       ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+           "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+       ((require 'elpaca))
+       ((elpaca-generate-autoloads "elpaca" repo)))
+        (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+      (error "%s" (with-current-buffer buffer (buffer-string))))
+  ((error) (warn "%s" err) (delete-directory repo 'recursive))))
     (unless (require 'elpaca-autoloads nil t)
       (require 'elpaca)
       (elpaca-generate-autoloads "elpaca" repo)
@@ -334,9 +334,9 @@ Literate configuration for init.el.
   (elpaca bind-key)
 
   (elpaca elpaca-use-package
-          ;; Enable :elpaca use-package keyword.
+          ;; Enable :ensure use-package keyword.
           (elpaca-use-package-mode)
-          ;; Assume :elpaca t unless otherwise specified.
+          ;; Assume :ensure t unless otherwise specified.
           (setq elpaca-use-package-by-default t))
 
   (elpaca-wait)
@@ -353,7 +353,7 @@ Will be used to download non-emacs packages needed by emacs packages
 
 #+begin_src emacs-lisp
   (use-package use-package-ensure-system-package
-    :elpaca nil
+    ;; :ensure nil
     :config (message "`use-package-ensure-system-package' loaded"))
 #+end_src
 
@@ -775,7 +775,7 @@ If you experience stuttering, increase this.
 #+begin_src emacs-lisp
   ;; Allows to repeat just one key to allow shorter key sequences
   (use-package repeat
-    :elpaca nil
+    :ensure nil
     :demand nil
     :defer nil
     :init (repeat-mode t)
@@ -1023,7 +1023,7 @@ We're not only saving the minibuffer history but compile history too
 
 #+begin_src emacs-lisp
   (use-package savehist
-    :elpaca nil
+    :ensure nil
     :init
     (savehist-mode t)
     ;; Remember recently opened files
@@ -1202,7 +1202,7 @@ Other nerd-icons related packages:
 
 #+begin_src emacs-lisp
   (use-package ansi-color
-    :elpaca nil
+    :ensure nil
     :hook
     (shell-mode . ansi-color-for-comint-mode-on)
     :config (message "`ansi-color' loaded"))
@@ -1551,7 +1551,7 @@ Better block deletion.
 #+begin_src emacs-lisp
   (use-package delete-block
     :load-path "lisp/"
-    :elpaca nil
+    :ensure nil
     :defer t
     :general
     ("C-d"                     'delete-block-forward)
@@ -1619,7 +1619,7 @@ Better ~M-w~
 #+begin_src emacs-lisp
   (use-package flycheck-languagetool
     :defer t
-    :elpaca (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
+    :ensure (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
     :hook ((text-mode . flycheck-languagetool-setup)
            (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
                          (require 'flycheck-languagetool)
@@ -1644,7 +1644,7 @@ Flyspell is automatically activated but you can toggle it with ~M-f t~.
 
 #+begin_src emacs-lisp
   (use-package flyspell
-    :elpaca nil
+    :ensure nil
     :init
     (defconst aspell-dicts-dumps
       (file-name-as-directory (no-littering-expand-etc-file-name "aspell-dicts-dumps/")))
@@ -1891,7 +1891,7 @@ TODO: hide-region-unpin doesn't work when changing buffer.
 #+begin_src emacs-lisp
   (use-package hide-region
     :load-path "lisp/"
-    :elpaca nil
+    :ensure nil
     :commands hide-region-pin
     :defer t
     :general
@@ -1921,7 +1921,7 @@ Simple mode to visualize blanks
 
 #+begin_src emacs-lisp
   (use-package whitespace
-    :elpaca nil
+    :ensure nil
     :defer t
     :hook
     (prog-mode . whitespace-mode)
@@ -1938,7 +1938,7 @@ Simple mode to visualize blanks
 
 #+begin_src emacs-lisp
   (use-package locked-window-buffer-mode
-    :elpaca nil
+    :ensure nil
     :general ("M-l"    'locked-window-buffer-mode))
 
 
@@ -1960,7 +1960,7 @@ Simple mode to visualize blanks
 
 #+begin_src emacs-lisp
   (use-package dired
-    :elpaca nil
+    :ensure nil
     :general
     (:keymaps 'dired-mode-map
               "DEL" 'dired-up-directory))
@@ -1984,7 +1984,7 @@ Simple mode to visualize blanks
 
 #+begin_src emacs-lisp
   (use-package dwim-shell-command
-    :elpaca (dwim-shell-command :files (:defaults "*.el"))
+    :ensure (dwim-shell-command :files (:defaults "*.el"))
     :general
     ([remap shell-command]   'dwim-shell-command)
     (:keymaps 'dired-mode-map
@@ -2069,7 +2069,7 @@ Customize ~hl-todo-keyword-faces~ to choose the keywords you want to highlights 
 
 #+begin_src emacs-lisp
   (use-package hl-todo
-    :elpaca (:depth nil)
+    :ensure (:depth nil)
     :config
     (global-hl-todo-mode 1)
     (message "`hl-todo' loaded"))
@@ -2163,13 +2163,13 @@ Org mode is, well, org mode.
 
 #+begin_src emacs-lisp
   (use-package org-protocol
-    :elpaca nil
+    :ensure nil
     :defer t
     :config
     (message "`org-protocol' loaded"))
 
   (use-package ox
-    :elpaca nil
+    :ensure nil
     :defer t
     :mode ("\\.org\\'" . org-mode)
     :init
@@ -2192,11 +2192,11 @@ Org mode is, well, org mode.
   (use-package ob-rust :defer t)
 
   (use-package ob-racket
-    :elpaca (:type git :host github :repo "hasu/emacs-ob-racket"))
+    :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
   (use-package org
     :defer t
-    :elpaca nil
+    :ensure nil
     :mode ("\\.org\\'" . org-mode)
     :hook (org-mode . mixed-pitch-mode)
     :after ob-racket
@@ -2482,7 +2482,7 @@ This package allows to see the org calendar and adds a capture template for sche
   (use-package calfw-org
     :defer t
     :after calfw
-    :elpaca nil
+    :ensure nil
     :init
     (define-prefix-command 'mdrp-calfw-map nil "Cal-")
     :general
@@ -2687,13 +2687,13 @@ Helper to create table of contents in org files.
 #+begin_src emacs-lisp
   (use-package ox-awesomecv
     :load-path "lisp/org-cv/"
-    :elpaca nil
+    :ensure nil
     :after org
     :config (message "`ox-awesomecv' loaded"))
 
   (use-package ox-moderncv
     :load-path "lisp/org-cv/"
-    :elpaca nil
+    :ensure nil
     :after org
     :config (message "`ox-moderncv' loaded"))
 #+end_src
@@ -2948,7 +2948,7 @@ TODO: Not working with OCaml
 
 #+begin_src emacs-lisp
   (use-package prog-mode
-    :elpaca nil
+    :ensure nil
     :init
     (defun mdrp/clear-compilation-finish-functions ()
       (setq compilation-finish-functions nil))
@@ -3196,7 +3196,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 #+begin_src emacs-lisp
   (use-package flycheck-correct
     :load-path "lisp/"
-    :elpaca nil
+    :ensure nil
     :defer t
     :hook flycheck-mode
     :general
@@ -3266,7 +3266,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 #+begin_src emacs-lisp
   (use-package hideshow
     :defer t
-    :elpaca nil
+    :ensure nil
     :hook (prog-mode . (lambda ()
                          (unless (eq major-mode 'tree-sitter-query-mode)
                            (hs-minor-mode))))
@@ -3370,7 +3370,7 @@ Allows to undo and redo changes in window configurations
 
 #+begin_src emacs-lisp
     (use-package winner
-      :elpaca nil
+      :ensure nil
       :custom
       (winner-boring-buffers
        '("*Completions*"
@@ -3470,7 +3470,7 @@ Vertico works with the default completion system instead of reimplementing a who
 
 #+begin_src emacs-lisp
   (use-package vertico
-    :elpaca (vertico :files (:defaults "extensions/*"))
+    :ensure (vertico :files (:defaults "extensions/*"))
     :defer t
     :after general
     :init
@@ -3530,7 +3530,7 @@ Useful keybindings are:
 #+begin_src emacs-lisp
   (use-package vertico-directory
     :after vertico
-    :elpaca nil
+    :ensure nil
     :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
     ;; More convenient directory navigation commands
     :general
@@ -3554,7 +3554,7 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
 #+begin_src emacs-lisp
   (use-package vertico-multiform
     :after vertico
-    :elpaca nil
+    :ensure nil
     :defer t
     :custom
     (vertico-buffer-display-action '(display-buffer-in-side-window
@@ -3767,7 +3767,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package corfu
-    :elpaca (corfu :files (:defaults "extensions/*"))
+    :ensure (corfu :files (:defaults "extensions/*"))
     :defer t
     :init
     ;; Function definitions
@@ -3832,7 +3832,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package corfu-popupinfo
-    :elpaca nil
+    :ensure nil
     :after corfu
     :hook (corfu-mode . corfu-popupinfo-mode)
     :general
@@ -3972,7 +3972,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+begin_src emacs-lisp
   (use-package emacs
     :defer t
-    :elpaca nil
+    :ensure nil
     :init
     ;; FRINGE
     ;; UI: the gutter looks less cramped with some space between it and  buffer.
@@ -4024,7 +4024,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package windmove
-    :elpaca nil
+    :ensure nil
     :general
     ;; windmove
     ("C-x <left>"              'windmove-left)
@@ -4330,8 +4330,8 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
     ;; remove the modes from `doom-modeline-continuous-word-count-modes'.
     (doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode))
 
-    ;; If non-nil, only display one number for checker information if applicable.
-    (doom-modeline-checker-simple-format nil)
+    ;; If non-nil, only display one number for check information if applicable.
+    (doom-modeline-check-simple-format nil)
 
     ;; The maximum number displayed for notifications.
     (doom-modeline-number-limit 99)
@@ -4377,11 +4377,11 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
     ;; Define your custom doom-modeline
     (doom-modeline-def-modeline 'mdrp/no-lsp-line
       '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
-      '(misc-info persp-name grip debug minor-modes major-mode process vcs checker))
+      '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
 
     (doom-modeline-def-modeline 'mdrp/lsp-line
       '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
-      '(misc-info persp-name grip debug minor-modes major-mode process vcs checker))
+      '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
 
     ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
     (setq doom-modeline-fn-alist
@@ -4451,7 +4451,7 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
 
 #+begin_src emacs-lisp
   (use-package outline
-    :elpaca nil
+    :ensure nil
     :general
     ("C-o" 'cm-map)
     (:keymaps 'cm-map
@@ -4491,7 +4491,7 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
 
 #+begin_src emacs-lisp
   (use-package outline-minor
-    :elpaca nil
+    :ensure nil
     :defer t
     :hook (prog-mode . outline-minor-mode)
     :config (message "`outline-minor' loaded"))
@@ -4532,7 +4532,7 @@ Nice bullets for outshine.
   (use-package pretty-outlines
     :defer t
     :load-path "lisp/"
-    :elpaca nil
+    :ensure nil
     :hook (
            (outline-mode . pretty-outlines-set-display-table)
            (outline-minor-mode . pretty-outlines-set-display-table)
@@ -4694,7 +4694,7 @@ Will pulse when the focus changes to show where the cursor is.
   (when use-eaf
     (use-package eaf
       :load-path "lisp/emacs-application-framework"
-      :elpaca nil
+      :ensure nil
       :defer t
       :custom
       ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
@@ -4737,7 +4737,7 @@ Will pulse when the focus changes to show where the cursor is.
 
 #+begin_src emacs-lisp
   (use-package treesit
-    :elpaca nil)
+    :ensure nil)
 #+end_src
 
 *** Treesit-auto
@@ -4796,7 +4796,7 @@ Code folding based on tree-sitter tree.
 #+begin_src emacs-lisp
   (use-package ts-fold
     :disabled
-    :elpaca (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
+    :ensure (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
     :defer t
     :hook
     (tuareg-mode . ts-fold-mode)
@@ -4811,7 +4811,7 @@ Code folding based on tree-sitter tree.
   (use-package ts-fold-indicators
     :disabled
     :load-path "lisp/ts-fold/"
-    :elpaca nil
+    :ensure nil
     :defer t
     :hook
     (tree-sitter-after-on . ts-fold-indicators-mode)
@@ -4948,7 +4948,7 @@ Code folding based on tree-sitter tree.
 #+begin_src emacs-lisp
   (when use-markdown
     (use-package markdown-mode
-      :elpaca nil
+      :ensure nil
       :defer t
       :mode (("README\\.md\\'" . gfm-mode)
              ("\\.md\\'"       . markdown-mode)
@@ -5006,7 +5006,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package conf-mode
-    :elpaca nil
+    :ensure nil
     :defer t
     :mode (
            ("/\\.merlin\\'" . conf-mode)
@@ -5046,7 +5046,7 @@ Library for parsing and generating JSON
 
 #+begin_src emacs-lisp
   (use-package json
-    :elpaca nil
+    :ensure nil
     :defer t
     :config
     (defun get-secrets-config-value (key)
@@ -5094,7 +5094,7 @@ Library for parsing and generating JSON
 
 #+begin_src emacs-lisp
   (use-package make-mode
-    :elpaca nil
+    :ensure nil
     :defer t
     :hook (make-mode . semantic-mode)
     :config (message "`make-mode' loaded"))
@@ -5112,7 +5112,7 @@ Library for parsing and generating JSON
 
 #+begin_src emacs-lisp
   (use-package cc-mode
-    :elpaca nil
+    :ensure nil
     :general
     (:keymaps 'c-mode-map
               "C-c C-a" nil))
@@ -5217,7 +5217,7 @@ Library for parsing and generating JSON
 #+begin_src emacs-lisp
   (use-package elisp-mode
     :defer t
-    :elpaca nil
+    :ensure nil
     :hook (elisp-mode . semantic-mode)
     :config (message "`elisp-mode' loaded"))
 #+end_src
@@ -5327,7 +5327,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 #+begin_src emacs-lisp
   (when use-latex
     (use-package tex-site
-      :elpaca (auctex :pre-build
+      :ensure (auctex :pre-build
                       (("./autogen.sh")
                        ("./configure"
                         "--without-texmf-dir"
@@ -5366,7 +5366,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       (message "`tex-site' loaded"))
 
     (use-package preview
-      :elpaca nil
+      :ensure nil
       :hook (LaTeX-mode . LaTeX-preview-setup)
       :config
       (setq-default preview-scale 1.4
@@ -5649,7 +5649,7 @@ Special tuareg mode when editing ~mly~ files.
 #+begin_src emacs-lisp
   (when use-ocaml
     (use-package tuareg-menhir
-      :elpaca nil
+      :ensure nil
       :defer t
       :mode ("\\.mly'" . tuareg-menhir-mode)
       :config (message "`tuareg-menhir' loaded")))
@@ -5664,7 +5664,7 @@ Special tuareg mode when editing ~mly~ files.
   (when use-ocaml
     (use-package dune-minor
       :load-path "lisp/"
-      :elpaca nil
+      :ensure nil
       :defer t
       :hook (tuareg-mode . dune-minor-mode)
       :config (message "`dune-minor' loaded")))
@@ -5674,7 +5674,7 @@ Special tuareg mode when editing ~mly~ files.
 
 #+begin_src emacs-lisp
   (use-package ocaml-utils-mode
-    :elpaca (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
+    :ensure (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
     :hook (tuareg-mode . ocaml-utils-mode)
     ;; :load-path "~/ocaml-utils-mode/"
     )
@@ -6048,7 +6048,7 @@ Some people use this, not my responsibility.
 #+begin_src emacs-lisp
   (when use-web
     (use-package css-mode
-      :elpaca nil
+      :ensure nil
       :defer t
       :mode "\\.css\\'"
       :config (message "`css-mode' loaded")))
@@ -6062,7 +6062,7 @@ Some people use this, not my responsibility.
 #+begin_src emacs-lisp
   (use-package simple-httpd
     :defer t
-    :elpaca nil
+    :ensure nil
     :config (message "`simple-httpd' loaded"))
 #+end_src
 
@@ -6073,7 +6073,7 @@ Some people use this, not my responsibility.
 
 #+begin_src emacs-lisp
   (use-package web-beautify
-    :elpaca (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
+    :ensure (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
 #+end_src
 
 * End
