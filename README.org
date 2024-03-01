@@ -247,7 +247,7 @@ After everything is installed you need to run these two commands just once.
 
 [[https://github.com/magit/ghub][Ghub]] is used and needs a bit of tuning first.
 
-In [[file:custom.el][custom.el]] you can see the line ~'(auth-sources '("~/.authinfo"))~, this is where packages looking for authentication sources will look. You can obviously customize it.
+In [[file:custom.el][custom.el]] you can see the line ~'(auth-sources '("-/.authinfo"))~, this is where packages looking for authentication sources will look. You can obviously customize it.
 
 Ghub expects to see lines of the following format:
 
