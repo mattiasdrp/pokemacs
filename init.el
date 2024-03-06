@@ -2258,7 +2258,7 @@ with a prefix ARG."
   ("M-s d" 'consult-find)
   ("M-s D" 'consult-locate)
   ("M-s g" 'consult-grep)
-  ("M-s G" 'consult-git-grep)
+  ("M-s G" 'mdrp/consult-git-grep-always-prompt-dir)
   ("M-s r" 'consult-ripgrep)
   ("M-s R" 'mdrp/consult-ripgrep-always-prompt-dir)
   ("M-s l" 'consult-line)
@@ -2305,6 +2305,10 @@ with a prefix ARG."
   (defun mdrp/consult-ripgrep-always-prompt-dir ()
     (interactive)
     (consult-ripgrep t))
+
+  (defun mdrp/consult-git-grep-always-prompt-dir ()
+    (interactive)
+    (consult-git-grep t))
 
   (defvar mdrp/consult-line-map
     (let ((map (make-sparse-keymap)))

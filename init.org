@@ -3623,7 +3623,7 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
     ("M-s d" 'consult-find)
     ("M-s D" 'consult-locate)
     ("M-s g" 'consult-grep)
-    ("M-s G" 'consult-git-grep)
+    ("M-s G" 'mdrp/consult-git-grep-always-prompt-dir)
     ("M-s r" 'consult-ripgrep)
     ("M-s R" 'mdrp/consult-ripgrep-always-prompt-dir)
     ("M-s l" 'consult-line)
@@ -3670,6 +3670,10 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
     (defun mdrp/consult-ripgrep-always-prompt-dir ()
       (interactive)
       (consult-ripgrep t))
+
+    (defun mdrp/consult-git-grep-always-prompt-dir ()
+      (interactive)
+      (consult-git-grep t))
 
     (defvar mdrp/consult-line-map
       (let ((map (make-sparse-keymap)))
