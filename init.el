@@ -20,7 +20,7 @@
 ;;; Code:
 
 (setq elpaca-core-date '(20240227))
-(defvar elpaca-installer-version 0.6)
+(defvar elpaca-installer-version 0.7)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -2260,6 +2260,7 @@ with a prefix ARG."
   ("M-s g" 'consult-grep)
   ("M-s G" 'consult-git-grep)
   ("M-s r" 'consult-ripgrep)
+  ("M-s R" 'mdrp/consult-ripgrep-always-prompt-dir)
   ("M-s l" 'consult-line)
   ("M-s L" 'consult-line-multi)
   ("M-s m" 'consult-multi-occur)
@@ -2301,6 +2302,9 @@ with a prefix ARG."
   ;; (defun consult-line-repeat ()
   ;;   (interactive)
 
+  (defun mdrp/consult-ripgrep-always-prompt-dir ()
+    (interactive)
+    (consult-ripgrep t))
 
   (defvar mdrp/consult-line-map
     (let ((map (make-sparse-keymap)))
