@@ -2327,6 +2327,8 @@ with a prefix ARG."
    consult-theme
    :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
+   mdrp/consult-git-grep-always-prompt-dir
+   mdrp/consult-ripgrep-always-prompt-dir
    consult-bookmark consult-recent-file consult-xref
    consult--source-bookmark consult--source-recent-file
    consult--source-project-recent-file
