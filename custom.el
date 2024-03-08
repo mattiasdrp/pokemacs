@@ -55,6 +55,7 @@
  '(use-eaf t)
  '(use-elm t)
  '(use-fsharp t)
+ '(use-gcal t)
  '(use-god nil)
  '(use-header-line t)
  '(use-java t)

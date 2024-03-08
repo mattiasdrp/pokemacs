@@ -104,6 +104,12 @@
   :type 'boolean
   :tag "󰲋 Emacs Application Framework")
 
+(defcustom use-gcal nil
+  "If non-nil, uses the org-gcal package."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Org Google Calendar")
+
 (defcustom use-god nil
   "If non-nil, uses the god (mode) packages.
 Similar to Vim's separation of command/insert modes"
@@ -858,6 +864,15 @@ debian, and derivatives). On most it's 'fd'.")
   :config
   (message "`easy-kill loaded"))
 
+(use-package json
+  :ensure nil
+  :demand t
+  :config
+  (defun get-secrets-config-value (key)
+    "Return the value of the json file secrets for key"
+    (cdr (assoc key (json-read-file "~/.secrets/secrets.json"))))
+  (message "`json' loaded"))
+
 (use-package flycheck-languagetool
   :defer t
   :ensure (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
@@ -1292,6 +1307,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-startup-with-inline-images t)
   (org-support-shift-select 'always)
   (org-roam-v2-ack t) ; anonying startup message
+
   :config
   ;; TODO states
   (setq org-todo-keywords
@@ -1440,8 +1456,8 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`org-inline-pdf' loaded"))
 
 (use-package calfw
+  :ensure (calfw :files ("calfw-org.el" "calfw.el"))
   :config
-  (setq cfw:org-overwrite-default-keybinding t)
   (setq cfw:fchar-junction ?╋
         cfw:fchar-vertical-line ?┃
         cfw:fchar-horizontal-line ?━
@@ -1461,16 +1477,17 @@ debian, and derivatives). On most it's 'fd'.")
   ("M-C" 'mdrp-calfw-map)
   (:keymaps 'mdrp-calfw-map
             "c" 'cfw:open-calendar-buffer
-            "o" 'cfw:open-org-calendar
-            )
+            "o" 'cfw:open-org-calendar)
   (:keymaps 'cfw:calendar-mode-map
             "RET" 'cfw:org-open-agenda-day)
   :custom
   (cfw:org-capture-template
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-     "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1)
-   )
+     "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1))
   :config
+
+  (setq cfw:org-overwrite-default-keybinding t)
+
   (defun cfw:org-capture-day ()
     (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
       (let ((pos (cfw:cursor-to-nearest-date)))
@@ -1490,15 +1507,24 @@ debian, and derivatives). On most it's 'fd'.")
 ;;         "&redirect_uri=" (url-hexify-string "urn:ietf:wg:oauth:2.0:oob")
 ;;         "&scope=" (url-hexify-string org-gcal-resource-url))
 
-(use-package org-gcal
-  :disabled
-  :custom
-  (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
-  (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
-  (org-gcal-fetch-file-alist
-   `(
-     (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
-     (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org"))))
+(when use-gcal
+  (use-package plstore
+    :ensure nil
+    :custom
+    (plstore-cache-passphrase-for-symmetric-encryption t)
+    :config
+    (add-to-list 'plstore-encrypt-to (get-secrets-config-value 'org-gcal-client-id)))
+
+  (use-package org-gcal
+    :after json
+    :demand t
+    :custom
+    (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
+    (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
+    (org-gcal-fetch-file-alist
+     `(
+       ;; (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
+       (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")))))
 
 (use-package org-super-agenda
   :defer t
@@ -1603,6 +1629,7 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :custom
   (org-make-toc-insert-custom-ids t)
+  :config
   (message "`org-make-toc' loaded"))
 
 (use-package ox-awesomecv
@@ -3324,16 +3351,6 @@ with a prefix ARG."
   :config
   (make-local-variable 'js-indent-level)
   (message "`json-mode' loaded"))
-
-(use-package json
-  :ensure nil
-  :defer t
-  :config
-  (defun get-secrets-config-value (key)
-    "Return the value of the json file secrets for key"
-    (cdr (assoc key (json-read-file "~/.secrets/secrets.json")))
-    )
-  (message "`json' loaded"))
 
 (use-package dune
   :defer t
