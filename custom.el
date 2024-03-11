@@ -52,7 +52,7 @@
  '(use-all-the-icons nil)
  '(use-clojure t)
  '(use-dashboard t)
- '(use-eaf t)
+ '(use-eaf nil)
  '(use-elm t)
  '(use-fsharp t)
  '(use-gcal t)
@@ -84,6 +84,7 @@
  '(vertico-multiform-categories
    '((imenu buffer) (file (vertico-sort-function . sort-directories-first))
      (corfu (vertico-sort-function . vertico-sort-alpha))
+     (jinx grid (vertico-grid-annotate . 20))
      (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
  '(vertico-multiform-commands
    '((consult-imenu buffer) (consult-line buffer) (execute-extended-command mouse)

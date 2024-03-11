@@ -625,7 +625,7 @@ debian, and derivatives). On most it's 'fd'.")
     )
   (general-define-key
    [remap kill-buffer]                  'kill-this-buffer
-   [remap ispell-word]                  'flyspell-correct-at-point
+   [remap ispell-word]                  'jinx-correct
    ;; Prefixed by C
    "C-x C-1"                 'delete-other-windows
    "C-x C-2"                 'split-window-below
@@ -689,11 +689,6 @@ debian, and derivatives). On most it's 'fd'.")
    "d"                       'hydra-dates/body)
   (general-def minibuffer-local-map
     "C-<tab>" 'dabbrev-expand)
-
-  (general-def flyspell-mouse-map
-    "RET"                     'flyspell-correct-at-point
-    [return]                  'flyspell-correct-at-point
-    )
   :config (message "`general' loaded"))
 (elpaca-wait)
 
@@ -873,155 +868,22 @@ debian, and derivatives). On most it's 'fd'.")
     (cdr (assoc key (json-read-file "~/.secrets/secrets.json"))))
   (message "`json' loaded"))
 
-(use-package flycheck-languagetool
-  :defer t
-  :ensure (flycheck-languagetool :host github :repo "mattiasdrp/flycheck-languagetool" :branch "prog-mode")
-  :hook ((text-mode . flycheck-languagetool-setup)
-         (lsp-mode . (lambda () (lsp-diagnostics-mode 1)
-                       (require 'flycheck-languagetool)
-                       (flycheck-languagetool-flycheck-enable))))
-  :config
-  (defun flycheck-languagetool-disable ()
-    "Disable flycheck-languagetool-package."
-    (interactive)
-    (setq flycheck-languagetool--text-mode nil)
-    (delete 'languagetool 'flycheck-checkers))
-  (message "`flycheck-languagetool' loaded"))
-
-(use-package flyspell
-  :ensure nil
+(use-package lsp-ltex
+  :ensure t
+  :hook (text-mode . (lambda ()
+                       (require 'lsp-ltex)
+                       (lsp)))  ; or lsp-deferred
   :init
-  (defconst aspell-dicts-dumps
-    (file-name-as-directory (no-littering-expand-etc-file-name "aspell-dicts-dumps/")))
+  (setq lsp-ltex-version "16.0.0"))  ; make sure you have set this, see below
 
-  ;; Create the aspell dictionaries dumps directory
-  (unless (file-exists-p aspell-dicts-dumps)
-    (make-directory aspell-dicts-dumps))
-
-  ;; Dump dictionaries if they don't exist
-  (defconst english-dump (concat aspell-dicts-dumps "english"))
-  (defconst french-dump (concat aspell-dicts-dumps "francais"))
-
-  (unless (or (not pokemacs/english-dict) (file-exists-p english-dump))
-    (async-shell-command
-     (concat "aspell --master=en_" pokemacs/english-dict " dump master > " english-dump)))
-  (unless (or (not pokemacs/french-dict) (file-exists-p french-dump))
-    (async-shell-command
-     (concat "aspell --master=fr_" pokemacs/french-dict " dump master > " french-dump)))
-
-  (defun mdrp/flyspell-on-for-buffer-type ()
-    "Enable Flyspell appropriately for the major mode of the current buffer.
-  Uses `flyspell-prog-mode' for modes derived from `prog-mode', so only strings
-  and comments get checked.  All other buffers get `flyspell-mode' to check
-  all text.  If flyspell is already enabled, does nothing."
-    (interactive)
-    (if (not (symbol-value flyspell-mode)) ; if not already on
-        (if (derived-mode-p 'pdf-view-mode)
-            (message "Flyspell off (pdf-view)")
-          (progn
-            (if (derived-mode-p 'prog-mode)
-                (progn
-                  (message "Flyspell on (code)")
-                  (flyspell-prog-mode))
-              ;; else
-              (progn
-                (message "Flyspell on (text)")
-                (flyspell-mode 1)))))))
-
-  (defun mdrp/change-dict (lang)
-    "Change dictionary to english. LANG is the desired language"
-    (interactive "sLang: ")
-    (ispell-change-dictionary lang)
-    (mdrp/flyspell-on-for-buffer-type))
-
-  (defun mdrp/english-dict ()
-    "Change dictionary to english."
-    (interactive)
-    (setq cape-dict-file english-dump)
-    (mdrp/change-dict "english"))
-
-  (defun mdrp/french-dict ()
-    "Change dictionary to french."
-    (interactive)
-    (setq cape-dict-file french-dump)
-    (mdrp/change-dict "francais"))
-
-  (defun mdrp/flyspell-toggle ()
-    "Turn Flyspell on if it is off, or off if it is on. When turning on,
-  it uses `flyspell-on-for-buffer-type' so code-vs-text is handled appropriately."
-    (interactive)
-    (if (symbol-value flyspell-mode)
-        (progn ; flyspell is on, turn it off
-          (message "Flyspell off")
-          (flyspell-mode -1))
-      ;; else - flyspell is off, turn it on
-      (mdrp/flyspell-on-for-buffer-type)))
-
-  :defer t
-  :hook (find-file . mdrp/flyspell-on-for-buffer-type)
+(use-package jinx
+  ;; :ensure-system-package libenchant-2-dev
+  :hook (emacs-startup . global-jinx-mode)
   :general
-  ("M-f" 'mdrp-fly-map)
-  ("C-f" 'mdrp-fly-map)
-  (:keymaps 'flyspell-mode-map
-            "C-;" nil)
-  (:keymaps 'mdrp-fly-map
-            "t" '(mdrp/flyspell-toggle :which-key "toggle flyspell mode and decides to put it in prog or text mode")
-            "f" '(mdrp/french-dict :which-key "load the french dictionary")
-            "e" '(mdrp/english-dict :which-key "load the english dictionary"))
-  :ensure-system-package aspell
-  ;; :ensure-system-package aspell-fr
-  ;; :ensure-system-package aspell-en
-  :config
-  (provide 'ispell) ; forcibly load ispell configs
-  (setq ispell-list-command "--list")
-  (mdrp/english-dict)
-  (setq-default flyspell-prog-text-faces
-                '(tree-sitter-hl-face:comment
-                  tree-sitter-hl-face:doc
-                  tree-sitter-hl-face:string
-                  font-lock-comment-face
-                  font-lock-doc-face
-                  font-lock-string-face))
-  (defun flyspell-buffer-after-pdict-save (&rest _)
-    (flyspell-buffer))
-
-  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
-  (setq flyspell-issue-welcome-flag nil
-        ;; Significantly speeds up flyspell, which would otherwise print
-        ;; messages for every word when checking the entire buffer
-        flyspell-issue-message-flag nil)
-
-  (add-hook 'flyspell-mode-hook
-            (defun +spell-inhibit-duplicate-detection-maybe-h ()
-              "Don't mark duplicates when style/grammar linters are present.
-  e.g. proselint and langtool."
-              (and (or (and (bound-and-true-p flycheck-mode)
-                            (executable-find "proselint"))
-                       (featurep 'langtool))
-                   (setq-local flyspell-mark-duplications-flag nil))))
-  (defadvice org-mode-flyspell-verify (after org-mode-flyspell-verify-hack activate)
-    (let* ((rlt ad-return-value)
-           (begin-regexp "^[ \t]*#\\+begin_\\(src\\|html\\|latex\\|example\\|quote\\)")
-           (end-regexp "^[ \t]*#\\+end_\\(src\\|html\\|latex\\|example\\|quote\\)")
-           (case-fold-search t)
-           b e)
-      (when ad-return-value
-        (save-excursion
-          (setq b (re-search-backward begin-regexp nil t))
-          (if b (setq e (re-search-forward end-regexp nil t))))
-        (if (and b e (< (point) e)) (setq rlt nil)))
-      (setq ad-return-value rlt)))
-  (message "`flyspell' loaded"))
-
-(use-package flyspell-correct
-  :after flyspell
-  :general
-  (:keymaps 'popup-menu-keymap
-            "<return>" 'popup-select)
-  (:keymaps 'mdrp-fly-map
-            "C-f" 'flyspell-correct-wrapper
-            )
-  :config (message "`flyspell-correct' loaded"))
+  (:keymaps 'jinx-overlay-map
+            "RET" 'jinx-correct)
+  ("M-$"  'jinx-correct)
+  ("C-M-$" 'jinx-languages))
 
 (use-package highlight-symbol
   :defer t
@@ -1134,7 +996,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package git-commit
   :defer t
-  :hook (git-commit-mode . mdrp/english-dict)
   :config (message "`git-commit' loaded"))
 
 (use-package magit
@@ -1524,7 +1385,8 @@ debian, and derivatives). On most it's 'fd'.")
     (org-gcal-fetch-file-alist
      `(
        ;; (,(get-secrets-config-value 'calendar-company) . "~/org/calendar_company.org")
-       (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")))))
+       (,(get-secrets-config-value 'calendar-user) . "~/org/calendar_user.org")))
+    (message "`org-gcal' loaded")))
 
 (use-package org-super-agenda
   :defer t
@@ -2727,7 +2589,7 @@ with a prefix ARG."
   ;; Require trigger prefix before template name when completing.
   :general
   ("M-+" 'tempel-complete) ;; Alternative tempel-expand
-  ("M-SPC" 'tempel-complete) ;; Alternative tempel-expand
+  ;; ("M-SPC" 'tempel-complete) ;; Alternative tempel-expand
   ("M-*" 'tempel-insert)
   (:keymaps 'tempel-map
             "RET" 'tempel-next)
@@ -3121,22 +2983,22 @@ with a prefix ARG."
     ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
     (eaf-browser-continue-where-left-off t)
     (eaf-browser-enable-adblocker t)
-    (browse-url-browser-function 'eaf-open-browser)
+    ;; (browse-url-browser-function 'eaf-open-browser)
     (eaf-browser-default-search-engine "duckduckgo")
     :config
-    (use-package eaf-all-the-icons)
-    (use-package eaf-org)
-    (use-package eaf-browser)
-    (use-package eaf-pdf-viewer)
-    (use-package eaf-system-monitor)
-    (use-package eaf-image-viewer)
-    (use-package eaf-markdown-previewer)
-    (use-package eaf-org-previewer)
-    (use-package eaf-demo)
+    (require 'eaf-all-the-icons)
+    (require 'eaf-org)
+    (require 'eaf-browser)
+    ;; (require 'eaf-pdf-viewer)
+    (require 'eaf-system-monitor)
+    (require 'eaf-image-viewer)
+    (require 'eaf-markdown-previewer)
+    (require 'eaf-org-previewer)
+    (require 'eaf-demo)
 
     (defalias 'browse-web #'eaf-open-browser)
-    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+    ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
     (eaf-bind-key nil "M-q" eaf-browser-keybinding)
     (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
@@ -3522,7 +3384,6 @@ with a prefix ARG."
     :hook
     (LaTeX-mode . LaTeX-math-mode)
     (LaTeX-mode . TeX-PDF-mode)
-    (LaTeX-mode . flyspell-mode)
     (LaTeX-mode . flycheck-mode)
     (LaTeX-mode . LaTeX-math-mode)
     :init
