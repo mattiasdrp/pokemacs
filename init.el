@@ -289,7 +289,14 @@ or nil if you don't want to use an english dictionary"
 (setq-default
  ;; Save backup files in a .backup directory
  backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
+ backup-by-copying t
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t
+ delete-by-moving-to-trash t)
 
+(setq-default
  ;; Briefly move cursor to the matching open-paren
  ;; even if it is not visible in the window.
  blink-matching-paren 'jump-offscreen
@@ -870,9 +877,10 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package lsp-ltex
   :ensure t
+  :defer t
   :hook (text-mode . (lambda ()
                        (require 'lsp-ltex)
-                       (lsp)))  ; or lsp-deferred
+                       (lsp-deferred)))
   :init
   (setq lsp-ltex-version "16.0.0"))  ; make sure you have set this, see below
 
@@ -953,6 +961,16 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package hide-mode-line
   :defer t
   :config (message "`hide-mode-line loaded"))
+
+(use-package vundo
+  :ensure t
+  :defer t
+  :commands (vundo)
+  :general
+  ("C-x u" 'vundo)
+  :custom
+  (vundo-glyph-alist vundo-unicode-symbols)
+  (vundo-compact-display t))
 
 (use-package whitespace
   :ensure nil
@@ -1103,6 +1121,7 @@ debian, and derivatives). On most it's 'fd'.")
   :after ob-racket
   :general
   ("M-o" 'mdrp-org-map)
+  ([remap lsp-find-definition] 'org-insert-link)
   ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
   (:keymaps 'mdrp-org-map
             "l"                       'org-store-link
@@ -1378,7 +1397,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (use-package org-gcal
     :after json
-    :demand t
+    :defer t
     :custom
     (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
     (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))

@@ -33,6 +33,7 @@ Literate configuration for init.el.
   - [[#load-functions][Load functions]]
   - [[#change-frame-title-format][Change frame title format]]
   - [[#ask-yn-instead-of-yesno][Ask y/n instead of yes/no]]
+  - [[#backup][Backup]]
   - [[#default-values][Default values]]
   - [[#start-emacs-as-a-server][Start emacs as a server]]
   - [[#repeat-mode][Repeat-mode]]
@@ -88,6 +89,7 @@ Literate configuration for init.el.
   - [[#multiple-cursors][Multiple cursors]]
   - [[#hide-region][Hide region]]
   - [[#hide-mode-line][Hide mode line]]
+  - [[#vundo][Vundo]]
   - [[#whitespace][Whitespace]]
   - [[#window-locking][Window locking]]
 - [[#diredshell][Dired/Shell]]
@@ -651,6 +653,23 @@ If you experience stuttering, increase this.
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
+** Backup
+:PROPERTIES:
+:CUSTOM_ID: backup
+:END:
+
+#+begin_src emacs-lisp
+  (setq-default
+   ;; Save backup files in a .backup directory
+   backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
+   backup-by-copying t
+   delete-old-versions t
+   kept-new-versions 6
+   kept-old-versions 2
+   version-control t
+   delete-by-moving-to-trash t)
+#+end_src
+
 ** TODO Default values
 :PROPERTIES:
 :CUSTOM_ID: default-values
@@ -658,9 +677,6 @@ If you experience stuttering, increase this.
 
 #+begin_src emacs-lisp
   (setq-default
-   ;; Save backup files in a .backup directory
-   backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
-
    ;; Briefly move cursor to the matching open-paren
    ;; even if it is not visible in the window.
    blink-matching-paren 'jump-offscreen
@@ -1639,9 +1655,10 @@ Library for parsing and generating JSON
 #+begin_src emacs-lisp
   (use-package lsp-ltex
     :ensure t
+    :defer t
     :hook (text-mode . (lambda ()
                          (require 'lsp-ltex)
-                         (lsp)))  ; or lsp-deferred
+                         (lsp-deferred)))
     :init
     (setq lsp-ltex-version "16.0.0"))  ; make sure you have set this, see below
 
@@ -1791,6 +1808,23 @@ Used by some packages
   (use-package hide-mode-line
     :defer t
     :config (message "`hide-mode-line loaded"))
+#+end_src
+
+** [[https://github.com/casouri/vundo][Vundo]]
+:PROPERTIES:
+:CUSTOM_ID: vundo
+:END:
+
+#+begin_src emacs-lisp
+  (use-package vundo
+    :ensure t
+    :defer t
+    :commands (vundo)
+    :general
+    ("C-x u" 'vundo)
+    :custom
+    (vundo-glyph-alist vundo-unicode-symbols)
+    (vundo-compact-display t))
 #+end_src
 
 ** [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace]]
@@ -2082,6 +2116,7 @@ Org mode is, well, org mode.
     :after ob-racket
     :general
     ("M-o" 'mdrp-org-map)
+    ([remap lsp-find-definition] 'org-insert-link)
     ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
     (:keymaps 'mdrp-org-map
               "l"                       'org-store-link
@@ -2419,7 +2454,7 @@ If I have to reuse a Google calendar I may enable this package again but I don't
 
     (use-package org-gcal
       :after json
-      :demand t
+      :defer t
       :custom
       (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
       (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
