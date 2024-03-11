@@ -1117,11 +1117,12 @@ debian, and derivatives). On most it's 'fd'.")
   :defer t
   :ensure nil
   :mode ("\\.org\\'" . org-mode)
-  :hook (org-mode . mixed-pitch-mode)
+  :hook
+  (org-mode . mixed-pitch-mode)
+  (org-mode . mdrp/org-mode-hook)
   :after ob-racket
   :general
   ("M-o" 'mdrp-org-map)
-  ([remap lsp-find-definition] 'org-insert-link)
   ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
   (:keymaps 'mdrp-org-map
             "l"                       'org-store-link
@@ -1136,6 +1137,14 @@ debian, and derivatives). On most it's 'fd'.")
             "C-c C-c"                 'org-edit-src-exit)
 
   :init
+  (defun mdrp/org-mode-hook ()
+    (let ((oldmap (cdr (assoc 'lsp-mode minor-mode-map-alist)))
+          (newmap (make-sparse-keymap)))
+      (set-keymap-parent newmap oldmap)
+      (define-key newmap (kbd "C-c C-l") 'org-insert-link)
+      (make-local-variable 'minor-mode-overriding-map-alist)
+      (push `(lsp-mode . ,newmap) minor-mode-overriding-map-alist)))
+
   (setq org-list-allow-alphabetical t)
   ;; If you don't want the agenda in french you can comment the following
   ;; expression. You can even set it to your preferred language
