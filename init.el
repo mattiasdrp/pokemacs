@@ -1039,6 +1039,8 @@ debian, and derivatives). On most it's 'fd'.")
         (smerge-vc-next-conflict))))
   (message "`magit' loaded"))
 
+(use-package transient)
+
 (when use-magit-todos
   (use-package magit-todos
     :defer t

@@ -1955,6 +1955,8 @@ Adds keybindings when editing a commit message.
             (flycheck-next-error)
           (smerge-vc-next-conflict))))
     (message "`magit' loaded"))
+
+  (use-package transient)
 #+end_src
 
 ** [[https://github.com/alphapapa/magit-todos][Magit todos]]
@@ -2118,7 +2120,6 @@ Org mode is, well, org mode.
     :after ob-racket
     :general
     ("M-o" 'mdrp-org-map)
-    ;; ([remap lsp-find-definition] 'org-insert-link)
     ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
     (:keymaps 'mdrp-org-map
               "l"                       'org-store-link
