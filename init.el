@@ -1140,6 +1140,7 @@ debian, and derivatives). On most it's 'fd'.")
   :general
   ("M-o" 'mdrp-org-map)
   ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
+  ("C-c o l" 'mdrp/logger)
   (:keymaps 'mdrp-org-map
             "l"                       'org-store-link
             "a"                       'org-agenda
@@ -1153,6 +1154,12 @@ debian, and derivatives). On most it's 'fd'.")
             "C-c C-c"                 'org-edit-src-exit)
 
   :init
+  (defun mdrp/logger ()
+    (interactive)
+    "Print logger"
+    (let ((line (number-to-string (line-number-at-pos))))
+      (kill-new (concat buffer-file-name "::" line))))
+
   (defun mdrp/org-mode-hook ()
     (let ((oldmap (cdr (assoc 'lsp-mode minor-mode-map-alist)))
           (newmap (make-sparse-keymap)))
@@ -1174,7 +1181,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (defun mdrp/org-compile-latex-and-update-other-buffer ()
     "Has as a premise that it's run from an org-mode buffer and the
-             other buffer already has the PDF open"
+               other buffer already has the PDF open"
     (interactive)
     (org-latex-export-to-pdf)
     (mdrp/update-other-buffer))
@@ -1190,6 +1197,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-hide-block-startup t)
   ;; Rest
   (org-ellipsis " ▾")
+  (org-startup-indented t)
   (org-adapt-indentation nil)
   (org-agenda-span 'week)
   (org-agenda-start-day "1d")
@@ -1243,7 +1251,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   (defun org-setup-<>-syntax-fix ()
     "Setup for characters ?< and ?> in source code blocks.
-          Add this function to `org-mode-hook'."
+            Add this function to `org-mode-hook'."
     (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
     (syntax-propertize (point-max)))
 
