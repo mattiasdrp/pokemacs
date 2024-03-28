@@ -1035,6 +1035,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package magit
   :defer t
   :general
+  ("C-c g"  'magit-file-dispatch)
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
   ("M-n"    'mdrp/smerge-or-flycheck-next)
   (:keymaps 'smerge-mode-map
