@@ -2266,14 +2266,15 @@ with a prefix ARG."
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
-   consult-theme
-   :preview-key '(:debounce 0.2 any)
+   consult-theme :preview-key '(:debounce 0.2 any)
+
+   consult-bookmark consult-recent-file
+   consult--source-project-recent-file
+   consult--source-recent-file consult-buffer
    consult-ripgrep consult-git-grep consult-grep
    mdrp/consult-git-grep-always-prompt-dir
    mdrp/consult-ripgrep-always-prompt-dir
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-recent-file
-   consult--source-project-recent-file
+   consult-xref consult--source-bookmark
    :preview-key '(:debounce 0.5 "M-."))
 
    ;; Optionally configure the narrowing key.
@@ -3001,7 +3002,6 @@ with a prefix ARG."
                             (agenda . 5)))
     (setq dashboard-set-navigator t)
     (setq dashboard-set-footer nil)
-    (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
     (setq dashboard-week-agenda t)
     :config
     (dashboard-setup-startup-hook)
@@ -3598,8 +3598,7 @@ with a prefix ARG."
               "C-c C-t" nil
               "C-c C-w" nil
               "C-c C-l" nil
-              "C-c w"   'mdrp/dune-watch
-              )
+              "C-c o w" 'ocaml-utils-dune-watch)
     :config
     (defvar-local mdrp/ocaml-templates-local mdrp/ocaml-templates "OCaml Templates")
     (add-to-list 'tempel-template-sources 'mdrp/ocaml-templates)
