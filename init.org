@@ -1411,9 +1411,9 @@ Useful packages that allows to see the possible keys after starting a combinatio
               "M-u"                     'upcase-dwim
               "C-f"                     'fill-region
               "C-q"                     'selected-off
-              "M-s r"                   'reverse-region
-              "M-s s"                   'sort-lines
-              "M-s w"                   'mdrp/sort-words
+              "C-c s r"                 'reverse-region
+              "C-c s s"                 'sort-lines
+              "C-c s w"                 'mdrp/sort-words
               "C-<return>"              'hide-region-hide
               "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window"))
     :config (message "`selected' loaded"))
@@ -3445,7 +3445,7 @@ Vertico works with the default completion system instead of reimplementing a who
               "C-M-p" #'vertico-previous-group
               "?" #'minibuffer-completion-help
               "M-RET" #'embark-dwim ;; pick some comfortable binding
-              "C-<up>" #'other-window
+              ;; "C-<up>" #'other-window
               )
     (:keymaps 'minibuffer-local-map
               "M-h" #'backward-kill-word)
@@ -3626,8 +3626,20 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
     ;; after lazily loading the package.
     :config
 
-    ;; (defun consult-line-repeat ()
-    ;;   (interactive)
+    (defun mdrp/consult-with-region (old-consult-function &optional dir given-initial)
+      "Pass the region to consult-grep/ripgrep if available.
+
+  DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
+      (interactive "P")
+      (message "wrapper")
+      (let ((initial
+             (or given-initial
+                 (when (use-region-p)
+                   (buffer-substring-no-properties (region-beginning) (region-end))))))
+        (funcall old-consult-function dir initial)))
+
+    (advice-add #'consult-ripgrep :around #'mdrp/consult-with-region)
+    (advice-add #'consult-grep :around #'mdrp/consult-with-region)
 
     (defun mdrp/consult-ripgrep-always-prompt-dir ()
       (interactive)
@@ -3641,6 +3653,24 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
       (let ((map (make-sparse-keymap)))
         (define-key map "\C-s" #'previous-history-element)
         map))
+
+    (defun consult-ripgrep-up-directory ()
+      (interactive)
+      (let ((parent-dir (file-name-directory (directory-file-name default-directory))))
+        (when parent-dir
+          (run-at-time 0 nil
+                       #'consult-ripgrep
+                       parent-dir
+                       (ignore-errors
+                         (buffer-substring-no-properties
+                          (1+ (minibuffer-prompt-end)) (point-max))))))
+      (minibuffer-quit-recursive-edit))
+
+    (consult-customize
+     consult-ripgrep
+     :keymap (let ((map (make-sparse-keymap)))
+               (define-key map (kbd "M-l") #'consult-ripgrep-up-directory)
+               map))
 
     (consult-customize consult-line :keymap mdrp/consult-line-map)
     ;; Optionally configure preview. The default value
@@ -3662,27 +3692,27 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
      consult-xref consult--source-bookmark
      :preview-key '(:debounce 0.5 "M-."))
 
-     ;; Optionally configure the narrowing key.
-     ;; Both < and C-+ work reasonably well.
-     (setq consult-narrow-key "<") ;; (kbd "C-+")
+    ;; Optionally configure the narrowing key.
+    ;; Both < and C-+ work reasonably well.
+    (setq consult-narrow-key "<") ;; (kbd "C-+")
 
-     ;; Optionally make narrowing help available in the minibuffer.
-     ;; You may want to use `embark-prefix-help-command' or which-key instead.
-     ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+    ;; Optionally make narrowing help available in the minibuffer.
+    ;; You may want to use `embark-prefix-help-command' or which-key instead.
+    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
 
-     ;; By default `consult-project-function' uses `project-root' from project.el.
-     ;; Optionally configure a different project root function.
-     ;; There are multiple reasonable alternatives to chose from.
+    ;; By default `consult-project-function' uses `project-root' from project.el.
+    ;; Optionally configure a different project root function.
+    ;; There are multiple reasonable alternatives to chose from.
       ;;;; 1. project.el (the default)
-     ;; (setq consult-project-function #'consult--default-project--function)
+    ;; (setq consult-project-function #'consult--default-project--function)
       ;;;; 2. projectile.el (projectile-project-root)
-     (autoload 'projectile-project-root "projectile")
-     (setq consult-project-function (lambda (_) (projectile-project-root)))
+    (autoload 'projectile-project-root "projectile")
+    (setq consult-project-function (lambda (_) (projectile-project-root)))
       ;;;; 3. vc.el (vc-root-dir)
-     ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+    ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
       ;;;; 4. locate-dominating-file
-     ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-     (message "`consult' loaded"))
+    ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+    (message "`consult' loaded"))
 #+end_src
 
 ** [[https://github.com/oantolin/embark][Embark]]
@@ -4794,6 +4824,29 @@ Code folding based on tree-sitter tree.
 
 #+end_src
 
+** [[https://github.com/mattiasdrp/combobulate][Combobulate]]
+
+#+begin_src emacs-lisp
+  (use-package combobulate
+    :after treesit
+    :preface
+    ;; You can customize Combobulate's key prefix here.
+    ;; Note that you may have to restart Emacs for this to take effect!
+    (setq combobulate-key-prefix "C-c c")
+    :hook
+    ((python-ts-mode . combobulate-mode)
+     (js-ts-mode . combobulate-mode)
+     (html-ts-mode . combobulate-mode)
+     (css-ts-mode . combobulate-mode)
+     (yaml-ts-mode . combobulate-mode)
+     (typescript-ts-mode . combobulate-mode)
+     (json-ts-mode . combobulate-mode)
+     (tsx-ts-mode . combobulate-mode))
+    ;; Amend this to the directory where you keep Combobulate's source
+    ;; code.
+    :load-path "lisp/combobulate")
+#+end_src
+
 * Programming languages
 :PROPERTIES:
 :CUSTOM_ID: programming-languages
@@ -5687,6 +5740,7 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 #+begin_src emacs-lisp
   (when use-python
     (use-package python
+      :ensure nil
       :defer t
       :hook (python-mode . semantic-mode)
       :config
