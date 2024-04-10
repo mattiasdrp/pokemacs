@@ -787,6 +787,39 @@ debian, and derivatives). On most it's 'fd'.")
 
 (add-hook 'kill-emacs-hook 'mdrp/unpropertize-kill-ring)
 
+(use-package emacs
+  :ensure nil
+  :demand t
+  :general
+  (:keymaps 'query-replace-map
+            "M-c" 'mdrp/toggle-case
+            "c"    'mdrp/toggle-case)
+  :config
+  (defun mdrp/toggle-case ()
+    (interactive)
+    (setq case-fold-search (not case-fold-search))
+    (message "toggled case-fold-search to %s" case-fold-search))
+  (defconst query-replace-help
+    "Type \\`SPC' or \\`y' to replace one match, Delete or \\`n' to skip to next,
+\\`RET' or \\`q' to exit, Period to replace one match and exit,
+\\`,' to replace but not move point immediately,
+\\`C-r' to enter recursive edit (\\[exit-recursive-edit] to get out again),
+\\`C-w' to delete match and recursive edit,
+\\`C-l' to clear the screen, redisplay, and offer same replacement again,
+\\`!' to replace all remaining matches in this buffer with no more questions,
+\\`^' to move point back to previous match,
+\\`u' to undo previous replacement,
+\\`U' to undo all replacements,
+\\`e' to edit the replacement string.
+\\`E' to edit the replacement string with exact case.
+In multi-buffer replacements type \\`Y' to replace all remaining
+matches in all remaining buffers with no more questions,
+\\`N' to skip to the next buffer without replacing remaining matches
+in the current buffer.
+\\`c' or \\`M-c' to toggle case sensitivity"
+    "Help message while in `query-replace'.")
+  )
+
 (setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
 
 (use-package nlinum
