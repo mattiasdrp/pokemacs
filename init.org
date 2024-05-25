@@ -3179,6 +3179,10 @@ On the fly syntax checking. One of the greatest package there is for making prog
     :defer t
     :init
     (define-prefix-command 'mdrp-fly-map nil "Fly-")
+    (defvar-keymap mdrp-flycheck-overlay-map
+      :doc "Keymap attached to lsp and flycheck overlays."
+      "M-$" #'lsp-execute-code-action)
+    (fset 'mdrp-flycheck-overlay-map mdrp-flycheck-overlay-map)
     :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
     :general
     (:keymaps 'mdrp-fly-map
@@ -3191,6 +3195,12 @@ On the fly syntax checking. One of the greatest package there is for making prog
       (if (flycheck-next-error-pos n reset)
           (list n reset)
         (list n t)))
+    (let ((overlays `(flycheck-info-overlay
+                      flycheck-error-overlay
+                      flycheck-warning-overlay
+                      lsp-flycheck-warning-unnecessary-category)))
+      (dolist (overlay overlays)
+        (put overlay 'keymap mdrp-flycheck-overlay-map)))
     (message "`flycheck' loaded"))
 #+end_src
 
@@ -4821,22 +4831,23 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 :END:
 
 #+begin_src emacs-lisp
-  ;; This package needs to be loaded to use language parsers
-  (use-package tree-sitter-langs
-    :defer t
-    :config (message "`tree-sitter-langs' loaded"))
+    ;; This package needs to be loaded to use language parsers
+    (use-package tree-sitter-langs
+      :defer t
+      :config (message "`tree-sitter-langs' loaded"))
 
-  (use-package tree-sitter
-    :demand t
-    :hook
-    (tree-sitter-after-on . tree-sitter-hl-mode)
-    :config
-    ;; This makes every node a link to a section of code
-    (setq tree-sitter-debug-jump-buttons t)
-    ;; and this highlights the entire sub tree in your code
-    (setq tree-sitter-debug-highlight-jump-region t)
-    (global-tree-sitter-mode)
-    :config (message "`tree-sitter' loaded"))
+    (use-package tree-sitter
+      :defer t
+      :hook
+      (tuareg-mode . tree-sitter-mode)
+      (tree-sitter-after-on . tree-sitter-hl-mode)
+      :config
+      ;; This makes every node a link to a section of code
+      (setq tree-sitter-debug-jump-buttons t)
+      ;; and this highlights the entire sub tree in your code
+      (setq tree-sitter-debug-highlight-jump-region t)
+      ;; (global-tree-sitter-mode)
+      :config (message "`tree-sitter' loaded"))
 #+end_src
 
 *** Tree sitter folding

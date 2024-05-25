@@ -1959,6 +1959,10 @@ have one rule for each file type."
   :defer t
   :init
   (define-prefix-command 'mdrp-fly-map nil "Fly-")
+  (defvar-keymap mdrp-flycheck-overlay-map
+    :doc "Keymap attached to lsp and flycheck overlays."
+    "M-$" #'lsp-execute-code-action)
+  (fset 'mdrp-flycheck-overlay-map mdrp-flycheck-overlay-map)
   :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
   :general
   (:keymaps 'mdrp-fly-map
@@ -1971,6 +1975,12 @@ have one rule for each file type."
     (if (flycheck-next-error-pos n reset)
         (list n reset)
       (list n t)))
+  (let ((overlays `(flycheck-info-overlay
+                    flycheck-error-overlay
+                    flycheck-warning-overlay
+                    lsp-flycheck-warning-unnecessary-category)))
+    (dolist (overlay overlays)
+      (put overlay 'keymap mdrp-flycheck-overlay-map)))
   (message "`flycheck' loaded"))
 
 (use-package flycheck-correct
@@ -3150,15 +3160,16 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config (message "`tree-sitter-langs' loaded"))
 
 (use-package tree-sitter
-  :demand t
+  :defer t
   :hook
+  (tuareg-mode . tree-sitter-mode)
   (tree-sitter-after-on . tree-sitter-hl-mode)
   :config
   ;; This makes every node a link to a section of code
   (setq tree-sitter-debug-jump-buttons t)
   ;; and this highlights the entire sub tree in your code
   (setq tree-sitter-debug-highlight-jump-region t)
-  (global-tree-sitter-mode)
+  ;; (global-tree-sitter-mode)
   :config (message "`tree-sitter' loaded"))
 
 (use-package ts-fold
