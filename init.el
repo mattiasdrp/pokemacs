@@ -2594,7 +2594,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; FRINGE
   ;; UI: the gutter looks less cramped with some space between it and  buffer.
   (setq-default fringes-outside-margins nil)
-
+  (setq-default describe-mode-outline nil)
 
   ;; Try to indent and if already indented, complete
   (setq tab-always-indent 'complete)
@@ -3960,8 +3960,15 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c c" 'seeing-is-believing-clear)))
 
 (when use-rust
+
+  (use-package rust-mode
+    :ensure t
+    :init
+    (setq rust-mode-treesitter-derive t))
+
   (use-package rustic
-    :mode ((rx ".rs" string-end) . rustic-mode)
+    :ensure (:repo "emacs-rustic/rustic")
+    :mode ("\\.rs$" . rustic-mode)
     :ensure-system-package
     ((taplo . "cargo install taplo-cli --features lsp")
      (rustfmt . "cargo install rustfmt"))
@@ -3973,9 +3980,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-M-;" 'mdrp/rust-doc-comment-dwim-following
               "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing)
     :init
-    (let ((mode '("\\.rs\\'" . rust-mode)))
-      (when (member mode auto-mode-alist)
-        (setq auto-mode-alist (remove mode auto-mode-alist))))
 
     (defun mdrp/rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
