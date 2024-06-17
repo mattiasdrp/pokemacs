@@ -101,12 +101,12 @@
 :CUSTOM_ID: languages
 :END:
 
-*** Ts-fold
+*** Combobulate
 :PROPERTIES:
-:CUSTOM_ID: ts-fold
+:CUSTOM_ID: combobulate
 :END:
 
-You need to initialise the ~ts-fold~ submodule until it is available on Melpa.
+You need to initialize the ~combobulate~ submodule until it is available on Melpa.
 
 #+begin_src sh
   git submodule init && git submodule update
