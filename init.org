@@ -1286,10 +1286,9 @@ Other nerd-icons related packages:
       "M-h"
       "M-/"
       "M-l"
-      "M-f"
-      )
+      "M-f")
     (general-define-key
-     [remap kill-buffer]                  'kill-this-buffer
+     [remap kill-buffer]                  'kill-current-buffer
      [remap ispell-word]                  'jinx-correct
      ;; Prefixed by C
      "C-x C-1"                 'delete-other-windows
@@ -1331,7 +1330,7 @@ Other nerd-icons related packages:
      ;; Custom comment overwriting comment-dwim key binding
      "M-;"                     'mdrp/comment-eclipse
      "M-p"                     'backward-paragraph
-     "M-<f1>"                  'kill-this-buffer
+     "M-<f1>"                  'kill-current-buffer
      "M-Q"                     'unfill-paragraph
 
      "M-+"                     'hs-toggle-hiding
@@ -1342,8 +1341,7 @@ Other nerd-icons related packages:
      [(shift f3)]              'prev-match
      [f4]                      'goto-line
      [f7]                      'next-error
-     [f8]                      'normal-mode
-     )
+     [f8]                      'normal-mode)
     (general-define-key
      :prefix "M-z"
      ;; Setup shorcuts for window resize width and height
