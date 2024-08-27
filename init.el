@@ -527,6 +527,7 @@ debian, and derivatives). On most it's 'fd'.")
            (string-match
             "Linux.*Microsoft.*Linux"
             (shell-command-to-string "uname -a")))
+  (eshell-command "xmodmap -e 'keycode 191 = space'")
   (setq
    browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
    browse-url-generic-args     '("/c" "start")
@@ -1070,8 +1071,8 @@ in the current buffer.
                        elpaca--pre-built-steps elpaca-build-steps))
           (list '+elpaca-unload-seq 'elpaca--activate-package)))
 
-(use-package seq
-  :ensure `(seq :build ,(+elpaca-seq-build-steps)))
+;; (use-package seq
+;;   :ensure `(seq :build ,(+elpaca-seq-build-steps)))
 
 (use-package magit
   :defer t
@@ -1145,6 +1146,9 @@ in the current buffer.
   :config
   (message "`org-protocol' loaded"))
 
+(use-package ox-pandoc
+  :defer t)
+
 (use-package ox
   :ensure nil
   :defer t
@@ -1175,6 +1179,7 @@ in the current buffer.
   :defer t
   :ensure nil
   :mode ("\\.org\\'" . org-mode)
+  :load-path "lisp/org-mode/lisp"
   :hook
   (org-mode . mixed-pitch-mode)
   (org-mode . mdrp/org-mode-hook)
@@ -1252,6 +1257,7 @@ in the current buffer.
   (org-hide-leading-stars nil)
   (org-hide-macro-markers t)
   (org-image-actual-width '(300))
+  (org-image-align 'center)
   (org-latex-compiler "latexmk")
   (org-log-done 'time)
   (org-odd-levels-only nil)
@@ -1335,46 +1341,6 @@ in the current buffer.
            "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
           ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
            "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
-  (custom-theme-set-faces
-   'user
-   '(org-block ((t (:inherit fixed-pitch))))
-   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-   '(org-document-title ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#c678dd"))))
-   '(org-level-1 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#51afef"))))
-   '(org-level-2 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#c678dd"))))
-   '(org-level-3 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#a9a1e1"))))
-   '(org-level-4 ((t (:inherit variable-pitch :height 1.2 :weight bold :foreground "#7cc3f3"))))
-   '(org-level-5 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
-   '(org-level-6 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
-   '(org-level-7 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
-   '(org-level-8 ((t (:inherit variable-pitch :height 1.1 :weight bold))))
-   '(org-property-value ((t (:inherit fixed-pitch))) t)
-   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold))))
-   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
-   ;; (let ((re "\\}\\(+\\|-\\) "))
-   ;;   (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 0 org-list-indent-offset)) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string (+ 2 org-list-indent-offset)) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◆"))))))
-
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
-   ;;                                    (* 2 (+ 2 org-list-indent-offset))) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◇"))))))
-   ;;    (font-lock-add-keywords
-   ;;     'org-mode
-   ;;     `((,(concat "^[[:space:]]\\{" (number-to-string
-   ;;                                    (* 3 (+ 2 org-list-indent-offset))) re)
-   ;;        (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◼"))))))
-   ;;    )
-   )
   (message "`org-mode' loaded"))
 
 (use-package org-modern
@@ -1599,6 +1565,95 @@ in the current buffer.
   :ensure nil
   :after org
   :config (message "`ox-moderncv' loaded"))
+
+(use-package org-present
+  :ensure t
+  :demand t
+  :after org
+  :general
+  (:keymaps 'org-present-mode-keymap
+            "<right>" 'mdrp/org-next-visible-heading-and-expand
+            "<left>" 'mdrp/org-prev-visible-heading-and-expand
+            "C-<right>" 'org-present-next
+            "C-<left>" 'org-present-prev)
+  :init
+  (defun mdrp/org-next-visible-heading-and-expand (arg)
+    (interactive "p")
+    (let ((res (call-interactively #'org-next-visible-heading arg)))
+      (if res
+          (call-interactively #'org-present-next)
+        (call-interactively #'org-fold-show-entry)))
+    (recenter 0 t))
+
+  (defun mdrp/org-prev-visible-heading-and-expand (arg)
+    (interactive "p")
+    (if (= (point) (point-min))
+        (progn
+          (call-interactively #'org-present-prev)
+          (goto-char (point-max))
+          (call-interactively #'org-previous-visible-heading arg)
+          (call-interactively #'org-fold-show-entry))
+      (progn
+        (call-interactively #'org-previous-visible-heading arg)
+        (call-interactively #'org-fold-show-entry)))
+    (recenter 0 t))
+
+  (defvar-local memo/header-line-format header-line-format)
+  (defvar-local memo/use-header-line use-header-line)
+  (defun mdrp/org-present-start ()
+    (visual-fill-column-mode 1)
+    (visual-line-mode 1)
+    (setq-local visual-fill-column-width 100)
+    (setq-local face-remapping-alist
+                '((default (:height 1.2) default)
+                  (header-line (:height 4.0) variable-pitch)
+                  (org-document-title (:height 1.75) org-document-title)
+                  (org-code (:height 1.55) org-code)
+                  (org-verbatim (:height 1.55) org-verbatim)
+                  (org-block (:height 1.25) org-block)
+                  (org-block-begin-line (:height 0.7) org-block-begin-line)))
+    (setq-local memo/header-line-format header-line-format)
+    (lsp-disconnect)
+    (flycheck-mode -1)
+    (lsp-mode -1)
+    (lsp-headerline-breadcrumb-mode -1)
+    (nlinum-mode -1)
+    (jinx-mode -1)
+    (setq use-header-line nil)
+    (setq header-line-format " ")
+    (consult-theme 'doom-palenight)
+    (hide-mode-line-mode 1)
+    (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
+    (message "`org-present' start"))
+
+  (defun mdrp/org-present-quit ()
+    (visual-fill-column-mode 0)
+    (visual-line-mode 0)
+    (hide-mode-line-mode 0)
+    (setq use-header-line memo/use-header-line)
+    (setq header-line-format memo/header-line-format)
+    (consult-theme pokemacs-theme)
+    (nlinum-mode)
+    (jinx-mode)
+    (lsp-mode)
+    (lsp-headerline-breadcrumb-mode)
+    (flycheck-mode)
+    (setq-local face-remapping-alist '((default variable-pitch default)))
+    (message "`org-present' quit"))
+
+  (defun mdrp/org-present-prepare-slide (buffer-name heading)
+    ;; Show only top-level headlines
+    (org-overview)
+    ;; Unfold the current entry
+    (org-show-entry)
+    ;; Show only direct subheadings of the slide but don't expand them
+    (org-show-children))
+
+  :hook ((org-present-mode . mdrp/org-present-start)
+         (org-present-mode-quit . mdrp/org-present-quit))
+  :config
+  (add-hook 'org-present-after-navigate-functions 'mdrp/org-present-prepare-slide)
+  (message "`org-present' loaded"))
 
 ;; Taken from doomemacs
 
@@ -4119,9 +4174,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 ;; Load personal configuration for org mode
 (load-file (expand-file-name "~/.secrets/org.el"))
 (message "`init' file loaded")
-  ;;;; Footer
+;;;; Footer
 
 ;; End:
 (provide 'init)
 
-  ;;; init.el ends here
+;;; init.el ends here
