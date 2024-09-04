@@ -19,39 +19,38 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(setq elpaca-core-date '(20240411))
 (defvar elpaca-installer-version 0.7)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-				:ref nil :depth 1
-				:files (:defaults "elpaca-test.el" (:exclude "extensions"))
-				:build (:not elpaca--activate-package)))
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-	 (build (expand-file-name "elpaca/" elpaca-builds-directory))
-	 (order (cdr elpaca-order))
-	 (default-directory repo))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
   (add-to-list 'load-path (if (file-exists-p build) build repo))
   (unless (file-exists-p repo)
     (make-directory repo t)
     (when (< emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
-	  (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-		   ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-						   ,@(when-let ((depth (plist-get order :depth)))
-						       (list (format "--depth=%d" depth) "--no-single-branch"))
-						   ,(plist-get order :repo) ,repo))))
-		   ((zerop (call-process "git" nil buffer t "checkout"
-					 (or (plist-get order :ref) "--"))))
-		   (emacs (concat invocation-directory invocation-name))
-		   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-					 "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-		   ((require 'elpaca))
-		   ((elpaca-generate-autoloads "elpaca" repo)))
-	      (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-	    (error "%s" (with-current-buffer buffer (buffer-string))))
-	((error) (warn "%s" err) (delete-directory repo 'recursive))))
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                 ,@(when-let ((depth (plist-get order :depth)))
+                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                 ,(plist-get order :repo) ,repo))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
   (unless (require 'elpaca-autoloads nil t)
     (require 'elpaca)
     (elpaca-generate-autoloads "elpaca" repo)
@@ -1052,28 +1051,12 @@ in the current buffer.
             [remap dired-smart-shell-command]    'dwim-shell-command)
   :config (require 'dwim-shell-commands))
 
-(use-package git-commit
-  :defer t
-  :config (message "`git-commit' loaded"))
-
 (use-package transient
   :ensure t)
 
-(defun +elpaca-unload-seq (e)
-  (and (featurep 'seq) (unload-feature 'seq t))
-  (elpaca--continue-build e))
-
-;; You could embed this code directly in the recipe, I just abstracted it into a function.
-(defun +elpaca-seq-build-steps ()
-  (append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
-                       elpaca--pre-built-steps elpaca-build-steps))
-          (list '+elpaca-unload-seq 'elpaca--activate-package)))
-
-;; (use-package seq
-;;   :ensure `(seq :build ,(+elpaca-seq-build-steps)))
-
 (use-package magit
   :defer t
+  :ensure t
   :general
   ("C-c g"  'magit-file-dispatch)
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
@@ -1462,10 +1445,14 @@ in the current buffer.
   (message "`org-super-agenda' loaded"))
 
 (use-package org-appear
+  :disabled
+  :after org
+  :ensure (org-appear :host github :repo "awth13/org-appear" :branch "org-9.7-fixes")
   :defer t
   :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autolinks t)
+  (setq org-appear-autoemphasis t)
   (message "`org-appear loaded"))
 
 (when use-org-roam
@@ -1578,22 +1565,19 @@ in the current buffer.
   (defun mdrp/org-next-visible-heading-and-expand (arg)
     (interactive "p")
     (let ((res (call-interactively #'org-next-visible-heading arg)))
-      (if res
+      (if (= (point) (point-max))
           (call-interactively #'org-present-next)
         (call-interactively #'org-fold-show-entry)))
     (recenter 0 t))
 
   (defun mdrp/org-prev-visible-heading-and-expand (arg)
     (interactive "p")
-    (if (= (point) (point-min))
-        (progn
-          (call-interactively #'org-present-prev)
-          (goto-char (point-max))
-          (call-interactively #'org-previous-visible-heading arg)
-          (call-interactively #'org-fold-show-entry))
-      (progn
-        (call-interactively #'org-previous-visible-heading arg)
-        (call-interactively #'org-fold-show-entry)))
+    (call-interactively #'org-fold-hide-entry)
+    (when (= (point) (point-min))
+      (call-interactively #'org-present-prev)
+      (goto-char (point-max)))
+    (call-interactively #'org-previous-visible-heading arg)
+    (call-interactively #'org-fold-show-entry)
     (recenter 0 t))
 
   (defvar-local memo/header-line-format header-line-format)
@@ -1602,9 +1586,10 @@ in the current buffer.
     (visual-fill-column-mode 1)
     (visual-line-mode 1)
     (setq-local visual-fill-column-width 100)
+    (setq-local line-spacing 0.7)
+    ;; (mixed-pitch-mode 1)
     (setq-local face-remapping-alist
-                '((default (:height 1.2) default)
-                  (header-line (:height 4.0) variable-pitch)
+                '((header-line (:height 4.0) variable-pitch)
                   (org-document-title (:height 1.75) org-document-title)
                   (org-code (:height 1.55) org-code)
                   (org-verbatim (:height 1.55) org-verbatim)
@@ -1628,6 +1613,7 @@ in the current buffer.
     (visual-fill-column-mode 0)
     (visual-line-mode 0)
     (hide-mode-line-mode 0)
+    (setq line-spacing nil)
     (setq use-header-line memo/use-header-line)
     (setq header-line-format memo/header-line-format)
     (consult-theme pokemacs-theme)
