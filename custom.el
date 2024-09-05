@@ -84,20 +84,6 @@
  '(use-visual-fill t)
  '(use-web t)
  '(use-window-purpose nil)
- '(vertico-multiform-categories
-   '((imenu buffer) (file (vertico-sort-function . sort-directories-first))
-     (corfu (vertico-sort-function . vertico-sort-alpha))
-     (jinx grid (vertico-grid-annotate . 20))
-     (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
- '(vertico-multiform-commands
-   '((consult-imenu buffer) (consult-line buffer) (execute-extended-command mouse)
-     (find-file (vertico-sort-function . sort-directories-first))
-     (insert-char (vertico-sort-function . sort-characters))
-     (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))
-     (posframe
-      (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-      (vertico-posframe-border-width . 10))
-     (t posframe)))
  '(warning-suppress-types '((comp)))
  '(x-stretch-cursor nil))
 
