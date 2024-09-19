@@ -44,6 +44,8 @@
  '(package-selected-packages nil)
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-theme 'doom-solarized-dark)
+ '(pokemacs-mono-font "Fira Code")
+ '(pokemacs-variable-font "Iosevka Aile")
  '(pokemacs/english-dict "GB")
  '(pokemacs/french-dict "FR")
  '(safe-local-variable-values
@@ -84,6 +86,23 @@
  '(use-visual-fill t)
  '(use-web t)
  '(use-window-purpose nil)
+ '(tuple-mono-font
+   (cond
+    ((x-list-fonts pokemacs-mono-font)         `(:font ,pokemacs-mono-font))
+    ((x-list-fonts "Fira Code")                '(:font "Fira Code"))
+    ((x-list-fonts "Inconsolata")              '(:font "Inconsolata"))
+    ((x-family-fonts "DejaVu")                 '(:family "DejaVu"))
+    (nil (warn "Cannot find a monospaced font."))) t)
+'(tuple-variable-font
+   (cond
+    ((x-list-fonts pokemacs-variable-font)     `(:font ,pokemacs-variable-font))
+    ((x-list-fonts "Iosevka Aile")             '(:font "Iosevka Aile"))
+    ((x-list-fonts "ETBembo")                  '(:font "ETBembo"))
+    ((x-list-fonts "Source Sans Pro")          '(:font "Source Sans Pro"))
+    ((x-list-fonts "Lucida Grande")            '(:font "Lucida Grande"))
+    ((x-list-fonts "Verdana")                  '(:font "Verdana"))
+    ((x-family-fonts "Sans Serif")             '(:family "Sans Serif"))
+    (nil (warn "Cannot find a Sans Serif Font."))) t)
  '(warning-suppress-types '((comp)))
  '(x-stretch-cursor nil))
 
@@ -92,13 +111,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Fira Code" :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
- '(fixed-pitch ((t (:family "Fira Code" :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
- '(variable-pitch ((t (:font "Iosevka Aile" :weight light :height 1.3))))
- '(lsp-lens-face ((t (:family "Fira Code" :foundry "CTDB" :inherit lsp-details-face))))
+ `(default ((t (,@tuple-mono-font :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
+ `(fixed-pitch ((t (,@tuple-mono-font :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
+ `(variable-pitch ((t (,@tuple-variable-font :weight light :height 1.3))))
+ `(lsp-lens-face ((t (,@tuple-mono-font :foundry "CTDB" :inherit lsp-details-face))))
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
- '(mode-line-inactive ((nil :family "Fira Code")))
+ `(mode-line-inactive ((nil ,@tuple-mono-font)))
  '(org-document-title ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))
  '(org-level-1 ((t (:inherit variable-pitch :height 1.7 :weight bold :foreground "#51afef"))))
  '(org-level-2 ((t (:inherit variable-pitch :height 1.4 :weight bold :foreground "#c678dd"))))

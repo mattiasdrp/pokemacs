@@ -186,6 +186,18 @@ Similar to Vim's separation of command/insert modes"
   :group 'pokemacs
   :tag "Appearance")
 
+(defcustom pokemacs-mono-font "Fira Code"
+  "Mono font."
+  :group 'pokemacs-appearance
+  :type 'string
+  :tag " Font")
+
+(defcustom pokemacs-variable-font "Iosevka Aile"
+  "Font for variable pitch."
+  :group 'pokemacs-appearance
+  :type 'string
+  :tag " Font")
+
 (defcustom pokemacs-theme 'doom-solarized-dark
   "Theme to load."
   :group 'pokemacs-appearance
