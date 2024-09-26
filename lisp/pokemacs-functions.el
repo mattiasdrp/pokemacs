@@ -1,4 +1,4 @@
-;;; mdrp-functions.el --- -*- lexical-binding: t -*-
+;;; pokemacs-functions.el --- -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2022 mattiasdrp and contributors.
 
@@ -18,7 +18,7 @@
 
 ;; Custom comment function a bit more clever
 ;; https://www.emacswiki.org/emacs/CommentingCode
-(defun mdrp/comment-eclipse (&optional arg)
+(defun pokemacs-comment-eclipse (&optional arg)
   "Replacement for the `comment-dwim' command.
 If no region is selected and current line is not blank and we are not at the
 end of the line, then comment current line.
@@ -32,7 +32,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 
 
 ;; Resizes the window width based on the input
-(defun mdrp/resize-window-width (w)
+(defun pokemacs-resize-window-width (w)
   "Resizes the window width based on W."
   (interactive (list (if (> (count-windows) 1)
                          (read-number "Set the current window width in [1~9]x10%: ")
@@ -40,14 +40,14 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
   (window-resize nil (- (truncate (* (/ w 10.0) (frame-width))) (window-total-width)) t))
 
 ;; Resizes the window height based on the input
-(defun mdrp/resize-window-height (h)
+(defun pokemacs-resize-window-height (h)
   "Resizes the window height based on H."
   (interactive (list (if (> (count-windows) 1)
                          (read-number "Set the current window height in [1~9]x10%: ")
                        (error "You need more than 1 window to execute this function!"))))
   (window-resize nil (- (truncate (* (/ h 10.0) (frame-height))) (window-total-height)) nil))
 
-(defun mdrp/resize-window (width delta)
+(defun pokemacs-resize-window (width delta)
   "Resize the current window's size.  If WIDTH is non-nil, resize width by some DELTA."
   (if (> (count-windows) 1)
       (window-resize nil delta width)
@@ -57,7 +57,7 @@ end of the line. Provides the optional ARG used by `comment-dwim'"
 (defun up-slightly () (interactive) (scroll-up 5))
 (defun down-slightly () (interactive) (scroll-down 5))
 
-(defun mdrp/sort-words (reverse beg end)
+(defun pokemacs-sort-words (reverse beg end)
   "Sort words in region alphabetically, in REVERSE if negative.
 Prefixed with negative \\[universal-argument], sorts in reverse.
 
@@ -72,63 +72,9 @@ See `sort-regexp-fields'."
       (modify-syntax-entry ?_ "w" temp-table)
       (sort-regexp-fields reverse "\\w+" "\\&" beg end))))
 
-(defvar-local mdrp/hydra-super-body nil)
+(defvar-local pokemacs-hydra-super-body nil)
 
-(defun mdrp/hydra-heading (&rest headings)
-  "Format HEADINGS to look pretty in a hydra docstring."
-  (mapconcat (lambda (it)
-               (propertize (format "%-20s" it) 'face 'shadow))
-             headings
-             nil))
-
-(defun mdrp/hydra-set-super ()
-  (when-let* ((suffix "-mode")
-              (position (- (length suffix)))
-              (mode (symbol-name major-mode))
-              (name (if (string= suffix (substring mode position))
-                        (substring mode 0 position)
-                      mode))
-              (body (intern (format "hydra-%s/body" name))))
-    (when (functionp body)
-      (setq mdrp/hydra-super-body body))))
-
-(defun mdrp/hydra-super-maybe ()
-  (interactive)
-  (if mdrp/hydra-super-body
-      (funcall mdrp/hydra-super-body)
-    (user-error "mdrp/hydra-super: mdrp/hydra-super-body is not set")))
-
-(defun mdrp/date-iso ()
-  "Insert the current date, ISO format, eg. 2016-12-09."
-  (interactive)
-  (insert (format-time-string "%F")))
-
-(defun mdrp/date-iso-with-time ()
-  "Insert the current date, ISO format with time, eg. 2016-12-09T14:34:54+0100."
-  (interactive)
-  (insert (format-time-string "%FT%T%z")))
-
-(defun mdrp/date-long ()
-  "Insert the current date, long format, eg. December 09, 2016."
-  (interactive)
-  (insert (format-time-string "%d %B %Y")))
-
-(defun mdrp/date-long-with-time ()
-  "Insert the current date, long format, eg. December 09, 2016 - 14:34."
-  (interactive)
-  (insert (capitalize (format-time-string "%d %B %Y - %H:%M"))))
-
-(defun mdrp/date-short ()
-  "Insert the current date, short format, eg. 2016.12.09."
-  (interactive)
-  (insert (format-time-string "%Y.%m.%d")))
-
-(defun mdrp/date-short-with-time ()
-  "Insert the current date, short format with time, eg. 2016.12.09 14:34"
-  (interactive)
-  (insert (format-time-string "%Y.%m.%d %H:%M")))
-
-(defun mdrp/update-other-buffer ()
+(defun pokemacs-update-other-buffer ()
   (interactive)
   (other-window 1)
   (revert-buffer nil t)
@@ -136,7 +82,7 @@ See `sort-regexp-fields'."
 
 ;;; FROM DOOM EMACS
 
-(defun mdrp/enlist (exp)
+(defun pokemacs-enlist (exp)
   "Return EXP wrapped in a list, or as-is if already a list."
   (declare (pure t) (side-effect-free t))
   (if (listp exp) exp (list exp)))
@@ -164,7 +110,7 @@ DOCSTRING and BODY are as in `defun'.
     (setq docstring nil))
   (let (where-alist)
     (while (keywordp (car body))
-      (push `(cons ,(pop body) (mdrp/enlist ,(pop body)))
+      (push `(cons ,(pop body) (pokemacs-enlist ,(pop body)))
             where-alist))
     `(progn
        (defun ,symbol ,arglist ,docstring ,@body)
@@ -172,6 +118,27 @@ DOCSTRING and BODY are as in `defun'.
          (dolist (target (cdr targets))
            (advice-add target (car targets) #',symbol))))))
 
-(provide 'mdrp-functions)
+(defmacro pokemacs-appendq! (sym &rest lists)
+  "Append LISTS to SYM in place."
+  `(setq ,sym (append ,sym ,@lists)))
+
+(defun pokemacs-partially-apply-interactively (cmd arg)
+  (lambda ()
+    (interactive)
+    (minibuffer-with-setup-hook
+        (lambda ()
+          (insert arg)
+          (add-hook 'post-command-hook #'exit-minibuffer nil t))
+      (call-interactively cmd))))
+
+(defun pokemacs-customize-my-custom-variable (variable)
+  (interactive)
+  (minibuffer-with-setup-hook
+      (lambda ()
+        (insert variable)
+        (add-hook 'post-command-hook #'exit-minibuffer nil t))
+    (call-interactively #'customize-set-variable)))
+
+(provide 'pokemacs-functions)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; mdrp-functions.el ends here
+;;; pokemacs-functions.el ends here

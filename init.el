@@ -198,11 +198,23 @@ Similar to Vim's separation of command/insert modes"
   :type 'string
   :tag " Font")
 
-(defcustom pokemacs-theme 'doom-solarized-dark
-  "Theme to load."
+(defcustom pokemacs-dark-theme-p t
+  "Dark or light theme."
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag "󰔎 Dark/Light")
+
+(defcustom pokemacs-dark-theme 'doom-solarized-dark
+  "Dark theme to load."
   :group 'pokemacs-appearance
   :type 'symbol
-  :tag "󰔎 Theme")
+  :tag "󰖔 Dark Theme")
+
+(defcustom pokemacs-light-theme 'doom-solarized-light
+  "Light theme to load."
+  :group 'pokemacs-appearance
+  :type 'symbol
+  :tag "󰖙 Light Theme")
 
 (defcustom use-all-the-icons nil
   "Use all-the-icons (when t) or nerd-icons (when nil)."
@@ -249,21 +261,16 @@ Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter 
   :group 'pokemacs
   :tag "Dictionaries")
 
-(defcustom pokemacs/english-dict "US"
-  "Use an English dictionary.
-Specify the linguistic variant (like GB, US etc)
-or nil if you don't want to use an english dictionary"
+(defcustom pokemacs-dict "en-GB"
+  "Dictionary language.
+Specify the chosen language used by spell checking tools in pokemacs."
   :group 'pokemacs-dictionaries
-  :type 'string
-  :tag "English variant")
-
-(defcustom pokemacs/french-dict "FR"
-  "Use a french dictionary.
-Specify the linguistic variant (like FR, BE etc)
-or nil if you don't want to use an english dictionary"
-  :group 'pokemacs-dictionaries
-  :type 'string
-  :tag "French variant")
+  :type '(choice (const :tag "en-GB"   "en-GB")
+                 (const :tag "en-US"   "en-US")
+                 (const :tag "fr"      "fr")
+                 (const :tag "No dict" nil)
+                 (string :tag "Other"))
+  :tag " Dictionary")
 
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
@@ -427,7 +434,7 @@ or nil if you don't want to use an english dictionary"
   :init (repeat-mode t)
   :config
   (setopt repeat-exit-timeout nil)
-  (defun mdrp/set-repeat-exit-timeout (list)
+  (defun pokemacs-set-repeat-exit-timeout (list)
     (dolist (command list)
       (put command 'repeat-exit-timeout pokemacs-repeat-timeout))))
 
@@ -479,21 +486,21 @@ or nil if you don't want to use an english dictionary"
 
 (require 'cl-lib)
 (require 'package)
-(require 'mdrp-functions)
+(require 'pokemacs-functions)
 
-(defconst mdrp/sys/win32
+(defconst pokemacs-sys/win32
   (eq system-type 'windows-nt)
   "Are we running on a WinTel system?")
 
-(defconst mdrp/sys/linux
+(defconst pokemacs-sys/linux
   (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux system?")
 
-(defconst mdrp/sys/mac
+(defconst pokemacs-sys/mac
   (eq system-type 'darwin)
   "Are we running on a Mac system?")
 
-(defvar mdrp/fd-binary
+(defvar pokemacs-fd-binary
   (cl-find-if #'executable-find (list "fdfind" "fd"))
   "The filename of the `fd' executable. On some distros it's 'fdfind' (ubuntu,
 debian, and derivatives). On most it's 'fd'.")
@@ -534,17 +541,21 @@ debian, and derivatives). On most it's 'fd'.")
   (add-to-list 'recentf-exclude no-littering-etc-directory)
   (message "`savehist' loaded"))
 
-(when (and (eq system-type 'gnu/linux)
-           (string-match
-            "Linux.*Microsoft.*Linux"
-            (shell-command-to-string "uname -a")))
-  (eshell-command "xmodmap -e 'keycode 191 = space'")
-  (setq
-   browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
-   browse-url-generic-args     '("/c" "start")
-   browse-url-browser-function #'browse-url-generic))
+(defun pokemacs-wsl-specific-function ()
+  "Change some values if running on WSL"
+  (when (and (eq system-type 'gnu/linux)
+             (string-match
+              "Linux.*Microsoft.*Linux"
+              (shell-command-to-string "uname -a")))
+    (eshell-command "xmodmap -e 'keycode 191 = space'")
+    (setq
+     browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
+     browse-url-generic-args     '("/c" "start")
+     browse-url-browser-function #'browse-url-generic)))
 
-(unless mdrp/sys/win32
+(add-hook 'after-init-hook #'pokemacs-wsl-specific-function)
+
+(unless pokemacs-sys/win32
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
   (set-language-environment "UTF-8")
@@ -685,12 +696,12 @@ debian, and derivatives). On most it's 'fd'.")
    ;; Prefixed by M
    "M-u"                     'upcase-dwim
 
-   "M-J"                     (lambda () (interactive) (mdrp/resize-window t 5))
-   "M-L"                     (lambda () (interactive) (mdrp/resize-window t -5))
-   "M-I"                     (lambda () (interactive) (mdrp/resize-window nil 5))
-   "M-K"                     (lambda () (interactive) (mdrp/resize-window nil -5))
+   "M-J"                     (lambda () (interactive) (pokemacs-resize-window t 5))
+   "M-L"                     (lambda () (interactive) (pokemacs-resize-window t -5))
+   "M-I"                     (lambda () (interactive) (pokemacs-resize-window nil 5))
+   "M-K"                     (lambda () (interactive) (pokemacs-resize-window nil -5))
    ;; Custom comment overwriting comment-dwim key binding
-   "M-;"                     'mdrp/comment-eclipse
+   "M-;"                     'pokemacs-comment-eclipse
    "M-p"                     'backward-paragraph
    "M-<f1>"                  'kill-current-buffer
    "M-Q"                     'unfill-paragraph
@@ -707,11 +718,15 @@ debian, and derivatives). On most it's 'fd'.")
   (general-define-key
    :prefix "M-z"
    ;; Setup shorcuts for window resize width and height
-   "w"                       'mdrp/resize-window-width
-   "h"                       'mdrp/resize-window-height)
+   "w"                       'pokemacs-resize-window-width
+   "h"                       'pokemacs-resize-window-height)
   (general-define-key
    :prefix "M-h"
-   "d"                       'hydra-dates/body)
+   "d"                       'hydra-dates/body
+   "f"                       'hydra-flycheck/body
+   "c"                       'hydra-compilation/body
+   "w"                       'hydra-window/body
+   "t"                       'pokemacs-toggles/body)
   (general-def minibuffer-local-map
     "C-<tab>" 'dabbrev-expand)
   :config (message "`general' loaded"))
@@ -744,6 +759,129 @@ debian, and derivatives). On most it's 'fd'.")
         which-key-idle-delay 0.1)
   (message "`which-key' loaded"))
 
+(use-package hydra
+  :demand t
+  :custom (hydra-default-hint nil)
+  :init
+  (defun pokemacs-hydra-heading (&rest headings)
+    "Format HEADINGS to look pretty in a hydra docstring."
+    (mapconcat (lambda (it)
+                 (propertize (format "%-20s" it) 'face 'shadow))
+               headings
+               nil))
+
+  (defun pokemacs-date-iso ()
+    "Insert the current date, ISO format, eg. 2016-12-09."
+    (interactive)
+    (insert (format-time-string "%F")))
+
+  (defun pokemacs-date-iso-with-time ()
+    "Insert the current date, ISO format with time, eg. 2016-12-09T14:34:54+0100."
+    (interactive)
+    (insert (format-time-string "%FT%T%z")))
+
+  (defun pokemacs-date-long ()
+    "Insert the current date, long format, eg. December 09, 2016."
+    (interactive)
+    (insert (format-time-string "%d %B %Y")))
+
+  (defun pokemacs-date-long-with-time ()
+    "Insert the current date, long format, eg. December 09, 2016 - 14:34."
+    (interactive)
+    (insert (capitalize (format-time-string "%d %B %Y - %H:%M"))))
+
+  (defun pokemacs-date-short ()
+    "Insert the current date, short format, eg. 2016.12.09."
+    (interactive)
+    (insert (format-time-string "%Y.%m.%d")))
+
+  (defun pokemacs-date-short-with-time ()
+    "Insert the current date, short format with time, eg. 2016.12.09 14:34"
+    (interactive)
+    (insert (format-time-string "%Y.%m.%d %H:%M")))
+  :config
+  (message "`hydra' loaded"))
+(elpaca-wait)
+
+;; NOTE: hydra and posframe are required
+(when use-posframe
+  (use-package hydra-posframe
+    :ensure (:type git :host github :repo "Ladicle/hydra-posframe")
+    :hook (after-init . hydra-posframe-mode)))
+
+(use-package major-mode-hydra
+  :ensure t
+  :demand t
+  :general
+  ("M-h h" 'major-mode-hydra)
+  ("M-h m" 'pokemacs-major-mode-hydra-custom)
+  :custom
+  (major-mode-hydra-invisible-quit-key "q")
+  :config
+  (defun pokemacs-major-mode-hydra-custom (mode)
+    (interactive
+     (list
+      (intern
+       (completing-read
+        "Describe custom theme: "
+        (mapcar #'symbol-name
+                (buffer-local-value 'local-minor-modes (current-buffer)))))))
+    (major-mode-hydra-dispatch mode))
+
+  (defun major-mode-hydra-dispatch (mode)
+    "Summon the hydra for given MODE (if there is one)."
+    (let ((orig-mode mode))
+      (catch 'done
+        (while mode
+          (let ((hydra (major-mode-hydra--body-name-for mode)))
+            (when (fboundp hydra)
+              (call-interactively hydra)
+              (throw 'done t)))
+          (setq mode (or (get mode 'derived-mode-parent) 'root-mode))))))
+
+  (setq major-mode-hydra-title-generator
+        '(lambda (mode)
+           (let ((icon (all-the-icons-icon-for-mode mode :v-adjust 0.05)))
+             (if (stringp icon)
+                 (s-concat "\n"
+                           (s-repeat 7 " ")
+                           icon
+                           " "
+                           (s-capitalize (symbol-name mode))
+                           " commands")
+               (s-concat "\n"
+                         (s-repeat 10 " ")
+                         (s-capitalize (symbol-name mode))
+                         " commands"))))))
+(elpaca-wait)
+
+(use-package pretty-hydra
+  :ensure nil
+  :config
+  (pretty-hydra-define
+   hydra-dates (:color teal :title "Dates" :quit-key "q")
+   ("Insert"
+    (("d" pokemacs-date-short "short")
+     ("i" pokemacs-date-iso "iso")
+     ("l" pokemacs-date-long "long"))
+
+    "Insert with time"
+    (("D" pokemacs-date-short-with-time "short")
+     ("I" pokemacs-date-iso-with-time "iso")
+     ("L" pokemacs-date-long-with-time "long")))))
+
+(use-package keycast
+  :commands keycast-mode
+  :config
+  (define-minor-mode keycast-mode
+    "Show current command and its key binding in the mode line (fix for use with doom-mode-line)."
+    :global t
+    (if keycast-mode
+        (add-hook 'pre-command-hook 'keycast--update t)
+      (remove-hook 'pre-command-hook 'keycast--update)))
+  (add-to-list 'global-mode-string '("" keycast-mode-line))
+  (message "`keycast' loaded"))
+
 (use-package selected
   :defer t
   :init
@@ -766,7 +904,7 @@ debian, and derivatives). On most it's 'fd'.")
             "C-q"                     'selected-off
             "C-c s r"                 'reverse-region
             "C-c s s"                 'sort-lines
-            "C-c s w"                 'mdrp/sort-words
+            "C-c s w"                 'pokemacs-sort-words
             "C-<return>"              'hide-region-hide
             "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window"))
   :config (message "`selected' loaded"))
@@ -800,55 +938,27 @@ debian, and derivatives). On most it's 'fd'.")
          )
   )
 
-(defun mdrp/unpropertize-kill-ring ()
-  (setq kill-ring (mapcar 'substring-no-properties kill-ring)))
-
-(add-hook 'kill-emacs-hook 'mdrp/unpropertize-kill-ring)
-
-(use-package emacs
+(use-package emacs-lisp-mode
   :ensure nil
-  :demand t
-  :general
-  (:keymaps 'query-replace-map
-            "M-c" 'mdrp/toggle-case
-            "c"    'mdrp/toggle-case)
-  :config
-  ;; use current region as first search
-  (defadvice isearch-mode (around isearch-mode-default-string (forward &optional regexp op-fun recursive-edit word-p) activate)
-    (if (and transient-mark-mode mark-active (not (eq (mark) (point))))
-        (progn
-          (isearch-update-ring (buffer-substring-no-properties (mark) (point)))
-          (deactivate-mark)
-          ad-do-it
-          (if (not forward)
-              (isearch-repeat-backward)
-            (goto-char (mark))
-            (isearch-repeat-forward)))
-      ad-do-it))
-  (defun mdrp/toggle-case ()
-    (interactive)
-    (setq case-fold-search (not case-fold-search))
-    (message "toggled case-fold-search to %s" case-fold-search))
-  (defconst query-replace-help
-    "Type \\`SPC' or \\`y' to replace one match, Delete or \\`n' to skip to next,
-\\`RET' or \\`q' to exit, Period to replace one match and exit,
-\\`,' to replace but not move point immediately,
-\\`C-r' to enter recursive edit (\\[exit-recursive-edit] to get out again),
-\\`C-w' to delete match and recursive edit,
-\\`C-l' to clear the screen, redisplay, and offer same replacement again,
-\\`!' to replace all remaining matches in this buffer with no more questions,
-\\`^' to move point back to previous match,
-\\`u' to undo previous replacement,
-\\`U' to undo all replacements,
-\\`e' to edit the replacement string.
-\\`E' to edit the replacement string with exact case.
-In multi-buffer replacements type \\`Y' to replace all remaining
-matches in all remaining buffers with no more questions,
-\\`N' to skip to the next buffer without replacing remaining matches
-in the current buffer.
-\\`c' or \\`M-c' to toggle case sensitivity"
-    "Help message while in `query-replace'.")
-  )
+
+  :mode-hydra
+  ((:color pink :quit-key "q")
+   ("Eval"
+    (("b" eval-buffer "buffer")
+     ("e" eval-defun "defun")
+     ("r" eval-region "region"))
+    "REPL"
+    (("I" ielm "ielm"))
+    "Doc"
+    (("f" describe-function "function")
+     ("v" describe-variable "variable")))))
+
+(use-package root-mode
+  :ensure nil
+  :mode-hydra
+  ((:color pink :quit-key "q")
+   ("Doc"
+    (("i" info-lookup-symbol "info lookup")))))
 
 (setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
 
@@ -865,15 +975,15 @@ in the current buffer.
 
 (use-package crux
   :init
-  (define-prefix-command 'mdrp-crux-map nil "Crux-")
+  (define-prefix-command 'pokemacs-crux-map nil "Crux-")
   :defer t
   :general
-  ("M-m" 'mdrp-crux-map)
+  ("M-m" 'pokemacs-crux-map)
   ("C-a" 'crux-move-beginning-of-line)
   ("C-x 4 t" 'crux-transpose-windows)
   ("C-x K" 'crux-kill-other-buffers)
   ("C-k" 'crux-smart-kill-line)
-  (:keymaps 'mdrp-crux-map
+  (:keymaps 'pokemacs-crux-map
             "w" '(crux-view-url :which-key "Open a new buffer containing the contents of URL.")
             "o" '(crux-open-with :which-key "Open visited file in default external program.")
             "e" '(crux-sudo-edit :which-key "Edit currently visited file as root.")
@@ -944,17 +1054,24 @@ in the current buffer.
   :hook (text-mode . (lambda ()
                        (require 'lsp-ltex)
                        (lsp-deferred)))
-  :init
-  (setq lsp-ltex-version "16.0.0"))  ; make sure you have set this, see below
+  :init (setq lsp-ltex-version "16.0.0")
+  :config (setq lsp-ltex-language pokemacs-dict))
 
 (use-package jinx
   ;; :ensure-system-package libenchant-2-dev
   :hook (emacs-startup . global-jinx-mode)
+  :init
+  (defun pokemacs-change-dict ()
+    (interactive)
+    (pokemacs-customize-my-custom-variable "pokemacs-dict")
+    (setq jinx-languages pokemacs-dict)
+    (setq lsp-ltex-language pokemacs-dict))
   :general
   (:keymaps 'jinx-overlay-map
             "RET" 'jinx-correct)
   ("M-$"  'jinx-correct)
-  ("C-M-$" 'jinx-languages))
+  ("C-M-$" 'jinx-languages)
+  :config (setq jinx-languages pokemacs-dict))
 
 (use-package highlight-symbol
   :defer t
@@ -969,40 +1086,6 @@ in the current buffer.
     :config
     (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
     (message "`highlight-symbol' loaded"))
-
-(use-package hydra
-  :defer t
-  :custom
-  (hydra-default-hint nil)
-  :config
-  (defhydra hydra-dates (:color teal)
-    (concat "\n " (mdrp/hydra-heading "Dates" "Insert" "Insert with Time")
-            "
- _q_ quit              _d_ short             _D_ short             ^^
- ^^                    _i_ iso               _I_ iso               ^^
- ^^                    _l_ long              _L_ long              ^^
-")
-    ("q" nil)
-    ("d" mdrp/date-short)
-    ("D" mdrp/date-short-with-time)
-    ("i" mdrp/date-iso)
-    ("I" mdrp/date-iso-with-time)
-    ("l" mdrp/date-long)
-    ("L" mdrp/date-long-with-time))
-  (message "`hydra' loaded"))
-
-(use-package keycast
-  :defer t
-  :commands keycast-mode
-  :config
-  (define-minor-mode keycast-mode
-    "Show current command and its key binding in the mode line (fix for use with doom-mode-line)."
-    :global t
-    (if keycast-mode
-        (add-hook 'pre-command-hook 'keycast--update t)
-      (remove-hook 'pre-command-hook 'keycast--update)))
-  (add-to-list 'global-mode-string '("" keycast-mode-line))
-  (message "`keycast' loaded"))
 
 (use-package multiple-cursors
   :defer t
@@ -1062,8 +1145,32 @@ in the current buffer.
             "DEL" 'dired-up-directory))
 
 (use-package dirvish
-  :demand t
-  :config (dirvish-override-dired-mode))
+  :commands dirvish-find-entry-a dirvish-dired-noselect-a
+  :init
+  (advice-add #'dired-find-file :override #'dirvish-find-entry-a)
+  (advice-add #'dired-noselect :around #'dirvish-dired-noselect-a)
+
+  (defun pokemacs-dired-update-mode-line-height-h ()
+    (when-let (height (bound-and-true-p doom-modeline-height))
+      (setq dirvish-mode-line-height height
+            dirvish-header-line-height height)))
+  :hook (dired-mode . pokemacs-dired-update-mode-line-height-h)
+  :config
+  ;; From doomemacs/blob/master/modules/emacs/dired/config.el#L84C1-L89C35
+  ;; Don't recycle sessions. We don't want leftover buffers lying around,
+  ;; especially if users are reconfiguring Dirvish or trying to recover from an
+  ;; error. It's too easy to accidentally break Dirvish (e.g. by focusing the
+  ;; header window) at the moment, or get stuck in a focus loop with the buried
+  ;; buffers. Starting from scratch isn't even that expensive, anyway.
+  (setq dirvish-reuse-session nil)
+  (setq dirvish-attributes '(file-size)
+        dirvish-mode-line-format
+        '(:left (sort file-time symlink) :right (omit yank index)))
+  (setq dirvish-subtree-always-show-state t)
+  (pokemacs-appendq! dirvish-attributes '(nerd-icons subtree-state))
+  (setq dirvish-hide-details '(dirvish dirvish-side)
+        dirvish-hide-cursor '(dirvish dirvish-side))
+  (dirvish-override-dired-mode))
 
 (use-package dwim-shell-command
   :ensure (dwim-shell-command :files (:defaults "*.el"))
@@ -1084,7 +1191,7 @@ in the current buffer.
   :general
   ("C-c g"  'magit-file-dispatch)
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
-  ("M-n"    'mdrp/smerge-or-flycheck-next)
+  ("M-n"    'pokemacs-smerge-or-flycheck-next)
   (:keymaps 'smerge-mode-map
             "M-m"                 'smerge-keep-mine
             "M-o"                 'smerge-keep-other)
@@ -1095,7 +1202,7 @@ in the current buffer.
   :config
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
-  (defun mdrp/smerge-or-flycheck-next ()
+  (defun pokemacs-smerge-or-flycheck-next ()
     (interactive)
     (let (files (vc-git-conflicted-files default-directory))
       (if (null files)
@@ -1159,7 +1266,7 @@ in the current buffer.
   :defer t
   :mode ("\\.org\\'" . org-mode)
   :init
-  (defun mdrp/filter-timestamp (trans back _comm)
+  (defun pokemacs-filter-timestamp (trans back _comm)
     "Remove <> around time-stamps."
     (pcase back
       (`html
@@ -1168,7 +1275,7 @@ in the current buffer.
        (replace-regexp-in-string "[<>]" "" trans))))
 
   :config
-  (add-to-list 'org-export-filter-timestamp-functions #'mdrp/filter-timestamp)
+  (add-to-list 'org-export-filter-timestamp-functions #'pokemacs-filter-timestamp)
   (message "`ox' loaded"))
 
 (use-package mixed-pitch
@@ -1187,13 +1294,13 @@ in the current buffer.
   :load-path "lisp/org-mode/lisp"
   :hook
   (org-mode . mixed-pitch-mode)
-  (org-mode . mdrp/org-mode-hook)
+  (org-mode . pokemacs-org-mode-hook)
   :after ob-racket
   :general
-  ("M-o" 'mdrp-org-map)
-  ("C-x C-p" 'mdrp/org-compile-latex-and-update-other-buffer)
-  ("C-c o l" 'mdrp/logger)
-  (:keymaps 'mdrp-org-map
+  ("M-o" 'pokemacs-org-map)
+  ("C-x C-p" 'pokemacs-org-compile-latex-and-update-other-buffer)
+  ("C-c o l" 'pokemacs-logger)
+  (:keymaps 'pokemacs-org-map
             "l"                       'org-store-link
             "a"                       'org-agenda
             "c"                       'org-capture)
@@ -1206,13 +1313,14 @@ in the current buffer.
             "C-c C-c"                 'org-edit-src-exit)
 
   :init
-  (defun mdrp/logger ()
+  (general-unbind org-mode-map "M-h")
+  (defun pokemacs-logger ()
     (interactive)
     "Print logger"
     (let ((line (number-to-string (line-number-at-pos))))
       (kill-new (concat buffer-file-name "::" line))))
 
-  (defun mdrp/org-mode-hook ()
+  (defun pokemacs-org-mode-hook ()
     (let ((oldmap (cdr (assoc 'lsp-mode minor-mode-map-alist)))
           (newmap (make-sparse-keymap)))
       (set-keymap-parent newmap oldmap)
@@ -1231,12 +1339,12 @@ in the current buffer.
                                    "Juin" "Juillet" "Août" "Septembre"
                                    "Octobre" "Novembre" "Décembre"])
 
-  (defun mdrp/org-compile-latex-and-update-other-buffer ()
+  (defun pokemacs-org-compile-latex-and-update-other-buffer ()
     "Has as a premise that it's run from an org-mode buffer and the
                other buffer already has the PDF open"
     (interactive)
     (org-latex-export-to-pdf)
-    (mdrp/update-other-buffer))
+    (pokemacs-update-other-buffer))
   :custom
   ;; Change this value to point to where your org files are
   (org-directory "~/org/")
@@ -1279,7 +1387,7 @@ in the current buffer.
   (setq org-todo-keywords
         '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
           ))
-  (define-prefix-command 'mdrp-org-map nil "Org-")
+  (define-prefix-command 'pokemacs-org-map nil "Org-")
   (defun transform-square-brackets-to-round-ones(string-to-transform)
     "Transforms [ into ( and ] into ), other chars left unchanged."
     (concat
@@ -1398,10 +1506,10 @@ in the current buffer.
   :after calfw
   :ensure nil
   :init
-  (define-prefix-command 'mdrp-calfw-map nil "Cal-")
+  (define-prefix-command 'pokemacs-calfw-map nil "Cal-")
   :general
-  ("M-C" 'mdrp-calfw-map)
-  (:keymaps 'mdrp-calfw-map
+  ("M-C" 'pokemacs-calfw-map)
+  (:keymaps 'pokemacs-calfw-map
             "c" 'cfw:open-calendar-buffer
             "o" 'cfw:open-org-calendar)
   (:keymaps 'cfw:calendar-mode-map
@@ -1486,7 +1594,7 @@ in the current buffer.
     :custom
     (org-roam-directory (file-truename "~/org/org-roam"))
     :general
-    (:keymaps 'mdrp-org-map
+    (:keymaps 'pokemacs-org-map
               "r" 'org-roam-buffer-toggle
               "f" 'org-roam-node-find
               "g" 'org-roam-graph
@@ -1581,12 +1689,12 @@ in the current buffer.
   :after org
   :general
   (:keymaps 'org-present-mode-keymap
-            "<right>" 'mdrp/org-next-visible-heading-and-expand
-            "<left>" 'mdrp/org-prev-visible-heading-and-expand
+            "<right>" 'pokemacs-org-next-visible-heading-and-expand
+            "<left>" 'pokemacs-org-prev-visible-heading-and-expand
             "C-<right>" 'org-present-next
             "C-<left>" 'org-present-prev)
   :init
-  (defun mdrp/org-next-visible-heading-and-expand (arg)
+  (defun pokemacs-org-next-visible-heading-and-expand (arg)
     (interactive "p")
     (let ((res (call-interactively #'org-next-visible-heading arg)))
       (if (= (point) (point-max))
@@ -1594,7 +1702,7 @@ in the current buffer.
         (call-interactively #'org-fold-show-entry)))
     (recenter 0 t))
 
-  (defun mdrp/org-prev-visible-heading-and-expand (arg)
+  (defun pokemacs-org-prev-visible-heading-and-expand (arg)
     (interactive "p")
     (call-interactively #'org-fold-hide-entry)
     (when (= (point) (point-min))
@@ -1606,7 +1714,7 @@ in the current buffer.
 
   (defvar-local memo/header-line-format header-line-format)
   (defvar-local memo/use-header-line use-header-line)
-  (defun mdrp/org-present-start ()
+  (defun pokemacs-org-present-start ()
     (visual-fill-column-mode 1)
     (visual-line-mode 1)
     (setq-local visual-fill-column-width 100)
@@ -1633,14 +1741,14 @@ in the current buffer.
     (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
     (message "`org-present' start"))
 
-  (defun mdrp/org-present-quit ()
+  (defun pokemacs-org-present-quit ()
     (visual-fill-column-mode 0)
     (visual-line-mode 0)
     (hide-mode-line-mode 0)
     (setq line-spacing nil)
     (setq use-header-line memo/use-header-line)
     (setq header-line-format memo/header-line-format)
-    (consult-theme pokemacs-theme)
+    (consult-theme (pokemacs-get-current-theme))
     (nlinum-mode)
     (jinx-mode)
     (lsp-mode)
@@ -1649,7 +1757,7 @@ in the current buffer.
     (setq-local face-remapping-alist '((default variable-pitch default)))
     (message "`org-present' quit"))
 
-  (defun mdrp/org-present-prepare-slide (buffer-name heading)
+  (defun pokemacs-org-present-prepare-slide (buffer-name heading)
     ;; Show only top-level headlines
     (org-overview)
     ;; Unfold the current entry
@@ -1657,39 +1765,39 @@ in the current buffer.
     ;; Show only direct subheadings of the slide but don't expand them
     (org-show-children))
 
-  :hook ((org-present-mode . mdrp/org-present-start)
-         (org-present-mode-quit . mdrp/org-present-quit))
+  :hook ((org-present-mode . pokemacs-org-present-start)
+         (org-present-mode-quit . pokemacs-org-present-quit))
   :config
-  (add-hook 'org-present-after-navigate-functions 'mdrp/org-present-prepare-slide)
+  (add-hook 'org-present-after-navigate-functions 'pokemacs-org-present-prepare-slide)
   (message "`org-present' loaded"))
 
 ;; Taken from doomemacs
 
-(defvar mdrp/lsp--default-read-process-output-max nil)
-(defvar mdrp/lsp--default-gcmh-high-cons-threshold nil)
-(defvar mdrp/lsp--optimization-init-p nil)
+(defvar pokemacs-lsp--default-read-process-output-max nil)
+(defvar pokemacs-lsp--default-gcmh-high-cons-threshold nil)
+(defvar pokemacs-lsp--optimization-init-p nil)
 
-(define-minor-mode mdrp/lsp-optimization-mode
+(define-minor-mode pokemacs-lsp-optimization-mode
   "Deploys universal GC and IPC optimizations for `lsp-mode' and `eglot'."
   :global t
   :init-value nil
-  (if (not mdrp/lsp-optimization-mode)
-      (setq-default read-process-output-max mdrp/lsp--default-read-process-output-max
-                    gcmh-high-cons-threshold mdrp/lsp--default-gcmh-high-cons-threshold
-                    mdrp/lsp--optimization-init-p nil)
+  (if (not pokemacs-lsp-optimization-mode)
+      (setq-default read-process-output-max pokemacs-lsp--default-read-process-output-max
+                    gcmh-high-cons-threshold pokemacs-lsp--default-gcmh-high-cons-threshold
+                    pokemacs-lsp--optimization-init-p nil)
     ;; Only apply these settings once!
-    (unless mdrp/lsp--optimization-init-p
-      (setq mdrp/lsp--default-read-process-output-max (default-value 'read-process-output-max)
-            mdrp/lsp--default-gcmh-high-cons-threshold (default-value 'gcmh-high-cons-threshold))
+    (unless pokemacs-lsp--optimization-init-p
+      (setq pokemacs-lsp--default-read-process-output-max (default-value 'read-process-output-max)
+            pokemacs-lsp--default-gcmh-high-cons-threshold (default-value 'gcmh-high-cons-threshold))
       (setq-default read-process-output-max (* 1024 1024))
       ;; REVIEW LSP causes a lot of allocations, with or without the native JSON
       ;;        library, so we up the GC threshold to stave off GC-induced
       ;;        slowdowns/freezes. Doom uses `gcmh' to enforce its GC strategy,
       ;;        so we modify its variables rather than `gc-cons-threshold'
       ;;        directly.
-      (setq-default gcmh-high-cons-threshold (* 2 mdrp/lsp--default-gcmh-high-cons-threshold))
+      (setq-default gcmh-high-cons-threshold (* 2 pokemacs-lsp--default-gcmh-high-cons-threshold))
       (gcmh-set-high-threshold)
-      (setq mdrp/lsp--optimization-init-p t))))
+      (setq pokemacs-lsp--optimization-init-p t))))
 
 (use-package lsp-mode
   :defer t
@@ -1706,11 +1814,11 @@ in the current buffer.
   (add-hook 'orderless-style-dispatchers #'minad/orderless-dispatch-prefixes-first)
   (setq-local completion-at-point-functions
               (list (cape-capf-buster #'lsp-completion-at-point)))
-  (defconst mdrp-lsp-mode-breadcrumb-segments
+  (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
       '(project path-up-to-project file symbols)))
-  :hook ((lsp-mode . mdrp/lsp-optimization-mode)
+  :hook ((lsp-mode . pokemacs-lsp-optimization-mode)
          (lsp-completion-mode . minad/lsp-mode-setup-completion)
          (caml-mode . lsp-deferred)
          (cc-mode . lsp-deferred)
@@ -1728,7 +1836,7 @@ in the current buffer.
   :general
   (:keymaps 'lsp-mode-map
             "C-c C-t" 'lsp-describe-thing-at-point
-            "C-c C-w" 'mdrp/lsp-get-type-and-kill
+            "C-c C-w" 'pokemacs-lsp-get-type-and-kill
             "C-c C-l" 'lsp-find-definition
             "C-c &"   'pop-global-mark :keymaps 'override)
   (:keymaps 'lsp-command-map
@@ -1745,7 +1853,7 @@ in the current buffer.
   :custom
   (lsp-log-io nil)
   (lsp-headerline-breadcrumb-enable t)
-  (lsp-headerline-breadcrumb-segments mdrp-lsp-mode-breadcrumb-segments)
+  (lsp-headerline-breadcrumb-segments pokemacs-lsp-mode-breadcrumb-segments)
   (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
   (lsp-modeline-code-actions-enable nil)
   (lsp-keymap-prefix "M-l")
@@ -1772,19 +1880,18 @@ in the current buffer.
   (lsp-ui-peek-find-references nil (list :folders (vector (projectile-project-root))))
   :config
 
-  (defvar mdrp/type-map
+  (defvar pokemacs-type-map
     (let ((keymap (make-sparse-keymap)))
-      (define-key keymap (kbd "C-w") #'mdrp/lsp-get-type-and-kill)
+      (define-key keymap (kbd "C-w") #'pokemacs-lsp-get-type-and-kill)
       keymap)
     "The local map to navigate type enclosing.")
 
-  (defun mdrp/set-type-map (&rest r)
-    (set-transient-map mdrp/type-map)
-    )
+  (defun pokemacs-set-type-map (&rest r)
+    (set-transient-map pokemacs-type-map))
 
-  (advice-add 'lsp-describe-thing-at-point :after #'mdrp/set-type-map)
+  (advice-add 'lsp-describe-thing-at-point :after #'pokemacs-set-type-map)
 
-  (defun mdrp/lsp-get-type-and-kill ()
+  (defun pokemacs-lsp-get-type-and-kill ()
     (interactive)
     (let ((contents (-some->> (lsp--text-document-position-params)
                       (lsp--make-request "textDocument/hover")
@@ -1867,10 +1974,10 @@ in the current buffer.
 (use-package prog-mode
   :ensure nil
   :init
-  (defun mdrp/clear-compilation-finish-functions ()
+  (defun pokemacs-clear-compilation-finish-functions ()
     (setq compilation-finish-functions nil))
   :hook
-  (prog-mode . mdrp/clear-compilation-finish-functions))
+  (prog-mode . pokemacs-clear-compilation-finish-functions))
 
 (use-package highlight-indent-guides
   :disabled
@@ -1945,7 +2052,7 @@ in the current buffer.
 
   (defcustom create-sibling-rules nil
     "Rules for creating \"sibling\" files.
-This is used by the `mdrp/find-sibling-file-wrapper' command.
+This is used by the `pokemacs-find-sibling-file-wrapper' command.
 
 See `find-sibling-rules' for more informations.
 
@@ -1958,7 +2065,7 @@ have one rule for each file type."
         '(
           ("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
 
-  (defun mdrp/find-sibling-file-wrapper (file)
+  (defun pokemacs-find-sibling-file-wrapper (file)
     "Visit a \"sibling\" file of FILE.
    When called interactively, FILE is the currently visited file.
 
@@ -2011,7 +2118,7 @@ have one rule for each file type."
                    (find-file new-file)))))))))))
 
   (general-define-key
-   "C-c C-a"                       'mdrp/find-sibling-file-wrapper))
+   "C-c C-a"                       'pokemacs-find-sibling-file-wrapper))
 
 (use-package fontify-face
   :defer t
@@ -2021,19 +2128,40 @@ have one rule for each file type."
 (use-package flycheck
   :defer t
   :init
-  (define-prefix-command 'mdrp-fly-map nil "Fly-")
-  (defvar-keymap mdrp-flycheck-overlay-map
-    :doc "Keymap attached to lsp and flycheck overlays."
-    "M-$" #'lsp-execute-code-action)
-  (fset 'mdrp-flycheck-overlay-map mdrp-flycheck-overlay-map)
+  (define-prefix-command 'pokemacs-fly-map nil "Fly-")
+  (defvar-keymap pokemacs-flycheck-overlay-map
+    :doc "Keymap attached to lsp and flycheck overlays.")
+  (fset 'pokemacs-flycheck-overlay-map pokemacs-flycheck-overlay-map)
   :hook ((prog-mode markdown-mode git-commit-mode text-mode) . flycheck-mode)
   :general
-  (:keymaps 'mdrp-fly-map
+  (:keymaps 'pokemacs-fly-map
             "p" 'flycheck-prev-error)
+  (:keymaps 'pokemacs-flycheck-overlay-map
+            "M-$" '(lsp-execute-code-action :which-key "LSP code action"))
   :custom
   (flycheck-indication-mode 'left-fringe)
   :config
-  (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
+  (pretty-hydra-define
+   hydra-flycheck
+   ( :title "Flycheck"
+     :pre (flycheck-list-errors)
+     :post (quit-windows-on "*Flycheck errors*")
+     :hint nil
+     :quit-key "q")
+   (
+    "Errors"
+    (("f" flycheck-error-list-set-filter "Filter"))
+
+    "Navigation"
+    (("j" flycheck-next-error "Next")
+     ("k" flycheck-previous-error "Previous")
+     ("gg" flycheck-first-error "First")
+     ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
+  ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
+  (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
+    (message "%S" args)
+    (funcall-interactively 'which-key-show-keymap 'global-map))
+
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
         (list n reset)
@@ -2043,7 +2171,8 @@ have one rule for each file type."
                     flycheck-warning-overlay
                     lsp-flycheck-warning-unnecessary-category)))
     (dolist (overlay overlays)
-      (put overlay 'keymap mdrp-flycheck-overlay-map)))
+      (put overlay 'keymap pokemacs-flycheck-overlay-map)
+      (put overlay 'cursor-sensor-functions '(pokemacs-show-which-key-flycheck-overlay))))
   (message "`flycheck' loaded"))
 
 (use-package flycheck-correct
@@ -2053,7 +2182,7 @@ have one rule for each file type."
   :hook flycheck-mode
   :general
   (:keymaps 'flycheck-mode-map
-          "M-RET" 'mdrp/correct-or-newline)
+          "M-RET" 'pokemacs-correct-or-newline)
   :config (message "`flycheck-correct' loaded"))
 
 (use-package quick-peek
@@ -2100,9 +2229,9 @@ have one rule for each file type."
   :general
   ("M-p"  'projectile-command-map)
   ("<f5>" 'projectile-compile-project)
-  ("<f6>" 'mdrp/recompile)
+  ("<f6>" 'pokemacs-recompile)
   :config
-  (defun mdrp/recompile ()
+  (defun pokemacs-recompile ()
     "Run project configure command.
 
 Normally you'll be prompted for a compilation command, unless
@@ -2162,6 +2291,53 @@ with a prefix ARG."
   :config
   (setq aw-dispatch-always t)
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
+  (pretty-hydra-define
+   hydra-window (:title "Window management" :quit-key "q")
+   ("Movement"
+    (("<left>" windmove-left "←")
+     ("<down>" windmove-down "↓")
+     ("<up>" windmove-up "↑")
+     ("<right>" windmove-right "→"))
+
+    "Split"
+    (("v" (lambda ()
+            (interactive)
+            (split-window-right)
+            (windmove-right)) "Vertical")
+     ("h" (lambda ()
+            (interactive)
+            (split-window-below)
+            (windmove-down)) "Horizontal")
+     ("u" (progn
+            (winner-undo)
+            (setq this-command 'winner-undo)) "Undo")
+     ("r" winner-redo "Redo"))
+
+    "Switch"
+    (("f" find-file "Find file")
+     ("a" (lambda ()
+            (interactive)
+            (ace-window 1)
+            (add-hook 'ace-window-end-once-hook
+                      'hydra-window/body)) "Ace window")
+     ("s" (lambda ()
+            (interactive)
+            (ace-swap-window)
+            (add-hook 'ace-window-end-once-hook
+                      'hydra-window/body)) "Swap"))
+
+    "Resize"
+    (("C-<left>" (lambda () (interactive) (pokemacs-resize-window t 5)) "X←")
+     ("C-<right>" (lambda () (interactive) (pokemacs-resize-window t -5)) "X→")
+     ("C-<up>" (lambda () (interactive) (pokemacs-resize-window nil 5)) "X↑")
+     ("C-<down>" (lambda () (interactive) (pokemacs-resize-window nil -5)) "X↓"))
+
+    "Purpose"
+    (("M" delete-other-windows "Delete other")
+     ("d" delete-window "Delete")
+     ("P" purpose-set-window-purpose "Set purpose")
+     ("!" purpose-toggle-window-purpose-dedicated "Toggle purpose")
+     ("#" purpose-toggle-window-buffer-dedicated "Toggle buffer"))))
   (message "`ace-window' loaded"))
 
 (when use-visual-fill
@@ -2173,7 +2349,7 @@ with a prefix ARG."
     (visual-fill-column-center-text t)
     :config
 
-    (defun mdrp/visual-fill-one-window ()
+    (defun pokemacs-visual-fill-one-window ()
       (global-visual-fill-column-mode -1)
       (if (window-full-width-p)
           (progn
@@ -2181,7 +2357,7 @@ with a prefix ARG."
             (set-window-fringes (selected-window) 8 8 nil nil))
         (global-visual-fill-column-mode -1)))
 
-    (add-hook 'window-state-change-hook 'mdrp/visual-fill-one-window)
+    (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
     (message "`visual-fill-column' loaded")))
 
 (when use-window-purpose
@@ -2279,7 +2455,7 @@ with a prefix ARG."
       (insert-char (vertico-sort-function . sort-characters))
       (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
   (when use-posframe
-    (mdrp/appendq! vertico-multiform-commands
+    (pokemacs-appendq! vertico-multiform-commands
                    '((posframe
                       (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
                       (vertico-posframe-border-width . 10))
@@ -2338,9 +2514,9 @@ with a prefix ARG."
   ("M-s d" 'consult-find)
   ("M-s D" 'consult-locate)
   ("M-s g" 'consult-grep)
-  ("M-s G" 'mdrp/consult-git-grep-always-prompt-dir)
+  ("M-s G" 'pokemacs-consult-git-grep-always-prompt-dir)
   ("M-s r" 'consult-ripgrep)
-  ("M-s R" 'mdrp/consult-ripgrep-always-prompt-dir)
+  ("M-s R" 'pokemacs-consult-ripgrep-always-prompt-dir)
   ("M-s l" 'consult-line)
   ("M-s L" 'consult-line-multi)
   ("M-s m" 'consult-multi-occur)
@@ -2379,7 +2555,7 @@ with a prefix ARG."
   ;; after lazily loading the package.
   :config
 
-  (defun mdrp/consult-with-region (old-consult-function &optional dir given-initial)
+  (defun pokemacs-consult-with-region (old-consult-function &optional dir given-initial)
     "Pass the region to consult-grep/ripgrep if available.
 
 DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
@@ -2391,18 +2567,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                  (buffer-substring-no-properties (region-beginning) (region-end))))))
       (funcall old-consult-function dir initial)))
 
-  (advice-add #'consult-ripgrep :around #'mdrp/consult-with-region)
-  (advice-add #'consult-grep :around #'mdrp/consult-with-region)
+  (advice-add #'consult-ripgrep :around #'pokemacs-consult-with-region)
+  (advice-add #'consult-grep :around #'pokemacs-consult-with-region)
 
-  (defun mdrp/consult-ripgrep-always-prompt-dir ()
+  (defun pokemacs-consult-ripgrep-always-prompt-dir ()
     (interactive)
     (consult-ripgrep t))
 
-  (defun mdrp/consult-git-grep-always-prompt-dir ()
+  (defun pokemacs-consult-git-grep-always-prompt-dir ()
     (interactive)
     (consult-git-grep t))
 
-  (defvar mdrp/consult-line-map
+  (defvar pokemacs-consult-line-map
     (let ((map (make-sparse-keymap)))
       (define-key map "\C-s" #'previous-history-element)
       map))
@@ -2425,7 +2601,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
              (define-key map (kbd "M-l") #'consult-ripgrep-up-directory)
              map))
 
-  (consult-customize consult-line :keymap mdrp/consult-line-map)
+  (consult-customize consult-line :keymap pokemacs-consult-line-map)
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
@@ -2440,8 +2616,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
    consult--source-project-recent-file
    consult--source-recent-file consult-buffer
    consult-ripgrep consult-git-grep consult-grep
-   mdrp/consult-git-grep-always-prompt-dir
-   mdrp/consult-ripgrep-always-prompt-dir
+   pokemacs-consult-git-grep-always-prompt-dir
+   pokemacs-consult-ripgrep-always-prompt-dir
    consult-xref consult--source-bookmark
    :preview-key '(:debounce 0.5 "M-."))
 
@@ -2711,15 +2887,15 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t)
   ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
-  (defun mdrp/highlight-selected-window (_)
+  (defun pokemacs-highlight-selected-window (_)
     "Highlight selected window with a different background color."
     (with-current-buffer (window-buffer (selected-window))
       (buffer-face-set `(:background ,(face-attribute 'match :background)))
       (run-with-timer 0.1 nil #'buffer-face-set 'default)))
-  (advice-add 'windmove-left :after #'mdrp/highlight-selected-window)
-  (advice-add 'windmove-right :after #'mdrp/highlight-selected-window)
-  (advice-add 'windmove-up :after #'mdrp/highlight-selected-window)
-  (advice-add 'windmove-down :after #'mdrp/highlight-selected-window)
+  (advice-add 'windmove-left :after #'pokemacs-highlight-selected-window)
+  (advice-add 'windmove-right :after #'pokemacs-highlight-selected-window)
+  (advice-add 'windmove-up :after #'pokemacs-highlight-selected-window)
+  (advice-add 'windmove-down :after #'pokemacs-highlight-selected-window)
   :config
   (message "`emacs' loaded"))
 
@@ -2732,13 +2908,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ("C-x <up>"                'windmove-up)
   ("C-x <down>"              'windmove-down)
   :bind
-  (:repeat-map mdrp/windmove-navigation-repeat-map
+  (:repeat-map pokemacs-windmove-navigation-repeat-map
                ("<left>" . 'windmove-left)
                ("<right>" . 'windmove-right)
                ("<up>" . 'windmove-up)
                ("<down>" . 'windmove-down))
   :config
-  (mdrp/set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
+  (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
 
 (use-package orderless
   :defer t
@@ -2756,10 +2932,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package cape
   :defer t
   :init
-  (define-prefix-command 'mdrp-cape-map nil "Cape-")
+  (define-prefix-command 'pokemacs-cape-map nil "Cape-")
   :general
-  ("M-c" 'mdrp-cape-map)
-  (:keymaps 'mdrp-cape-map
+  ("M-c" 'pokemacs-cape-map)
+  (:keymaps 'pokemacs-cape-map
             "p" 'completion-at-point ;; capf
             "t" 'complete-tag        ;; etags
             "d" 'cape-dabbrev        ;; or dabbrev-completion
@@ -2782,7 +2958,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
   ;; Defining capf for specific modes
   (defalias 'cape-?dict+keyword
-    (if (or pokemacs/english-dict pokemacs/french-dict)
+    (if pokemacs-dict
         (cape-capf-super #'cape-dict #'cape-keyword)
       (cape-capf-super #'cape-keyword)))
   :hook
@@ -2842,10 +3018,23 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 ;; The package is young and doesn't have comprehensive coverage.
 (use-package tempel-collection)
 
+(defun pokemacs-get-current-theme ()
+  (if pokemacs-dark-theme-p
+      pokemacs-dark-theme
+    pokemacs-light-theme))
+
+(defun pokemacs-load-theme ()
+  (consult-theme (pokemacs-get-current-theme)))
+
+(defun pokemacs-toggle-dark-light-theme ()
+  (interactive)
+  (setq pokemacs-dark-theme-p (not pokemacs-dark-theme-p))
+  (pokemacs-load-theme))
+
 (use-package doom-themes
   :config
   ;; Global settings (defaults)
-  (load-theme pokemacs-theme t)
+  (load-theme (pokemacs-get-current-theme) t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -2989,11 +3178,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
   :config
   ;; Define your custom doom-modeline
-  (doom-modeline-def-modeline 'mdrp/no-lsp-line
+  (doom-modeline-def-modeline 'pokemacs-no-lsp-line
     '(bar " " matches follow buffer-info modals remote-host buffer-position word-count parrot selection-info)
     '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
 
-  (doom-modeline-def-modeline 'mdrp/lsp-line
+  (doom-modeline-def-modeline 'pokemacs-lsp-line
     '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
     '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
 
@@ -3005,27 +3194,27 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
            doom-modeline-fn-alist)
           doom-modeline-fn-alist))
 
-  (defun mdrp/mode-line-to-header-line ()
+  (defun pokemacs-mode-line-to-header-line ()
     (when use-header-line
       (setq header-line-format mode-line-format)
       (setq mode-line-format nil)))
 
   ;; Add to `doom-modeline-mode-hook` or other hooks
-  (defun mdrp/setup-no-lsp-doom-modeline ()
+  (defun pokemacs-setup-no-lsp-doom-modeline ()
     (message "doom no lsp modeline change")
-    (doom-modeline-set-modeline 'mdrp/no-lsp-line 'default)
-    (mdrp/mode-line-to-header-line))
+    (doom-modeline-set-modeline 'pokemacs-no-lsp-line 'default)
+    (pokemacs-mode-line-to-header-line))
 
-  (defun mdrp/setup-lsp-doom-modeline ()
+  (defun pokemacs-setup-lsp-doom-modeline ()
     (message "doom lsp modeline change")
     (lsp-headerline-breadcrumb-mode -1)
-    (doom-modeline-set-modeline 'mdrp/lsp-line nil)
-    (mdrp/mode-line-to-header-line)
+    (doom-modeline-set-modeline 'pokemacs-lsp-line nil)
+    (pokemacs-mode-line-to-header-line)
     (lsp-headerline-breadcrumb-mode 1))
 
   ;; Redefine all the mouse interactions of the modeline to the headerline
-  (add-hook 'doom-modeline-mode-hook 'mdrp/setup-no-lsp-doom-modeline)
-  (add-hook 'lsp-mode-hook 'mdrp/setup-lsp-doom-modeline)
+  (add-hook 'doom-modeline-mode-hook 'pokemacs-setup-no-lsp-doom-modeline)
+  (add-hook 'lsp-mode-hook 'pokemacs-setup-lsp-doom-modeline)
   (doom-modeline-mode)
   (when use-header-line
     (define-key mode-line-major-mode-keymap [header-line]
@@ -3459,10 +3648,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :defer t
   :mode ("^dune$" "^dune-project$")
   :init
-  (define-prefix-command 'mdrp-dune-map nil "Dune-")
+  (define-prefix-command 'pokemacs-dune-map nil "Dune-")
   :general
-  ("M-d" mdrp-dune-map)
-  (:keymaps 'mdrp-dune-map
+  ("M-d" pokemacs-dune-map)
+  (:keymaps 'pokemacs-dune-map
             "C-c" 'compile
             "l" 'dune-insert-library-form
             "e" 'dune-insert-executable-form
@@ -3718,7 +3907,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 ;; (ligature-set-ligatures 'tuareg-mode '(tuareg-prettify-symbols-extra-alist))
 ;; harmless if `prettify-symbols-mode' isn't active
 ;; (setq tuareg-prettify-symbols-full t)
-(defun mdrp/opam-shell-command-to-string (command)
+(defun pokemacs-opam-shell-command-to-string (command)
   "Similar to shell-command-to-string, but returns nil unless the process
   returned 0, and ignores stderr (shell-command-to-string ignores return value)"
   (let* ((return-value 0)
@@ -3730,9 +3919,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                   shell-command-switch command))))))
     (if (= return-value 0) return-string nil)))
 
-(defun mdrp/load-path-opam (&rest _)
+(defun pokemacs-load-path-opam (&rest _)
   (let ((opam-share
-         (let ((reply (mdrp/opam-shell-command-to-string "opam var share --safe")))
+         (let ((reply (pokemacs-opam-shell-command-to-string "opam var share --safe")))
            (when reply (substring reply 0 -1)))))
     (message opam-share)
     (let ((path (concat opam-share "/emacs/site-lisp")))
@@ -3741,7 +3930,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       )
     ))
 
-(defun mdrp/erase-and-fill-buffer (buffer)
+(defun pokemacs-erase-and-fill-buffer (buffer)
   "Erase the current BUFFER and move point to beginning of buffer."
   (with-current-buffer buffer
     (let ((npoint (search-backward "**********")))
@@ -3753,7 +3942,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-ocaml
 
-  (defcustom mdrp/ocaml-templates
+  (defcustom pokemacs-ocaml-templates
     '(
       (af "assert false;" n>)
       (pp "Printf.printf \"" p "\" " p ";" n> q)
@@ -3780,7 +3969,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     ;; The following line can be used instead of :ensure t to load
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
     ;; I'm not really sure that it's useful.
-    ;; :load-path (lambda () (mdrp/load-path-opam))
+    ;; :load-path (lambda () (pokemacs-load-path-opam))
     :general
     (:keymaps 'tuareg-mode-map
               "C-c C-t" nil
@@ -3788,9 +3977,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c C-l" nil
               "C-c o w" 'ocaml-utils-dune-watch)
     :config
-    (defvar-local mdrp/ocaml-templates-local mdrp/ocaml-templates "OCaml Templates")
-    (add-to-list 'tempel-template-sources 'mdrp/ocaml-templates)
-    (defun mdrp/map (l)
+    (defvar-local pokemacs-ocaml-templates-local pokemacs-ocaml-templates "OCaml Templates")
+    (add-to-list 'tempel-template-sources 'pokemacs-ocaml-templates)
+    (defun pokemacs-map (l)
       (-map (lambda (x) (list
                     (concat "\\([^/]+\\)" (regexp-quote (car x)))
                     (concat "\\1" (regexp-quote (cdr x))))
@@ -3804,15 +3993,15 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (setq tuareg-electric-indent t)
 
     (tuareg-opam-update-env (tuareg-opam-current-compiler))
-    (defun mdrp/update-opam-env (&rest _)
+    (defun pokemacs-update-opam-env (&rest _)
       (when (derived-mode-p 'tuareg-mode)
         (tuareg-opam-update-env nil)
         ))
 
-    (defun mdrp/update-load-path-opam (&rest _)
+    (defun pokemacs-update-load-path-opam (&rest _)
       (when (derived-mode-p 'tuareg-mode)
         (let ((opam-share
-               (let ((reply (mdrp/opam-shell-command-to-string "opam var share --safe")))
+               (let ((reply (pokemacs-opam-shell-command-to-string "opam var share --safe")))
                  (when reply (substring reply 0 -1)))))
           (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
           )
@@ -3820,12 +4009,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
     (if (boundp 'window-buffer-change-functions)
         (progn
-          (add-hook 'window-buffer-change-functions 'mdrp/update-opam-env)
-          (add-hook 'window-buffer-change-functions 'mdrp/update-load-path-opam)
+          (add-hook 'window-buffer-change-functions 'pokemacs-update-opam-env)
+          (add-hook 'window-buffer-change-functions 'pokemacs-update-load-path-opam)
           )
       (progn
-        (add-hook 'post-command-hook 'mdrp/update-opam-env)
-        (add-hook 'post-command-hook 'mdrp/update-load-path-opam)
+        (add-hook 'post-command-hook 'pokemacs-update-opam-env)
+        (add-hook 'post-command-hook 'pokemacs-update-load-path-opam)
         ))
     (unless (version< emacs-version "29")
       (message "unbind c-c c-a")
@@ -3847,8 +4036,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                   (".eliomi" . ".eliom")
                   ))
              (rl (-map #'cons-reverse l))
-             (l (mdrp/map l))
-             (rl (mdrp/map rl)))
+             (l (pokemacs-map l))
+             (rl (pokemacs-map rl)))
         (setq find-sibling-rules (append find-sibling-rules l rl))
         (message "`tuareg' loaded")))
     :hook
@@ -3885,10 +4074,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package ocp-indent
     ;; must be careful to always defer this, it has autoloads that adds hooks
     ;; which we do not want if the executable can't be found
-    :defer t
-    :hook (tuareg-mode . mdrp/ocaml-init-ocp-indent-h)
+    :hook (tuareg-mode . pokemacs-ocaml-init-ocp-indent-h)
     :config
-    (defun mdrp/ocaml-init-ocp-indent-h ()
+    (defun pokemacs-ocaml-init-ocp-indent-h ()
       "Run `ocp-setup-indent', so long as the ocp-indent binary exists."
       (when (executable-find "ocp-indent")
         (ocp-setup-indent)))
@@ -4022,6 +4210,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
        (merlin-mode)))
     (message "`reason-mode' loaded")))
 
+(use-package rst-mode
+  :ensure nil
+  :defer t
+  :hook (rst-mode . auto-fill-mode))
+
 (when use-ruby
   (use-package enh-ruby-mode
     :mode (("Appraisals\\'" . enh-ruby-mode)
@@ -4064,15 +4257,15 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     ((taplo . "cargo install taplo-cli --features lsp")
      (rustfmt . "cargo install rustfmt"))
     :hook
-    (rustic-mode . mdrp/set-rustic-compilation-mode)
+    (rustic-mode . pokemacs-set-rustic-compilation-mode)
     :general
     (:keymaps 'rustic-mode-map
               "C-c s" 'lsp-rust-analyzer-status
-              "C-M-;" 'mdrp/rust-doc-comment-dwim-following
-              "C-M-," 'mdrp/rust-doc-comment-dwim-enclosing)
+              "C-M-;" 'pokemacs-rust-doc-comment-dwim-following
+              "C-M-," 'pokemacs-rust-doc-comment-dwim-enclosing)
     :init
 
-    (defun mdrp/rust-doc-comment-dwim (c)
+    (defun pokemacs-rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
       (interactive)
 
@@ -4086,28 +4279,28 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               (setq p1 (region-beginning) p2 (region-end))
               (goto-char p1)
               (if (wholeLineIsCmt-p c)
-                  (mdrp/uncomment-region p1 p2 c)
-                (mdrp/comment-region p1 p2 c)
+                  (pokemacs-uncomment-region p1 p2 c)
+                (pokemacs-comment-region p1 p2 c)
                 ))
           (progn
             (if (wholeLineIsCmt-p c)
-                (mdrp/uncomment-current-line c)
-              (mdrp/comment-current-line c)
+                (pokemacs-uncomment-current-line c)
+              (pokemacs-comment-current-line c)
               )))))
 
-    (defun mdrp/wholeLineIsCmt-p (c)
+    (defun pokemacs-wholeLineIsCmt-p (c)
       (save-excursion
         (beginning-of-line 1)
         (looking-at (concat "[ \t]*//" c))
         ))
 
-    (defun mdrp/comment-current-line (c)
+    (defun pokemacs-comment-current-line (c)
       (interactive)
       (beginning-of-line 1)
       (insert (concat "//" c))
       )
 
-    (defun mdrp/uncomment-current-line (c)
+    (defun pokemacs-uncomment-current-line (c)
       "Remove “//c” (if any) in the beginning of current line."
       (interactive)
       (when (wholeLineIsCmt-p c)
@@ -4116,45 +4309,45 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (delete-backward-char 4)
         ))
 
-    (defun mdrp/comment-region (p1 p2 c)
+    (defun pokemacs-comment-region (p1 p2 c)
       "Add “//c” to the beginning of each line of selected text."
       (interactive "r")
       (let ((deactivate-mark nil))
         (save-excursion
           (goto-char p2)
           (while (>= (point) p1)
-            (mdrp/comment-current-line c)
+            (pokemacs-comment-current-line c)
             (previous-line)
             ))))
 
-    (defun mdrp/uncomment-region (p1 p2 c)
+    (defun pokemacs-uncomment-region (p1 p2 c)
       "Remove “//c” (if any) in the beginning of each line of selected text."
       (interactive "r")
       (let ((deactivate-mark nil))
         (save-excursion
           (goto-char p2)
           (while (>= (point) p1)
-            (mdrp/uncomment-current-line c)
+            (pokemacs-uncomment-current-line c)
             (previous-line) )) ))
 
-    (defun mdrp/rust-doc-comment-dwim-following ()
+    (defun pokemacs-rust-doc-comment-dwim-following ()
       (interactive)
-      (mdrp/rust-doc-comment-dwim "/ "))
+      (pokemacs-rust-doc-comment-dwim "/ "))
 
-    (defun mdrp/rust-doc-comment-dwim-enclosing ()
+    (defun pokemacs-rust-doc-comment-dwim-enclosing ()
       (interactive)
-      (mdrp/rust-doc-comment-dwim "! "))
+      (pokemacs-rust-doc-comment-dwim "! "))
 
     :config
-    (define-derived-mode mdrp/rustic-compilation-mode rustic-compilation-mode "compilation"
+    (define-derived-mode pokemacs-rustic-compilation-mode rustic-compilation-mode "compilation"
       "A wrapper for `rustic-compilation-mode'.")
-    (defun mdrp/function-rustic-compilation-mode (buf _str)
+    (defun pokemacs-function-rustic-compilation-mode (buf _str)
       (with-current-buffer buf
-        (mdrp/rustic-compilation-mode)
+        (pokemacs-rustic-compilation-mode)
         (compilation-auto-jump buf (match-beginning 0))))
 
-    (defun mdrp/set-rustic-compilation-mode ()
-      (add-to-list 'compilation-finish-functions 'mdrp/function-rustic-compilation-mode))
+    (defun pokemacs-set-rustic-compilation-mode ()
+      (add-to-list 'compilation-finish-functions 'pokemacs-function-rustic-compilation-mode))
 
     (setq rust-prettify-symbols-alist nil)
     ;; Allign to `.`

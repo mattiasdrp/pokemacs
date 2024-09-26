@@ -42,12 +42,11 @@
  '(magit-diff-refine-hunk 'all)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages nil)
+ '(pokemacs-dict "en-GB")
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-theme 'doom-solarized-dark)
  '(pokemacs-mono-font "Fira Code")
  '(pokemacs-variable-font "Iosevka Aile")
- '(pokemacs/english-dict "GB")
- '(pokemacs/french-dict "FR")
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down
                                         projectile-root-bottom-up
