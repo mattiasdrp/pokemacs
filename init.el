@@ -727,7 +727,6 @@ debian, and derivatives). On most it's 'fd'.")
    "d"                       '(hydra-dates/body :which-key "Date Utils")
    "f"                       '(hydra-flycheck/body :which-key "Flycheck")
    "g"                       '(hydra-smerge/body :which-key "Git/Smerge")
-   "c"                       '(hydra-compilation/body :which-key "Compilation")
    "w"                       '(hydra-window/body :which-key "Window")
    "t"                       '(pokemacs-toggles/body :which-key "Toggles"))
   (general-def minibuffer-local-map
@@ -1177,6 +1176,24 @@ debian, and derivatives). On most it's 'fd'.")
             "g"             'magit-status
             "G"             'git-messenger:popup-message
             "M-g"           'magit-dispatch)
+  :init
+  (pretty-hydra-define
+   hydra-smerge (:title "Smerge" :hint nil :quit-key "q")
+   (
+    "Resolve Conflict"
+    (("m" smerge-keep-upper "Keep Upper")
+     ("o" smerge-keep-lower "Keep Lower")
+     ("a" smerge-keep-all "Keep All")
+     ("r" smerge-resolve "Auto")
+     ("e" smerge-ediff "Ediff"))
+
+    "Navigation"
+    (("n" smerge-vc-next-conflict "Next")
+     ("p" smerge-prev "Previous")
+     ("s" smerge-start-session "Start"))
+
+    "Utility"
+    (("c" git-messenger:popup-message "Commit at point M-v G"))))
   :config
   (setq magit-auto-revert-mode t)
   (setq magit-auto-revert-immediately t)
@@ -1186,21 +1203,6 @@ debian, and derivatives). On most it's 'fd'.")
       (if (null files)
           (flycheck-next-error)
         (smerge-vc-next-conflict))))
-
-  (pretty-hydra-define
-     hydra-smerge (:title "Smerge" :hint nil :quit-key "q")
-     (
-      "Resolve Conflict"
-      (("m" smerge-keep-upper "Keep Upper")
-       ("o" smerge-keep-lower "Keep Lower")
-       ("a" smerge-keep-all "Keep All")
-       ("r" smerge-resolve "Auto")
-       ("e" smerge-ediff "Ediff"))
-
-      "Navigation"
-      (("n" smerge-vc-next-conflict "Next")
-       ("p" smerge-prev "Previous")
-       ("s" smerge-start-session "Start"))))
   (message "`magit' loaded"))
 
 (when use-magit-todos
@@ -2142,9 +2144,8 @@ with a prefix ARG."
   (message "`winner' loaded"))
 
 (use-package ace-window
+  :demand t
   :config
-  (setq aw-dispatch-always t)
-  (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (pretty-hydra-define
    hydra-window (:title "Window management" :quit-key "q")
    ("Movement"
@@ -2192,6 +2193,8 @@ with a prefix ARG."
      ("P" purpose-set-window-purpose "Set purpose")
      ("!" purpose-toggle-window-purpose-dedicated "Toggle purpose")
      ("#" purpose-toggle-window-buffer-dedicated "Toggle buffer"))))
+  (setq aw-dispatch-always t)
+  (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
 (when use-visual-fill
@@ -2740,6 +2743,27 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (advice-add 'windmove-up :after #'pokemacs-highlight-selected-window)
   (advice-add 'windmove-down :after #'pokemacs-highlight-selected-window)
   :config
+  (pretty-hydra-define
+   pokemacs-toggles
+   (:title "Toggles" :quit-key "q")
+   ("Basic"
+    (("n" nlinum-mode "line number" :toggle nlinum-mode)
+     ("w" whitespace-mode "whitespace" :toggle whitespace-mode)
+     ("r" rainbow-mode "rainbow" :toggle rainbow-mode)
+     ("R" rainbow-delimiters-mode "rainbow delim" :toggle rainbow-delimiters-mode)
+     ("L" global-page-break-lines-mode "page break lines" :toggle global-page-break-lines-mode))
+    "Highlight"
+    (("l" hl-line-mode "line" :toggle hl-line-mode)
+     ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
+    "UI"
+    (("d" pokemacs-toggle-dark-light-theme "dark theme" :toggle pokemacs-dark-theme-p))
+    "Coding"
+    (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
+     ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
+     )
+    "Emacs"
+    (("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+     ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
   (message "`emacs' loaded"))
 
 (use-package windmove
