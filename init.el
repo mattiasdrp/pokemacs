@@ -722,11 +722,12 @@ debian, and derivatives). On most it's 'fd'.")
    "h"                       'pokemacs-resize-window-height)
   (general-define-key
    :prefix "M-h"
-   "d"                       'hydra-dates/body
-   "f"                       'hydra-flycheck/body
-   "c"                       'hydra-compilation/body
-   "w"                       'hydra-window/body
-   "t"                       'pokemacs-toggles/body)
+   "d"                       '(hydra-dates/body :which-key "Date Utils")
+   "f"                       '(hydra-flycheck/body :which-key "Flycheck")
+   "g"                       '(hydra-smerge/body :which-key "Git/Smerge")
+   "c"                       '(hydra-compilation/body :which-key "Compilation")
+   "w"                       '(hydra-window/body :which-key "Window")
+   "t"                       '(pokemacs-toggles/body :which-key "Toggles"))
   (general-def minibuffer-local-map
     "C-<tab>" 'dabbrev-expand)
   :config (message "`general' loaded"))
@@ -761,14 +762,10 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hydra
   :demand t
-  :custom (hydra-default-hint nil)
+  :custom
+  (hydra-default-hint nil)
+  (hydra-look-for-remap t)
   :init
-  (defun pokemacs-hydra-heading (&rest headings)
-    "Format HEADINGS to look pretty in a hydra docstring."
-    (mapconcat (lambda (it)
-                 (propertize (format "%-20s" it) 'face 'shadow))
-               headings
-               nil))
 
   (defun pokemacs-date-iso ()
     "Insert the current date, ISO format, eg. 2016-12-09."
@@ -813,8 +810,8 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :demand t
   :general
-  ("M-h h" 'major-mode-hydra)
-  ("M-h m" 'pokemacs-major-mode-hydra-custom)
+  ("M-h h" '(major-mode-hydra :which-key "Major mode"))
+  ("M-h m" '(pokemacs-major-mode-hydra-custom :which-key "Custom mode"))
   :custom
   (major-mode-hydra-invisible-quit-key "q")
   :config
@@ -1208,6 +1205,21 @@ debian, and derivatives). On most it's 'fd'.")
       (if (null files)
           (flycheck-next-error)
         (smerge-vc-next-conflict))))
+
+  (pretty-hydra-define
+     hydra-smerge (:title "Smerge" :hint nil :quit-key "q")
+     (
+      "Resolve Conflict"
+      (("m" smerge-keep-upper "Keep Upper")
+       ("o" smerge-keep-lower "Keep Lower")
+       ("a" smerge-keep-all "Keep All")
+       ("r" smerge-resolve "Auto")
+       ("e" smerge-ediff "Ediff"))
+
+      "Navigation"
+      (("n" smerge-vc-next-conflict "Next")
+       ("p" smerge-prev "Previous")
+       ("s" smerge-start-session "Start"))))
   (message "`magit' loaded"))
 
 (when use-magit-todos
