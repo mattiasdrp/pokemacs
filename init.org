@@ -4954,7 +4954,6 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
   (use-package outline-minor
     :ensure nil
     :defer t
-    :hook (prog-mode . outline-minor-mode)
     :config (message "`outline-minor' loaded"))
 #+end_src
 
@@ -4976,7 +4975,6 @@ TODO: To be coherent with ~odoc~, for example, I need to update outline regexps 
   (use-package outshine
     :defer t
     :init (defvar outline-minor-mode-prefix "\C-o")
-    :hook (outline-minor-mode . outshine-mode)
     :config
     (setq outshine-preserve-delimiter-whitespace nil)
     (message "`outshine' loaded"))

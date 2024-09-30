@@ -3280,13 +3280,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package outline-minor
   :ensure nil
   :defer t
-  :hook (prog-mode . outline-minor-mode)
   :config (message "`outline-minor' loaded"))
 
 (use-package outshine
   :defer t
   :init (defvar outline-minor-mode-prefix "\C-o")
-  :hook (outline-minor-mode . outshine-mode)
   :config
   (setq outshine-preserve-delimiter-whitespace nil)
   (message "`outshine' loaded"))
