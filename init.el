@@ -74,6 +74,7 @@
    use-package-verbose t
    use-package-expand-minimally t
    use-package-compute-statistics t
+   use-package-always-defer t
    use-package-enable-imenu-support t))
 
 (use-package use-package-ensure-system-package
@@ -423,14 +424,15 @@ Specify the chosen language used by spell checking tools in pokemacs."
  ;; Flash the screen
  visible-bell nil)
 
-(require 'server)
-(unless (server-running-p) (server-start))
+(use-package server
+  :ensure nil
+  :config
+  (unless (server-running-p) (server-start))
+  (message "`server' loaded"))
 
 ;; Allows to repeat just one key to allow shorter key sequences
 (use-package repeat
   :ensure nil
-  :demand nil
-  :defer nil
   :init (repeat-mode t)
   :config
   (setopt repeat-exit-timeout nil)
@@ -468,7 +470,6 @@ Specify the chosen language used by spell checking tools in pokemacs."
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (use-package auto-package-update
-  :defer t
   :custom
   (auto-package-update-show-preview t)
   (auto-package-update-prompt-before-update t)
@@ -476,6 +477,7 @@ Specify the chosen language used by spell checking tools in pokemacs."
   :config (message "`auto-package-update' loaded"))
 
 (use-package no-littering
+  :demand t
   :config (message "`no-littering' loaded"))
 (elpaca-wait)
 
@@ -514,15 +516,12 @@ debian, and derivatives). On most it's 'fd'.")
   :config (gcmh-mode 1))
 
 (use-package esup
-  :defer t
   :config
   (setq esup-depth 0)
   (message "`esup' loaded"))
 
 (use-package prescient
-  :init
-  (setq prescient-persist-mode 1)
-  :defer t
+  :init (setq prescient-persist-mode 1)
   :config (message "`prescient' loaded"))
 
 (use-package savehist
@@ -531,7 +530,6 @@ debian, and derivatives). On most it's 'fd'.")
   (savehist-mode t)
   ;; Remember recently opened files
   (recentf-mode t)
-  :defer t
   :custom
   (history-delete-duplicates t)
   :config
@@ -566,37 +564,41 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package all-the-icons
   :if (display-graphic-p)
+  :demand t
   :config
-  (when use-all-the-icons (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons"))
-  (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
+  (when use-all-the-icons
+    (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
+    (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons"))
   (message "`all-the-icons' loaded"))
 
 (when use-all-the-icons
   (use-package all-the-icons-dired
+    :if (display-graphic-p)
     :hook (dired-mode . all-the-icons-dired-mode)
     :config
     (message "`all-the-icons-dired' loaded")))
 
 (when use-all-the-icons
   (use-package all-the-icons-completion
-    :init
-    (all-the-icons-completion-mode)
+    :if (display-graphic-p)
+    :init (all-the-icons-completion-mode)
     :after (marginalia all-the-icons)
     :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
     :config
     (message "`all-the-icons-completion' loaded")))
 
-(use-package nerd-icons
-  :config
-  (unless use-all-the-icons (set-fontset-font t '(#x25d0 . #xf10d7) "Symbols Nerd Font Mono"))
-  (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
-  (message "`nerd-icons' loaded"))
+(unless use-all-the-icons
+  (use-package nerd-icons
+    :demand t
+    :config
+    (set-fontset-font t '(#x25d0 . #xf10d7) "Symbols Nerd Font Mono")
+    (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
+    (message "`nerd-icons' loaded")))
 
 (unless use-all-the-icons
   (use-package nerd-icons-dired
     :hook (dired-mode . nerd-icons-dired-mode)
-    :config
-    (message "`nerd-icons-dired' loaded")))
+    :config (message "`nerd-icons-dired' loaded")))
 
 (unless use-all-the-icons
   (use-package nerd-icons-completion
@@ -607,7 +609,7 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`nerd-icons-completion' loaded")))
 
 (use-package ligature
-  :defer t
+  :demand t
   :config
   ;; Enable the "www" ligature in every possible major mode
   (ligature-set-ligatures 't '("www"))
@@ -615,18 +617,19 @@ debian, and derivatives). On most it's 'fd'.")
   ;; `variable-pitch' face supports it
   (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
   ;; Enable all Fira Code ligatures in programming modes
-  (ligature-set-ligatures 'prog-mode '(
-                                       "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
-                                       ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
-                                       "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
-                                       "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
-                                       ;; "..""..."
-                                       "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
-                                       "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
-                                       "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
-                                       "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
-                                       "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
-                                       "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
+  (ligature-set-ligatures
+   'prog-mode '(
+                "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+                ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+                "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+                "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
+                ;; "..""..."
+                "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+                "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+                "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+                "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+                "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+                "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t)
@@ -634,8 +637,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package ansi-color
   :ensure nil
-  :hook
-  (shell-mode . ansi-color-for-comint-mode-on)
+  :hook (shell-mode . ansi-color-for-comint-mode-on)
   :config (message "`ansi-color' loaded"))
 
 (use-package kurecolor
@@ -880,7 +882,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`keycast' loaded"))
 
 (use-package selected
-  :defer t
   :init
   (require 'hide-region)
   (selected-global-mode)
@@ -960,20 +961,17 @@ debian, and derivatives). On most it's 'fd'.")
 (setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
 
 (use-package nlinum
-  :init
-  (global-nlinum-mode 1)
+  :init (global-nlinum-mode 1)
   :config
   (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
   (message "`nlinum' loaded"))
 
 (use-package cheatsheet
-  :defer t
   :config (message "`cheatsheet' loaded"))
 
 (use-package crux
   :init
   (define-prefix-command 'pokemacs-crux-map nil "Crux-")
-  :defer t
   :general
   ("M-m" 'pokemacs-crux-map)
   ("C-a" 'crux-move-beginning-of-line)
@@ -1006,7 +1004,6 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package delete-block
   :load-path "lisp/"
   :ensure nil
-  :defer t
   :general
   ("C-d"                     'delete-block-forward)
   ("C-<backspace>"           'delete-block-backward)
@@ -1015,7 +1012,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package discover-my-major
   :after general
-  :defer t
   :general ("C-h C-m" 'discover-my-major)
   :config (message "`discover-my-major' loaded"))
 
@@ -1029,7 +1025,6 @@ debian, and derivatives). On most it's 'fd'.")
   ("C-h C" 'helpful-command))
 
 (use-package easy-kill
-  :defer t
   :general
   ([remap kill-ring-save] 'easy-kill)
   ([remap mark-sexp] 'easy-mark)
@@ -1046,8 +1041,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`json' loaded"))
 
 (use-package lsp-ltex
-  :ensure t
-  :defer t
   :hook (text-mode . (lambda ()
                        (require 'lsp-ltex)
                        (lsp-deferred)))
@@ -1071,21 +1064,18 @@ debian, and derivatives). On most it's 'fd'.")
   :config (setq jinx-languages pokemacs-dict))
 
 (use-package highlight-symbol
-  :defer t
-    :init (highlight-symbol-mode)
-    :general
-    (:keymaps 'highlight-symbol-nav-mode-map
-              "M-n" nil
-              "M-p" nil
-              )
-    ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
-    ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
-    :config
-    (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-    (message "`highlight-symbol' loaded"))
+  :init (highlight-symbol-mode)
+  :general
+  (:keymaps 'highlight-symbol-nav-mode-map
+            "M-n" nil
+            "M-p" nil)
+  ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
+  ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
+  :config
+  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+  (message "`highlight-symbol' loaded"))
 
 (use-package multiple-cursors
-  :defer t
   :general
   ("C-c n" 'mc/mark-next-like-this)
   ("C-c p" 'mc/mark-previous-like-this)
@@ -1096,18 +1086,14 @@ debian, and derivatives). On most it's 'fd'.")
   :load-path "lisp/"
   :ensure nil
   :commands hide-region-pin
-  :defer t
   :general
   ("C-c r u" 'hide-region-unpin)
   :config (message "`hide-region loaded"))
 
 (use-package hide-mode-line
-  :defer t
   :config (message "`hide-mode-line loaded"))
 
 (use-package vundo
-  :ensure t
-  :defer t
   :commands (vundo)
   :general
   ("C-x u" 'vundo)
@@ -1117,7 +1103,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package whitespace
   :ensure nil
-  :defer t
   :hook
   (prog-mode . whitespace-mode)
   (text-mode . whitespace-mode)
@@ -1125,15 +1110,14 @@ debian, and derivatives). On most it's 'fd'.")
   (whitespace-style '(face empty indentation::space tab trailing))
   :config (message "`whitespace loaded"))
 
-(use-package locked-window-buffer-mode
-  :ensure nil
-  :general ("M-l"    'locked-window-buffer-mode))
-
-
 (define-minor-mode locked-window-buffer-mode
   "Make the current window always display this buffer."
   :lighter "locked"
   (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
+
+(use-package locked-window-buffer-mode
+  :ensure nil
+  :general ("M-l l"    'locked-window-buffer-mode))
 
 (use-package dired
   :ensure nil
@@ -1179,12 +1163,9 @@ debian, and derivatives). On most it's 'fd'.")
             [remap dired-smart-shell-command]    'dwim-shell-command)
   :config (require 'dwim-shell-commands))
 
-(use-package transient
-  :ensure t)
+(use-package transient)
 
 (use-package magit
-  :defer t
-  :ensure t
   :general
   ("C-c g"  'magit-file-dispatch)
   ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
@@ -1224,7 +1205,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (when use-magit-todos
   (use-package magit-todos
-    :defer t
     :hook (magit . magit-todos)
     :config
     (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
@@ -1232,26 +1212,19 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hl-todo
   :ensure (:depth nil)
-  :config
-  (global-hl-todo-mode 1)
-  (message "`hl-todo' loaded"))
+  :init (global-hl-todo-mode 1)
+  :config (message "`hl-todo' loaded"))
 
 (use-package git-messenger
-  :defer t
   :config
   (setq git-messenger:show-detail t
         git-messenger:use-magit-popup t)
   (message "`git-messenger' loaded"))
 
 (use-package git-timemachine
-  :defer t
-  :general
-  (:keymaps 'magit-mode-map
-            "<left>" '(git-timemachine :wk "Go back in git history"))
   :config (message "`git-timemachine' loaded"))
 
 (use-package git-modes
-  :defer t
   :config (message "`git-modes' loaded"))
 
 (use-package code-review
@@ -1261,21 +1234,17 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`code-review' loaded"))
 
 (use-package ghub
-  :defer t
   :config (message "`ghub' loaded"))
 
 (use-package org-protocol
   :ensure nil
-  :defer t
   :config
   (message "`org-protocol' loaded"))
 
-(use-package ox-pandoc
-  :defer t)
+(use-package ox-pandoc)
 
 (use-package ox
   :ensure nil
-  :defer t
   :mode ("\\.org\\'" . org-mode)
   :init
   (defun pokemacs-filter-timestamp (trans back _comm)
@@ -1291,16 +1260,14 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`ox' loaded"))
 
 (use-package mixed-pitch
-  :defer t
   :config (message "`mixed-pitch' loaded"))
 
-(use-package ob-rust :defer t)
+(use-package ob-rust)
 
 (use-package ob-racket
   :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
 (use-package org
-  :defer t
   :ensure nil
   :mode ("\\.org\\'" . org-mode)
   :load-path "lisp/org-mode/lisp"
@@ -1482,7 +1449,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`org-modern' loaded"))
 
 (use-package org-auto-tangle
-  :defer t
   :hook (org-mode . org-auto-tangle-mode)
   :config (message "`org-auto-tangle' loaded"))
 
@@ -1496,7 +1462,6 @@ debian, and derivatives). On most it's 'fd'.")
   )
 
 (use-package org-inline-pdf
-  :defer t
   :ensure-system-package pdf2svg
   :hook (org-mode . org-inline-pdf-mode)
   :config (message "`org-inline-pdf' loaded"))
@@ -1514,7 +1479,6 @@ debian, and derivatives). On most it's 'fd'.")
         cfw:fchar-top-right-corner ?┓))
 
 (use-package calfw-org
-  :defer t
   :after calfw
   :ensure nil
   :init
@@ -1563,7 +1527,6 @@ debian, and derivatives). On most it's 'fd'.")
 
   (use-package org-gcal
     :after json
-    :defer t
     :custom
     (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
     (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
@@ -1574,7 +1537,6 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`org-gcal' loaded")))
 
 (use-package org-super-agenda
-  :defer t
   :config
   (setq org-super-agenda-groups
         '(;; Each group has an implicit Boolean OR operator between its selectors.
@@ -1592,7 +1554,6 @@ debian, and derivatives). On most it's 'fd'.")
   :disabled
   :after org
   :ensure (org-appear :host github :repo "awth13/org-appear" :branch "org-9.7-fixes")
-  :defer t
   :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autolinks t)
@@ -1601,7 +1562,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 (when use-org-roam
   (use-package org-roam
-    :defer t
     :after org
     :custom
     (org-roam-directory (file-truename "~/org/org-roam"))
@@ -1667,7 +1627,6 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`org-roam' loaded"))
 
   (use-package org-roam-ui
-    :defer t
     :after org-roam
     :config
     (setq org-roam-ui-sync-theme t
@@ -1677,7 +1636,7 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`org-roam-ui' loaded")))
 
 (use-package org-make-toc
-  :defer t
+  :commands org-make-toc
   :custom
   (org-make-toc-insert-custom-ids t)
   :config
@@ -1694,94 +1653,6 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure nil
   :after org
   :config (message "`ox-moderncv' loaded"))
-
-(use-package org-present
-  :ensure t
-  :demand t
-  :after org
-  :general
-  (:keymaps 'org-present-mode-keymap
-            "<right>" 'pokemacs-org-next-visible-heading-and-expand
-            "<left>" 'pokemacs-org-prev-visible-heading-and-expand
-            "C-<right>" 'org-present-next
-            "C-<left>" 'org-present-prev)
-  :init
-  (defun pokemacs-org-next-visible-heading-and-expand (arg)
-    (interactive "p")
-    (let ((res (call-interactively #'org-next-visible-heading arg)))
-      (if (= (point) (point-max))
-          (call-interactively #'org-present-next)
-        (call-interactively #'org-fold-show-entry)))
-    (recenter 0 t))
-
-  (defun pokemacs-org-prev-visible-heading-and-expand (arg)
-    (interactive "p")
-    (call-interactively #'org-fold-hide-entry)
-    (when (= (point) (point-min))
-      (call-interactively #'org-present-prev)
-      (goto-char (point-max)))
-    (call-interactively #'org-previous-visible-heading arg)
-    (call-interactively #'org-fold-show-entry)
-    (recenter 0 t))
-
-  (defvar-local memo/header-line-format header-line-format)
-  (defvar-local memo/use-header-line use-header-line)
-  (defun pokemacs-org-present-start ()
-    (visual-fill-column-mode 1)
-    (visual-line-mode 1)
-    (setq-local visual-fill-column-width 100)
-    (setq-local line-spacing 0.7)
-    ;; (mixed-pitch-mode 1)
-    (setq-local face-remapping-alist
-                '((header-line (:height 4.0) variable-pitch)
-                  (org-document-title (:height 1.75) org-document-title)
-                  (org-code (:height 1.55) org-code)
-                  (org-verbatim (:height 1.55) org-verbatim)
-                  (org-block (:height 1.25) org-block)
-                  (org-block-begin-line (:height 0.7) org-block-begin-line)))
-    (setq-local memo/header-line-format header-line-format)
-    (lsp-disconnect)
-    (flycheck-mode -1)
-    (lsp-mode -1)
-    (lsp-headerline-breadcrumb-mode -1)
-    (nlinum-mode -1)
-    (jinx-mode -1)
-    (setq use-header-line nil)
-    (setq header-line-format " ")
-    (consult-theme 'doom-palenight)
-    (hide-mode-line-mode 1)
-    (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
-    (message "`org-present' start"))
-
-  (defun pokemacs-org-present-quit ()
-    (visual-fill-column-mode 0)
-    (visual-line-mode 0)
-    (hide-mode-line-mode 0)
-    (setq line-spacing nil)
-    (setq use-header-line memo/use-header-line)
-    (setq header-line-format memo/header-line-format)
-    (consult-theme (pokemacs-get-current-theme))
-    (nlinum-mode)
-    (jinx-mode)
-    (lsp-mode)
-    (lsp-headerline-breadcrumb-mode)
-    (flycheck-mode)
-    (setq-local face-remapping-alist '((default variable-pitch default)))
-    (message "`org-present' quit"))
-
-  (defun pokemacs-org-present-prepare-slide (buffer-name heading)
-    ;; Show only top-level headlines
-    (org-overview)
-    ;; Unfold the current entry
-    (org-show-entry)
-    ;; Show only direct subheadings of the slide but don't expand them
-    (org-show-children))
-
-  :hook ((org-present-mode . pokemacs-org-present-start)
-         (org-present-mode-quit . pokemacs-org-present-quit))
-  :config
-  (add-hook 'org-present-after-navigate-functions 'pokemacs-org-present-prepare-slide)
-  (message "`org-present' loaded"))
 
 ;; Taken from doomemacs
 
@@ -1812,9 +1683,6 @@ debian, and derivatives). On most it's 'fd'.")
       (setq pokemacs-lsp--optimization-init-p t))))
 
 (use-package lsp-mode
-  :defer t
-  :after projectile
-  :commands lsp
   :init
   (defun minad/orderless-dispatch-prefixes-first (_pattern index _total)
     (and (eq index 0) 'orderless-prefixes))
@@ -1841,7 +1709,6 @@ debian, and derivatives). On most it's 'fd'.")
          (elm-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (kotlin-mode . lsp-deferred)
-         (python-mode . lsp-deferred)
          (enh-ruby-mode . lsp-deferred)
          (rustic-mode . lsp-deferred)
          (tuareg-mode . lsp-deferred))
@@ -1942,7 +1809,6 @@ debian, and derivatives). On most it's 'fd'.")
 
 ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
 (use-package lsp-ui
-  :defer t
   :hook (lsp-mode . lsp-ui-mode)
   :general
   ("C-M-d" 'lsp-ui-doc-show)
@@ -1975,12 +1841,10 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`lsp-ui' loaded"))
 
 (use-package lsp-treemacs
-  :defer t
   :after lsp
   :config (message "`lsp-treemacs' loaded"))
 
 (use-package consult-lsp
-  :defer t
   :disabled)
 
 (use-package prog-mode
@@ -1991,20 +1855,7 @@ debian, and derivatives). On most it's 'fd'.")
   :hook
   (prog-mode . pokemacs-clear-compilation-finish-functions))
 
-(use-package highlight-indent-guides
-  :disabled
-  :hook (prog-mode . highlight-indent-guides-mode)
-  :config
-  (setq highlight-indent-guides-auto-enabled nil)
-  ;; (setq highlight-indent-guides-responsive 'stack)
-  (set-face-background 'highlight-indent-guides-stack-character-face "red")
-  (set-face-background 'highlight-indent-guides-top-character-face "pink")
-  (set-face-foreground 'highlight-indent-guides-character-face "white")
-  (setq highlight-indent-guides-method 'bitmap)
-  :config (message "`highlight-indent-guides' loaded"))
-
 (use-package apheleia
-  :defer t
   :hook
   (c-mode        . apheleia-mode)
   (c++-mode      . apheleia-mode)
@@ -2027,7 +1878,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`apheleia' loaded"))
 
 (use-package dap-mode
-  :defer t
   :general
   (:keymaps 'lsp-mode-map
             "M-<f5>" 'dap-hydra)
@@ -2040,7 +1890,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`dap' loaded"))
 
 (use-package dumb-jump
-  :defer t
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   (defhydra dumb-jump-hydra (:color blue :columns 3)
@@ -2133,12 +1982,10 @@ have one rule for each file type."
    "C-c C-a"                       'pokemacs-find-sibling-file-wrapper))
 
 (use-package fontify-face
-  :defer t
   :hook (font-lock-mode . fontify-face-mode)
   :config (message "`fontify-face' loaded"))
 
 (use-package flycheck
-  :defer t
   :init
   (define-prefix-command 'pokemacs-fly-map nil "Fly-")
   (defvar-keymap pokemacs-flycheck-overlay-map
@@ -2190,7 +2037,6 @@ have one rule for each file type."
 (use-package flycheck-correct
   :load-path "lisp/"
   :ensure nil
-  :defer t
   :hook flycheck-mode
   :general
   (:keymaps 'flycheck-mode-map
@@ -2214,7 +2060,6 @@ have one rule for each file type."
   (message "`flycheck-inline' loaded"))
 
 (use-package consult-flycheck
-  :defer t
   :general
   ("C-c l" 'consult-flycheck)
   :config (message "`consult-flycheck' loaded"))
@@ -2223,7 +2068,6 @@ have one rule for each file type."
   :hook (flycheck-mode . (lambda () (flycheck-rust-setup))))
 
 (use-package hideshow
-  :defer t
   :ensure nil
   :hook (prog-mode . (lambda ()
                        (unless (eq major-mode 'tree-sitter-query-mode)
@@ -2261,7 +2105,6 @@ with a prefix ARG."
   (message "`projectile' loaded"))
 
 (use-package separedit
-  :defer t
   :general
   ("C-c C-e"                 'separedit)
   :config
@@ -2269,7 +2112,6 @@ with a prefix ARG."
   (message "`separedit' loaded"))
 
 (use-package treemacs
-  :defer t
   :config (message "`treemacs' loaded"))
 
 (use-package uniquify
@@ -2354,7 +2196,6 @@ with a prefix ARG."
 
 (when use-visual-fill
   (use-package visual-fill-column
-    :defer t
     :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
     :custom
     (visual-fill-column-width 100)
@@ -2374,7 +2215,6 @@ with a prefix ARG."
 
 (when use-window-purpose
   (use-package window-purpose
-    :defer t
     :config
     (purpose-mode)
     (purpose-x-magit-multi-on)
@@ -2382,10 +2222,8 @@ with a prefix ARG."
 
 (use-package vertico
   :ensure (vertico :files (:defaults "extensions/*"))
-  :defer t
   :after general
-  :init
-  (vertico-mode)
+  :init (vertico-mode)
   :general
   (:keymaps 'vertico-map
             "<tab>" #'minibuffer-complete         ; common prefix
@@ -2441,7 +2279,6 @@ with a prefix ARG."
 (use-package vertico-multiform
   :after vertico
   :ensure nil
-  :defer t
   :custom
   (vertico-buffer-display-action '(display-buffer-in-side-window
                                    (side . right)
@@ -2486,11 +2323,9 @@ with a prefix ARG."
     (message "`vertico-posframe loaded")))
 
 (use-package consult
-  :defer t
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
-  :defer t
   :ensure-system-package (rg . ripgrep)
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :general
@@ -2656,7 +2491,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`consult' loaded"))
 
 (use-package embark
-  :defer t
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
   ("C-:" 'embark-default-act-noquit)  ;; good alternative: M-.
@@ -2683,7 +2517,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :after (embark consult)
-  :defer t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode)
   :config
@@ -2691,7 +2524,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package corfu
   :ensure (corfu :files (:defaults "extensions/*"))
-  :defer t
   :init
   ;; Function definitions
 
@@ -2866,7 +2698,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config (message "`kind-icon' loaded"))
 
 (use-package emacs
-  :defer t
   :ensure nil
   :init
   ;; FRINGE
@@ -2929,7 +2760,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
 
 (use-package orderless
-  :defer t
   :custom
   (completion-styles '(substring orderless basic))
   (orderless-matching-styles '(orderless-prefixes))
@@ -2942,9 +2772,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config (message "`orderless' loaded"))
 
 (use-package cape
-  :defer t
-  :init
-  (define-prefix-command 'pokemacs-cape-map nil "Cape-")
+  :init (define-prefix-command 'pokemacs-cape-map nil "Cape-")
   :general
   ("M-c" 'pokemacs-cape-map)
   (:keymaps 'pokemacs-cape-map
@@ -2979,7 +2807,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package marginalia
   :after vertico
-  :defer t
   :init (marginalia-mode)
   :custom
   (marginalia-align 'center)
@@ -2988,7 +2815,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config (message "`marginalia' loaded"))
 
 (use-package iedit
-  :defer t
   :general
   (:keymaps 'lsp-mode-map
             "C-;" nil)
@@ -3044,6 +2870,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (pokemacs-load-theme))
 
 (use-package doom-themes
+  :demand t
   :config
   ;; Global settings (defaults)
   (load-theme (pokemacs-get-current-theme) t)
@@ -3062,7 +2889,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`doom-themes' loaded"))
 
 (use-package anzu
-  :defer t
   :init
   (global-anzu-mode +1)
   (anzu-mode +1)
@@ -3074,6 +2900,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`anzu' loaded"))
 
 (use-package doom-modeline
+  :demand t
   :init
   ;; If non-nil, cause imenu to see `doom-modeline' declarations.
   ;; This is done by adjusting `lisp-imenu-generic-expression' to
@@ -3236,6 +3063,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`doom-modeline' loaded"))
 
 (use-package minions
+  :demand t
   :config (minions-mode)
   :custom
   (minions-mode-line-lighter "☰")
@@ -3277,37 +3105,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
   (message "`outline' loaded"))
 
-(use-package outline-minor
-  :ensure nil
-  :defer t
-  :config (message "`outline-minor' loaded"))
-
-(use-package outshine
-  :defer t
-  :init (defvar outline-minor-mode-prefix "\C-o")
-  :config
-  (setq outshine-preserve-delimiter-whitespace nil)
-  (message "`outshine' loaded"))
-
-(use-package pretty-outlines
-  :defer t
-  :load-path "lisp/"
-  :ensure nil
-  :hook (
-         (outline-mode . pretty-outlines-set-display-table)
-         (outline-minor-mode . pretty-outlines-set-display-table)
-         (emacs-lisp-mode . pretty-outlines-add-bullets)
-         )
-  :config (message "`pretty-outlines' loaded"))
-
 (use-package rainbow-mode
-  :defer t
   :hook (help-mode prog-mode text-mode org-mode)
   :config (message "`rainbow-mode' loaded"))
 
 (if use-rainbow
     (use-package rainbow-delimiters
-      :defer t
       :hook (prog-mode . rainbow-delimiters-mode)
       :config (message "`rainbow-delimiters' loaded")))
 
@@ -3343,14 +3146,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-solaire
   (use-package solaire-mode
-    :defer t
     :config
     (solaire-global-mode +1)
     (message "`solaire' loaded")))
 
 (when use-dashboard
   (use-package page-break-lines
-    :defer t
     :config (message "`page-break-lines' loaded"))
 
   (use-package dashboard
@@ -3375,30 +3176,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (message "`dashboard' loaded"))
   (elpaca-wait))
 
-(use-package svg-tag-mode
-  :disabled
-  :defer t
-  :config
-  (setq svg-tag-tags
-        '((":TODO:" . ((lambda (tag)
-                         (svg-tag-make "TODO" :face 'org-tag
-                                       :radius 0 :inverse t :margin 0))))
-          (":NOTE:" . ((lambda (tag)
-                         (svg-tag-make "NOTE" :face 'font-lock-comment-face
-                                       :inverse nil :margin 0 :radius 0))))
-          ("\([0-9a-zA-Z]\)" . ((lambda (tag)
-                                  (svg-tag-make tag :beg 1 :end -1 :radius 12))))
-          ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
-                                             (svg-tag-make tag :beg 1 :end -1 :radius 8))))))
-  (svg-tag-mode)
-  (global-svg-tag-mode)
-  (message "`svg-tag-mode' loaded"))
-
 (when use-eaf
   (use-package eaf
     :load-path "lisp/emacs-application-framework"
     :ensure nil
-    :defer t
     :custom
     ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
     (eaf-browser-continue-where-left-off t)
@@ -3435,11 +3216,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 ;; This package needs to be loaded to use language parsers
 (use-package tree-sitter-langs
-  :defer t
   :config (message "`tree-sitter-langs' loaded"))
 
 (use-package tree-sitter
-  :defer t
   :hook
   (tuareg-mode . tree-sitter-mode)
   (tree-sitter-after-on . tree-sitter-hl-mode)
@@ -3454,7 +3233,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package ts-fold
   :disabled
   :ensure (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
-  :defer t
   :hook
   (tuareg-mode . ts-fold-mode)
   (c-mode    . ts-fold-mode)
@@ -3469,7 +3247,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :disabled
   :load-path "lisp/ts-fold/"
   :ensure nil
-  :defer t
   :hook
   (tree-sitter-after-on . ts-fold-indicators-mode)
   :config
@@ -3600,7 +3377,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (when use-markdown
   (use-package markdown-mode
     :ensure nil
-    :defer t
     :mode (("README\\.md\\'" . gfm-mode)
            ("\\.md\\'"       . markdown-mode)
            ("\\.markdown\\'" . gfm-mode))
@@ -3614,20 +3390,17 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-markdown
   (use-package markdown-toc
-    :defer t
     :config (message "`markdown-toc' loaded")))
 
 (when use-pandoc
   (use-package pandoc-mode
     :ensure-system-package pandoc
-    :defer t
     :hook ((markdown-mode . pandoc-mode)
            (pandoc-mode . pandoc-load-default-settings))
     :config (message "`pandoc-mode' loaded")))
 
 (use-package conf-mode
   :ensure nil
-  :defer t
   :mode (
          ("/\\.merlin\\'" . conf-mode)
          ("_tags\\'" . conf-mode)
@@ -3637,7 +3410,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config (message "`conf-mode' loaded"))
 
 (use-package json-mode
-  :defer t
   :mode (("\\.bowerrc$"     . json-mode)
          ("\\.jshintrc$"    . json-mode)
          ("\\.json_schema$" . json-mode)
@@ -3655,7 +3427,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`json-mode' loaded"))
 
 (use-package dune
-  :defer t
   :mode ("^dune$" "^dune-project$")
   :init
   (define-prefix-command 'pokemacs-dune-map nil "Dune-")
@@ -3680,7 +3451,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package make-mode
   :ensure nil
-  :defer t
   :hook (make-mode . semantic-mode)
   :config (message "`make-mode' loaded"))
 
@@ -3740,23 +3510,19 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-clojure
   (use-package clojure-mode
-    :defer t
     :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
     :config (message "`clojure-mode' loaded")))
 
 (when use-clojure
   (use-package cider
-    :defer t
     :config (message "`cider' loaded")))
 
 (use-package elisp-mode
-  :defer t
   :ensure nil
   :hook (elisp-mode . semantic-mode)
   :config (message "`elisp-mode' loaded"))
 
 (use-package puni
-  :defer t
   :hook ((clojure-mode elisp-mode) . puni-mode)
   :config (message "`puni' loaded")
   ;; :general
@@ -3766,25 +3532,21 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   )
 
 (use-package flycheck-package
-  :defer t
   :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
   :config (message "`flycheck-package' loaded"))
 
 (when use-elm
   (use-package elm-mode
-    :defer t
     :general
     (:keymaps 'elm-mode-map
      "<tab>" 'elm-indent-cycle)
     :config (message "`elm-mode' loaded"))
 
   (use-package haskell-mode
-    :defer t
     :config (message "`haskell-mode' loaded")))
 
 (when use-fsharp
   (use-package fsharp-mode
-    :defer t
     :init
     (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet"))
     (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet/tools"))
@@ -3799,7 +3561,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-kotlin
   (use-package kotlin-mode
-    :defer t
     :config (message "`kotlin-mode' loaded")))
 
 (when use-java
@@ -3889,7 +3650,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               [(control return)] nil))
 
   (use-package auctex-latexmk
-    :defer t
     :hook
     (LaTeX-mode . (lambda ()
                     (add-to-list 'TeX-command-list
@@ -3904,7 +3664,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-michelson
   (use-package deferred
-    :defer t
     :config (message "`deferred' loaded"))
 
   ;; TODO: rewrite it without hardcoded paths
@@ -3969,7 +3728,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     :tag " OCaml Templates")
 
   (use-package tuareg
-    :defer t
     :ensure-system-package
     ((ocamllsp . "opam install ocaml-lsp-server")
      (ocamlformat . "opam install ocamlformat")
@@ -4095,7 +3853,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (when use-ocaml
   (use-package tuareg-menhir
     :ensure nil
-    :defer t
     :mode ("\\.mly'" . tuareg-menhir-mode)
     :config (message "`tuareg-menhir' loaded")))
 
@@ -4103,7 +3860,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package dune-minor
     :load-path "lisp/"
     :ensure nil
-    :defer t
     :hook (tuareg-mode . dune-minor-mode)
     :config (message "`dune-minor' loaded")))
 
@@ -4114,7 +3870,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   )
 
 (use-package pdf-tools
-  :defer t
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :magic ("%PDF" . pdf-view-mode)
   :hook
@@ -4127,14 +3882,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`pdf-tools' loaded"))
 
 (use-package saveplace-pdf-view
-  :defer t
   :after pdf-view
   :config (message "`saveplace-pdf-view' loaded"))
 
 (when use-python
   (use-package python
     :ensure nil
-    :defer t
     :hook (python-mode . semantic-mode)
     :config
     ;; Remove guess indent python message
@@ -4156,7 +3909,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-python
   (use-package pyvenv
-    :defer t
     :hook (python-mode . pyvenv-mode)
     :config
     ;; Setting work on to easily switch between environments
@@ -4170,7 +3922,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-python
   (use-package lsp-pyright
-    :defer t
+    :after (python lsp-mode)
+    :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp-deferred)))
     :config
     (setq lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
     (setq lsp-pyright-disable-language-service nil
@@ -4181,8 +3936,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (message "`lsp-pyright' loaded")))
 
 (when use-racket
-  (use-package racket-mode
-    :defer t))
+  (use-package racket-mode))
 
 (when use-reason
   (defun shell-cmd (cmd)
@@ -4211,18 +3965,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (setq refmt-command refmt-bin)))
 
   (use-package reason-mode
-          :defer t
-    :config
-    (add-hook
-     'reason-mode-hook
-     (lambda ()
-       (add-hook 'before-save-hook 'refmt-before-save)
-       (merlin-mode)))
-    (message "`reason-mode' loaded")))
+    :hook (reason-mode . (lambda ()
+                           (add-hook 'before-save-hook 'refmt-before-save)
+                           (merlin-mode)))
+    :config (message "`reason-mode' loaded")))
 
 (use-package rst-mode
   :ensure nil
-  :defer t
   :hook (rst-mode . auto-fill-mode))
 
 (when use-ruby
@@ -4241,8 +3990,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
     :ensure-system-package (solargraph . "gem install --user-install solargraph"))
 
-  (use-package rbenv
-    :defer t)
+  (use-package rbenv)
 
   (use-package inf-ruby)
 
@@ -4378,19 +4126,16 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-web
   (use-package web-mode
-    :defer t
     :mode "\\.php\\'"
     :config (message "`web-mode' loaded")))
 
 (when use-web
   (use-package css-mode
     :ensure nil
-    :defer t
     :mode "\\.css\\'"
     :config (message "`css-mode' loaded")))
 
 (use-package simple-httpd
-  :defer t
   :ensure nil
   :config (message "`simple-httpd' loaded"))
 

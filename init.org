@@ -358,6 +358,7 @@ Literate configuration for init.el.
      use-package-verbose t
      use-package-expand-minimally t
      use-package-compute-statistics t
+     use-package-always-defer t
      use-package-enable-imenu-support t))
 #+end_src
 
@@ -820,8 +821,11 @@ If you experience stuttering, increase this.
 :END:
 
 #+begin_src emacs-lisp
-  (require 'server)
-  (unless (server-running-p) (server-start))
+  (use-package server
+    :ensure nil
+    :config
+    (unless (server-running-p) (server-start))
+    (message "`server' loaded"))
 #+end_src
 
 ** Repeat-mode
@@ -833,8 +837,6 @@ If you experience stuttering, increase this.
   ;; Allows to repeat just one key to allow shorter key sequences
   (use-package repeat
     :ensure nil
-    :demand nil
-    :defer nil
     :init (repeat-mode t)
     :config
     (setopt repeat-exit-timeout nil)
@@ -951,7 +953,6 @@ Automatic updating of packages (you can customize ~auto-update-package-interval~
 
 #+begin_src emacs-lisp
   (use-package auto-package-update
-    :defer t
     :custom
     (auto-package-update-show-preview t)
     (auto-package-update-prompt-before-update t)
@@ -968,6 +969,7 @@ Stop creating files everywhere and put them all in a single place
 
 #+begin_src emacs-lisp
   (use-package no-littering
+    :demand t
     :config (message "`no-littering' loaded"))
   (elpaca-wait)
 #+end_src
@@ -1045,7 +1047,6 @@ Before this part you shouldn't use any ~use-package~ function since it's not loa
 
 #+begin_src emacs-lisp
   (use-package esup
-    :defer t
     :config
     (setq esup-depth 0)
     (message "`esup' loaded"))
@@ -1065,9 +1066,7 @@ Sorting and filtering of completions
 
 #+begin_src emacs-lisp
   (use-package prescient
-    :init
-    (setq prescient-persist-mode 1)
-    :defer t
+    :init (setq prescient-persist-mode 1)
     :config (message "`prescient' loaded"))
 #+end_src
 
@@ -1085,7 +1084,6 @@ We're not only saving the minibuffer history but compile history too
     (savehist-mode t)
     ;; Remember recently opened files
     (recentf-mode t)
-    :defer t
     :custom
     (history-delete-duplicates t)
     :config
@@ -1152,9 +1150,11 @@ In order to use this package you need to run ~M-x all-the-icons-install~ the fir
 #+begin_src emacs-lisp
   (use-package all-the-icons
     :if (display-graphic-p)
+    :demand t
     :config
-    (when use-all-the-icons (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons"))
-    (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
+    (when use-all-the-icons
+      (set-fontset-font t '(#xe3d0 . #xe909) "Material Icons")
+      (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons"))
     (message "`all-the-icons' loaded"))
 #+end_src
 
@@ -1163,6 +1163,7 @@ Other all-the-icons related packages:
 #+begin_src emacs-lisp
   (when use-all-the-icons
     (use-package all-the-icons-dired
+      :if (display-graphic-p)
       :hook (dired-mode . all-the-icons-dired-mode)
       :config
       (message "`all-the-icons-dired' loaded")))
@@ -1176,8 +1177,8 @@ Other all-the-icons related packages:
 #+begin_src emacs-lisp
   (when use-all-the-icons
     (use-package all-the-icons-completion
-      :init
-      (all-the-icons-completion-mode)
+      :if (display-graphic-p)
+      :init (all-the-icons-completion-mode)
       :after (marginalia all-the-icons)
       :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
       :config
@@ -1192,11 +1193,13 @@ Other all-the-icons related packages:
 In order to use this package you need to run ~M-x nerd-icons-install-fonts~ the first time your configuration is loaded
 
 #+begin_src emacs-lisp
-  (use-package nerd-icons
-    :config
-    (unless use-all-the-icons (set-fontset-font t '(#x25d0 . #xf10d7) "Symbols Nerd Font Mono"))
-    (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
-    (message "`nerd-icons' loaded"))
+  (unless use-all-the-icons
+    (use-package nerd-icons
+      :demand t
+      :config
+      (set-fontset-font t '(#x25d0 . #xf10d7) "Symbols Nerd Font Mono")
+      (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
+      (message "`nerd-icons' loaded")))
 #+end_src
 
 Other nerd-icons related packages:
@@ -1205,8 +1208,7 @@ Other nerd-icons related packages:
   (unless use-all-the-icons
     (use-package nerd-icons-dired
       :hook (dired-mode . nerd-icons-dired-mode)
-      :config
-      (message "`nerd-icons-dired' loaded")))
+      :config (message "`nerd-icons-dired' loaded")))
 #+end_src
 
 *** [[https://github.com/rainstormstudio/nerd-icons-completion][Nerd-icons completion]]
@@ -1231,7 +1233,7 @@ Other nerd-icons related packages:
 
 #+begin_src emacs-lisp
   (use-package ligature
-    :defer t
+    :demand t
     :config
     ;; Enable the "www" ligature in every possible major mode
     (ligature-set-ligatures 't '("www"))
@@ -1239,18 +1241,19 @@ Other nerd-icons related packages:
     ;; `variable-pitch' face supports it
     (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
     ;; Enable all Fira Code ligatures in programming modes
-    (ligature-set-ligatures 'prog-mode '(
-                                         "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
-                                         ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
-                                         "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
-                                         "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
-                                         ;; "..""..."
-                                         "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
-                                         "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
-                                         "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
-                                         "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
-                                         "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
-                                         "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
+    (ligature-set-ligatures
+     'prog-mode '(
+                  "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+                  ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+                  "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+                  "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
+                  ;; "..""..."
+                  "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+                  "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+                  "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+                  "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+                  "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+                  "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
     ;; Enables ligature checks globally in all buffers. You can also do it
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t)
@@ -1265,8 +1268,7 @@ Other nerd-icons related packages:
 #+begin_src emacs-lisp
   (use-package ansi-color
     :ensure nil
-    :hook
-    (shell-mode . ansi-color-for-comint-mode-on)
+    :hook (shell-mode . ansi-color-for-comint-mode-on)
     :config (message "`ansi-color' loaded"))
 #+end_src
 
@@ -1592,7 +1594,6 @@ Needs to be manually activated. Will display all the actions made.
 
 #+begin_src emacs-lisp
   (use-package selected
-    :defer t
     :init
     (require 'hide-region)
     (selected-global-mode)
@@ -1796,8 +1797,7 @@ src
 
 #+begin_src emacs-lisp
   (use-package nlinum
-    :init
-    (global-nlinum-mode 1)
+    :init (global-nlinum-mode 1)
     :config
     (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
     (message "`nlinum' loaded"))
@@ -1812,7 +1812,6 @@ When I have the time
 
 #+begin_src emacs-lisp
   (use-package cheatsheet
-    :defer t
     :config (message "`cheatsheet' loaded"))
 #+end_src
 
@@ -1832,7 +1831,6 @@ Useful commands. Notably (not all of them are crux but we put them in the crux c
   (use-package crux
     :init
     (define-prefix-command 'pokemacs-crux-map nil "Crux-")
-    :defer t
     :general
     ("M-m" 'pokemacs-crux-map)
     ("C-a" 'crux-move-beginning-of-line)
@@ -1874,7 +1872,6 @@ Better block deletion.
   (use-package delete-block
     :load-path "lisp/"
     :ensure nil
-    :defer t
     :general
     ("C-d"                     'delete-block-forward)
     ("C-<backspace>"           'delete-block-backward)
@@ -1890,7 +1887,6 @@ Better block deletion.
 #+begin_src emacs-lisp
   (use-package discover-my-major
     :after general
-    :defer t
     :general ("C-h C-m" 'discover-my-major)
     :config (message "`discover-my-major' loaded"))
 #+end_src
@@ -1920,7 +1916,6 @@ Better ~M-w~
 
 #+begin_src emacs-lisp
    (use-package easy-kill
-     :defer t
      :general
      ([remap kill-ring-save] 'easy-kill)
      ([remap mark-sexp] 'easy-mark)
@@ -1958,8 +1953,6 @@ Library for parsing and generating JSON
 
 #+begin_src emacs-lisp
   (use-package lsp-ltex
-    :ensure t
-    :defer t
     :hook (text-mode . (lambda ()
                          (require 'lsp-ltex)
                          (lsp-deferred)))
@@ -2004,18 +1997,16 @@ Useful package that allows to go to the next and previous symbols at point with 
 
 #+begin_src emacs-lisp
   (use-package highlight-symbol
-    :defer t
-      :init (highlight-symbol-mode)
-      :general
-      (:keymaps 'highlight-symbol-nav-mode-map
-                "M-n" nil
-                "M-p" nil
-                )
-      ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
-      ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
-      :config
-      (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
-      (message "`highlight-symbol' loaded"))
+    :init (highlight-symbol-mode)
+    :general
+    (:keymaps 'highlight-symbol-nav-mode-map
+              "M-n" nil
+              "M-p" nil)
+    ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
+    ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
+    :config
+    (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
+    (message "`highlight-symbol' loaded"))
 #+end_src
 
 ** [[https://github.com/magnars/multiple-cursors.el][Multiple cursors]]
@@ -2027,7 +2018,6 @@ Allows to have multiple cursors. There are a lot of functions provided by this m
 
 #+begin_src emacs-lisp
   (use-package multiple-cursors
-    :defer t
     :general
     ("C-c n" 'mc/mark-next-like-this)
     ("C-c p" 'mc/mark-previous-like-this)
@@ -2049,7 +2039,6 @@ TODO: hide-region-unpin doesn't work when changing buffer.
     :load-path "lisp/"
     :ensure nil
     :commands hide-region-pin
-    :defer t
     :general
     ("C-c r u" 'hide-region-unpin)
     :config (message "`hide-region loaded"))
@@ -2064,7 +2053,6 @@ Used by some packages
 
 #+begin_src emacs-lisp
   (use-package hide-mode-line
-    :defer t
     :config (message "`hide-mode-line loaded"))
 #+end_src
 
@@ -2075,8 +2063,6 @@ Used by some packages
 
 #+begin_src emacs-lisp
   (use-package vundo
-    :ensure t
-    :defer t
     :commands (vundo)
     :general
     ("C-x u" 'vundo)
@@ -2095,7 +2081,6 @@ Simple mode to visualize blanks
 #+begin_src emacs-lisp
   (use-package whitespace
     :ensure nil
-    :defer t
     :hook
     (prog-mode . whitespace-mode)
     (text-mode . whitespace-mode)
@@ -2110,15 +2095,14 @@ Simple mode to visualize blanks
 :END:
 
 #+begin_src emacs-lisp
-  (use-package locked-window-buffer-mode
-    :ensure nil
-    :general ("M-l"    'locked-window-buffer-mode))
-
-
   (define-minor-mode locked-window-buffer-mode
     "Make the current window always display this buffer."
     :lighter "locked"
     (set-window-dedicated-p (selected-window) locked-window-buffer-mode))
+
+  (use-package locked-window-buffer-mode
+    :ensure nil
+    :general ("M-l l"    'locked-window-buffer-mode))
 #+end_src
 
 * Dired/Shell
@@ -2202,12 +2186,9 @@ Simple mode to visualize blanks
 :END:
 
 #+begin_src emacs-lisp
-  (use-package transient
-    :ensure t)
+  (use-package transient)
 
   (use-package magit
-    :defer t
-    :ensure t
     :general
     ("C-c g"  'magit-file-dispatch)
     ("M-v"    '(:keymap magit-mode-map :package magit :wk "Magit-:"))
@@ -2256,7 +2237,6 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
 #+begin_src emacs-lisp
   (when use-magit-todos
     (use-package magit-todos
-      :defer t
       :hook (magit . magit-todos)
       :config
       (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
@@ -2273,9 +2253,8 @@ Customize ~hl-todo-keyword-faces~ to choose the keywords you want to highlights 
 #+begin_src emacs-lisp
   (use-package hl-todo
     :ensure (:depth nil)
-    :config
-    (global-hl-todo-mode 1)
-    (message "`hl-todo' loaded"))
+    :init (global-hl-todo-mode 1)
+    :config (message "`hl-todo' loaded"))
 #+end_src
 
 ** [[https://github.com/emacsorphanage/git-messenger][Git messenger]]
@@ -2287,7 +2266,6 @@ Show the commit at point to see what happened here. Invoke with ~M-v G~.
 
 #+begin_src emacs-lisp
   (use-package git-messenger
-    :defer t
     :config
     (setq git-messenger:show-detail t
           git-messenger:use-magit-popup t)
@@ -2305,10 +2283,6 @@ TODO: Display possible commands when git-timemachine starts
 
 #+begin_src emacs-lisp
   (use-package git-timemachine
-    :defer t
-    :general
-    (:keymaps 'magit-mode-map
-              "<left>" '(git-timemachine :wk "Go back in git history"))
     :config (message "`git-timemachine' loaded"))
 #+end_src
 
@@ -2321,7 +2295,6 @@ Major modes for editing .gitignore files, .git/config etc
 
 #+begin_src emacs-lisp
   (use-package git-modes
-    :defer t
     :config (message "`git-modes' loaded"))
 #+end_src
 
@@ -2347,7 +2320,6 @@ Some configuration is needed for this to work. See [[file:README.org::#git-hosts
 
 #+begin_src emacs-lisp
   (use-package ghub
-    :defer t
     :config (message "`ghub' loaded"))
 #+end_src
 
@@ -2366,16 +2338,13 @@ Org mode is, well, org mode.
 #+begin_src emacs-lisp
   (use-package org-protocol
     :ensure nil
-    :defer t
     :config
     (message "`org-protocol' loaded"))
 
-  (use-package ox-pandoc
-    :defer t)
+  (use-package ox-pandoc)
 
   (use-package ox
     :ensure nil
-    :defer t
     :mode ("\\.org\\'" . org-mode)
     :init
     (defun pokemacs-filter-timestamp (trans back _comm)
@@ -2391,16 +2360,14 @@ Org mode is, well, org mode.
     (message "`ox' loaded"))
 
   (use-package mixed-pitch
-    :defer t
     :config (message "`mixed-pitch' loaded"))
 
-  (use-package ob-rust :defer t)
+  (use-package ob-rust)
 
   (use-package ob-racket
     :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
   (use-package org
-    :defer t
     :ensure nil
     :mode ("\\.org\\'" . org-mode)
     :load-path "lisp/org-mode/lisp"
@@ -2596,7 +2563,6 @@ Org mode is, well, org mode.
 
 #+begin_src emacs-lisp
   (use-package org-auto-tangle
-    :defer t
     :hook (org-mode . org-auto-tangle-mode)
     :config (message "`org-auto-tangle' loaded"))
 #+end_src
@@ -2631,7 +2597,6 @@ See pdf inlined when included in org files.
 
 #+begin_src emacs-lisp
   (use-package org-inline-pdf
-    :defer t
     :ensure-system-package pdf2svg
     :hook (org-mode . org-inline-pdf-mode)
     :config (message "`org-inline-pdf' loaded"))
@@ -2667,7 +2632,6 @@ This package allows to see the org calendar and adds a capture template for sche
 
 #+begin_src emacs-lisp
   (use-package calfw-org
-    :defer t
     :after calfw
     :ensure nil
     :init
@@ -2725,7 +2689,6 @@ If I have to reuse a Google calendar I may enable this package again but I don't
 
     (use-package org-gcal
       :after json
-      :defer t
       :custom
       (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
       (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
@@ -2745,7 +2708,6 @@ Better agenda view for ~org-agenda~
 
 #+begin_src emacs-lisp
   (use-package org-super-agenda
-    :defer t
     :config
     (setq org-super-agenda-groups
           '(;; Each group has an implicit Boolean OR operator between its selectors.
@@ -2772,7 +2734,6 @@ Like unprettify at point but for org invisible elements (links etc)
     :disabled
     :after org
     :ensure (org-appear :host github :repo "awth13/org-appear" :branch "org-9.7-fixes")
-    :defer t
     :hook (org-mode . org-appear-mode)
     :config
     (setq org-appear-autolinks t)
@@ -2790,7 +2751,6 @@ The next package I need to use fully, just starting right now.
 #+begin_src emacs-lisp
   (when use-org-roam
     (use-package org-roam
-      :defer t
       :after org
       :custom
       (org-roam-directory (file-truename "~/org/org-roam"))
@@ -2856,7 +2816,6 @@ The next package I need to use fully, just starting right now.
       (message "`org-roam' loaded"))
 
     (use-package org-roam-ui
-      :defer t
       :after org-roam
       :config
       (setq org-roam-ui-sync-theme t
@@ -2875,7 +2834,7 @@ Helper to create table of contents in org files.
 
 #+begin_src emacs-lisp
   (use-package org-make-toc
-    :defer t
+    :commands org-make-toc
     :custom
     (org-make-toc-insert-custom-ids t)
     :config
@@ -2899,101 +2858,6 @@ Helper to create table of contents in org files.
     :ensure nil
     :after org
     :config (message "`ox-moderncv' loaded"))
-#+end_src
-
-** [[https://github.com/rlister/org-present][Org-present]]
-:PROPERTIES:
-:CUSTOM_ID: org-present
-:END:
-
-#+begin_src emacs-lisp
-  (use-package org-present
-    :ensure t
-    :demand t
-    :after org
-    :general
-    (:keymaps 'org-present-mode-keymap
-              "<right>" 'pokemacs-org-next-visible-heading-and-expand
-              "<left>" 'pokemacs-org-prev-visible-heading-and-expand
-              "C-<right>" 'org-present-next
-              "C-<left>" 'org-present-prev)
-    :init
-    (defun pokemacs-org-next-visible-heading-and-expand (arg)
-      (interactive "p")
-      (let ((res (call-interactively #'org-next-visible-heading arg)))
-        (if (= (point) (point-max))
-            (call-interactively #'org-present-next)
-          (call-interactively #'org-fold-show-entry)))
-      (recenter 0 t))
-
-    (defun pokemacs-org-prev-visible-heading-and-expand (arg)
-      (interactive "p")
-      (call-interactively #'org-fold-hide-entry)
-      (when (= (point) (point-min))
-        (call-interactively #'org-present-prev)
-        (goto-char (point-max)))
-      (call-interactively #'org-previous-visible-heading arg)
-      (call-interactively #'org-fold-show-entry)
-      (recenter 0 t))
-
-    (defvar-local memo/header-line-format header-line-format)
-    (defvar-local memo/use-header-line use-header-line)
-    (defun pokemacs-org-present-start ()
-      (visual-fill-column-mode 1)
-      (visual-line-mode 1)
-      (setq-local visual-fill-column-width 100)
-      (setq-local line-spacing 0.7)
-      ;; (mixed-pitch-mode 1)
-      (setq-local face-remapping-alist
-                  '((header-line (:height 4.0) variable-pitch)
-                    (org-document-title (:height 1.75) org-document-title)
-                    (org-code (:height 1.55) org-code)
-                    (org-verbatim (:height 1.55) org-verbatim)
-                    (org-block (:height 1.25) org-block)
-                    (org-block-begin-line (:height 0.7) org-block-begin-line)))
-      (setq-local memo/header-line-format header-line-format)
-      (lsp-disconnect)
-      (flycheck-mode -1)
-      (lsp-mode -1)
-      (lsp-headerline-breadcrumb-mode -1)
-      (nlinum-mode -1)
-      (jinx-mode -1)
-      (setq use-header-line nil)
-      (setq header-line-format " ")
-      (consult-theme 'doom-palenight)
-      (hide-mode-line-mode 1)
-      (set-frame-parameter (selected-frame) 'alpha '(97 . 100))
-      (message "`org-present' start"))
-
-    (defun pokemacs-org-present-quit ()
-      (visual-fill-column-mode 0)
-      (visual-line-mode 0)
-      (hide-mode-line-mode 0)
-      (setq line-spacing nil)
-      (setq use-header-line memo/use-header-line)
-      (setq header-line-format memo/header-line-format)
-      (consult-theme (pokemacs-get-current-theme))
-      (nlinum-mode)
-      (jinx-mode)
-      (lsp-mode)
-      (lsp-headerline-breadcrumb-mode)
-      (flycheck-mode)
-      (setq-local face-remapping-alist '((default variable-pitch default)))
-      (message "`org-present' quit"))
-
-    (defun pokemacs-org-present-prepare-slide (buffer-name heading)
-      ;; Show only top-level headlines
-      (org-overview)
-      ;; Unfold the current entry
-      (org-show-entry)
-      ;; Show only direct subheadings of the slide but don't expand them
-      (org-show-children))
-
-    :hook ((org-present-mode . pokemacs-org-present-start)
-           (org-present-mode-quit . pokemacs-org-present-quit))
-    :config
-    (add-hook 'org-present-after-navigate-functions 'pokemacs-org-present-prepare-slide)
-    (message "`org-present' loaded"))
 #+end_src
 
 * [[https://github.com/emacs-lsp/lsp-mode/][LSP]]
@@ -3038,9 +2902,6 @@ Minor mode acting as a client between a language server protocol and emacs.
         (setq pokemacs-lsp--optimization-init-p t))))
 
   (use-package lsp-mode
-    :defer t
-    :after projectile
-    :commands lsp
     :init
     (defun minad/orderless-dispatch-prefixes-first (_pattern index _total)
       (and (eq index 0) 'orderless-prefixes))
@@ -3067,7 +2928,6 @@ Minor mode acting as a client between a language server protocol and emacs.
            (elm-mode . lsp-deferred)
            (fsharp-mode . lsp-deferred)
            (kotlin-mode . lsp-deferred)
-           (python-mode . lsp-deferred)
            (enh-ruby-mode . lsp-deferred)
            (rustic-mode . lsp-deferred)
            (tuareg-mode . lsp-deferred))
@@ -3175,7 +3035,6 @@ Minor mode acting as a client between a language server protocol and emacs.
 #+begin_src emacs-lisp
   ;; Useful link : https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
   (use-package lsp-ui
-    :defer t
     :hook (lsp-mode . lsp-ui-mode)
     :general
     ("C-M-d" 'lsp-ui-doc-show)
@@ -3215,7 +3074,6 @@ Minor mode acting as a client between a language server protocol and emacs.
 
 #+begin_src emacs-lisp
   (use-package lsp-treemacs
-    :defer t
     :after lsp
     :config (message "`lsp-treemacs' loaded"))
 #+end_src
@@ -3229,7 +3087,6 @@ TODO: Not working with OCaml
 
 #+begin_src emacs-lisp
   (use-package consult-lsp
-    :defer t
     :disabled)
 #+end_src
 
@@ -3253,27 +3110,6 @@ TODO: Not working with OCaml
     (prog-mode . pokemacs-clear-compilation-finish-functions))
 #+end_src
 
-** DISABLED: [[https://github.com/DarthFennec/highlight-indent-guides][Highlight indent guides]]
-:PROPERTIES:
-:CUSTOM_ID: disabled-highlight-indent-guides
-:END:
-
-Show level of indentations. Can't manage to give it the proper colour and always found it distracting so putting it on hold for now.
-
-#+begin_src emacs-lisp
-  (use-package highlight-indent-guides
-    :disabled
-    :hook (prog-mode . highlight-indent-guides-mode)
-    :config
-    (setq highlight-indent-guides-auto-enabled nil)
-    ;; (setq highlight-indent-guides-responsive 'stack)
-    (set-face-background 'highlight-indent-guides-stack-character-face "red")
-    (set-face-background 'highlight-indent-guides-top-character-face "pink")
-    (set-face-foreground 'highlight-indent-guides-character-face "white")
-    (setq highlight-indent-guides-method 'bitmap)
-    :config (message "`highlight-indent-guides' loaded"))
-#+end_src
-
 ** [[https://github.com/radian-software/apheleia][Apheleia]]
 :PROPERTIES:
 :CUSTOM_ID: apheleia
@@ -3283,7 +3119,6 @@ Asynchronous code formatting after saving files.
 
 #+begin_src emacs-lisp
   (use-package apheleia
-    :defer t
     :hook
     (c-mode        . apheleia-mode)
     (c++-mode      . apheleia-mode)
@@ -3319,7 +3154,6 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
 
 #+begin_src emacs-lisp
   (use-package dap-mode
-    :defer t
     :general
     (:keymaps 'lsp-mode-map
               "M-<f5>" 'dap-hydra)
@@ -3339,7 +3173,6 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
 
 #+begin_src emacs-lisp
   (use-package dumb-jump
-    :defer t
     :config
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
     (defhydra dumb-jump-hydra (:color blue :columns 3)
@@ -3448,7 +3281,6 @@ Allows to see immediately how a face will look
 
 #+begin_src emacs-lisp
   (use-package fontify-face
-    :defer t
     :hook (font-lock-mode . fontify-face-mode)
     :config (message "`fontify-face' loaded"))
 #+end_src
@@ -3467,7 +3299,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 #+begin_src emacs-lisp
   (use-package flycheck
-    :defer t
     :init
     (define-prefix-command 'pokemacs-fly-map nil "Fly-")
     (defvar-keymap pokemacs-flycheck-overlay-map
@@ -3526,7 +3357,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
   (use-package flycheck-correct
     :load-path "lisp/"
     :ensure nil
-    :defer t
     :hook flycheck-mode
     :general
     (:keymaps 'flycheck-mode-map
@@ -3571,7 +3401,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 #+begin_src emacs-lisp
   (use-package consult-flycheck
-    :defer t
     :general
     ("C-c l" 'consult-flycheck)
     :config (message "`consult-flycheck' loaded"))
@@ -3594,7 +3423,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
 
 #+begin_src emacs-lisp
   (use-package hideshow
-    :defer t
     :ensure nil
     :hook (prog-mode . (lambda ()
                          (unless (eq major-mode 'tree-sitter-query-mode)
@@ -3650,7 +3478,6 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
 
 #+begin_src emacs-lisp
   (use-package separedit
-    :defer t
     :general
     ("C-c C-e"                 'separedit)
     :config
@@ -3665,7 +3492,6 @@ Allows to edit comments in a separate buffer with a chosen text-mode (default is
 
 #+begin_src emacs-lisp
   (use-package treemacs
-    :defer t
     :config (message "`treemacs' loaded"))
 #+end_src
 
@@ -3789,7 +3615,6 @@ This mode will center the text when only one window is displayed.
 #+begin_src emacs-lisp
   (when use-visual-fill
     (use-package visual-fill-column
-      :defer t
       :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
       :custom
       (visual-fill-column-width 100)
@@ -3816,7 +3641,6 @@ This mode will center the text when only one window is displayed.
 #+begin_src emacs-lisp
   (when use-window-purpose
     (use-package window-purpose
-      :defer t
       :config
       (purpose-mode)
       (purpose-x-magit-multi-on)
@@ -3847,10 +3671,8 @@ Vertico works with the default completion system instead of reimplementing a who
 #+begin_src emacs-lisp
   (use-package vertico
     :ensure (vertico :files (:defaults "extensions/*"))
-    :defer t
     :after general
-    :init
-    (vertico-mode)
+    :init (vertico-mode)
     :general
     (:keymaps 'vertico-map
               "<tab>" #'minibuffer-complete         ; common prefix
@@ -3931,7 +3753,6 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
   (use-package vertico-multiform
     :after vertico
     :ensure nil
-    :defer t
     :custom
     (vertico-buffer-display-action '(display-buffer-in-side-window
                                      (side . right)
@@ -3983,11 +3804,9 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
 
 #+begin_src emacs-lisp
   (use-package consult
-    :defer t
     ;; Enable automatic preview at point in the *Completions* buffer. This is
     ;; relevant when you use the default completion UI.
     :hook (completion-list-mode . consult-preview-at-point-mode)
-    :defer t
     :ensure-system-package (rg . ripgrep)
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :general
@@ -4162,7 +3981,6 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package embark
-    :defer t
     :general
     ("C-." 'embark-act)          ;; pick some comfortable binding
     ("C-:" 'embark-default-act-noquit)  ;; good alternative: M-.
@@ -4189,7 +4007,6 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
   ;; Consult users will also want the embark-consult package.
   (use-package embark-consult
     :after (embark consult)
-    :defer t
     :hook
     (embark-collect-mode . consult-preview-at-point-mode)
     :config
@@ -4209,7 +4026,6 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+begin_src emacs-lisp
   (use-package corfu
     :ensure (corfu :files (:defaults "extensions/*"))
-    :defer t
     :init
     ;; Function definitions
 
@@ -4412,7 +4228,6 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package emacs
-    :defer t
     :ensure nil
     :init
     ;; FRINGE
@@ -4491,7 +4306,6 @@ Better completions in minibuffers
 
 #+begin_src emacs-lisp
   (use-package orderless
-    :defer t
     :custom
     (completion-styles '(substring orderless basic))
     (orderless-matching-styles '(orderless-prefixes))
@@ -4511,9 +4325,7 @@ Better completions in minibuffers
 
 #+begin_src emacs-lisp
   (use-package cape
-    :defer t
-    :init
-    (define-prefix-command 'pokemacs-cape-map nil "Cape-")
+    :init (define-prefix-command 'pokemacs-cape-map nil "Cape-")
     :general
     ("M-c" 'pokemacs-cape-map)
     (:keymaps 'pokemacs-cape-map
@@ -4558,7 +4370,6 @@ Useful informations added in the minibuffer options
 #+begin_src emacs-lisp
   (use-package marginalia
     :after vertico
-    :defer t
     :init (marginalia-mode)
     :custom
     (marginalia-align 'center)
@@ -4574,7 +4385,6 @@ Useful informations added in the minibuffer options
 
 #+begin_src emacs-lisp
   (use-package iedit
-    :defer t
     :general
     (:keymaps 'lsp-mode-map
               "C-;" nil)
@@ -4663,6 +4473,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
 
 #+begin_src emacs-lisp
   (use-package doom-themes
+    :demand t
     :config
     ;; Global settings (defaults)
     (load-theme (pokemacs-get-current-theme) t)
@@ -4695,7 +4506,6 @@ Displays a counter in the mode-line when searching or query replacing.
 
 #+begin_src emacs-lisp
   (use-package anzu
-    :defer t
     :init
     (global-anzu-mode +1)
     (anzu-mode +1)
@@ -4720,6 +4530,7 @@ Some customization is available from [[file:custom.el][custom.el]], mainly ~doom
 
 #+begin_src emacs-lisp
   (use-package doom-modeline
+    :demand t
     :init
     ;; If non-nil, cause imenu to see `doom-modeline' declarations.
     ;; This is done by adjusting `lisp-imenu-generic-expression' to
@@ -4891,6 +4702,7 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
 
 #+begin_src emacs-lisp
   (use-package minions
+    :demand t
     :config (minions-mode)
     :custom
     (minions-mode-line-lighter "☰")
@@ -4945,61 +4757,6 @@ Implements a menu that lists enabled and disabled minor modes in the mode-line.
     (message "`outline' loaded"))
 #+end_src
 
-*** Minor mode
-:PROPERTIES:
-:CUSTOM_ID: minor-mode
-:END:
-
-#+begin_src emacs-lisp
-  (use-package outline-minor
-    :ensure nil
-    :defer t
-    :config (message "`outline-minor' loaded"))
-#+end_src
-
-*** TODO [[https://github.com/alphapapa/outshine][Outshine]]
-:PROPERTIES:
-:CUSTOM_ID: outshine
-:END:
-
-Bring org mode to non org files.
-
-To declare a heading just add one or more ~*~ in a comment start:
-- OCaml : ~(* * Heading 1 *)~, ~(* ** Heading 2 *)~, ...
-- Python: ~#  Heading 1*~, ~# ** Heading 2~, ...
-- etc
-
-TODO: To be coherent with ~odoc~, for example, I need to update outline regexps to handle OCaml headings.
-
-#+begin_src emacs-lisp
-  (use-package outshine
-    :defer t
-    :init (defvar outline-minor-mode-prefix "\C-o")
-    :config
-    (setq outshine-preserve-delimiter-whitespace nil)
-    (message "`outshine' loaded"))
-#+end_src
-
-*** Pretty outlines
-:PROPERTIES:
-:CUSTOM_ID: pretty-outlines
-:END:
-
-Nice bullets for outshine.
-
-#+begin_src emacs-lisp
-  (use-package pretty-outlines
-    :defer t
-    :load-path "lisp/"
-    :ensure nil
-    :hook (
-           (outline-mode . pretty-outlines-set-display-table)
-           (outline-minor-mode . pretty-outlines-set-display-table)
-           (emacs-lisp-mode . pretty-outlines-add-bullets)
-           )
-    :config (message "`pretty-outlines' loaded"))
-#+end_src
-
 ** [[https://github.com/emacsmirror/rainbow-mode][Rainbow mode]]
 :PROPERTIES:
 :CUSTOM_ID: rainbow-mode
@@ -5009,7 +4766,6 @@ Display colors with a background corresponding to the color
 
 #+begin_src emacs-lisp
   (use-package rainbow-mode
-    :defer t
     :hook (help-mode prog-mode text-mode org-mode)
     :config (message "`rainbow-mode' loaded"))
 #+end_src
@@ -5024,7 +4780,6 @@ Different colours for different depths of parentheses, brackets etc
 #+begin_src emacs-lisp
   (if use-rainbow
       (use-package rainbow-delimiters
-        :defer t
         :hook (prog-mode . rainbow-delimiters-mode)
         :config (message "`rainbow-delimiters' loaded")))
 #+end_src
@@ -5076,7 +4831,6 @@ Will pulse when the focus changes to show where the cursor is.
 #+begin_src emacs-lisp
   (when use-solaire
     (use-package solaire-mode
-      :defer t
       :config
       (solaire-global-mode +1)
       (message "`solaire' loaded")))
@@ -5090,7 +4844,6 @@ Will pulse when the focus changes to show where the cursor is.
 #+begin_src emacs-lisp
   (when use-dashboard
     (use-package page-break-lines
-      :defer t
       :config (message "`page-break-lines' loaded"))
 
     (use-package dashboard
@@ -5116,33 +4869,6 @@ Will pulse when the focus changes to show where the cursor is.
     (elpaca-wait))
 #+end_src
 
-** TODO SVG Tags
-:PROPERTIES:
-:CUSTOM_ID: svg-tags
-:END:
-
-#+begin_src emacs-lisp
-  (use-package svg-tag-mode
-    :disabled
-    :defer t
-    :config
-    (setq svg-tag-tags
-          '((":TODO:" . ((lambda (tag)
-                           (svg-tag-make "TODO" :face 'org-tag
-                                         :radius 0 :inverse t :margin 0))))
-            (":NOTE:" . ((lambda (tag)
-                           (svg-tag-make "NOTE" :face 'font-lock-comment-face
-                                         :inverse nil :margin 0 :radius 0))))
-            ("\([0-9a-zA-Z]\)" . ((lambda (tag)
-                                    (svg-tag-make tag :beg 1 :end -1 :radius 12))))
-            ("\([0-9a-zA-Z][0-9a-zA-Z]\)" . ((lambda (tag)
-                                               (svg-tag-make tag :beg 1 :end -1 :radius 8))))))
-    (svg-tag-mode)
-    (global-svg-tag-mode)
-    (message "`svg-tag-mode' loaded"))
-
-#+end_src
-
 * [[https://github.com/emacs-eaf/emacs-application-framework][EAF]]
 :PROPERTIES:
 :CUSTOM_ID: eaf
@@ -5153,7 +4879,6 @@ Will pulse when the focus changes to show where the cursor is.
     (use-package eaf
       :load-path "lisp/emacs-application-framework"
       :ensure nil
-      :defer t
       :custom
       ;; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
       (eaf-browser-continue-where-left-off t)
@@ -5228,11 +4953,9 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 #+begin_src emacs-lisp
   ;; This package needs to be loaded to use language parsers
   (use-package tree-sitter-langs
-    :defer t
     :config (message "`tree-sitter-langs' loaded"))
 
   (use-package tree-sitter
-    :defer t
     :hook
     (tuareg-mode . tree-sitter-mode)
     (tree-sitter-after-on . tree-sitter-hl-mode)
@@ -5256,7 +4979,6 @@ Code folding based on tree-sitter tree.
   (use-package ts-fold
     :disabled
     :ensure (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
-    :defer t
     :hook
     (tuareg-mode . ts-fold-mode)
     (c-mode    . ts-fold-mode)
@@ -5271,7 +4993,6 @@ Code folding based on tree-sitter tree.
     :disabled
     :load-path "lisp/ts-fold/"
     :ensure nil
-    :defer t
     :hook
     (tree-sitter-after-on . ts-fold-indicators-mode)
     :config
@@ -5434,7 +5155,6 @@ Code folding based on tree-sitter tree.
   (when use-markdown
     (use-package markdown-mode
       :ensure nil
-      :defer t
       :mode (("README\\.md\\'" . gfm-mode)
              ("\\.md\\'"       . markdown-mode)
              ("\\.markdown\\'" . gfm-mode))
@@ -5455,7 +5175,6 @@ Code folding based on tree-sitter tree.
 #+begin_src emacs-lisp
   (when use-markdown
     (use-package markdown-toc
-      :defer t
       :config (message "`markdown-toc' loaded")))
 #+end_src
 
@@ -5468,7 +5187,6 @@ Code folding based on tree-sitter tree.
   (when use-pandoc
     (use-package pandoc-mode
       :ensure-system-package pandoc
-      :defer t
       :hook ((markdown-mode . pandoc-mode)
              (pandoc-mode . pandoc-load-default-settings))
       :config (message "`pandoc-mode' loaded")))
@@ -5492,7 +5210,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (use-package conf-mode
     :ensure nil
-    :defer t
     :mode (
            ("/\\.merlin\\'" . conf-mode)
            ("_tags\\'" . conf-mode)
@@ -5509,7 +5226,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package json-mode
-    :defer t
     :mode (("\\.bowerrc$"     . json-mode)
            ("\\.jshintrc$"    . json-mode)
            ("\\.json_schema$" . json-mode)
@@ -5535,7 +5251,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package dune
-    :defer t
     :mode ("^dune$" "^dune-project$")
     :init
     (define-prefix-command 'pokemacs-dune-map nil "Dune-")
@@ -5567,7 +5282,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (use-package make-mode
     :ensure nil
-    :defer t
     :hook (make-mode . semantic-mode)
     :config (message "`make-mode' loaded"))
 #+end_src
@@ -5659,7 +5373,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (when use-clojure
     (use-package clojure-mode
-      :defer t
       :hook (clojure-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
       :config (message "`clojure-mode' loaded")))
 #+end_src
@@ -5672,7 +5385,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (when use-clojure
     (use-package cider
-      :defer t
       :config (message "`cider' loaded")))
 #+end_src
 
@@ -5688,7 +5400,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package elisp-mode
-    :defer t
     :ensure nil
     :hook (elisp-mode . semantic-mode)
     :config (message "`elisp-mode' loaded"))
@@ -5701,7 +5412,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package puni
-    :defer t
     :hook ((clojure-mode elisp-mode) . puni-mode)
     :config (message "`puni' loaded")
     ;; :general
@@ -5718,7 +5428,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package flycheck-package
-    :defer t
     :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
     :config (message "`flycheck-package' loaded"))
 #+end_src
@@ -5731,14 +5440,12 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (when use-elm
     (use-package elm-mode
-      :defer t
       :general
       (:keymaps 'elm-mode-map
        "<tab>" 'elm-indent-cycle)
       :config (message "`elm-mode' loaded"))
 
     (use-package haskell-mode
-      :defer t
       :config (message "`haskell-mode' loaded")))
 #+end_src
 
@@ -5750,7 +5457,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (when use-fsharp
     (use-package fsharp-mode
-      :defer t
       :init
       (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet"))
       (add-to-list 'exec-path (concat (getenv "HOME") "/.dotnet/tools"))
@@ -5772,7 +5478,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (when use-kotlin
     (use-package kotlin-mode
-      :defer t
       :config (message "`kotlin-mode' loaded")))
 #+end_src
 
@@ -5878,7 +5583,6 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
                 [(control return)] nil))
 
     (use-package auctex-latexmk
-      :defer t
       :hook
       (LaTeX-mode . (lambda ()
                       (add-to-list 'TeX-command-list
@@ -5900,7 +5604,6 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 #+begin_src emacs-lisp
   (when use-michelson
     (use-package deferred
-      :defer t
       :config (message "`deferred' loaded"))
 
     ;; TODO: rewrite it without hardcoded paths
@@ -5984,7 +5687,6 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       :tag " OCaml Templates")
 
     (use-package tuareg
-      :defer t
       :ensure-system-package
       ((ocamllsp . "opam install ocaml-lsp-server")
        (ocamlformat . "opam install ocamlformat")
@@ -6119,7 +5821,6 @@ Special tuareg mode when editing ~mly~ files.
   (when use-ocaml
     (use-package tuareg-menhir
       :ensure nil
-      :defer t
       :mode ("\\.mly'" . tuareg-menhir-mode)
       :config (message "`tuareg-menhir' loaded")))
 #+end_src
@@ -6134,7 +5835,6 @@ Special tuareg mode when editing ~mly~ files.
     (use-package dune-minor
       :load-path "lisp/"
       :ensure nil
-      :defer t
       :hook (tuareg-mode . dune-minor-mode)
       :config (message "`dune-minor' loaded")))
 #+end_src
@@ -6161,7 +5861,6 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 
 #+begin_src emacs-lisp
   (use-package pdf-tools
-    :defer t
     :mode ("\\.pdf\\'" . pdf-view-mode)
     :magic ("%PDF" . pdf-view-mode)
     :hook
@@ -6181,7 +5880,6 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 
 #+begin_src emacs-lisp
   (use-package saveplace-pdf-view
-    :defer t
     :after pdf-view
     :config (message "`saveplace-pdf-view' loaded"))
 #+end_src
@@ -6200,7 +5898,6 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
   (when use-python
     (use-package python
       :ensure nil
-      :defer t
       :hook (python-mode . semantic-mode)
       :config
       ;; Remove guess indent python message
@@ -6232,7 +5929,6 @@ Setting the ~WORKON_HOME~ environment variable points at where the envs are loca
 #+begin_src emacs-lisp
   (when use-python
     (use-package pyvenv
-      :defer t
       :hook (python-mode . pyvenv-mode)
       :config
       ;; Setting work on to easily switch between environments
@@ -6257,7 +5953,10 @@ Read the docs for the different variables set in the config.
 #+begin_src emacs-lisp
   (when use-python
     (use-package lsp-pyright
-      :defer t
+      :after (python lsp-mode)
+      :hook (python-mode . (lambda ()
+                            (require 'lsp-pyright)
+                            (lsp-deferred)))
       :config
       (setq lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
       (setq lsp-pyright-disable-language-service nil
@@ -6275,9 +5974,7 @@ Read the docs for the different variables set in the config.
 
 #+begin_src emacs-lisp
   (when use-racket
-    (use-package racket-mode
-      :defer t))
-
+    (use-package racket-mode))
 #+end_src
 
 ** [[https://github.com/reasonml-editor/reason-mode][Reason]]
@@ -6315,14 +6012,10 @@ Some people use this, not my responsibility.
         (setq refmt-command refmt-bin)))
 
     (use-package reason-mode
-            :defer t
-      :config
-      (add-hook
-       'reason-mode-hook
-       (lambda ()
-         (add-hook 'before-save-hook 'refmt-before-save)
-         (merlin-mode)))
-      (message "`reason-mode' loaded")))
+      :hook (reason-mode . (lambda ()
+                             (add-hook 'before-save-hook 'refmt-before-save)
+                             (merlin-mode)))
+      :config (message "`reason-mode' loaded")))
 #+end_src
 
 ** RST
@@ -6333,7 +6026,6 @@ Some people use this, not my responsibility.
 #+begin_src emacs-lisp
   (use-package rst-mode
     :ensure nil
-    :defer t
     :hook (rst-mode . auto-fill-mode))
 #+end_src
 
@@ -6359,8 +6051,7 @@ Some people use this, not my responsibility.
 
       :ensure-system-package (solargraph . "gem install --user-install solargraph"))
 
-    (use-package rbenv
-      :defer t)
+    (use-package rbenv)
 
     (use-package inf-ruby)
 
@@ -6524,7 +6215,6 @@ Some people use this, not my responsibility.
 #+begin_src emacs-lisp
   (when use-web
     (use-package web-mode
-      :defer t
       :mode "\\.php\\'"
       :config (message "`web-mode' loaded")))
 #+end_src
@@ -6538,7 +6228,6 @@ Some people use this, not my responsibility.
   (when use-web
     (use-package css-mode
       :ensure nil
-      :defer t
       :mode "\\.css\\'"
       :config (message "`css-mode' loaded")))
 #+end_src
@@ -6550,7 +6239,6 @@ Some people use this, not my responsibility.
 
 #+begin_src emacs-lisp
   (use-package simple-httpd
-    :defer t
     :ensure nil
     :config (message "`simple-httpd' loaded"))
 #+end_src
