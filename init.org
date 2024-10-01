@@ -3963,6 +3963,8 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package embark
+    :demand t
+    :after (consult)
     :general
     ("C-." 'embark-act)          ;; pick some comfortable binding
     ("C-:" 'embark-default-act-noquit)  ;; good alternative: M-.

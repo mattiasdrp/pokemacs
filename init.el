@@ -2494,6 +2494,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`consult' loaded"))
 
 (use-package embark
+  :demand t
+  :after (consult)
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
   ("C-:" 'embark-default-act-noquit)  ;; good alternative: M-.
