@@ -1010,7 +1010,6 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`delete-block' loaded"))
 
 (use-package discover-my-major
-  :after general
   :general ("C-h C-m" 'discover-my-major)
   :config (message "`discover-my-major' loaded"))
 
@@ -1270,13 +1269,10 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
 (use-package org
-  :ensure nil
   :mode ("\\.org\\'" . org-mode)
-  :load-path "lisp/org-mode/lisp"
   :hook
   (org-mode . mixed-pitch-mode)
   (org-mode . pokemacs-org-mode-hook)
-  :after ob-racket
   :general
   ("M-o" 'pokemacs-org-map)
   ("C-x C-p" 'pokemacs-org-compile-latex-and-update-other-buffer)
@@ -1528,7 +1524,6 @@ debian, and derivatives). On most it's 'fd'.")
     (add-to-list 'plstore-encrypt-to (get-secrets-config-value 'org-gcal-client-id)))
 
   (use-package org-gcal
-    :after json
     :custom
     (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
     (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
@@ -1647,13 +1642,15 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ox-awesomecv
   :load-path "lisp/org-cv/"
   :ensure nil
-  :after org
+  :init (advice-add #'org-export-to-file
+                    :before (lambda (&rest _) (require 'ox-awesomecv)))
   :config (message "`ox-awesomecv' loaded"))
 
 (use-package ox-moderncv
   :load-path "lisp/org-cv/"
   :ensure nil
-  :after org
+  :init (advice-add #'org-export-to-file
+                    :before (lambda (&rest _) (require 'ox-awesomecv)))
   :config (message "`ox-moderncv' loaded"))
 
 ;; Taken from doomemacs
@@ -2494,7 +2491,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`consult' loaded"))
 
 (use-package embark
-  :demand t
+  :commands embark-collect
   :after (consult)
   :general
   ("C-." 'embark-act)          ;; pick some comfortable binding
@@ -2586,7 +2583,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package corfu-popupinfo
   :ensure nil
-  :after corfu
   :hook (corfu-mode . corfu-popupinfo-mode)
   :general
   (:keymaps 'corfu-popupinfo-map
@@ -3758,7 +3754,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     ((ocamllsp . "opam install ocaml-lsp-server")
      (ocamlformat . "opam install ocamlformat")
      (ocaml-print-intf . "opam install ocaml-print-intf"))
-    :after tempel
     :mode ("\\.ml\\'" . tuareg-mode)
     ;; The following line can be used instead of :ensure t to load
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -3771,6 +3766,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c C-l" nil
               "C-c o w" 'ocaml-utils-dune-watch)
     :config
+    (require 'tempel)
     (defvar-local pokemacs-ocaml-templates-local pokemacs-ocaml-templates "OCaml Templates")
     (add-to-list 'tempel-template-sources 'pokemacs-ocaml-templates)
     (defun pokemacs-map (l)
@@ -3832,8 +3828,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
              (rl (-map #'cons-reverse l))
              (l (pokemacs-map l))
              (rl (pokemacs-map rl)))
-        (setq find-sibling-rules (append find-sibling-rules l rl))
-        (message "`tuareg' loaded")))
+        (setq find-sibling-rules (append find-sibling-rules l rl)))
+      (message "`tuareg' loaded"))
     :hook
     (tuareg-mode . (lambda ()
                      ;; Commented symbols are actually prettier with ligatures or just ugly

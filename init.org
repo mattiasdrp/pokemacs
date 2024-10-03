@@ -1864,7 +1864,6 @@ Better block deletion.
 
 #+begin_src emacs-lisp
   (use-package discover-my-major
-    :after general
     :general ("C-h C-m" 'discover-my-major)
     :config (message "`discover-my-major' loaded"))
 #+end_src
@@ -2349,13 +2348,10 @@ Org mode is, well, org mode.
     :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
   (use-package org
-    :ensure nil
     :mode ("\\.org\\'" . org-mode)
-    :load-path "lisp/org-mode/lisp"
     :hook
     (org-mode . mixed-pitch-mode)
     (org-mode . pokemacs-org-mode-hook)
-    :after ob-racket
     :general
     ("M-o" 'pokemacs-org-map)
     ("C-x C-p" 'pokemacs-org-compile-latex-and-update-other-buffer)
@@ -2669,7 +2665,6 @@ If I have to reuse a Google calendar I may enable this package again but I don't
       (add-to-list 'plstore-encrypt-to (get-secrets-config-value 'org-gcal-client-id)))
 
     (use-package org-gcal
-      :after json
       :custom
       (org-gcal-client-id (get-secrets-config-value 'org-gcal-client-id))
       (org-gcal-client-secret (get-secrets-config-value 'org-gcal-client-secret))
@@ -2831,13 +2826,15 @@ Helper to create table of contents in org files.
   (use-package ox-awesomecv
     :load-path "lisp/org-cv/"
     :ensure nil
-    :after org
+    :init (advice-add #'org-export-to-file
+                      :before (lambda (&rest _) (require 'ox-awesomecv)))
     :config (message "`ox-awesomecv' loaded"))
 
   (use-package ox-moderncv
     :load-path "lisp/org-cv/"
     :ensure nil
-    :after org
+    :init (advice-add #'org-export-to-file
+                      :before (lambda (&rest _) (require 'ox-awesomecv)))
     :config (message "`ox-moderncv' loaded"))
 #+end_src
 
@@ -3963,7 +3960,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package embark
-    :demand t
+    :commands embark-collect
     :after (consult)
     :general
     ("C-." 'embark-act)          ;; pick some comfortable binding
@@ -4074,7 +4071,6 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 #+begin_src emacs-lisp
   (use-package corfu-popupinfo
     :ensure nil
-    :after corfu
     :hook (corfu-mode . corfu-popupinfo-mode)
     :general
     (:keymaps 'corfu-popupinfo-map
@@ -5696,7 +5692,6 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       ((ocamllsp . "opam install ocaml-lsp-server")
        (ocamlformat . "opam install ocamlformat")
        (ocaml-print-intf . "opam install ocaml-print-intf"))
-      :after tempel
       :mode ("\\.ml\\'" . tuareg-mode)
       ;; The following line can be used instead of :ensure t to load
       ;; the tuareg.el file installed with tuareg when running opam install tuareg
@@ -5709,6 +5704,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
                 "C-c C-l" nil
                 "C-c o w" 'ocaml-utils-dune-watch)
       :config
+      (require 'tempel)
       (defvar-local pokemacs-ocaml-templates-local pokemacs-ocaml-templates "OCaml Templates")
       (add-to-list 'tempel-template-sources 'pokemacs-ocaml-templates)
       (defun pokemacs-map (l)
@@ -5770,8 +5766,8 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
                (rl (-map #'cons-reverse l))
                (l (pokemacs-map l))
                (rl (pokemacs-map rl)))
-          (setq find-sibling-rules (append find-sibling-rules l rl))
-          (message "`tuareg' loaded")))
+          (setq find-sibling-rules (append find-sibling-rules l rl)))
+        (message "`tuareg' loaded"))
       :hook
       (tuareg-mode . (lambda ()
                        ;; Commented symbols are actually prettier with ligatures or just ugly
