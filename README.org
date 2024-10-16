@@ -62,7 +62,7 @@
       libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev \
       libjansson-dev libharfbuzz-dev libharfbuzz-bin imagemagick libmagickwand-dev \
       libgccjit-10-dev libgccjit0 gcc-10 libjansson4 libjansson-dev libtree-sitter-dev \
-      xaw3dg-dev texinfo libx11-dev
+      xaw3dg-dev texinfo libx11-dev libenchant-2-dev
   #+end_src
 
   #+begin_src sh
