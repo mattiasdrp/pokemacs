@@ -425,6 +425,7 @@ Specify the chosen language used by spell checking tools in pokemacs."
  visible-bell nil)
 
 (use-package server
+  :demand t
   :ensure nil
   :config
   (unless (server-running-p) (server-start))
@@ -1237,11 +1238,6 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ghub
   :config (message "`ghub' loaded"))
 
-(use-package org-protocol
-  :ensure nil
-  :config
-  (message "`org-protocol' loaded"))
-
 (use-package ox-pandoc)
 
 (use-package ox
@@ -1290,6 +1286,13 @@ debian, and derivatives). On most it's 'fd'.")
             "C-c C-c"                 'org-edit-src-exit)
 
   :init
+  ;; Load personal configuration for org mode
+  (add-hook 'elpaca-after-init-hook
+            (lambda ()
+              (let ((file (expand-file-name "~/.secrets/org.el")))
+                (when (file-exists-p file)
+                  (load-file file)
+                  (message "%S loaded" file)))))
   (general-unbind org-mode-map "M-h")
   (defun pokemacs-logger ()
     (interactive)
@@ -1432,6 +1435,8 @@ debian, and derivatives). On most it's 'fd'.")
           ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
            "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
   (message "`org-mode' loaded"))
+
+;; (require 'org-protocol)
 
 (use-package org-modern
   :after org
@@ -3177,26 +3182,38 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     :config (message "`page-break-lines' loaded"))
 
   (use-package dashboard
-    :init
+    :custom
     ;; Set the title
-    (setq dashboard-banner-logo-title "Pokemacs")
-    ;; Set the banner
-    (setq dashboard-startup-banner "~/.emacs.d/etc/dashboard/calvin_hobbes.jpeg")
-    (setq dashboard-center-content t)
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-icon-type (if use-all-the-icons 'all-the-icons 'nerd-icons))
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-items '((recents  . 5)
-                            (bookmarks . 5)
-                            (projects . 5)
-                            (agenda . 5)))
-    (setq dashboard-set-navigator t)
-    (setq dashboard-set-footer nil)
-    (setq dashboard-week-agenda t)
+    (dashboard-banner-logo-title "Pokemacs")
+    ;; ;; Set the banner
+    (dashboard-startup-banner "~/.emacs.d/etc/dashboard/calvin_hobbes.jpeg")
+    (dashboard-center-content t)
+    (dashboard-set-heading-icons t)
+    (dashboard-icon-type (if use-all-the-icons 'all-the-icons 'nerd-icons))
+    (dashboard-set-file-icons t)
+    (dashboard-items '((recents  . 5)
+                       (bookmarks . 5)
+                       (projects . 5)
+                       (agenda . 5)))
+    (dashboard-set-navigator t)
+    (dashboard-set-footer nil)
+    (dashboard-week-agenda t)
+    (dashboard-init-info
+     (lambda ()
+       (let ((package-count 0) (time (emacs-init-time)))
+         (when (fboundp 'elpaca--queued)
+           (setq time (format "%f seconds" (float-time (time-subtract elpaca-after-init-time
+                                                                      before-init-time))))
+           (setq package-count (length (elpaca--queued))))
+         (if (zerop package-count)
+             (format "Emacs started in %s with %s gc" time gcs-done)
+           (format "%d packages loaded in %s with %s gc" package-count time gcs-done)))))
+    :hook
+    (elpaca-after-init . dashboard-insert-startupify-lists)
+    (elpaca-after-init . dashboard-initialize)
     :config
     (dashboard-setup-startup-hook)
-    (message "`dashboard' loaded"))
-  (elpaca-wait))
+    (message "`dashboard' loaded")))
 
 (when use-eaf
   (use-package eaf
@@ -4166,11 +4183,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
-;; Load personal configuration for org mode
-(load-file (expand-file-name "~/.secrets/org.el"))
+
 (message "`init' file loaded")
 ;;;; Footer
-
+(message "Number of gcs: %d" gcs-done)
 ;; End:
 (provide 'init)
 
