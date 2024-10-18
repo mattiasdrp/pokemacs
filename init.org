@@ -6933,6 +6933,36 @@ Some people use this, not my responsibility.
     (use-package sicp))
 #+end_src
 
+
+*** Copilot
+:PROPERTIES:
+:CUSTOM_ID: copilot
+:END:
+
+#+begin_src emacs-lisp
+  (use-package copilot
+    :ensure (copilot :repo "https://github.com/copilot-emacs/copilot.el")
+    :init (copilot-mode)
+    :hook (prog-mode . copilot-mode)
+    :bind (:map copilot-completion-map
+                ("<tab>" . 'copilot-accept-completion)
+                ("TAB" . 'copilot-accept-completion)
+                ("C-TAB" . 'copilot-accept-completion-by-word)
+                ("C-<tab>" . 'copilot-accept-completion-by-word)
+                ("C-n" . 'copilot-next-completion)
+                ("C-p" . 'copilot-previous-completion))
+    :config
+    (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+    (add-to-list 'copilot-indentation-alist '(org-mode 2))
+    (add-to-list 'copilot-indentation-alist '(text-mode 2))
+    (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+    (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
+
+#+end_src
+
+
+
+
 ** Web modes
 :PROPERTIES:
 :CUSTOM_ID: web-modes
