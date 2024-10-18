@@ -20,7 +20,7 @@
 
 (require 'flycheck)
 
-(defun mdrp/error-at-point (pos)
+(defun pokemacs-error-at-point (pos)
   "Correct the first error encountered at POS.
 
   This method replace the word at POS by the first suggestion coming from
@@ -29,10 +29,10 @@
     (when error
       (message "Error: %S" error))))
 
-(defun mdrp/correct-or-newline (pos)
+(defun pokemacs-correct-or-newline (pos)
   "Doc POS."
   (interactive "d")
-  (unless (mdrp/error-at-point pos)
+  (unless (pokemacs-error-at-point pos)
     (newline)))
 
 ;;;###autoload

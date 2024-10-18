@@ -236,7 +236,7 @@ if the CMD is expected to open and external application."
 With the prefix argument, modify the command's invocation.
 Dune: Compile the current project."
   (interactive
-   (list (read-from-minibuffer "Build name: " nil nil nil 'mdrp/dune-history)))
+   (list (read-from-minibuffer "Build name: " nil nil nil 'ocaml-utils-dune-history)))
   (dune-process--start (concat "Build " name)
                         (concat dune-process--command-build " " name)))
 
@@ -246,7 +246,7 @@ Dune: Compile the current project."
 With the prefix argument, modify the command's invocation.
 Dune: Build and execute a specific binary"
   (interactive
-   (list (read-from-minibuffer "Binary name: " nil nil nil 'mdrp/dune-history)))
+   (list (read-from-minibuffer "Binary name: " nil nil nil 'ocaml-utils-dune-history)))
   (dune-process--start (concat "Run " name)
                         (concat dune-process--command-exec " " name)))
 
