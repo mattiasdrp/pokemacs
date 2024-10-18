@@ -141,6 +141,12 @@
   :type 'boolean
   :tag " Mu4e")
 
+(defcustom use-copilot nil
+  "If non-nil, uses the copilot packages."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Copilot")
+
 (defcustom use-org nil
   "If non-nil, install Org mode from it's git repo.
 Otherwise, the org provided with emacs will be used"
@@ -4879,6 +4885,25 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-sicp
   (use-package sicp))
+
+(when use-copilot
+  (use-package copilot
+    :ensure (copilot :host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+    :init (copilot-mode)
+    :hook (prog-mode . copilot-mode)
+    :general
+    (:keymaps 'copilot-completion-map
+              "<tab>" 'copilot-accept-completion
+              "TAB" 'copilot-accept-completion
+              "C-TAB" 'copilot-accept-completion-by-word
+              "C-<tab>" 'copilot-accept-completion-by-word
+              "C-n" 'copilot-next-completion
+              "C-p" 'copilot-previous-completion)
+    (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+    (add-to-list 'copilot-indentation-alist '(org-mode 2))
+    (add-to-list 'copilot-indentation-alist '(text-mode 2))
+    (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+    (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
 
 (when use-web
   (use-package web-mode

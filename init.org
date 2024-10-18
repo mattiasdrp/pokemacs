@@ -190,9 +190,6 @@ Literate configuration for init.el.
   - [[#marginalia][Marginalia]]
   - [[#iedit][Iedit]]
   - [[#tempel][Tempel]]
-  - [[#copilot][Copilot]]
-    - [[#main-mode-6][Main mode]]
-    - [[#copilot-chat][Copilot-chat]]
 - [[#gui][GUI]]
   - [[#mode-line][Mode-line]]
     - [[#anzu][Anzu]]
@@ -208,16 +205,16 @@ Literate configuration for init.el.
 - [[#eaf][EAF]]
 - [[#tree-sitter][Tree sitter]]
   - [[#treesit][Treesit]]
-    - [[#main-mode-7][Main Mode]]
+    - [[#main-mode-6][Main Mode]]
     - [[#treesit-auto][Treesit-auto]]
   - [[#tree-sitter-elisp][Tree sitter elisp]]
-    - [[#main-mode-8][Main mode]]
+    - [[#main-mode-7][Main mode]]
     - [[#tree-sitter-folding][Tree sitter folding]]
   - [[#combobulate][Combobulate]]
 - [[#programming-languages][Programming languages]]
   - [[#enabledisable-packages-related-to-languages][Enable/Disable packages related to languages]]
   - [[#markdown][Markdown]]
-    - [[#main-mode-9][Main mode]]
+    - [[#main-mode-8][Main mode]]
     - [[#lsp-marksman][LSP-marksman]]
     - [[#markdown-toc][Markdown toc]]
     - [[#pandoc][Pandoc]]
@@ -227,13 +224,13 @@ Literate configuration for init.el.
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
   - [[#cc][C/C++]]
-    - [[#main-mode-10][Main mode]]
+    - [[#main-mode-9][Main mode]]
     - [[#ccls][CCLS]]
   - [[#clojure][Clojure]]
-    - [[#main-mode-11][Main mode]]
+    - [[#main-mode-10][Main mode]]
     - [[#cider][CIDER]]
   - [[#emacs-lisp][Emacs-Lisp]]
-    - [[#main-mode-12][Main mode]]
+    - [[#main-mode-11][Main mode]]
     - [[#lisp-extra-font-lock][Lisp extra font lock]]
     - [[#puni][Puni]]
     - [[#flycheck-package][Flycheck package]]
@@ -254,14 +251,14 @@ Literate configuration for init.el.
   - [[#michelson][Michelson]]
   - [[#ocaml][OCaml]]
     - [[#useful-functions][Useful functions]]
-    - [[#main-mode-13][Main mode]]
+    - [[#main-mode-12][Main mode]]
     - [[#tuareg-menhir][Tuareg Menhir]]
     - [[#dune-commands][Dune commands]]
     - [[#ocaml-utils][OCaml utils]]
   - [[#pdf-files][Pdf files]]
     - [[#saveplace-in-pdf][Saveplace in pdf]]
   - [[#python][Python]]
-    - [[#main-mode-14][Main mode]]
+    - [[#main-mode-13][Main mode]]
     - [[#pyvenv][Pyvenv]]
     - [[#lsp-pyright][Lsp pyright]]
   - [[#racket][Racket]]
@@ -270,8 +267,9 @@ Literate configuration for init.el.
   - [[#ruby][Ruby]]
   - [[#rust][Rust]]
   - [[#sicp][SICP]]
+  - [[#copilot][Copilot]]
   - [[#web-modes][Web modes]]
-    - [[#main-mode-15][Main mode]]
+    - [[#main-mode-14][Main mode]]
     - [[#css-mode][CSS mode]]
     - [[#simple-httpd][Simple HTTPD]]
     - [[#beautify][Beautify]]
@@ -470,6 +468,12 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'pokemacs-packages
     :type 'boolean
     :tag " Mu4e")
+
+  (defcustom use-copilot nil
+    "If non-nil, uses the copilot packages."
+    :group 'pokemacs-packages
+    :type 'boolean
+    :tag " Copilot")
 
   (defcustom use-org nil
     "If non-nil, install Org mode from it's git repo.
@@ -5536,7 +5540,7 @@ Will pulse when the focus changes to show where the cursor is.
 
 *** Main Mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-7
+:CUSTOM_ID: main-mode-6
 :END:
 
 #+begin_src emacs-lisp
@@ -5609,7 +5613,7 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-8
+:CUSTOM_ID: main-mode-7
 :END:
 
 #+begin_src emacs-lisp
@@ -5865,7 +5869,7 @@ Code folding based on treesit.el tree.
 
 **** [[https://github.com/jrblevin/markdown-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-9
+:CUSTOM_ID: main-mode-8
 :END:
 
 #+begin_src emacs-lisp
@@ -6034,7 +6038,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-10
+:CUSTOM_ID: main-mode-9
 :END:
 
 #+begin_src emacs-lisp
@@ -6107,7 +6111,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-11
+:CUSTOM_ID: main-mode-10
 :END:
 
 #+begin_src emacs-lisp
@@ -6135,7 +6139,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-12
+:CUSTOM_ID: main-mode-11
 :END:
 
 #+begin_src emacs-lisp
@@ -6536,7 +6540,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 
 *** [[https://github.com/ocaml/tuareg][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-13
+:CUSTOM_ID: main-mode-12
 :END:
 
 #+begin_src emacs-lisp
@@ -6774,7 +6778,7 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 
 *** [[https://gitlab.com/python-mode-devs/python-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-14
+:CUSTOM_ID: main-mode-13
 :END:
 
 #+begin_src emacs-lisp
@@ -7091,6 +7095,34 @@ Some people use this, not my responsibility.
     (use-package sicp))
 #+end_src
 
+
+** Copilot
+:PROPERTIES:
+:CUSTOM_ID: copilot
+:END:
+
+#+begin_src emacs-lisp
+    (when use-copilot
+      (use-package copilot
+        :ensure (copilot :host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+        :init (copilot-mode)
+        :hook (prog-mode . copilot-mode)
+        :general
+        (:keymaps 'copilot-completion-map
+                  "<tab>" 'copilot-accept-completion
+                  "TAB" 'copilot-accept-completion
+                  "C-TAB" 'copilot-accept-completion-by-word
+                  "C-<tab>" 'copilot-accept-completion-by-word
+                  "C-n" 'copilot-next-completion
+                  "C-p" 'copilot-previous-completion)
+        (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+        (add-to-list 'copilot-indentation-alist '(org-mode 2))
+        (add-to-list 'copilot-indentation-alist '(text-mode 2))
+        (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+        (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
+#+end_src
+
+
 ** Web modes
 :PROPERTIES:
 :CUSTOM_ID: web-modes
@@ -7098,7 +7130,7 @@ Some people use this, not my responsibility.
 
 *** [[https://github.com/fxbois/web-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-15
+:CUSTOM_ID: main-mode-14
 :END:
 
 #+begin_src emacs-lisp
