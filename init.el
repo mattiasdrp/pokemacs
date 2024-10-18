@@ -199,6 +199,18 @@ Similar to Vim's separation of command/insert modes"
   :type 'string
   :tag " Font")
 
+(defcustom tuple-mono-font `(:font ,pokemacs-mono-font)
+  "Font for mono pitch."
+  :group 'pokemacs-appearance
+  :type 'list
+  :tag " Font")
+
+(defcustom tuple-variable-font `(:font ,pokemacs-variable-font)
+  "Font for variable pitch."
+  :group 'pokemacs-appearance
+  :type 'list
+  :tag " Font")
+
 (defcustom pokemacs-dark-theme-p t
   "Dark or light theme."
   :group 'pokemacs-appearance

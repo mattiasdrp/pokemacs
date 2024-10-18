@@ -86,22 +86,28 @@
  '(use-web t)
  '(use-window-purpose nil)
  '(tuple-mono-font
-   (cond
-    ((x-list-fonts pokemacs-mono-font)         `(:font ,pokemacs-mono-font))
-    ((x-list-fonts "Fira Code")                '(:font "Fira Code"))
-    ((x-list-fonts "Inconsolata")              '(:font "Inconsolata"))
-    ((x-family-fonts "DejaVu")                 '(:family "DejaVu"))
-    (nil (warn "Cannot find a monospaced font."))) t)
-'(tuple-variable-font
-   (cond
-    ((x-list-fonts pokemacs-variable-font)     `(:font ,pokemacs-variable-font))
-    ((x-list-fonts "Iosevka Aile")             '(:font "Iosevka Aile"))
-    ((x-list-fonts "ETBembo")                  '(:font "ETBembo"))
-    ((x-list-fonts "Source Sans Pro")          '(:font "Source Sans Pro"))
-    ((x-list-fonts "Lucida Grande")            '(:font "Lucida Grande"))
-    ((x-list-fonts "Verdana")                  '(:font "Verdana"))
-    ((x-family-fonts "Sans Serif")             '(:family "Sans Serif"))
-    (nil (warn "Cannot find a Sans Serif Font."))) t)
+   (if (window-system)
+       (cond
+        ((x-list-fonts pokemacs-mono-font)         `(:font ,pokemacs-mono-font))
+        ((x-list-fonts "Fira Code")                '(:font "Fira Code"))
+        ((x-list-fonts "Inconsolata")              '(:font "Inconsolata"))
+        ((x-family-fonts "DejaVu")                 '(:family "DejaVu"))
+        (nil (warn "Cannot find a monospaced font.")))
+     '(:family "Monospace"))
+   t)
+ '(tuple-variable-font
+   (if (window-system)
+       (cond
+        ((x-list-fonts pokemacs-variable-font)     `(:font ,pokemacs-variable-font))
+        ((x-list-fonts "Iosevka Aile")             '(:font "Iosevka Aile"))
+        ((x-list-fonts "ETBembo")                  '(:font "ETBembo"))
+        ((x-list-fonts "Source Sans Pro")          '(:font "Source Sans Pro"))
+        ((x-list-fonts "Lucida Grande")            '(:font "Lucida Grande"))
+        ((x-list-fonts "Verdana")                  '(:font "Verdana"))
+        ((x-family-fonts "Sans Serif")             '(:family "Sans Serif"))
+        (nil (warn "Cannot find a Sans Serif Font.")))
+     '(:family "Monospace"))
+   t)
  '(warning-suppress-types '((comp)))
  '(x-stretch-cursor nil))
 
