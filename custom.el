@@ -43,15 +43,35 @@
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages nil)
  '(pokemacs-dict "en-GB")
+ '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-theme 'doom-solarized-dark t)
- '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-variable-font "Iosevka Aile" t)
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down
                                         projectile-root-bottom-up
                                         projectile-root-top-down-recurring)))
  '(show-paren-style 'expression)
+ '(tuple-mono-font
+   (if (window-system)
+       (cond ((x-list-fonts pokemacs-mono-font) `(:font ,pokemacs-mono-font))
+             ((x-list-fonts "Fira Code") '(:font "Fira Code"))
+             ((x-list-fonts "Inconsolata") '(:font "Inconsolata"))
+             ((x-family-fonts "DejaVu") '(:family "DejaVu"))
+             (nil (warn "Cannot find a monospaced font.")))
+     '(:family "Monospace")) t)
+ '(tuple-variable-font
+   (if (window-system)
+       (cond
+        ((x-list-fonts pokemacs-variable-font) `(:font ,pokemacs-variable-font))
+        ((x-list-fonts "Iosevka Aile") '(:font "Iosevka Aile"))
+        ((x-list-fonts "ETBembo") '(:font "ETBembo"))
+        ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+        ((x-list-fonts "Lucida Grande") '(:font "Lucida Grande"))
+        ((x-list-fonts "Verdana") '(:font "Verdana"))
+        ((x-family-fonts "Sans Serif") '(:family "Sans Serif"))
+        (nil (warn "Cannot find a Sans Serif Font.")))
+     '(:family "Monospace")) t)
  '(use-all-the-icons nil)
  '(use-clojure t)
  '(use-dashboard t)
@@ -63,7 +83,7 @@
  '(use-header-line t)
  '(use-java t)
  '(use-kotlin t)
- '(use-latex t)
+ '(use-latex nil)
  '(use-magit-todos t)
  '(use-markdown t)
  '(use-maximize t)
@@ -85,30 +105,7 @@
  '(use-visual-fill t)
  '(use-web t)
  '(use-window-purpose nil)
- '(tuple-mono-font
-   (if (window-system)
-       (cond
-        ((x-list-fonts pokemacs-mono-font)         `(:font ,pokemacs-mono-font))
-        ((x-list-fonts "Fira Code")                '(:font "Fira Code"))
-        ((x-list-fonts "Inconsolata")              '(:font "Inconsolata"))
-        ((x-family-fonts "DejaVu")                 '(:family "DejaVu"))
-        (nil (warn "Cannot find a monospaced font.")))
-     '(:family "Monospace"))
-   t)
- '(tuple-variable-font
-   (if (window-system)
-       (cond
-        ((x-list-fonts pokemacs-variable-font)     `(:font ,pokemacs-variable-font))
-        ((x-list-fonts "Iosevka Aile")             '(:font "Iosevka Aile"))
-        ((x-list-fonts "ETBembo")                  '(:font "ETBembo"))
-        ((x-list-fonts "Source Sans Pro")          '(:font "Source Sans Pro"))
-        ((x-list-fonts "Lucida Grande")            '(:font "Lucida Grande"))
-        ((x-list-fonts "Verdana")                  '(:font "Verdana"))
-        ((x-family-fonts "Sans Serif")             '(:family "Sans Serif"))
-        (nil (warn "Cannot find a Sans Serif Font.")))
-     '(:family "Monospace"))
-   t)
- '(warning-suppress-types '((comp)))
+ '(warning-suppress-types '((treesit) (comp)))
  '(x-stretch-cursor nil))
 
 (custom-set-faces
@@ -118,7 +115,6 @@
  ;; If there is more than one, they won't work right.
  `(default ((t (,@tuple-mono-font :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
  `(fixed-pitch ((t (,@tuple-mono-font :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
- `(variable-pitch ((t (,@tuple-variable-font :weight light :height 1.3))))
  `(lsp-lens-face ((t (,@tuple-mono-font :foundry "CTDB" :inherit lsp-details-face))))
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
@@ -157,7 +153,8 @@
  '(region                ((t (:extend t :background "#93a1a1" :foreground "#073642" :inverse-video t))))
  '(secondary-selection   ((t (:inherit region))))
  '(show-paren-match      ((t (:inherit highlight :foreground unspecified :weight normal))))
- '(show-paren-mismatch   ((t (:foreground unspecified :weight normal :background "#7D3131")))))
+ '(show-paren-mismatch   ((t (:foreground unspecified :weight normal :background "#7D3131"))))
+ `(variable-pitch ((t (,@tuple-variable-font :weight light :height 1.3)))))
 
 (provide 'custom)
 ;;; custom.el ends here

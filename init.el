@@ -621,6 +621,20 @@ debian, and derivatives). On most it's 'fd'.")
     (nerd-icons-completion-mode)
     (message "`nerd-icons-completion' loaded")))
 
+(use-package nerd-icons-corfu
+  :demand t
+  :after (nerd-icons corfu)
+  :config
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+  ;; Optionally:
+  ;; (setq nerd-icons-corfu-mapping
+  ;;       '((array :style "cod" :icon "symbol_array" :face font-lock-type-face)
+  ;;         (boolean :style "cod" :icon "symbol_boolean" :face font-lock-builtin-face)
+  ;;         ;; ...
+  ;;         (t :style "cod" :icon "code" :face font-lock-warning-face)))
+  ;; Remember to add an entry for `t', the library uses that as default.
+  )
+
 (use-package ligature
   :demand t
   :config
@@ -1018,8 +1032,8 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure nil
   :general
   ("C-d"                     'delete-block-forward)
-  ("C-<backspace>"           'delete-block-backward)
-  ("M-<backspace>"           'delete-block-backward)
+  ("C-<DEL>"           'delete-block-backward)
+  ("M-<DEL>"           'delete-block-backward)
   :config (message "`delete-block' loaded"))
 
 (use-package discover-my-major
@@ -2086,7 +2100,10 @@ have one rule for each file type."
 (use-package hideshow
   :ensure nil
   :hook (prog-mode . (lambda ()
-                       (unless (eq major-mode 'tree-sitter-query-mode)
+                       (unless
+                           (or
+                            (eq major-mode 'rust-ts-mode)
+                            (eq major-mode 'tree-sitter-query-mode))
                          (hs-minor-mode))))
   :commands (hs-minor-mode
              hs-toggle-hiding)
@@ -2288,8 +2305,8 @@ with a prefix ARG."
   :general
   (:keymaps 'vertico-map
             "RET" 'vertico-directory-enter
-            "<backspace>" 'vertico-directory-delete-char
-            "M-<backspace>" 'vertico-directory-delete-word)
+            "<DEL>" 'vertico-directory-delete-char
+            "M-<DEL>" 'vertico-directory-delete-word)
   ;; Tidy shadowed file names
   :config (message "`vertico-directory' loaded"))
 
@@ -2618,6 +2635,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`corfu-precient' loaded"))
 
 (use-package kind-icon
+  :disabled t
   :after corfu
   :custom
   (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
@@ -3255,15 +3273,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (message "`eaf' loaded"))) ;; unbind, see more in the Wiki
 
 (use-package treesit
-  :ensure nil)
+  :demand t
+  :ensure nil
+  :config (message "`treesit' loaded"))
 
 (use-package treesit-auto
-  :after treesit
+  :demand t
   :custom
   (treesit-auto-install 'prompt)
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  (global-treesit-auto-mode)
+  (message "`treesit-auto' loaded"))
 
 ;; This package needs to be loaded to use language parsers
 (use-package tree-sitter-langs
@@ -4055,13 +4076,17 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (when use-rust
 
   (use-package rust-mode
+    :demand t
     :ensure t
     :init
-    (setq rust-mode-treesitter-derive t))
+    (setq rust-mode-treesitter-derive t)
+    :config
+    (require 'rustic nil t)
+    (message "`rust-mode' loaded"))
 
   (use-package rustic
     :ensure (:repo "emacs-rustic/rustic")
-    :mode ("\\.rs$" . rustic-mode)
+    :after (rust-mode)
     :ensure-system-package
     ((taplo . "cargo install taplo-cli --features lsp")
      (rustfmt . "cargo install rustfmt"))
@@ -4073,7 +4098,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-M-;" 'pokemacs-rust-doc-comment-dwim-following
               "C-M-," 'pokemacs-rust-doc-comment-dwim-enclosing)
     :init
-
     (defun pokemacs-rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
       (interactive)

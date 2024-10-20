@@ -1239,6 +1239,25 @@ Other nerd-icons related packages:
       (message "`nerd-icons-completion' loaded")))
 #+end_src
 
+*** [[https://github.com/LuigiPiucco/nerd-icons-corfu][Nerd icons corfu]]
+
+#+begin_src emacs-lisp
+  (use-package nerd-icons-corfu
+    :demand t
+    :after (nerd-icons corfu)
+    :config
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+    ;; Optionally:
+    ;; (setq nerd-icons-corfu-mapping
+    ;;       '((array :style "cod" :icon "symbol_array" :face font-lock-type-face)
+    ;;         (boolean :style "cod" :icon "symbol_boolean" :face font-lock-builtin-face)
+    ;;         ;; ...
+    ;;         (t :style "cod" :icon "code" :face font-lock-warning-face)))
+    ;; Remember to add an entry for `t', the library uses that as default.
+    )
+
+#+end_src
+
 ** [[https://github.com/mickeynp/ligature.el][Ligatures]]
 :PROPERTIES:
 :CUSTOM_ID: ligatures
@@ -1865,8 +1884,8 @@ Better block deletion.
     :ensure nil
     :general
     ("C-d"                     'delete-block-forward)
-    ("C-<backspace>"           'delete-block-backward)
-    ("M-<backspace>"           'delete-block-backward)
+    ("C-<DEL>"           'delete-block-backward)
+    ("M-<DEL>"           'delete-block-backward)
     :config (message "`delete-block' loaded"))
 #+end_src
 
@@ -3420,7 +3439,10 @@ On the fly syntax checking. One of the greatest package there is for making prog
   (use-package hideshow
     :ensure nil
     :hook (prog-mode . (lambda ()
-                         (unless (eq major-mode 'tree-sitter-query-mode)
+                         (unless
+                             (or
+                              (eq major-mode 'rust-ts-mode)
+                              (eq major-mode 'tree-sitter-query-mode))
                            (hs-minor-mode))))
     :commands (hs-minor-mode
                hs-toggle-hiding)
@@ -3730,8 +3752,8 @@ Useful keybindings are:
     :general
     (:keymaps 'vertico-map
               "RET" 'vertico-directory-enter
-              "<backspace>" 'vertico-directory-delete-char
-              "M-<backspace>" 'vertico-directory-delete-word)
+              "<DEL>" 'vertico-directory-delete-char
+              "M-<DEL>" 'vertico-directory-delete-word)
     ;; Tidy shadowed file names
     :config (message "`vertico-directory' loaded"))
  #+end_src
@@ -4120,6 +4142,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package kind-icon
+    :disabled t
     :after corfu
     :custom
     (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
@@ -4950,7 +4973,9 @@ Will pulse when the focus changes to show where the cursor is.
 
 #+begin_src emacs-lisp
   (use-package treesit
-    :ensure nil)
+    :demand t
+    :ensure nil
+    :config (message "`treesit' loaded"))
 #+end_src
 
 *** Treesit-auto
@@ -4960,12 +4985,13 @@ Will pulse when the focus changes to show where the cursor is.
 
 #+begin_src emacs-lisp
   (use-package treesit-auto
-    :after treesit
+    :demand t
     :custom
     (treesit-auto-install 'prompt)
     :config
     (treesit-auto-add-to-auto-mode-alist 'all)
-    (global-treesit-auto-mode))
+    (global-treesit-auto-mode)
+    (message "`treesit-auto' loaded"))
 #+end_src
 
 ** Tree sitter elisp
@@ -6104,13 +6130,17 @@ Some people use this, not my responsibility.
   (when use-rust
 
     (use-package rust-mode
+      :demand t
       :ensure t
       :init
-      (setq rust-mode-treesitter-derive t))
+      (setq rust-mode-treesitter-derive t)
+      :config
+      (require 'rustic nil t)
+      (message "`rust-mode' loaded"))
 
     (use-package rustic
       :ensure (:repo "emacs-rustic/rustic")
-      :mode ("\\.rs$" . rustic-mode)
+      :after (rust-mode)
       :ensure-system-package
       ((taplo . "cargo install taplo-cli --features lsp")
        (rustfmt . "cargo install rustfmt"))
@@ -6122,7 +6152,6 @@ Some people use this, not my responsibility.
                 "C-M-;" 'pokemacs-rust-doc-comment-dwim-following
                 "C-M-," 'pokemacs-rust-doc-comment-dwim-enclosing)
       :init
-
       (defun pokemacs-rust-doc-comment-dwim (c)
         "Comment or uncomment the current line or text selection."
         (interactive)
