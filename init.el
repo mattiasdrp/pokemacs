@@ -285,6 +285,39 @@ Specify the chosen language used by spell checking tools in pokemacs."
                  (string :tag "Other"))
   :tag " Dictionary")
 
+(defun pokemacs-get-current-theme ()
+  (if pokemacs-dark-theme-p
+      pokemacs-dark-theme
+    pokemacs-light-theme))
+
+(defun pokemacs-load-theme ()
+  (consult-theme (pokemacs-get-current-theme)))
+
+(defun pokemacs-toggle-dark-light-theme ()
+  (interactive)
+  (setq pokemacs-dark-theme-p (not pokemacs-dark-theme-p))
+  (pokemacs-load-theme))
+
+(use-package doom-themes
+  :demand t
+  :config
+  ;; Global settings (defaults)
+  (load-theme (pokemacs-get-current-theme) t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  ;; (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config)
+  (message "`doom-themes' loaded"))
+(elpaca-wait)
+
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
 
@@ -2634,8 +2667,19 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (corfu-prescient-mode 1)
   (message "`corfu-precient' loaded"))
 
+(use-package corfu-terminal
+  :unless (display-graphic-p)
+  :ensure (corfu-terminal :type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+  :init (corfu-terminal-mode +1))
+
+(use-package corfu-doc-terminal
+  :disabled
+  :unless (display-graphic-p)
+  :ensure (corfu-doc-terminal :type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
+  :config (corfu-doc-terminal-mode +1))
+
 (use-package kind-icon
-  :disabled t
+  :disabled
   :after corfu
   :custom
   (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
@@ -2913,38 +2957,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 ;; The package is young and doesn't have comprehensive coverage.
 (use-package tempel-collection)
 
-(defun pokemacs-get-current-theme ()
-  (if pokemacs-dark-theme-p
-      pokemacs-dark-theme
-    pokemacs-light-theme))
-
-(defun pokemacs-load-theme ()
-  (consult-theme (pokemacs-get-current-theme)))
-
-(defun pokemacs-toggle-dark-light-theme ()
-  (interactive)
-  (setq pokemacs-dark-theme-p (not pokemacs-dark-theme-p))
-  (pokemacs-load-theme))
-
-(use-package doom-themes
-  :demand t
-  :config
-  ;; Global settings (defaults)
-  (load-theme (pokemacs-get-current-theme) t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  ;; (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-  (doom-themes-treemacs-config)
-
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config)
-  (message "`doom-themes' loaded"))
-
 (use-package anzu
   :init
   (global-anzu-mode +1)
@@ -3220,6 +3232,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (dashboard-center-content t)
     (dashboard-set-heading-icons t)
     (dashboard-icon-type (if use-all-the-icons 'all-the-icons 'nerd-icons))
+    (dashboard-display-icons-p (if use-all-the-icons nil t))
     (dashboard-set-file-icons t)
     (dashboard-items '((recents  . 5)
                        (bookmarks . 5)

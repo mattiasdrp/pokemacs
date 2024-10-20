@@ -1,0 +1,64 @@
+:PROPERTIES:
+:TOC:      :include all :force ((nothing)) :ignore ((nothing)) :local ((nothing))
+:END:
+#+TITLE: Tips and tricks
+#+AUTHOR: mattiasdrp
+#+DATE: <2024-10-20 Sun>
+#+LANGUAGE: en_US
+#+PROPERTY: header-args :results silent :exports code :tangle yes
+#+AUTO_TANGLE: t
+#+STARTUP: hideblocks
+
+#+KEYWORDS: Emacs, tips, tricks
+
+Some tips and tricks that I found throughout the years or that I specifically implemented in pokemacs to make my life easier.
+
+* Utility
+
+- ~M-x window-swap-states~: Swaps two windows
+- ~M-l l~: Lock the current window
+- ~M-h~: Useful hydras (toggles etc)
+
+* LSP
+
+~M-,~: Jumps back to the mark where jumping functions like ~xref-find-definition~ or ~lsp-find-definition~
+
+* Marks
+
+- ~C-SPC C-SPC~: Put a mark without creating a region
+- ~C-x C-SPC~: Go back to the previous mark
+- ~M-g m (consult-mark)~ or ~k (consult-global-mark)~ : List of all local or global marks
+
+* Bookmarks (marks++)
+Bookmarks are saved between each session and can be named.
+
+- ~C-x r m~: Set a bookmark
+- ~C-x r b~: Jump to a bookmark if its name exists or create a new one
+
+* Find
+
+- ~M-p~ : Go back in history (works with everything that uses the minibuffer like ~find-file~, ~ripgrep~ etc. Each command has its own history)
+- ~M-x embark-collect~: Groups all the results in the minibuffer in a specific interactive buffer
+
+* Rectangle
+
+- ~C-M-<mouse-1>~: rectangular selection
+
+* Consult
+
+- ~#regexp#filter-string~: The pattern of a consult input. ~filter-string~ is used to filter the results obtained with ~regexp~
+- ~M-RET~: Jump to the current result without closing the minibuffer
+- ~M-.~: Preview the result at point (useful when unsure about the result)
+- ~<regexp> -- -g *.ml~:  Limit the search to files ending with ~.ml~
+- ~<regexp> -- -g !pattern~: Remove the files corresponding to ~pattern~ from the search results
+
+* Isearch
+
+- ~C-g~: Deletes the part of the current search that is not matching anything
+- ~M-e~: Edit the current search
+- ~M-c~ (or ~c~ once the input can't be edited): Case sentitivity
+
+* Magit
+
+- ~M-v G~: See the last commit that edited the line at point
+- When rebasing, ~v~ on the hunk at point will reverse it (~k~ in the magit buffer)

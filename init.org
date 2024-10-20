@@ -24,6 +24,9 @@ Literate configuration for init.el.
   - [[#install-and-set-use-package][Install and set use-package]]
   - [[#disable-warnings][Disable warnings]]
   - [[#disableenable-features][Disable/Enable features]]
+  - [[#themes-etc][Themes etc]]
+    - [[#swap-between-darklight-themes][Swap between dark/light themes]]
+    - [[#doom-theme][Doom theme]]
   - [[#set-useful-variables][Set useful variables]]
     - [[#init-file][Init file]]
     - [[#load-custom-file][Load custom file]]
@@ -60,6 +63,7 @@ Literate configuration for init.el.
     - [[#all-the-icons-completion][All the icons completion]]
   - [[#nerd-icons][Nerd-icons]]
     - [[#nerd-icons-completion][Nerd-icons completion]]
+    - [[#nerd-icons-corfu][Nerd icons corfu]]
   - [[#ligatures][Ligatures]]
   - [[#ansi-color][Ansi color]]
   - [[#kurecolor][Kurecolor]]
@@ -124,7 +128,6 @@ Literate configuration for init.el.
   - [[#org-roam][Org roam]]
   - [[#org-make-toc][Org make toc]]
   - [[#org-cv][Org CV]]
-  - [[#org-present][Org-present]]
 - [[#lsp][LSP]]
   - [[#main-mode-0][Main mode]]
   - [[#lsp-ui][Lsp ui]]
@@ -132,7 +135,6 @@ Literate configuration for init.el.
   - [[#consult-lsp][Consult lsp]]
 - [[#prog-mode-utilities][Prog mode utilities]]
   - [[#prog-mode][Prog-mode]]
-  - [[#disabled-highlight-indent-guides][DISABLED: Highlight indent guides]]
   - [[#apheleia][Apheleia]]
   - [[#dap][DAP]]
     - [[#main-mode-1][Main mode]]
@@ -167,6 +169,8 @@ Literate configuration for init.el.
     - [[#main-mode-4][Main mode]]
     - [[#corfu-popupinfo][Corfu-popupinfo]]
     - [[#corfu-prescient][Corfu-prescient]]
+    - [[#corfu-terminal][Corfu terminal]]
+    - [[#corfu-doc-terminal][Corfu doc terminal]]
     - [[#kind-icon][Kind-icon]]
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
   - [[#windmove][Windmove]]
@@ -176,24 +180,17 @@ Literate configuration for init.el.
   - [[#iedit][Iedit]]
   - [[#tempel][Tempel]]
 - [[#gui][GUI]]
-  - [[#themes-etc][Themes etc]]
-    - [[#swap-between-darklight-themes][Swap between dark/light themes]]
-    - [[#doom-theme][Doom theme]]
   - [[#mode-line][Mode-line]]
     - [[#anzu][Anzu]]
     - [[#doom-modeline][Doom modeline]]
     - [[#minions][Minions]]
   - [[#outline-major-and-minor-modes][Outline (major and minor modes)]]
     - [[#major-mode][Major mode]]
-    - [[#minor-mode][Minor mode]]
-    - [[#outshine][Outshine]]
-    - [[#pretty-outlines][Pretty outlines]]
   - [[#rainbow-mode][Rainbow mode]]
   - [[#rainbow-delimiters][Rainbow delimiters]]
   - [[#pulsar][Pulsar]]
   - [[#solaire][Solaire]]
   - [[#dashboard][Dashboard]]
-  - [[#svg-tags][SVG Tags]]
 - [[#eaf][EAF]]
 - [[#tree-sitter][Tree sitter]]
   - [[#treesit][Treesit]]
@@ -589,6 +586,60 @@ This is a list of custom variables that allow to enable/disable features. If you
                    (const :tag "No dict" nil)
                    (string :tag "Other"))
     :tag " Dictionary")
+#+end_src
+
+** Themes etc
+:PROPERTIES:
+:CUSTOM_ID: themes-etc
+:END:
+
+*** Swap between dark/light themes
+:PROPERTIES:
+:CUSTOM_ID: swap-between-darklight-themes
+:END:
+
+#+begin_src emacs-lisp
+  (defun pokemacs-get-current-theme ()
+    (if pokemacs-dark-theme-p
+        pokemacs-dark-theme
+      pokemacs-light-theme))
+
+  (defun pokemacs-load-theme ()
+    (consult-theme (pokemacs-get-current-theme)))
+
+  (defun pokemacs-toggle-dark-light-theme ()
+    (interactive)
+    (setq pokemacs-dark-theme-p (not pokemacs-dark-theme-p))
+    (pokemacs-load-theme))
+#+end_src
+
+*** [[https://github.com/doomemacs/themes][Doom theme]]
+:PROPERTIES:
+:CUSTOM_ID: doom-theme
+:END:
+
+Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/screenshots][here]]. Need to load it before custom to be able to use ~doom-color~
+
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :demand t
+    :config
+    ;; Global settings (defaults)
+    (load-theme (pokemacs-get-current-theme) t)
+
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+
+    ;; Enable custom neotree theme (all-the-icons must be installed!)
+    ;; (doom-themes-neotree-config)
+    ;; or for treemacs users
+    (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+    (doom-themes-treemacs-config)
+
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config)
+    (message "`doom-themes' loaded"))
+  (elpaca-wait)
 #+end_src
 
 ** Set useful variables
@@ -1240,6 +1291,9 @@ Other nerd-icons related packages:
 #+end_src
 
 *** [[https://github.com/LuigiPiucco/nerd-icons-corfu][Nerd icons corfu]]
+:PROPERTIES:
+:CUSTOM_ID: nerd-icons-corfu
+:END:
 
 #+begin_src emacs-lisp
   (use-package nerd-icons-corfu
@@ -2348,205 +2402,205 @@ Org mode is, well, org mode.
 :END:
 
 #+begin_src emacs-lisp
-  (use-package ox-pandoc)
+    (use-package ox-pandoc)
 
-  (use-package ox
-    :ensure nil
-    :mode ("\\.org\\'" . org-mode)
-    :init
-    (defun pokemacs-filter-timestamp (trans back _comm)
-      "Remove <> around time-stamps."
-      (pcase back
-        (`html
-         (replace-regexp-in-string "&[lg]t;" "" trans))
-        (`latex
-         (replace-regexp-in-string "[<>]" "" trans))))
+    (use-package ox
+      :ensure nil
+      :mode ("\\.org\\'" . org-mode)
+      :init
+      (defun pokemacs-filter-timestamp (trans back _comm)
+        "Remove <> around time-stamps."
+        (pcase back
+          (`html
+           (replace-regexp-in-string "&[lg]t;" "" trans))
+          (`latex
+           (replace-regexp-in-string "[<>]" "" trans))))
 
-    :config
-    (add-to-list 'org-export-filter-timestamp-functions #'pokemacs-filter-timestamp)
-    (message "`ox' loaded"))
+      :config
+      (add-to-list 'org-export-filter-timestamp-functions #'pokemacs-filter-timestamp)
+      (message "`ox' loaded"))
 
-  (use-package mixed-pitch
-    :config (message "`mixed-pitch' loaded"))
+    (use-package mixed-pitch
+      :config (message "`mixed-pitch' loaded"))
 
-  (use-package ob-rust)
+    (use-package ob-rust)
 
-  (use-package ob-racket
-    :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
+    (use-package ob-racket
+      :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
-  (use-package org
-    :mode ("\\.org\\'" . org-mode)
-    :hook
-    (org-mode . mixed-pitch-mode)
-    (org-mode . pokemacs-org-mode-hook)
-    :general
-    ("M-o" 'pokemacs-org-map)
-    ("C-x C-p" 'pokemacs-org-compile-latex-and-update-other-buffer)
-    ("C-c o l" 'pokemacs-logger)
-    (:keymaps 'pokemacs-org-map
-              "l"                       'org-store-link
-              "a"                       'org-agenda
-              "c"                       'org-capture)
-    (:keymaps 'org-mode-map
-              "M-j"                     'org-goto
-              "C-c C-a"                 nil
-              "C-<return>"              'org-meta-return
-              "M-C-<return>"            'org-insert-heading-respect-content)
-    (:keymaps 'org-src-mode-map
-              "C-c C-c"                 'org-edit-src-exit)
+    (use-package org
+      :mode ("\\.org\\'" . org-mode)
+      :hook
+      (org-mode . mixed-pitch-mode)
+      (org-mode . pokemacs-org-mode-hook)
+      :general
+      ("M-o" 'pokemacs-org-map)
+      ("C-x C-p" 'pokemacs-org-compile-latex-and-update-other-buffer)
+      ("C-c o l" 'pokemacs-logger)
+      (:keymaps 'pokemacs-org-map
+                "l"                       'org-store-link
+                "a"                       'org-agenda
+                "c"                       'org-capture)
+      (:keymaps 'org-mode-map
+                "M-j"                     'org-goto
+                "C-c C-a"                 nil
+                "C-<return>"              'org-meta-return
+                "M-C-<return>"            'org-insert-heading-respect-content)
+      (:keymaps 'org-src-mode-map
+                "C-c C-c"                 'org-edit-src-exit)
 
-    :init
-    ;; Load personal configuration for org mode
-    (add-hook 'elpaca-after-init-hook
-              (lambda ()
-                (let ((file (expand-file-name "~/.secrets/org.el")))
-                  (when (file-exists-p file)
-                    (load-file file)
-                    (message "%S loaded" file)))))
-    (general-unbind org-mode-map "M-h")
-    (defun pokemacs-logger ()
-      (interactive)
-      "Print logger"
-      (let ((line (number-to-string (line-number-at-pos))))
-        (kill-new (concat buffer-file-name "::" line))))
+      :init
+      ;; Load personal configuration for org mode
+      (add-hook 'elpaca-after-init-hook
+                (lambda ()
+                  (let ((file (expand-file-name "~/.secrets/org.el")))
+                    (when (file-exists-p file)
+                      (load-file file)
+                      (message "%S loaded" file)))))
+      (general-unbind org-mode-map "M-h")
+      (defun pokemacs-logger ()
+        (interactive)
+        "Print logger"
+        (let ((line (number-to-string (line-number-at-pos))))
+          (kill-new (concat buffer-file-name "::" line))))
 
-    (defun pokemacs-org-mode-hook ()
-      (let ((oldmap (cdr (assoc 'lsp-mode minor-mode-map-alist)))
-            (newmap (make-sparse-keymap)))
-        (set-keymap-parent newmap oldmap)
-        (define-key newmap (kbd "C-c C-l") 'org-insert-link)
-        (make-local-variable 'minor-mode-overriding-map-alist)
-        (push `(lsp-mode . ,newmap) minor-mode-overriding-map-alist)))
+      (defun pokemacs-org-mode-hook ()
+        (let ((oldmap (cdr (assoc 'lsp-mode minor-mode-map-alist)))
+              (newmap (make-sparse-keymap)))
+          (set-keymap-parent newmap oldmap)
+          (define-key newmap (kbd "C-c C-l") 'org-insert-link)
+          (make-local-variable 'minor-mode-overriding-map-alist)
+          (push `(lsp-mode . ,newmap) minor-mode-overriding-map-alist)))
 
-    (setq org-list-allow-alphabetical t)
-    ;; If you don't want the agenda in french you can comment the following
-    ;; expression. You can even set it to your preferred language
-    ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
-    (setq calendar-week-start-day 1
-          calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
-                                   "Jeudi" "Vendredi" "Samedi"]
-          calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
-                                     "Juin" "Juillet" "Août" "Septembre"
-                                     "Octobre" "Novembre" "Décembre"])
+      (setq org-list-allow-alphabetical t)
+      ;; If you don't want the agenda in french you can comment the following
+      ;; expression. You can even set it to your preferred language
+      ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
+      (setq calendar-week-start-day 1
+            calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
+                                     "Jeudi" "Vendredi" "Samedi"]
+            calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
+                                       "Juin" "Juillet" "Août" "Septembre"
+                                       "Octobre" "Novembre" "Décembre"])
 
-    (defun pokemacs-org-compile-latex-and-update-other-buffer ()
-      "Has as a premise that it's run from an org-mode buffer and the
-                 other buffer already has the PDF open"
-      (interactive)
-      (org-latex-export-to-pdf)
-      (pokemacs-update-other-buffer))
-    :custom
-    ;; Change this value to point to where your org files are
-    (org-directory "~/org/")
-    ;; Babel
-    (org-confirm-babel-evaluate nil)
-    (org-insert-heading-respect-content nil)
-    (org-special-ctrl-a/e t)
-    (org-src-fontify-natively t)
-    (org-src-tab-acts-natively t)
-    (org-hide-block-startup t)
-    ;; Rest
-    (org-ellipsis " ▾")
-    (org-startup-indented t)
-    (org-adapt-indentation nil)
-    (org-agenda-span 'week)
-    (org-agenda-start-day "1d")
-    (org-agenda-start-on-weekday nil)
-    (org-agenda-start-with-log-mode t)
-    (org-cycle-separator-lines -1)
-    (org-fontify-done-headline t)
-    (org-footnote-auto-adjust t)
-    (org-hide-emphasis-markers t)
-    (org-hide-leading-stars nil)
-    (org-hide-macro-markers t)
-    (org-image-actual-width '(300))
-    (org-image-align 'center)
-    (org-latex-compiler "latexmk")
-    (org-log-done 'time)
-    (org-odd-levels-only nil)
-    (org-pretty-entities t)
-    (org-src-fontify-natively t)
-    (org-src-tab-acts-natively t)
-    (org-startup-truncated nil)
-    (org-startup-with-inline-images t)
-    (org-support-shift-select 'always)
-    (org-roam-v2-ack t) ; anonying startup message
+      (defun pokemacs-org-compile-latex-and-update-other-buffer ()
+        "Has as a premise that it's run from an org-mode buffer and the
+                   other buffer already has the PDF open"
+        (interactive)
+        (org-latex-export-to-pdf)
+        (pokemacs-update-other-buffer))
+      :custom
+      ;; Change this value to point to where your org files are
+      (org-directory "~/org/")
+      ;; Babel
+      (org-confirm-babel-evaluate nil)
+      (org-insert-heading-respect-content nil)
+      (org-special-ctrl-a/e t)
+      (org-src-fontify-natively t)
+      (org-src-tab-acts-natively t)
+      (org-hide-block-startup t)
+      ;; Rest
+      (org-ellipsis " ▾")
+      (org-startup-indented t)
+      (org-adapt-indentation nil)
+      (org-agenda-span 'week)
+      (org-agenda-start-day "1d")
+      (org-agenda-start-on-weekday nil)
+      (org-agenda-start-with-log-mode t)
+      (org-cycle-separator-lines -1)
+      (org-fontify-done-headline t)
+      (org-footnote-auto-adjust t)
+      (org-hide-emphasis-markers t)
+      (org-hide-leading-stars nil)
+      (org-hide-macro-markers t)
+      (org-image-actual-width '(300))
+      (org-image-align 'center)
+      (org-latex-compiler "latexmk")
+      (org-log-done 'time)
+      (org-odd-levels-only nil)
+      (org-pretty-entities t)
+      (org-src-fontify-natively t)
+      (org-src-tab-acts-natively t)
+      (org-startup-truncated nil)
+      (org-startup-with-inline-images t)
+      (org-support-shift-select 'always)
+      (org-roam-v2-ack t) ; anonying startup message
 
-    :config
-    ;; TODO states
-    (setq org-todo-keywords
-          '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
-            ))
-    (define-prefix-command 'pokemacs-org-map nil "Org-")
-    (defun transform-square-brackets-to-round-ones(string-to-transform)
-      "Transforms [ into ( and ] into ), other chars left unchanged."
-      (concat
-       (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform)))
-    (customize-set-value 'org-latex-with-hyperref nil)
-    (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
-    (setq org-image-actual-width nil)
-    (defun org-mode-<>-syntax-fix (start end)
-      "Change syntax of characters ?< and ?> to symbol within source code blocks."
-      (let ((case-fold-search t))
-        (when (eq major-mode 'org-mode)
-          (save-excursion
-            (goto-char start)
-            (while (re-search-forward "<\\|>" end t)
-              (when (save-excursion
-                      (and
-                       (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
-                       (string-equal (downcase (match-string 1)) "begin")))
-                ;; This is a < or > in an org-src block
-                (put-text-property (point) (1- (point))
-                                   'syntax-table (string-to-syntax "_"))))))))
+      :config
+      ;; TODO states
+      (setq org-todo-keywords
+            '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
+              ))
+      (define-prefix-command 'pokemacs-org-map nil "Org-")
+      (defun transform-square-brackets-to-round-ones(string-to-transform)
+        "Transforms [ into ( and ] into ), other chars left unchanged."
+        (concat
+         (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform)))
+      (customize-set-value 'org-latex-with-hyperref nil)
+      (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
+      (setq org-image-actual-width nil)
+      (defun org-mode-<>-syntax-fix (start end)
+        "Change syntax of characters ?< and ?> to symbol within source code blocks."
+        (let ((case-fold-search t))
+          (when (eq major-mode 'org-mode)
+            (save-excursion
+              (goto-char start)
+              (while (re-search-forward "<\\|>" end t)
+                (when (save-excursion
+                        (and
+                         (re-search-backward "[[:space:]]*#\\+\\(begin\\|end\\)_src\\_>" nil t)
+                         (string-equal (downcase (match-string 1)) "begin")))
+                  ;; This is a < or > in an org-src block
+                  (put-text-property (point) (1- (point))
+                                     'syntax-table (string-to-syntax "_"))))))))
 
-    (defun org-setup-<>-syntax-fix ()
-      "Setup for characters ?< and ?> in source code blocks.
-              Add this function to `org-mode-hook'."
-      (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
-      (syntax-propertize (point-max)))
+      (defun org-setup-<>-syntax-fix ()
+        "Setup for characters ?< and ?> in source code blocks.
+                Add this function to `org-mode-hook'."
+        (setq syntax-propertize-function 'org-mode-<>-syntax-fix)
+        (syntax-propertize (point-max)))
 
-    (add-hook 'org-mode-hook #'org-setup-<>-syntax-fix)
+      (add-hook 'org-mode-hook #'org-setup-<>-syntax-fix)
 
-    (setq org-agenda-custom-commands
-          '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
-             ((org-agenda-span 'month)
-              (org-agenda-show-all-dates nil)))))
-    (calendar-set-date-style 'iso)
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '(
-       (emacs-lisp . t)
-       (latex . t)
-       (ocaml . t)
-       (racket . t)
-       (rust . t)
-       (shell . t)))
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (push '("- [ ]" . "") prettify-symbols-alist)
-                (push '("+ [ ]" . "") prettify-symbols-alist)
-                (push '("* [ ]" . "") prettify-symbols-alist)
-                (push '("- [X]" . "") prettify-symbols-alist)
-                (push '("+ [X]" . "") prettify-symbols-alist)
-                (push '("* [X]" . "") prettify-symbols-alist)
-                (push '("- [-]" . "") prettify-symbols-alist)
-                (push '("+ [-]" . "") prettify-symbols-alist)
-                (push '("* [-]" . "") prettify-symbols-alist)
-                (prettify-symbols-mode)))
-    (setq org-capture-templates
-          `(
-            ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-             "* TODO %?\n  %u\n  %a")
-            ("s" "Scheduled" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-             "* TODO %?\n SCHEDULED: %^t \n %a")
-            ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-             "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-            ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-             "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
-    (message "`org-mode' loaded"))
+      (setq org-agenda-custom-commands
+            '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
+               ((org-agenda-span 'month)
+                (org-agenda-show-all-dates nil)))))
+      (calendar-set-date-style 'iso)
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '(
+         (emacs-lisp . t)
+         (latex . t)
+         (ocaml . t)
+         (racket . t)
+         (rust . t)
+         (shell . t)))
+      (add-hook 'org-mode-hook
+                (lambda ()
+                  (push '("- [ ]" . "") prettify-symbols-alist)
+                  (push '("+ [ ]" . "") prettify-symbols-alist)
+                  (push '("* [ ]" . "") prettify-symbols-alist)
+                  (push '("- [X]" . "") prettify-symbols-alist)
+                  (push '("+ [X]" . "") prettify-symbols-alist)
+                  (push '("* [X]" . "") prettify-symbols-alist)
+                  (push '("- [-]" . "") prettify-symbols-alist)
+                  (push '("+ [-]" . "") prettify-symbols-alist)
+                  (push '("* [-]" . "") prettify-symbols-alist)
+                  (prettify-symbols-mode)))
+      (setq org-capture-templates
+            `(
+              ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+               "* TODO %?\n  %u\n  %a")
+              ("s" "Scheduled" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+               "* TODO %?\n SCHEDULED: %^t \n %a")
+              ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+               "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+              ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+               "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
+      (message "`org-mode' loaded"))
 
-  ;; (require 'org-protocol)
+    ;; (require 'org-protocol)
 #+end_src
 
 ** [[https://github.com/minad/org-modern][Org modern]]
@@ -4135,6 +4189,37 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     (message "`corfu-precient' loaded"))
 #+end_src
 
+*** [[https://codeberg.org/akib/emacs-corfu-terminal][Corfu terminal]]
+:PROPERTIES:
+:CUSTOM_ID: corfu-terminal
+:END:
+
+This should be removed when childframes are implemented in terminal Emacs
+
+#+begin_src emacs-lisp
+  (use-package corfu-terminal
+    :unless (display-graphic-p)
+    :ensure (corfu-terminal :type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
+    :init (corfu-terminal-mode +1))
+#+end_src
+
+*** [[https://codeberg.org/akib/emacs-corfu-doc-terminal][Corfu doc terminal]]
+:PROPERTIES:
+:CUSTOM_ID: corfu-doc-terminal
+:END:
+
+This should be removed when childframes are implemented in terminal Emacs
+Need to fork this repo to make it work with the new corfu-popupinfo
+
+#+begin_src emacs-lisp
+  (use-package corfu-doc-terminal
+    :disabled
+    :unless (display-graphic-p)
+    :ensure (corfu-doc-terminal :type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
+    :config (corfu-doc-terminal-mode +1))
+#+end_src
+
+
 *** Kind-icon
 :PROPERTIES:
 :CUSTOM_ID: kind-icon
@@ -4142,7 +4227,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package kind-icon
-    :disabled t
+    :disabled
     :after corfu
     :custom
     (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
@@ -4479,59 +4564,6 @@ Useful informations added in the minibuffer options
 :PROPERTIES:
 :CUSTOM_ID: gui
 :END:
-
-** Themes etc
-:PROPERTIES:
-:CUSTOM_ID: themes-etc
-:END:
-
-*** Swap between dark/light themes
-:PROPERTIES:
-:CUSTOM_ID: swap-between-darklight-themes
-:END:
-
-#+begin_src emacs-lisp
-  (defun pokemacs-get-current-theme ()
-    (if pokemacs-dark-theme-p
-        pokemacs-dark-theme
-      pokemacs-light-theme))
-
-  (defun pokemacs-load-theme ()
-    (consult-theme (pokemacs-get-current-theme)))
-
-  (defun pokemacs-toggle-dark-light-theme ()
-    (interactive)
-    (setq pokemacs-dark-theme-p (not pokemacs-dark-theme-p))
-    (pokemacs-load-theme))
-#+end_src
-
-*** [[https://github.com/doomemacs/themes][Doom theme]]
-:PROPERTIES:
-:CUSTOM_ID: doom-theme
-:END:
-
-Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/screenshots][here]].
-
-#+begin_src emacs-lisp
-  (use-package doom-themes
-    :demand t
-    :config
-    ;; Global settings (defaults)
-    (load-theme (pokemacs-get-current-theme) t)
-
-    ;; Enable flashing mode-line on errors
-    (doom-themes-visual-bell-config)
-
-    ;; Enable custom neotree theme (all-the-icons must be installed!)
-    ;; (doom-themes-neotree-config)
-    ;; or for treemacs users
-    (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-    (doom-themes-treemacs-config)
-
-    ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config)
-    (message "`doom-themes' loaded"))
-#+end_src
 
 ** Mode-line
 :PROPERTIES:
@@ -4896,6 +4928,7 @@ Will pulse when the focus changes to show where the cursor is.
       (dashboard-center-content t)
       (dashboard-set-heading-icons t)
       (dashboard-icon-type (if use-all-the-icons 'all-the-icons 'nerd-icons))
+      (dashboard-display-icons-p (if use-all-the-icons nil t))
       (dashboard-set-file-icons t)
       (dashboard-items '((recents  . 5)
                          (bookmarks . 5)
