@@ -120,7 +120,7 @@
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
  `(mode-line-inactive ((nil ,@tuple-mono-font)))
- `(region                ((t (:extend t :background ,(doom-color 'base2)
+ `(region                ((t (:extend t :background ,(doom-color 'base5)
                                       :distant-foreground ,(doom-color 'base4)))))
  '(secondary-selection   ((t (:inherit region))))
  `(show-paren-match      ((t (:inherit region :background ,(doom-color 'base2)
