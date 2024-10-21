@@ -416,7 +416,7 @@ This is a list of custom variables that allow to enable/disable features. If you
 
   (defcustom use-god nil
     "If non-nil, uses the god (mode) packages.
-  Similar to Vim's separation of command/insert modes"
+    Similar to Vim's separation of command/insert modes"
     :group 'pokemacs-packages
     :type 'boolean
     :tag " God Mode")
@@ -551,14 +551,14 @@ This is a list of custom variables that allow to enable/disable features. If you
 
   (defcustom use-rainbow nil
     "If non-nil, don't be @thriim.
-  Rainbowify parentheses and other things."
+    Rainbowify parentheses and other things."
     :group 'pokemacs-appearance
     :type 'boolean
     :tag "󱃗 Rainbows")
 
   (defcustom use-solaire t
     "If non-nil, uses the solaire package.
-  Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
+    Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
     :group 'pokemacs-appearance
     :type 'boolean
     :tag " Solaire")
@@ -578,7 +578,7 @@ This is a list of custom variables that allow to enable/disable features. If you
 
   (defcustom pokemacs-dict "en-GB"
     "Dictionary language.
-  Specify the chosen language used by spell checking tools in pokemacs."
+    Specify the chosen language used by spell checking tools in pokemacs."
     :group 'pokemacs-dictionaries
     :type '(choice (const :tag "en-GB"   "en-GB")
                    (const :tag "en-US"   "en-US")
@@ -605,7 +605,14 @@ This is a list of custom variables that allow to enable/disable features. If you
       pokemacs-light-theme))
 
   (defun pokemacs-load-theme ()
-    (consult-theme (pokemacs-get-current-theme)))
+    (load-theme (pokemacs-get-current-theme) t)
+    (custom-set-faces
+     `(show-paren-match
+       ((t (:inherit region :background ,(doom-color 'base3)
+                     :weight unspecified :foreground unspecified))))
+     `(show-paren-mismatch
+       ((t (:foreground unspecified :weight unspecified
+                        :background ,(doom-color 'warning)))))))
 
   (defun pokemacs-toggle-dark-light-theme ()
     (interactive)
@@ -626,7 +633,6 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
     :config
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
-    (load-theme (pokemacs-get-current-theme) t)
     ;; Enable custom neotree theme (all-the-icons must be installed!)
     ;; (doom-themes-neotree-config)
     ;; or for treemacs users
@@ -662,7 +668,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
 #+begin_src emacs-lisp
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file 'noerror)
-  (load-theme (pokemacs-get-current-theme) t)
+  (pokemacs-load-theme)
 #+end_src
 
 ** Maximize and fullscreen at start-up

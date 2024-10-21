@@ -45,7 +45,8 @@
  '(pokemacs-dict "en-GB")
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-repeat-timeout 0.5)
- '(pokemacs-theme 'doom-solarized-dark t)
+ '(pokemacs-dark-theme 'doom-solarized-dark t)
+ '(pokemacs-light-theme 'doom-solarized-light t)
  '(pokemacs-variable-font "Iosevka Aile" t)
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down
@@ -120,13 +121,6 @@
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
  `(mode-line-inactive ((nil ,@tuple-mono-font)))
- `(region                ((t (:extend t :background ,(doom-color 'base5)
-                                      :distant-foreground ,(doom-color 'base4)))))
- '(secondary-selection   ((t (:inherit region))))
- `(show-paren-match      ((t (:inherit region :background ,(doom-color 'base2)
-                                       :weight unspecified :foreground unspecified))))
- `(show-paren-mismatch   ((t (:foreground unspecified :weight unspecified
-                                          :background ,(doom-color 'warning)))))
  `(variable-pitch ((t (,@tuple-variable-font :weight light :height 1.3)))))
 
 (provide 'custom)
