@@ -626,7 +626,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
     :config
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
-
+    (load-theme (pokemacs-get-current-theme) t)
     ;; Enable custom neotree theme (all-the-icons must be installed!)
     ;; (doom-themes-neotree-config)
     ;; or for treemacs users

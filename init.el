@@ -303,7 +303,7 @@ Specify the chosen language used by spell checking tools in pokemacs."
   :config
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-
+  (load-theme (pokemacs-get-current-theme) t)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   ;; (doom-themes-neotree-config)
   ;; or for treemacs users
