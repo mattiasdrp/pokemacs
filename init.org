@@ -624,9 +624,6 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
   (use-package doom-themes
     :demand t
     :config
-    ;; Global settings (defaults)
-    (load-theme (pokemacs-get-current-theme) t)
-
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
 
@@ -665,6 +662,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
 #+begin_src emacs-lisp
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (load custom-file 'noerror)
+  (load-theme (pokemacs-get-current-theme) t)
 #+end_src
 
 ** Maximize and fullscreen at start-up

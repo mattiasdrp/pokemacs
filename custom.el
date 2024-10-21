@@ -51,8 +51,8 @@
    '((projectile-project-root-functions projectile-root-top-down
                                         projectile-root-bottom-up
                                         projectile-root-top-down-recurring)))
- '(show-paren-style 'expression)
  '(show-paren-priority -50)
+ '(show-paren-style 'expression)
  '(tuple-mono-font
    (if (window-system)
        (cond ((x-list-fonts pokemacs-mono-font) `(:font ,pokemacs-mono-font))
@@ -106,7 +106,7 @@
  '(use-visual-fill t)
  '(use-web t)
  '(use-window-purpose nil)
- '(warning-suppress-types '((treesit) (comp)))
+ '(warning-suppress-types '((flycheck syntax-checker) (treesit) (comp)))
  '(x-stretch-cursor nil))
 
 (custom-set-faces

@@ -301,9 +301,6 @@ Specify the chosen language used by spell checking tools in pokemacs."
 (use-package doom-themes
   :demand t
   :config
-  ;; Global settings (defaults)
-  (load-theme (pokemacs-get-current-theme) t)
-
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
 
@@ -323,6 +320,7 @@ Specify the chosen language used by spell checking tools in pokemacs."
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror)
+(load-theme (pokemacs-get-current-theme) t)
 
 (when use-maximize
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
