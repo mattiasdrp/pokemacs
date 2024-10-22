@@ -722,10 +722,11 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package general
   :demand t
   :init
+  (if (display-graphic-p)
+      (general-unbind "C-z"))
   (general-unbind
     "C-o"
     "C-f"
-    "C-z"
     "C-x C-z"
     "M-z"
     "M-m"
