@@ -290,15 +290,23 @@
       pokemacs-dark-theme
     pokemacs-light-theme))
 
-(defun pokemacs-load-theme ()
-  (load-theme (pokemacs-get-current-theme) t)
+(defun pokemacs--reface (&rest _)
   (custom-set-faces
+   `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
+   `(org-block-begin-line ((t)) t)
+   `(org-block-end-line ((t :foreground unspecified :background unspecified)))
    `(show-paren-match
      ((t (:inherit region :background ,(doom-color 'base3)
                    :weight unspecified :foreground unspecified))))
    `(show-paren-mismatch
      ((t (:foreground unspecified :weight unspecified
                       :background ,(doom-color 'warning)))))))
+
+(defun pokemacs-load-theme ()
+  (load-theme (pokemacs-get-current-theme) t)
+  (pokemacs--reface))
+
+(advice-add #'consult-theme :after #'pokemacs--reface)
 
 (defun pokemacs-toggle-dark-light-theme ()
   (interactive)
@@ -1616,10 +1624,9 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`org-super-agenda' loaded"))
 
 (use-package org-appear
-  :disabled
   :after org
   :ensure (org-appear :host github :repo "awth13/org-appear" :branch "org-9.7-fixes")
-  :hook (org-mode . org-appear-mode)
+  :hook (org-mode . (lambda () (org-appear-mode 1)))
   :config
   (setq org-appear-autolinks t)
   (setq org-appear-autoemphasis t)
