@@ -1759,14 +1759,9 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package lsp-mode
   :init
-  (defun minad/orderless-dispatch-prefixes-first (_pattern index _total)
-    (and (eq index 0) 'orderless-prefixes))
-
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless)))
-
-  (add-hook 'orderless-style-dispatchers #'minad/orderless-dispatch-prefixes-first)
   (setq-local completion-at-point-functions
               (list (cape-capf-buster #'lsp-completion-at-point)))
   (defconst pokemacs-lsp-mode-breadcrumb-segments
@@ -2874,7 +2869,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package orderless
   :custom
-  (completion-styles '(substring orderless basic))
+  (completion-styles '(orderless basic))
   (orderless-matching-styles '(orderless-prefixes))
   (orderless-component-separator 'orderless-escapable-split-on-space)
   (read-file-name-completion-ignore-case t)
