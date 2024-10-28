@@ -2281,6 +2281,7 @@ with a prefix ARG."
       (if (window-full-width-p)
           (progn
             (global-visual-fill-column-mode 1)
+            (setq mode-line-right-align-edge 'window)
             (set-window-fringes (selected-window) 8 8 nil nil))
         (global-visual-fill-column-mode -1)))
 
@@ -2975,6 +2976,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)
   (message "`anzu' loaded"))
 
+(defcustom pokemacs-mode-line-right-align 'right-fringe
+  "See https://github.com/seagle0128/doom-modeline/issues/672.
+   Original value is 'window"
+  :group 'pokemacs-appearance
+  :type 'symbol
+  :tag " Modeline")
+
 (use-package doom-modeline
   :demand t
   :init
@@ -2985,6 +2993,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (setq doom-modeline-support-imenu t)
   ;; I don't care about the percentage position of the cursor
   (setq mode-line-percent-position nil)
+  (setq mode-line-right-align-edge pokemacs-mode-line-right-align)
   :custom
 
   ;; Whether to use hud instead of default bar. It's only respected in GUI.

@@ -47,6 +47,7 @@
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-dark-theme 'doom-solarized-dark t)
  '(pokemacs-light-theme 'doom-solarized-light t)
+ '(pokemacs-mode-line-right-align 'right-fringe t)
  '(pokemacs-variable-font "Iosevka Aile" t)
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down
