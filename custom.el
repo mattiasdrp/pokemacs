@@ -53,6 +53,7 @@
    '((projectile-project-root-functions projectile-root-top-down
                                         projectile-root-bottom-up
                                         projectile-root-top-down-recurring)))
+ '(sh-basic-offset 2)
  '(show-paren-priority -50)
  '(show-paren-style 'expression)
  '(tuple-mono-font

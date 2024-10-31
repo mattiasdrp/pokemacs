@@ -1927,6 +1927,11 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package apheleia
   :init (apheleia-global-mode +1)
   :config
+  (let*
+      ((shfmt-value (alist-get 'shfmt apheleia-formatters))
+       (command (pop shfmt-value))
+       (shfmt-value (cons command (cons "-sr" shfmt-value))))
+    (setf (alist-get 'shfmt apheleia-formatters) shfmt-value))
   (setf (alist-get 'isort apheleia-formatters)
         '("isort" "--stdout" "-"))
   (setf (alist-get 'python-mode apheleia-mode-alist)
