@@ -1813,8 +1813,7 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-enable-imenu nil)
   (lsp-enable-snippet nil)
   (lsp-enable-dap-auto-configure nil)
-  (lsp-disabled-clients '((python-mode . pyls)))
-
+  (lsp-disabled-clients '((python-mode . pyls) (python-ts-mode . pyls)))
   ;; Rust-analyzer is the almost official lsp server for Rust
   (lsp-rust-server 'rust-analyzer)
   (lsp-rust-analyzer-cargo-watch-command "clippy")
@@ -1926,23 +1925,13 @@ debian, and derivatives). On most it's 'fd'.")
   (prog-mode . pokemacs-clear-compilation-finish-functions))
 
 (use-package apheleia
-  :hook
-  (c-mode        . apheleia-mode)
-  (c++-mode      . apheleia-mode)
-  (caml-mode     . apheleia-mode)
-  (elm-mode      . apheleia-mode)
-  (java-mode     . apheleia-mode)
-  (fsharp-mode   . apheleia-mode)
-  (kotlin-mode   . apheleia-mode)
-  (python-mode   . apheleia-mode)
-  (enh-ruby-mode . apheleia-mode)
-  (rustic-mode   . apheleia-mode)
-  (rust-ts-mode  . apheleia-mode)
-  (tuareg-mode   . apheleia-mode)
+  :init (apheleia-global-mode +1)
   :config
   (setf (alist-get 'isort apheleia-formatters)
         '("isort" "--stdout" "-"))
   (setf (alist-get 'python-mode apheleia-mode-alist)
+        '(isort black))
+  (setf (alist-get 'python-ts-mode apheleia-mode-alist)
         '(isort black))
   (push '(enh-ruby-mode . rubocop) apheleia-mode-alist)
   (message "`apheleia' loaded"))
@@ -3336,7 +3325,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :ensure (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
   :hook
   (tuareg-mode . ts-fold-mode)
-  (c-mode    . ts-fold-mode)
+  (c-mode      . ts-fold-mode)
   (c++-mode    . ts-fold-mode)
   (python-mode . ts-fold-mode)
   (rustic-mode . ts-fold-mode)
@@ -3356,6 +3345,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`ts-fold-indicators' loaded"))
 
 (use-package combobulate
+  :disabled
   :after treesit
   :preface
   ;; You can customize Combobulate's key prefix here.
@@ -3989,7 +3979,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (when use-python
   (use-package python
     :ensure nil
-    :hook (python-mode . semantic-mode)
+    :hook (python-ts-mode . semantic-mode)
     :config
     ;; Remove guess indent python message
     (setq python-indent-guess-indent-offset-verbose nil)
@@ -4010,7 +4000,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-python
   (use-package pyvenv
-    :hook (python-mode . pyvenv-mode)
+    :hook (python-ts-mode . pyvenv-mode)
     :config
     ;; Setting work on to easily switch between environments
     (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs/"))
@@ -4024,7 +4014,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (when use-python
   (use-package lsp-pyright
     :after (python lsp-mode)
-    :hook (python-mode . (lambda ()
+    :hook (python-ts-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp-deferred)))
     :config
