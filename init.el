@@ -125,6 +125,12 @@
   :type 'boolean
   :tag " Magit todos")
 
+(defcustom use-mu4e nil
+  "If non-nil, use mu4e and smtpmail."
+  :group 'pokemacs-packages
+  :type 'boolean
+  :tag " Mu4e")
+
 (defcustom use-org-agenda-startup nil
   "Start the org agenda at startup."
   :group 'pokemacs-packages

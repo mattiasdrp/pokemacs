@@ -92,6 +92,7 @@
  '(use-markdown t)
  '(use-maximize t)
  '(use-michelson nil)
+ '(use-mu4e nil)
  '(use-ocaml t)
  '(use-org-agenda-startup nil)
  '(use-org-roam t)
