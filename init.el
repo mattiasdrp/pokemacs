@@ -285,22 +285,37 @@
                  (string :tag "Other"))
   :tag " Dictionary")
 
+(setq user-init-file (or load-file-name (buffer-file-name)))
+(setq user-emacs-directory (file-name-directory user-init-file))
+
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file 'noerror)
+
 (defun pokemacs-get-current-theme ()
   (if pokemacs-dark-theme-p
       pokemacs-dark-theme
     pokemacs-light-theme))
 
+(defun reface-p (face)
+  ;; saved-face is nil if the face hasn't been customized
+  (message "reface %S is %S" face (get face 'saved-face))
+  (not (get face 'saved-face)))
+
 (defun pokemacs--reface (&rest _)
   (custom-set-faces
    `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
    `(org-block-begin-line ((t)) t)
-   `(org-block-end-line ((t :foreground unspecified :background unspecified)))
-   `(show-paren-match
-     ((t (:inherit region :background ,(doom-color 'base3)
-                   :weight unspecified :foreground unspecified))))
-   `(show-paren-mismatch
-     ((t (:foreground unspecified :weight unspecified
-                      :background ,(doom-color 'warning)))))))
+   `(org-block-end-line ((t :foreground unspecified :background unspecified))))
+  (if (reface-p 'show-paren-match)
+      (custom-set-faces
+       `(show-paren-match
+         ((t (:inherit region :background ,(doom-color 'base3)
+                       :weight unspecified :foreground unspecified))))))
+  (if (reface-p 'show-paren-mismatch)
+      (custom-set-faces
+       `(show-paren-mismatch
+         ((t (:foreground unspecified :weight unspecified
+                          :background ,(doom-color 'warning))))))))
 
 (defun pokemacs-load-theme ()
   (load-theme (pokemacs-get-current-theme) t)
@@ -326,15 +341,9 @@
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
+  (pokemacs-load-theme)
   (message "`doom-themes' loaded"))
 (elpaca-wait)
-
-(setq user-init-file (or load-file-name (buffer-file-name)))
-(setq user-emacs-directory (file-name-directory user-init-file))
-
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(load custom-file 'noerror)
-(pokemacs-load-theme)
 
 (when use-maximize
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
@@ -930,16 +939,16 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure nil
   :config
   (pretty-hydra-define
-   hydra-dates (:color teal :title "Dates" :quit-key "q")
-   ("Insert"
-    (("d" pokemacs-date-short "short")
-     ("i" pokemacs-date-iso "iso")
-     ("l" pokemacs-date-long "long"))
+    hydra-dates (:color teal :title "Dates" :quit-key "q")
+    ("Insert"
+     (("d" pokemacs-date-short "short")
+      ("i" pokemacs-date-iso "iso")
+      ("l" pokemacs-date-long "long"))
 
-    "Insert with time"
-    (("D" pokemacs-date-short-with-time "short")
-     ("I" pokemacs-date-iso-with-time "iso")
-     ("L" pokemacs-date-long-with-time "long")))))
+     "Insert with time"
+     (("D" pokemacs-date-short-with-time "short")
+      ("I" pokemacs-date-iso-with-time "iso")
+      ("L" pokemacs-date-long-with-time "long")))))
 
 (use-package keycast
   :commands keycast-mode
@@ -2347,6 +2356,7 @@ with a prefix ARG."
 
 (use-package vertico-multiform
   :after vertico
+  :hook (vertico-mode . vertico-multiform-mode)
   :ensure nil
   :custom
   (vertico-buffer-display-action '(display-buffer-in-side-window
@@ -2362,25 +2372,22 @@ with a prefix ARG."
     (nconc (vertico-sort-alpha (seq-remove (lambda (x) (string-suffix-p "/" x)) files))
            (vertico-sort-alpha (seq-filter (lambda (x) (string-suffix-p "/" x)) files))))
 
-  (setq vertico-multiform-categories
-    '((imenu buffer) (file (vertico-sort-function . sort-directories-first))
-      (corfu (vertico-sort-function . vertico-sort-alpha))
-      (jinx grid (vertico-grid-annotate . 20))
-      (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
-  (setq vertico-multiform-commands
-    '((consult-imenu buffer) (consult-line buffer) (execute-extended-command mouse)
-      (find-file (vertico-sort-function . sort-directories-first))
-      (insert-char (vertico-sort-function . sort-characters))
-      (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
   (when use-posframe
+    (mapcar (lambda (properties)
+              (setcdr properties (push 'posframe (cdr properties))))
+            vertico-multiform-commands)
+    (mapcar (lambda (properties) (setcdr properties (push 'posframe (cdr properties))))
+            vertico-multiform-categories)
+    (pokemacs-appendq! vertico-multiform-categories
+                       '((t posframe)))
     (pokemacs-appendq! vertico-multiform-commands
-                   '((posframe
-                      (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-                      (vertico-posframe-border-width . 10))
-                     (t posframe))))
+                       '((posframe
+                          (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+                          (vertico-posframe-border-width . 10))
+                         (t posframe))))
 
   (vertico-multiform-mode)
-  (message "`vertico-multiform loaded"))
+  (message "`vertico-multiform' loaded"))
 
 (when use-posframe
   (use-package vertico-posframe
@@ -2389,7 +2396,7 @@ with a prefix ARG."
     (vertico-posframe-width 80)
     :config
     (vertico-posframe-mode 1)
-    (message "`vertico-posframe loaded")))
+    (message "`vertico-posframe' loaded")))
 
 (use-package consult
   ;; Enable automatic preview at point in the *Completions* buffer. This is
