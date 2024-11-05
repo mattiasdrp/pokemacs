@@ -144,6 +144,10 @@ DOCSTRING and BODY are as in `defun'.
   (interactive)
   (visual-fill-column-mode -1)
   (setq middle-window (split-window-right))
+  (dotimes (_ (- pokemacs-columns 3))
+    (select-window middle-window)
+    (setq middle-window (split-window-right))
+    (balance-windows))
   (select-window middle-window)
   ;; Third window, start with magit
   (setq magit-window (split-window-right))

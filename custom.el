@@ -42,6 +42,7 @@
  '(magit-diff-refine-hunk 'all)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages nil)
+ '(pokemacs-columns 3)
  '(pokemacs-dict "en-GB")
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-repeat-timeout 0.5)

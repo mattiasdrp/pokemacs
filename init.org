@@ -497,6 +497,17 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'pokemacs
     :tag "Appearance")
 
+  (defcustom pokemacs-columns 3
+    "Number of columns for pokemacs-restore-session
+  The n-1 first columns are unlocked vertical columns
+  The last one is split in three locked horizontal windows:
+  - magit
+  - compilation
+  - lsp"
+    :group 'pokemacs-appearance
+    :type 'int
+    :tag " Layout")
+
   (defcustom pokemacs-mono-font "Fira Code"
     "Mono font."
     :group 'pokemacs-appearance
