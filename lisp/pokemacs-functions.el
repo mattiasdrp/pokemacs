@@ -139,6 +139,39 @@ DOCSTRING and BODY are as in `defun'.
         (add-hook 'post-command-hook #'exit-minibuffer nil t))
     (call-interactively #'customize-set-variable)))
 
+(defun pokemacs-restore-session ()
+  "TODO."
+  (interactive)
+  (visual-fill-column-mode -1)
+  (setq middle-window (split-window-right))
+  (select-window middle-window)
+  ;; Third window, start with magit
+  (setq magit-window (split-window-right))
+  (select-window magit-window)
+  (with-selected-window magit-window
+    (defvar magit-display-buffer-function)
+    (let ((magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
+      (magit-status-quick))
+    (general-def 'magit-mode-map "q" 'windmove-left)
+    ;; Lock after creating the magit buffer otherwise it's created in another window
+    (locked-window-buffer-mode))
+  ;; Fourth window below magit is the compilation window,
+  ;; create a buffer without compiling
+  (setq compilation-window (split-window-below))
+  (select-window compilation-window)
+  (set-window-buffer (selected-window) (get-buffer-create "*compilation*"))
+  (with-selected-window compilation-window
+    (locked-window-buffer-mode))
+  ;; Fifth window below compilation is the lsp-help window,
+  ;; create a buffer without calling lsp
+  (setq lsp-window (split-window-below))
+  (select-window lsp-window)
+  (set-window-buffer (selected-window) (get-buffer-create "*lsp-help*"))
+  (with-selected-window lsp-window
+    (locked-window-buffer-mode))
+  (select-window middle-window)
+  (balance-windows))
+
 (provide 'pokemacs-functions)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; pokemacs-functions.el ends here
