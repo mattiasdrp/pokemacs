@@ -19,7 +19,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(defvar elpaca-installer-version 0.7)
+(defvar elpaca-installer-version 0.8)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -36,18 +36,18 @@
     (make-directory repo t)
     (when (< emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
-        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
-                                                 ,@(when-let ((depth (plist-get order :depth)))
-                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
-                                                 ,(plist-get order :repo) ,repo))))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                                       (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                  ,@(when-let* ((depth (plist-get order :depth)))
+                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                  ,(plist-get order :repo) ,repo))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
             (progn (message "%s" (buffer-string)) (kill-buffer buffer))
           (error "%s" (with-current-buffer buffer (buffer-string))))
       ((error) (warn "%s" err) (delete-directory repo 'recursive))))
@@ -393,6 +393,7 @@
  kept-new-versions 6
  kept-old-versions 2
  version-control t
+ desktop-save-mode 1
  delete-by-moving-to-trash t)
 
 (setq-default
@@ -1044,6 +1045,122 @@ debian, and derivatives). On most it's 'fd'.")
   ((:color pink :quit-key "q")
    ("Doc"
     (("i" info-lookup-symbol "info lookup")))))
+
+(defun pokemacs-unpropertize-kill-ring ()
+  (setq kill-ring (mapcar 'substring-no-properties kill-ring)))
+
+(add-hook 'kill-emacs-hook #'pokemacs-unpropertize-kill-ring)
+
+(use-package emacs
+  :demand t
+  :ensure nil
+  :general
+  (:keymaps 'query-replace-map
+            "M-c" 'pokemacs-toggle-case
+            "c"   'pokemacs-toggle-case)
+  :config
+
+  ;; (defvar pokemacs-progress-reporter--pulse-characters ["a" "b" "c" "d"]
+  ;;   "Characters to use for pulsing progress reporters.")
+
+  ;; (defun progress-reporter-do-update (reporter value &optional suffix)
+  ;;   (let* ((parameters   (cdr reporter))
+  ;;          (update-time  (aref parameters 0))
+  ;;          (min-value    (aref parameters 1))
+  ;;          (max-value    (aref parameters 2))
+  ;;          (text         (aref parameters 3))
+  ;;          (enough-time-passed
+  ;;           ;; See if enough time has passed since the last update.
+  ;;           (or (not update-time)
+  ;;               (when (time-less-p update-time nil)
+  ;; 	              ;; Calculate time for the next update
+  ;; 	              (aset parameters 0 (+ update-time (aref parameters 5)))))))
+  ;;     (cond ((and min-value max-value)
+  ;;            ;; Numerical indicator
+  ;;            (let* ((one-percent (/ (- max-value min-value) 100.0))
+  ;; 	                (percentage  (if (= max-value min-value)
+  ;; 			                             0
+  ;; 			                           (truncate (/ (- value min-value)
+  ;; 				                                      one-percent)))))
+  ;;              ;; Calculate NEXT-UPDATE-VALUE.  If we are not printing
+  ;;              ;; message because not enough time has passed, use 1
+  ;;              ;; instead of MIN-CHANGE.  This makes delays between echo
+  ;;              ;; area updates closer to MIN-TIME.
+  ;;              (setcar reporter
+  ;; 	                   (min (+ min-value (* (+ percentage
+  ;; 				                                     (if enough-time-passed
+  ;; 					                                       ;; MIN-CHANGE
+  ;; 					                                       (aref parameters 4)
+  ;; 				                                       1))
+  ;; 				                                  one-percent))
+  ;; 		                      max-value))
+  ;;              (when (integerp value)
+  ;;                (setcar reporter (ceiling (car reporter))))
+  ;;              ;; Print message only if enough time has passed
+  ;;              (when enough-time-passed
+  ;;                (if suffix
+  ;;                    (aset parameters 6 suffix)
+  ;;                  (setq suffix (or (aref parameters 6) "")))
+  ;;                (if (> percentage 0)
+  ;;                    (message "%s%d%% %s" text percentage suffix)
+  ;;                  (message "%s %s" text suffix)))))
+  ;;           ;; Pulsing indicator
+  ;;           (enough-time-passed
+  ;;            (when (and value (not suffix))
+  ;;              (setq suffix value))
+  ;;            (if suffix
+  ;;                (aset parameters 6 suffix)
+  ;;              (setq suffix (or (aref parameters 6) "")))
+  ;;            (let* ((index (mod (1+ (car reporter)) 4))
+  ;;                   (message-log-max nil)
+  ;;                   (pulse-char (aref pokemacs-progress-reporter--pulse-characters
+  ;;                                     index)))
+  ;;              (setcar reporter index)
+  ;;              (message "%s %s %s" text pulse-char suffix))))))
+  ;; (defun test-progress ()
+  ;;   (interactive)
+  ;;   (let ((progress-reporter
+  ;;          (make-progress-reporter "Collecting mana for Emacs...")))
+  ;;     (dotimes (k 500)
+  ;;       (sit-for 0.01)
+  ;;       (progress-reporter-update progress-reporter k))
+  ;;     (progress-reporter-done progress-reporter)))
+  ;; use current region as first search
+  (defadvice isearch-mode (around isearch-mode-default-string (forward &optional regexp op-fun recursive-edit word-p) activate)
+    (if (and transient-mark-mode mark-active (not (eq (mark) (point))))
+        (progn
+          (isearch-update-ring (buffer-substring-no-properties (mark) (point)))
+          (deactivate-mark)
+          ad-do-it
+          (if (not forward)
+              (isearch-repeat-backward)
+            (goto-char (mark))
+            (isearch-repeat-forward)))
+      ad-do-it))
+  (defun pokemacs-toggle-case ()
+    (interactive)
+    (setq case-fold-search (not case-fold-search))
+    (message "toggled case-fold-search to %s" case-fold-search))
+  (defconst query-replace-help
+    "Type \\`SPC' or \\`y' to replace one match, Delete or \\`n' to skip to next,
+  \\`RET' or \\`q' to exit, Period to replace one match and exit,
+  \\`,' to replace but not move point immediately,
+  \\`C-r' to enter recursive edit (\\[exit-recursive-edit] to get out again),
+  \\`C-w' to delete match and recursive edit,
+  \\`C-l' to clear the screen, redisplay, and offer same replacement again,
+  \\`!' to replace all remaining matches in this buffer with no more questions,
+  \\`^' to move point back to previous match,
+  \\`u' to undo previous replacement,
+  \\`U' to undo all replacements,
+  \\`e' to edit the replacement string.
+  \\`E' to edit the replacement string with exact case.
+  In multi-buffer replacements type \\`Y' to replace all remaining
+  matches in all remaining buffers with no more questions,
+  \\`N' to skip to the next buffer without replacing remaining matches
+  in the current buffer.
+  \\`c' or \\`M-c' to toggle case sensitivity"
+    "Help message while in `query-replace'.")
+  (message "`emacs' config loaded"))
 
 (setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
 
@@ -2206,6 +2323,7 @@ with a prefix ARG."
   (message "`uniquify' loaded"))
 
 (use-package winner
+  :demand t
   :ensure nil
   :custom
   (winner-boring-buffers
@@ -2262,8 +2380,8 @@ with a prefix ARG."
                       'hydra-window/body)) "Swap"))
 
     "Resize"
-    (("C-<left>" (lambda () (interactive) (pokemacs-resize-window t 5)) "X←")
-     ("C-<right>" (lambda () (interactive) (pokemacs-resize-window t -5)) "X→")
+    (("C-<left>" (lambda () (interactive) (pokemacs-resize-window t -5)) "X←")
+     ("C-<right>" (lambda () (interactive) (pokemacs-resize-window t 5)) "X→")
      ("C-<up>" (lambda () (interactive) (pokemacs-resize-window nil 5)) "X↑")
      ("C-<down>" (lambda () (interactive) (pokemacs-resize-window nil -5)) "X↓"))
 
