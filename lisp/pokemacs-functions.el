@@ -140,9 +140,9 @@ DOCSTRING and BODY are as in `defun'.
     (call-interactively #'customize-set-variable)))
 
 (defun pokemacs-restore-session ()
-  "TODO."
+  "Restore a session by creating the proper buffers."
   (interactive)
-  (visual-fill-column-mode -1)
+  (when use-visual-fill (visual-fill-column-mode -1))
   (setq middle-window (split-window-right))
   (dotimes (_ (- pokemacs-columns 3))
     (select-window middle-window)
@@ -156,7 +156,6 @@ DOCSTRING and BODY are as in `defun'.
     (defvar magit-display-buffer-function)
     (let ((magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1))
       (magit-status-quick))
-    (general-def 'magit-mode-map "q" 'windmove-left)
     ;; Lock after creating the magit buffer otherwise it's created in another window
     (locked-window-buffer-mode))
   ;; Fourth window below magit is the compilation window,
