@@ -145,10 +145,10 @@ DOCSTRING and BODY are as in `defun'.
   (when use-visual-fill (visual-fill-column-mode -1))
   (setq columns-number (or columns pokemacs-columns))
   (setq current-prefix-arg nil)
-  (setq middle-window (split-window-right))
-  (dotimes (_ (- columns-number 3))
-    (select-window middle-window)
+  (setq middle-window (selected-window))
+  (dotimes (_ (- columns-number 2))
     (setq middle-window (split-window-right))
+    (select-window middle-window)
     (balance-windows))
   (select-window middle-window)
   ;; Third window, start with magit
