@@ -648,26 +648,36 @@ This is a list of custom variables that allow to enable/disable features. If you
         pokemacs-dark-theme
       pokemacs-light-theme))
 
-  (defun reface-p (face)
+  (setq reface-list nil)
+
+  (defun fill-reface-list (face)
     ;; saved-face is nil if the face hasn't been customized
     (message "reface %S is %S" face (get face 'saved-face))
-    (not (get face 'saved-face)))
+    (unless (get face 'saved-face)
+      (add-to-list 'reface-list face)))
+
+  (fill-reface-list 'show-paren-match)
+  (fill-reface-list 'show-paren-mismatch)
+
+  (defun reface-p (face)
+    (member face reface-list))
 
   (defun pokemacs--reface (&rest _)
     (custom-set-faces
      `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
      `(org-block-begin-line ((t)) t)
      `(org-block-end-line ((t :foreground unspecified :background unspecified))))
-    (if (reface-p 'show-paren-match)
-        (custom-set-faces
-         `(show-paren-match
-           ((t (:inherit region :background ,(doom-color 'base3)
-                         :weight unspecified :foreground unspecified))))))
-    (if (reface-p 'show-paren-mismatch)
-        (custom-set-faces
-         `(show-paren-mismatch
-           ((t (:foreground unspecified :weight unspecified
-                            :background ,(doom-color 'warning))))))))
+    (when (reface-p 'show-paren-match)
+      (message "reface show paren match")
+      (custom-set-faces
+       `(show-paren-match
+         ((t (:inherit region :background ,(doom-color 'base3)
+                       :weight unspecified :foreground unspecified))))))
+    (when (reface-p 'show-paren-mismatch)
+      (custom-set-faces
+       `(show-paren-mismatch
+         ((t (:foreground unspecified :weight unspecified
+                          :background ,(doom-color 'warning))))))))
 
   (defun pokemacs-load-theme ()
     (load-theme (pokemacs-get-current-theme) t)

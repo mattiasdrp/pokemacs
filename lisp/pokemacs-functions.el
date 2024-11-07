@@ -139,12 +139,14 @@ DOCSTRING and BODY are as in `defun'.
         (add-hook 'post-command-hook #'exit-minibuffer nil t))
     (call-interactively #'customize-set-variable)))
 
-(defun pokemacs-restore-session ()
+(defun pokemacs-restore-session (&optional columns)
   "Restore a session by creating the proper buffers."
-  (interactive)
+  (interactive "P")
   (when use-visual-fill (visual-fill-column-mode -1))
+  (setq columns-number (or columns pokemacs-columns))
+  (setq current-prefix-arg nil)
   (setq middle-window (split-window-right))
-  (dotimes (_ (- pokemacs-columns 3))
+  (dotimes (_ (- columns-number 3))
     (select-window middle-window)
     (setq middle-window (split-window-right))
     (balance-windows))
