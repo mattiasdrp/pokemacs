@@ -95,7 +95,8 @@
   :tag "Packages")
 
 (defcustom use-dashboard nil
-  "If non-nil, uses the dashboard packages."
+  "If non-nil, uses the dashboard packages.
+This package greets you with a nice startup screen"
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰕮 Dashboard")
@@ -107,68 +108,76 @@
   :tag "󰲋 Emacs Application Framework")
 
 (defcustom use-gcal nil
-  "If non-nil, uses the org-gcal package."
+  "If non-nil, uses the org-gcal package.
+This package is used to link google calendars to org agendas.
+This is way too emacsy for most people"
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Org Google Calendar")
 
 (defcustom use-god nil
   "If non-nil, uses the god (mode) packages.
-  Similar to Vim's separation of command/insert modes"
+Similar to Vim's separation of command/insert modes"
   :group 'pokemacs-packages
   :type 'boolean
   :tag " God Mode")
 
 (defcustom use-magit-todos nil
-  "If non-nil, show todos in the current project in magit buffer."
+  "If non-nil, show todos in the current project in magit buffer.
+If your project contains a lot of todos you may want to disable this package."
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Magit todos")
 
 (defcustom use-mu4e nil
-  "If non-nil, use mu4e and smtpmail."
+  "If non-nil, use mu4e and smtpmail.
+Reading your emails in emacs, what else?"
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Mu4e")
 
 (defcustom use-org-agenda-startup nil
-  "Start the org agenda at startup."
+  "Start the org agenda at startup.
+If you don't live the org life you don't need it.
+But you don't live the org life.
+That's on you."
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Org Agenda")
 
 (defcustom use-org-roam nil
-  "If non-nil, uses Org roam."
+  "If non-nil, uses Org roam.
+The Zettelkasten method.
+In emacs.
+With org-mode."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰠮 Zettelkasten/Org Roam")
 
 (defcustom use-pandoc nil
-  "If non-nil, uses the pandoc packages."
+  "If non-nil, uses the pandoc packages.
+You know, for markdown. Because you don't use org-mode."
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Pandoc")
 
 (defcustom use-posframe nil
-  "If non-nil, uses the vertico-posframe packages."
+  "If non-nil, uses the vertico-posframe packages.
+Instead of displaying candidate menus in the minibuffer display them in a fancy posframe."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰹉 Posframe")
 
-(defcustom use-spotify nil
-  "If non-nil, uses the spotify packages."
-  :group 'pokemacs-packages
-  :type 'boolean
-  :tag " Spotify")
-
 (defcustom use-treemacs nil
-  "If non-nil, uses the treemacs packages."
+  "If non-nil, uses the treemacs packages.
+Some people want vscode in their emacs. Don't gate-keep, give them their big tree."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰙅 Treemacs")
 
 (defcustom use-window-purpose nil
-  "If non-nil, uses the window-purpose package."
+  "If non-nil, uses the window-purpose package.
+Give windows a 'purpose' to prevent them from being populated by buffers that don't have the same purpose."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰡃 Window Purpose")
@@ -195,38 +204,40 @@
 
 (defcustom pokemacs-columns 3
   "Number of columns for pokemacs-restore-session
-The n-1 first columns are unlocked vertical columns
-The last one is split in three locked horizontal windows:
-- magit
-- compilation
-- lsp"
+  The n-1 first columns are unlocked vertical columns
+  The last one is split in three locked horizontal windows:
+  - magit
+  - compilation
+  - lsp"
   :group 'pokemacs-appearance
   :type 'int
   :tag " Layout")
 
 (defcustom pokemacs-mono-font "Fira Code"
-  "Mono font."
+  "Default mono font."
   :group 'pokemacs-appearance
   :type 'string
-  :tag " Font")
+  :tag " Mono Font")
 
 (defcustom pokemacs-variable-font "Iosevka Aile"
-  "Font for variable pitch."
+  "Default variable font."
   :group 'pokemacs-appearance
   :type 'string
-  :tag " Font")
+  :tag " Variable Font")
 
 (defcustom tuple-mono-font `(:font ,pokemacs-mono-font)
-  "Font for mono pitch."
+  "List of possible mono fonts (the first available one will be used).
+`pokemacs-mono-font' is the first checked font"
   :group 'pokemacs-appearance
   :type 'list
-  :tag " Font")
+  :tag " Mono Fonts")
 
 (defcustom tuple-variable-font `(:font ,pokemacs-variable-font)
-  "Font for variable pitch."
+  "List of possible mono fonts (the first available one will be used).
+`pokemacs-variable-font' is the first checked font"
   :group 'pokemacs-appearance
   :type 'list
-  :tag " Font")
+  :tag " Variable Fonts")
 
 (defcustom pokemacs-dark-theme-p t
   "Dark or light theme."
@@ -247,7 +258,8 @@ The last one is split in three locked horizontal windows:
   :tag "󰖙 Light Theme")
 
 (defcustom use-all-the-icons nil
-  "Use all-the-icons (when t) or nerd-icons (when nil)."
+  "Use all-the-icons (when t) or nerd-icons (when nil).
+nerd-icons is a better choice and I plan to stop using all-the-icons completely."
   :group 'pokemacs-appearance
   :type 'boolean
   :tag " Icons")
@@ -266,14 +278,14 @@ The last one is split in three locked horizontal windows:
 
 (defcustom use-rainbow nil
   "If non-nil, don't be @thriim.
-  Rainbowify parentheses and other things."
+Rainbowify parentheses and other things."
   :group 'pokemacs-appearance
   :type 'boolean
   :tag "󱃗 Rainbows")
 
 (defcustom use-solaire t
   "If non-nil, uses the solaire package.
-  Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
+Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
   :group 'pokemacs-appearance
   :type 'boolean
   :tag " Solaire")
@@ -293,7 +305,7 @@ The last one is split in three locked horizontal windows:
 
 (defcustom pokemacs-dict "en-GB"
   "Dictionary language.
-  Specify the chosen language used by spell checking tools in pokemacs."
+Specify the chosen language used by spell checking tools in pokemacs."
   :group 'pokemacs-dictionaries
   :type '(choice (const :tag "en-GB"   "en-GB")
                  (const :tag "en-US"   "en-US")
@@ -1022,28 +1034,25 @@ debian, and derivatives). On most it's 'fd'.")
   (setq god-mode-enable-function-key-translation nil)
   :config
   (defun my-god-mode-update-modeline ()
-    (cond (god-local-mode (progn
-                            (set-face-background 'mode-line "#e9e2cb")
-                            (set-face-foreground 'mode-line "black")
-                            (set-face-background 'mode-line-inactive "#e9e2cb")
-                            (set-face-foreground 'mode-line-inactive "black")
-                            ))
+    (cond (god-local-mode
+           (progn
+             (set-face-background 'mode-line "#e9e2cb")
+             (set-face-foreground 'mode-line "black")
+             (set-face-background 'mode-line-inactive "#e9e2cb")
+             (set-face-foreground 'mode-line-inactive "black")))
           (t (progn
                (set-face-background 'mode-line "#0a2832")
                (set-face-foreground 'mode-line "white")
                (set-face-background 'mode-line-inactive "#0a2832")
-               (set-face-foreground 'mode-line-inactive "white")
-               ))))
+               (set-face-foreground 'mode-line-inactive "white")))))
   (add-hook 'god-mode-enabled-hook #'my-god-mode-update-modeline)
   (add-hook 'god-mode-disabled-hook #'my-god-mode-update-modeline)
   (setq god-exempt-major-modes nil)
   (setq god-exempt-predicates nil)
-  :general (
-         ("<escape>"                'god-mode-all)
-         ("²"                       'god-mode-all)
-         ("C-²"                     'god-mode-all)
-         )
-  )
+  :general
+  (("<escape>"                'god-mode-all)
+   ("²"                       'god-mode-all)
+   ("C-²"                     'god-mode-all)))
 
 (use-package emacs-lisp-mode
   :ensure nil
@@ -1284,7 +1293,7 @@ debian, and derivatives). On most it's 'fd'.")
   (:keymaps 'jinx-overlay-map
             "RET" 'jinx-correct)
   ("M-$"  'jinx-correct)
-  ("C-M-$" 'jinx-languages)
+  ("C-M-$" 'pokemacs-change-dict)
   :config (setq jinx-languages pokemacs-dict))
 
 (use-package highlight-symbol
@@ -2136,14 +2145,15 @@ See `find-sibling-rules' for more informations.
 
 Unlike `find-sibling-rules', `create-sibling-rules' should only
 have one rule for each file type."
+    :group 'pokemacs-languages
     :type 'sexp
-    :version "29.1")
+    :version "29.1"
+    :tag " Create sibling rules")
 
   (setq create-sibling-rules
-        '(
-          ("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
+        '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
 
-  (defun pokemacs-find-sibling-file-wrapper (file)
+  (defun pokemacs-find-sibling-file (file)
     "Visit a \"sibling\" file of FILE.
    When called interactively, FILE is the currently visited file.
 
@@ -2194,9 +2204,9 @@ have one rule for each file type."
                      (write-file new-file))
                    (kill-buffer output-buffer)
                    (find-file new-file)))))))))))
-
   (general-define-key
-   "C-c C-a"                       'pokemacs-find-sibling-file-wrapper))
+   [remap find-sibling-file]    'pokemacs-find-sibling-file
+   "C-c C-a"                    'pokemacs-find-sibling-file))
 
 (use-package fontify-face
   :hook (font-lock-mode . fontify-face-mode)
@@ -3105,7 +3115,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
   ;; (global-tempel-abbrev-mode)
-  )
+  :config
+  (setq-local tempel-template-sources tempel-template-sources)
+  (put 'tempel-template-sources 'permanent-local t))
 
 ;; Optional: Add tempel-collection.
 ;; The package is young and doesn't have comprehensive coverage.
@@ -3992,9 +4004,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c C-l" nil
               "C-c o w" 'ocaml-utils-dune-watch)
     :config
-    (require 'tempel)
-    (defvar-local pokemacs-ocaml-templates-local pokemacs-ocaml-templates "OCaml Templates")
-    (add-to-list 'tempel-template-sources 'pokemacs-ocaml-templates)
     (defun pokemacs-map (l)
       (-map (lambda (x) (list
                     (concat "\\([^/]+\\)" (regexp-quote (car x)))
@@ -4011,27 +4020,22 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (tuareg-opam-update-env (tuareg-opam-current-compiler))
     (defun pokemacs-update-opam-env (&rest _)
       (when (derived-mode-p 'tuareg-mode)
-        (tuareg-opam-update-env nil)
-        ))
+        (tuareg-opam-update-env nil)))
 
     (defun pokemacs-update-load-path-opam (&rest _)
       (when (derived-mode-p 'tuareg-mode)
         (let ((opam-share
                (let ((reply (pokemacs-opam-shell-command-to-string "opam var share --safe")))
                  (when reply (substring reply 0 -1)))))
-          (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
-          )
-        ))
+          (add-to-list 'load-path (concat opam-share "/emacs/site-lisp")))))
 
     (if (boundp 'window-buffer-change-functions)
         (progn
           (add-hook 'window-buffer-change-functions 'pokemacs-update-opam-env)
-          (add-hook 'window-buffer-change-functions 'pokemacs-update-load-path-opam)
-          )
+          (add-hook 'window-buffer-change-functions 'pokemacs-update-load-path-opam))
       (progn
         (add-hook 'post-command-hook 'pokemacs-update-opam-env)
-        (add-hook 'post-command-hook 'pokemacs-update-load-path-opam)
-        ))
+        (add-hook 'post-command-hook 'pokemacs-update-load-path-opam)))
     (unless (version< emacs-version "29")
       (message "unbind c-c c-a")
       (general-unbind tuareg-mode-map "C-c C-a")
@@ -4049,14 +4053,14 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                   (".mll" . ".ml")
                   (".mll" . ".ml")
                   (".mly" . ".ml")
-                  (".eliomi" . ".eliom")
-                  ))
+                  (".eliomi" . ".eliom")))
              (rl (-map #'cons-reverse l))
              (l (pokemacs-map l))
              (rl (pokemacs-map rl)))
         (setq find-sibling-rules (append find-sibling-rules l rl)))
       (message "`tuareg' loaded"))
     :hook
+    (tuareg-mode . (lambda () (pokemacs-set-local-tempel-template 'pokemacs-ocaml-templates)))
     (tuareg-mode . (lambda ()
                      ;; Commented symbols are actually prettier with ligatures or just ugly
                      (setq prettify-symbols-alist

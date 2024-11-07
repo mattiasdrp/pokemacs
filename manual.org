@@ -1,0 +1,329 @@
+#+title: Pokemacs documentation
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+Over the years I've been crafting pokemacs with love and my most loyal users kept asking me about a doc that I never wrote because I wanted to add new features and, you know, you can read the commit messages, there's all the documentation. But the reality is:
+1. People don't read commit messages (why should they?)
+2. A central point for documentation is usually a good idea
+
+So here it is!
+
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :ignore (this)
+:END:
+
+:CONTENTS:
+- [[#introduction][Introduction]]
+- [[#what-is-pokemacs][What is pokemacs?]]
+- [[#how-to-use-pokemacs][How to use pokemacs?]]
+  - [[#customel][custom.el]]
+  - [[#post-customorg][post-custom.org]]
+- [[#package-manager][Package manager]]
+- [[#debugging-pokemacs][Debugging pokemacs]]
+- [[#generalities-about-pokemacs-customisation][Generalities about pokemacs customisation]]
+  - [[#ocaml-templates][Ocaml templates:]]
+  - [[#create-sibling-rules][Create sibling rules]]
+- [[#utility][Utility]]
+  - [[#hydras][Hydras]]
+  - [[#repeat-mode][Repeat mode]]
+  - [[#history][History]]
+  - [[#window-management][Window management]]
+  - [[#which-key][Which key]]
+  - [[#region][Region]]
+  - [[#searching][Searching]]
+  - [[#crux][Crux]]
+  - [[#spell-and-grammar-checking][Spell and grammar checking]]
+  - [[#magit][Magit]]
+  - [[#programming-utilities][Programming utilities]]
+- [[#pokemacs-appearance][Pokemacs appearance]]
+- [[#conclusion][Conclusion]]
+:END:
+
+* What is pokemacs?
+:PROPERTIES:
+:CUSTOM_ID: what-is-pokemacs
+:END:
+
+Pokemacs is not supposed to be [[https://github.com/doomemacs/doomemacs][doomemacs]] or [[https://github.com/syl20bnr/spacemacs][spacemacs]]. It's an opinionated Emacs configuration that I use on a daily basis and where I know why everything is here and how they work together. Sometimes I'll break everything because I wanted to try a new package manager or a new completion engine and that's the life of this configuration. I'm glad that others use it but my main target is me and the enjoyment I have tweaking it.
+
+The main difference between pokemacs and many other configurations is that pokemacs is a literate configuration written in a big org-mode file that is automatically tangled to an Emacs-lisp init file. I tried creating multiple files but having to jump from file to file to make any edit was not something I enjoyed and felt comfortable with. I fell in love with org-mode many years ago and wanted to try literate programming. This was the perfect opportunity.
+
+Nevertheless, if you use it and think that I should add a new package or implement a new feature or anything, feel free to create an issue.
+
+I still have to think @hlissner and @syl20bnr for there respective configurations that helped me fix issues with some packages by looking at how they handled them. I even imported some useful functions from their respective configurations (and since we're thanking people, @tarsius, @minad, @yyoncho, @oantolin, @karthink and many others I forget from reddit, stack overflow, YouTube and dark corners of the web, for their useful packages, blog posts, reactivity, help etc)
+
+* How to use pokemacs?
+:PROPERTIES:
+:CUSTOM_ID: how-to-use-pokemacs
+:END:
+
+RTFM. No, for real, read the README, it gives a lot of information to start on the right foot with pokemacs.
+
+As for this manual, you can click on links or hit ~C-c C-o~ because the ~m~ in ~Emacs~ is not for ~mouse~.
+
+Pokemacs is updated regularly. No fancy ~pokemacs update~ or anything. Just ~git pull --rebase~. There are two files I almost never touch:
+- ~custom.el~
+- ~post_custom.org~
+
+Your ~.emacs.d~ should look like this
+
+#+begin_src bash
+  commit hash1 (HEAD -> main)
+  Author: pokemacs-user <pokemacs-user@mail.com>
+  Date:   ...
+
+      Customization commit (modifies commit.el and post_custom.org)
+
+  commit hash2 (mattias/main)
+  Author: mattiasdrp <mattias@kojin.tech>
+  Date:   ...
+
+      Last pokemacs commit
+#+end_src
+
+This way you always keep your customisation on top of pokemacs.
+
+** ~custom.el~
+:PROPERTIES:
+:CUSTOM_ID: customel
+:END:
+
+Used to customise your Emacs the way you like it. Some like blinking cursors, some don't. Some want to see the whole expression between parentheses, some would rather just see the matching parenthesis. ~custom.el~ is where you express yourself.
+
+There's a catch though. If you use ~customize-variable~ or ~customize~, the ~custom.el~ file will be rewritten by Emacs and there are some customisation that will be rewritten and even though they shouldn't break anything, pokemacs is going to work less well now (Bourville). In this case ~magit~ is your friend to  just keep your customisation and revert the rest (with ~k~ in a magit status buffer)
+
+** ~post-custom.org~
+:PROPERTIES:
+:CUSTOM_ID: post-customorg
+:END:
+
+This file is your goto file to write anything that can be done after initialisation. Setup ~mu4e~, change some bindings, add utility functions etc. I never touch it. The file will automatically tangle to ~post-custom.el~ whenever you save it.
+
+* Package manager
+:PROPERTIES:
+:CUSTOM_ID: package-manager
+:END:
+
+Pokemacs' package manager is [[https://github.com/progfolio/elpaca/][elpaca]]. I tried a lot of them and this one is my favourite. Easy to use, works really well with ~use-package~ and everything's lazy. Don't load what is not needed at the moment.
+
+The first time you'll start pokemacs it'll install packages that are needed to work properly. As I said, this configuration is primarly for me, I don't want to remember what I need to install so I let ~use-package~ do it for me and I'm happy with it. You can still comment the ~ensure-package:~ stanzas (if you edit ~init.org~ with ~emacs -Q~ you'll have to ~C-c C-v t~ to tangle it in ~init.el~).
+
+* Debugging pokemacs
+:PROPERTIES:
+:CUSTOM_ID: debugging-pokemacs
+:END:
+
+All the values created by pokemacs are in ~var~ in your ~default-directory~ (usually ~.emacs.d/var~).
+
+All the packages are installed in ~elpaca~ in your ~default-directory~ (usually ~.emacs.d/elpaca~).
+
+Before going berserk and removing both directories you can start with ~M-x elpaca-manager RET g i~ to list all your installed packages. Hitting ~r x~ on a package will reinstall it. You can find other key bindings with ~h~ or ~?~.
+
+~C-h k~ followed by a key combination is your friend to know which function you're calling.
+
+~M-x describe-symbol~ (or ~variable~ or ~function~) can give you a lot of useful informations as ~C-h m~ that will tell you all the active modes in your current buffer.
+
+~M-x describe-char~ will tell you a lot of information about the character at point.
+
+If after all of this you can't fix your issue, hit me up, I'm always happy to help.
+
+* Generalities about pokemacs customisation
+:PROPERTIES:
+:CUSTOM_ID: generalities-about-pokemacs-customisation
+:END:
+
+Even though this configuration is opinionated, there's a way to enable/disable features. The easiest way to find all the customizations allowed by pokemacs is to ~M-x customize-group RET pokemacs~ or hit ~C-c C-c~ on the following code block:
+
+#+begin_src emacs-lisp :results none
+  (customize-group 'pokemacs)
+#+end_src
+
+I won't explain here what most of these options do because I think their description is explicit enough. There are two that need an explanation though:
+
+** Ocaml templates:
+:PROPERTIES:
+:CUSTOM_ID: ocaml-templates
+:END:
+
+I mainly code in OCaml. For years I tried to use Yasnippet but I didn't like how it interacted with lsp and other completion tools. I started using [[https://github.com/minad/tempel][tempel]] and found it quite useful. Tempel offers templates that can either be inserted with ~M-x tempel-insert~  (bound to ~M-*~) or completed with ~M-x tempel-complete~ (bound to ~M-+~). OCaml doesn't have any saved templates and I decided to create templates for OCaml expressions that are often used. My workflow will look like this
+
+#+begin_src
+fp M-+
+#+end_src
+
+That will give me
+
+#+begin_src
+Format.printf "|" |;
+#+end_src
+
+After filling the first ~|~, hitting ~RET~ will jump to the second ~|~.
+
+You can add your own templates for OCaml by editing this variable or you can add templates for a different mode and just add it like this:
+
+#+begin_src emacs-lisp :results none
+  :hook (my-specific-mode . (lambda () (pokemacs-set-local-tempel-template 'my-specific-mode-templates)))
+#+end_src
+
+This will make sure that the template is added for your mode only.
+
+** Create sibling rules
+:PROPERTIES:
+:CUSTOM_ID: create-sibling-rules
+:END:
+
+Emacs 29.1 added the possibility to define our own rule to find sibling files (usually bound to ~C-c C-a~, this function allows to jump, for example in OCaml, from a ~.ml~ to its ~.mli~ counterpart and vice-versa). This allowed me to define a function that tries to jump to its sibling and, if no such sibling is found, try to create it. The rule to create a sibling file is defined in this custom variable that, right now, only contains:
+
+#+begin_src emacs-lisp :results none
+(("\\([^/]+\\)\\.ml\\'" "\\1.mli" . "dune exec -- ocaml-print-intf"))
+#+end_src
+
+This is basically saying: if you try to create an ~.mli~ file from a ~.ml~ file, run the shell command ~dune exec -- ocaml-print-intf~ to fill it.
+
+* Utility
+:PROPERTIES:
+:CUSTOM_ID: utility
+:END:
+
+** Hydras
+:PROPERTIES:
+:CUSTOM_ID: hydras
+:END:
+
+Hydras are modes in which you don't have to use many fingers to execute actions (à la Vi command mode). Find all the available hydras with ~M-h~ (the most important ones are ~M-h t~, ~M-h g~ and ~M-h w~.
+I plan to add more when I have the time.
+
+** Repeat mode
+:PROPERTIES:
+:CUSTOM_ID: repeat-mode
+:END:
+
+A feature that's well hidden and that a lot of emacs users (so let's say 41 out of the 53 emacs users) don't know: some commands in Emacs can be repeated without repeating their prefix.
+
+Try it with ~C-x <left>|<right>|<up>|<down>~ to navigate through your windows by just pressing ~<left>|<right>|<up>|<down>~. If you find yourself repeating a command, there's a high chance that it activated the repeat mode and you don't know.
+
+** History
+:PROPERTIES:
+:CUSTOM_ID: history
+:END:
+
+Avoid using ~compile~ and rather use ~projectile-compile-project~. The savehist package remembers your compilation commands in a single list while it remember your projectile compilation commands by creating a list for each project. You don't want to ~cargo build~ an OCaml project, right?
+
+~M-p/n~ goes up/down in history even between different emacs sessions. You can use it with ~find-file~, ~isearch~, ~ripgrep~ etc. Emacs loves to remember things but it doesn't need cookies and doesn't send it to the NSA. Win/win.
+
+** Window management
+:PROPERTIES:
+:CUSTOM_ID: window-management
+:END:
+
+Whoops, I just closed the window I was working on and this layout was so hard to obtain. Have you heard about our lord and saviour ~winner-mode~? Don't worry, just hit ~C-c <left>~, it will undo your last window change (and, yes, this is a command that activates the repeat mode).
+
+I also implemented a utility function that will lock a window (yes, no more "why this file decided to replace my compilation window?!", just hit ~M-l l~ on windows you don't want to be filled with a different buffer (and if you're lost with the difference between buffers and windows well, not my mission, sorry, we'll talk about yank and kill another time)
+
+** Which key
+:PROPERTIES:
+:CUSTOM_ID: which-key
+:END:
+
+If you forgot a succession of key bindings but remember the prefix, hit it and wait, ~which-key~ will tell you what you can do next.
+
+** Region
+:PROPERTIES:
+:CUSTOM_ID: region
+:END:
+
+When a region is selected there's a lot of things you can do:
+- Look at what [[file:init.org::#selected][Selected]] offers
+- Search the selected region with ~C-s~ (will autofill the minibuffer with the region) or other search tools like ~consult-ripgrep~ (~M-s r/R~)
+- Pin it with ~C-p~ (unpin with ~M-x hide-region-unpin~ (bound to ~C-c r u~)
+
+** Searching
+:PROPERTIES:
+:CUSTOM_ID: searching
+:END:
+
+- Consult is a powerful tool that's even more powerful when used with orderless and friends. Here are some tips:
+  - ~#regexp#filter-string~: The pattern of a consult input. ~filter-string~ is used to filter the results obtained with ~regexp~
+  - ~M-RET~: Jump to the current result without closing the minibuffer
+  - ~M-.~: Preview the result at point (useful when unsure about the result)
+  - ~<regexp> -- -g *.ml~:  Limit the search to files ending with ~.ml~
+  - ~<regexp> -- -g !pattern~: Remove the files corresponding to ~pattern~ from the search results
+- Isearch is also powerful to find things in a single buffer but people usually quit it when they want to edit their search, don't do that, do this instead:
+  - ~C-g~: Deletes the part of the current search that is not matching anything
+  - ~M-e~: Edit the current search
+  - ~M-c~ (or ~c~ once the input can't be edited): Case sensitivity
+- When the point is on a symbol you can use ~S-M-<up>/<down>~ to jump directly to the exact same symbol in the current buffer.
+
+** Crux
+:PROPERTIES:
+:CUSTOM_ID: crux
+:END:
+
+Look at [[file:init.org::#crux][this doc]] or just hit ~M-m~ to see what's possible (but really, look at [[file:init.org::#crux][this doc]]).
+
+** Spell and grammar checking
+:PROPERTIES:
+:CUSTOM_ID: spell-and-grammar-checking
+:END:
+
+Pokemacs uses [[https://github.com/minad/jinx][Jinx]] because I had issues with flyspell that would slow down emacs tremendously. Change your dictionaries with ~pokemacs-change-dict~, don't use ~jinx-languages~.
+
+** Magit
+:PROPERTIES:
+:CUSTOM_ID: magit
+:END:
+
+I can't explain magit. You have to discover it by yourself.
+
+** Programming utilities
+:PROPERTIES:
+:CUSTOM_ID: programming-utilities
+:END:
+
+Pokemacs uses:
+- ~lsp-mode~ as its completion engine (and a lot of other useful features like type at point, jump to definition etc) when available.
+  - When checking the type at point with ~C-c C-t~ you can hit ~C-w~ to copy the returned type
+- ~Apheleia~ as its autoformatter (whenever you save a file, apheleia will format it according to its recipe for its major mode. OCaml files will be formatted by ocamlformat, for example)
+- ~Flycheck~ as its syntax checker. Flychack will most likely be plugged to LSP but other checkers can be used if LSP doesn't return any error (like Jinx but I still need to make it work in OCaml files)
+- ~Imenu~ allows to navigate through a file by point of interests. Give it a try.
+- ~Projectile~ to handle what a "project" is.
+- ~Treesit~ for syntax colouring (the time of big regexps is finally behind us)
+  - There's an issue (that I can't fix since it's coming from an external package) with Java. If you don't have anything working when opening a Java file do the following until it's fixed:
+    #+begin_src emacs-lisp
+      (setq treesit-auto-langs '(java))
+      M-x treesit-auto-install-all
+    #+end_src
+- Specific to OCaml:
+  - Look at the ~M-x ocaml-utils-*~ commands (WiP)
+
+* Pokemacs appearance
+:PROPERTIES:
+:CUSTOM_ID: pokemacs-appearance
+:END:
+
+There are four custom variables you should customise:
+
+- ~pokemacs-mono-font~: your favourite font for code (usually fira code or fonts like this)
+- ~pokemacs-variable-font~: your favourite font for normal text (usually Comic Sans
+- ~pokemacs-light-theme~: do I need to explain it? Anyway, you can have a taste of the available themes with ~M-x consult-themes~
+- ~pokemacs-dark-theme~: 󰔎
+
+You can toggle between light and dark theme with ~M-x pokemacs-toggle-dark-light-theme~ (you can actually look at what pokemacs allows you to do by hitting ~M-x pokemacs~ see what the completion offers. Curiousity should always be rewarded.
+
+Try ~M-x pokemacs-restore-session~ or ~M-7 M-x pokemacs-restore-session~. That's a work in progress but I'm quite proud of it.
+
+* Conclusion
+:PROPERTIES:
+:CUSTOM_ID: conclusion
+:END:
+
+This should be enough for now. Hope you have a nice journey with me. I'm falling asleep now. Love you all.
+
+# Local Variables:
+# jinx-languages: "en_GB"
+# jinx-local-words: "pokemacs"
+# End:

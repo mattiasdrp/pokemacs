@@ -103,6 +103,7 @@
  '(use-racket t)
  '(use-rainbow t)
  '(use-reason nil)
+ '(use-ruby t)
  '(use-rust t)
  '(use-sicp t)
  '(use-solaire t)

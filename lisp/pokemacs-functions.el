@@ -177,6 +177,10 @@ DOCSTRING and BODY are as in `defun'.
   (select-window middle-window)
   (balance-windows))
 
+(defun pokemacs-set-local-tempel-template (template)
+  (require 'tempel)
+  (add-to-list 'tempel-template-sources template))
+
 (provide 'pokemacs-functions)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; pokemacs-functions.el ends here
