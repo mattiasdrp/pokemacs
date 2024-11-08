@@ -202,17 +202,6 @@ Give windows a 'purpose' to prevent them from being populated by buffers that do
   :group 'pokemacs
   :tag "Appearance")
 
-(defcustom pokemacs-columns 3
-  "Number of columns for pokemacs-restore-session
-  The n-1 first columns are unlocked vertical columns
-  The last one is split in three locked horizontal windows:
-  - magit
-  - compilation
-  - lsp"
-  :group 'pokemacs-appearance
-  :type 'int
-  :tag " Layout")
-
 (defcustom pokemacs-mono-font "Fira Code"
   "Default mono font."
   :group 'pokemacs-appearance
@@ -2445,6 +2434,17 @@ with a prefix ARG."
 
     (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
     (message "`visual-fill-column' loaded")))
+
+(use-package pokemacs-layout
+  :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
+  :commands pokemacs-layout-apply pokemacs-restore-session
+  :config
+  (defun pokemacs-restore-session (&optional columns)
+    "Restore a session by creating the proper buffers."
+    (interactive "P")
+    (let ((pokemacs-layout-columns (or columns pokemacs-layout-columns)))
+      (setq current-prefix-arg nil)
+      (pokemacs-layout--apply "prog custom layout"))))
 
 (when use-window-purpose
   (use-package window-purpose
