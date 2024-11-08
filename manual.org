@@ -54,7 +54,7 @@ The main difference between pokemacs and many other configurations is that pokem
 
 Nevertheless, if you use it and think that I should add a new package or implement a new feature or anything, feel free to create an issue.
 
-I still have to think @hlissner and @syl20bnr for there respective configurations that helped me fix issues with some packages by looking at how they handled them. I even imported some useful functions from their respective configurations (and since we're thanking people, @tarsius, @minad, @yyoncho, @oantolin, @karthink and many others I forget from reddit, stack overflow, YouTube and dark corners of the web, for their useful packages, blog posts, reactivity, help etc)
+I still have to think @hlissner and @syl20bnr for their respective configurations that helped me fix issues with some packages by looking at how they handled them. I even imported some useful functions from their respective configurations (and since we're thanking people, @tarsius, @minad, @yyoncho, @oantolin, @karthink and many others I forget from reddit, stack overflow, YouTube and dark corners of the web, for their useful packages, blog posts, reactivity, help etc)
 
 * How to use pokemacs?
 :PROPERTIES:
@@ -94,7 +94,7 @@ This way you always keep your customisation on top of pokemacs.
 
 Used to customise your Emacs the way you like it. Some like blinking cursors, some don't. Some want to see the whole expression between parentheses, some would rather just see the matching parenthesis. ~custom.el~ is where you express yourself.
 
-There's a catch though. If you use ~customize-variable~ or ~customize~, the ~custom.el~ file will be rewritten by Emacs and there are some customisation that will be rewritten and even though they shouldn't break anything, pokemacs is going to work less well now (Bourville). In this case ~magit~ is your friend to  just keep your customisation and revert the rest (with ~k~ in a magit status buffer)
+There's a catch though. If you use ~customize-variable~ or ~customize~, the ~custom.el~ file will be rewritten by Emacs and there are some customisation that will be rewritten. Even though they shouldn't break anything, pokemacs is going to work less well now (©Bourville). In this case ~magit~ is your friend to just keep your customisation and revert the rest (with ~k~ in a magit status buffer).
 
 ** ~post-custom.org~
 :PROPERTIES:
@@ -108,7 +108,9 @@ This file is your goto file to write anything that can be done after initialisat
 :CUSTOM_ID: package-manager
 :END:
 
-Pokemacs' package manager is [[https://github.com/progfolio/elpaca/][elpaca]]. I tried a lot of them and this one is my favourite. Easy to use, works really well with ~use-package~ and everything's lazy. Don't load what is not needed at the moment.
+Pokemacs' package manager is [[https://github.com/progfolio/elpaca/][elpaca]]. I tried a lot of different package managers and this one is my favourite. Easy to use, works really well with ~use-package~ and everything's lazy. Don't load what is not needed at the moment.
+
+If you think that a package is not working, add ~:demand t~ to its use-package stanza to force its loading at init time. Sometimes packages are not loaded because I don't use them a lot and I never realised they were not loaded.
 
 The first time you'll start pokemacs it'll install packages that are needed to work properly. As I said, this configuration is primarly for me, I don't want to remember what I need to install so I let ~use-package~ do it for me and I'm happy with it. You can still comment the ~ensure-package:~ stanzas (if you edit ~init.org~ with ~emacs -Q~ you'll have to ~C-c C-v t~ to tangle it in ~init.el~).
 
@@ -194,7 +196,7 @@ This is basically saying: if you try to create an ~.mli~ file from a ~.ml~ file,
 :CUSTOM_ID: hydras
 :END:
 
-Hydras are modes in which you don't have to use many fingers to execute actions (à la Vi command mode). Find all the available hydras with ~M-h~ (the most important ones are ~M-h t~, ~M-h g~ and ~M-h w~.
+Hydras are modes in which you don't have to use many fingers to execute actions (à la Vi command mode). Find all the available hydras with ~M-h~ (the most important ones are ~M-h t~, ~M-h g~ and ~M-h w~).
 I plan to add more when I have the time.
 
 ** Repeat mode
@@ -204,14 +206,16 @@ I plan to add more when I have the time.
 
 A feature that's well hidden and that a lot of emacs users (so let's say 41 out of the 53 emacs users) don't know: some commands in Emacs can be repeated without repeating their prefix.
 
-Try it with ~C-x <left>|<right>|<up>|<down>~ to navigate through your windows by just pressing ~<left>|<right>|<up>|<down>~. If you find yourself repeating a command, there's a high chance that it activated the repeat mode and you don't know.
+Try it with ~C-x <left>|<right>|<up>|<down>~ to navigate through your windows by just pressing repeateadly, after the first prefixed command, ~<left>|<right>|<up>|<down>~. If you find yourself repeating a command, there's a high chance that it activated the repeat mode and you don't know. If you want to know precisely the commands that can be repeated you can execute `M-x describe-repeat-maps`.
+
+Repeat-mode is usually left after some time passed without an user action or when you hit a key that is not in the repeat mode keymap. Or you can simply `C-g`.
 
 ** History
 :PROPERTIES:
 :CUSTOM_ID: history
 :END:
 
-Avoid using ~compile~ and rather use ~projectile-compile-project~. The savehist package remembers your compilation commands in a single list while it remember your projectile compilation commands by creating a list for each project. You don't want to ~cargo build~ an OCaml project, right?
+Avoid using ~compile~ and rather use ~projectile-compile-project~. The savehist package remembers your compilation commands in a single list while it remembers your projectile compilation commands by creating a list for each project. You don't want to ~cargo build~ an OCaml project, right?
 
 ~M-p/n~ goes up/down in history even between different emacs sessions. You can use it with ~find-file~, ~isearch~, ~ripgrep~ etc. Emacs loves to remember things but it doesn't need cookies and doesn't send it to the NSA. Win/win.
 
@@ -222,7 +226,7 @@ Avoid using ~compile~ and rather use ~projectile-compile-project~. The savehist 
 
 Whoops, I just closed the window I was working on and this layout was so hard to obtain. Have you heard about our lord and saviour ~winner-mode~? Don't worry, just hit ~C-c <left>~, it will undo your last window change (and, yes, this is a command that activates the repeat mode).
 
-I also implemented a utility function that will lock a window (yes, no more "why this file decided to replace my compilation window?!", just hit ~M-l l~ on windows you don't want to be filled with a different buffer (and if you're lost with the difference between buffers and windows well, not my mission, sorry, we'll talk about yank and kill another time)
+I also implemented a utility function that will lock a window (yes, no more "why this buffer decided to replace my compilation window?!"), just hit ~M-l l~ on windows you don't want to be filled with a different buffer (and if you're lost with the difference between buffers and windows well, not my mission, sorry, we'll talk about yank and kill another time)
 
 ** Which key
 :PROPERTIES:
@@ -239,7 +243,7 @@ If you forgot a succession of key bindings but remember the prefix, hit it and w
 When a region is selected there's a lot of things you can do:
 - Look at what [[file:init.org::#selected][Selected]] offers
 - Search the selected region with ~C-s~ (will autofill the minibuffer with the region) or other search tools like ~consult-ripgrep~ (~M-s r/R~)
-- Pin it with ~C-p~ (unpin with ~M-x hide-region-unpin~ (bound to ~C-c r u~)
+- Pin it with ~C-p~ and unpin with ~M-x hide-region-unpin~ (bound to ~C-c r u~)
 
 ** Searching
 :PROPERTIES:
@@ -257,6 +261,8 @@ When a region is selected there's a lot of things you can do:
   - ~M-e~: Edit the current search
   - ~M-c~ (or ~c~ once the input can't be edited): Case sensitivity
 - When the point is on a symbol you can use ~S-M-<up>/<down>~ to jump directly to the exact same symbol in the current buffer.
+- ~M-x embark-act~: allows to execute some code on the current candidate at point (like renaming a file)
+- ~M-x embark-collect~: collects all the candidates in an interactive buffer (one of my favourite features ever)
 
 ** Crux
 :PROPERTIES:
@@ -307,8 +313,8 @@ Pokemacs uses:
 
 There are four custom variables you should customise:
 
-- ~pokemacs-mono-font~: your favourite font for code (usually fira code or fonts like this)
-- ~pokemacs-variable-font~: your favourite font for normal text (usually Comic Sans
+- ~pokemacs-mono-font~: your favourite font for code (usually FiraCode or fonts like this)
+- ~pokemacs-variable-font~: your favourite font for normal text (usually Comic Sans)
 - ~pokemacs-light-theme~: do I need to explain it? Anyway, you can have a taste of the available themes with ~M-x consult-themes~
 - ~pokemacs-dark-theme~: 󰔎
 
@@ -322,8 +328,3 @@ Try ~M-x pokemacs-restore-session~ or ~M-7 M-x pokemacs-restore-session~. That's
 :END:
 
 This should be enough for now. Hope you have a nice journey with me. I'm falling asleep now. Love you all.
-
-# Local Variables:
-# jinx-languages: "en_GB"
-# jinx-local-words: "pokemacs"
-# End:
