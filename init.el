@@ -750,6 +750,15 @@ debian, and derivatives). On most it's 'fd'.")
   :hook (shell-mode . ansi-color-for-comint-mode-on)
   :config (message "`ansi-color' loaded"))
 
+(use-package xterm-color
+  :config
+  (setq compilation-environment '("TERM=xterm-256color"))
+
+  (defun my/advice-compilation-filter (f proc string)
+    (funcall f proc (xterm-color-filter string)))
+
+  (advice-add 'compilation-filter :around #'my/advice-compilation-filter))
+
 (use-package kurecolor
   :config (message "`kurecolor' loaded"))
 

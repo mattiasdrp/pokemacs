@@ -47,6 +47,7 @@
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-dark-theme 'doom-solarized-dark t)
+ '(pokemacs-layout-columns 2)
  '(pokemacs-light-theme 'doom-solarized-light t)
  '(pokemacs-mode-line-right-align 'right-fringe t)
  '(pokemacs-variable-font "Iosevka Aile" t)
