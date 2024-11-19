@@ -98,6 +98,7 @@ Literate configuration for init.el.
   - [[#multiple-cursors][Multiple cursors]]
   - [[#hide-region][Hide region]]
   - [[#hide-mode-line][Hide mode line]]
+  - [[#view-large-files][View Large Files]]
   - [[#vundo][Vundo]]
   - [[#whitespace][Whitespace]]
   - [[#window-locking][Window locking]]
@@ -157,6 +158,7 @@ Literate configuration for init.el.
   - [[#winner][Winner]]
   - [[#ace-window][Ace window]]
   - [[#visual-fill-column][Visual fill column]]
+  - [[#pokemacs-layout][Pokemacs layout]]
   - [[#window-purpose][Window Purpose]]
 - [[#completion][Completion]]
   - [[#vertico][Vertico]]
@@ -1220,15 +1222,16 @@ When working in WSL emacs will believe it's in a Linux environment when it's act
 #+begin_src emacs-lisp
   (defun pokemacs-wsl-specific-function ()
     "Change some values if running on WSL"
-    (when (and (eq system-type 'gnu/linux)
-               (string-match
-                "Linux.*Microsoft.*Linux"
-                (shell-command-to-string "uname -a")))
+    (when (getenv "WSLENV")
+      (message "setting wsl env")
       (eshell-command "xmodmap -e 'keycode 191 = space'")
-      (setq
-       browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
-       browse-url-generic-args     '("/c" "start")
-       browse-url-browser-function #'browse-url-generic)))
+      (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
+            (cmd-args '("/c" "start")))
+        (when (file-exists-p cmd-exe)
+          (setq browse-url-generic-program  cmd-exe
+                browse-url-generic-args     cmd-args
+                browse-url-browser-function 'browse-url-generic
+                search-web-default-browser 'browse-url-generic)))))
 
   (add-hook 'after-init-hook #'pokemacs-wsl-specific-function)
 #+end_src
@@ -2174,7 +2177,13 @@ You need to install ~libenchant-2-dev~ and ~pkgconf~.
               "RET" 'jinx-correct)
     ("M-$"  'jinx-correct)
     ("C-M-$" 'pokemacs-change-dict)
-    :config (setq jinx-languages pokemacs-dict))
+    :config
+    (setq jinx-languages pokemacs-dict)
+    ;; Temporary setting tree-sitter faces for jinx-include-faces
+    ;; When tuareg has a proper treesitter mode this will become useless
+    (let* ((prog-faces (alist-get 'prog-mode jinx-include-faces))
+           (new-prog-faces (cl-revappend prog-faces '(tree-sitter-hl-face:doc tree-sitter-hl-face:string tree-sitter-hl-face:comment))))
+      (setf (alist-get 'prog-mode jinx-include-faces) new-prog-faces)))
 #+end_src
 
 ** [[https://github.com/nschum/highlight-symbol.el][Highlight symbol]]
@@ -2243,6 +2252,17 @@ Used by some packages
 #+begin_src emacs-lisp
   (use-package hide-mode-line
     :config (message "`hide-mode-line loaded"))
+#+end_src
+
+** [[https://github.com/m00natic/vlfi][View Large Files]]
+:PROPERTIES:
+:CUSTOM_ID: view-large-files
+:END:
+
+#+begin_src emacs-lisp
+  (use-package vlf
+    :demand t
+    :config (require 'vlf-setup))
 #+end_src
 
 ** [[https://github.com/casouri/vundo][Vundo]]
@@ -3823,6 +3843,9 @@ This mode will center the text when only one window is displayed.
 #+end_src
 
 ** Pokemacs layout
+:PROPERTIES:
+:CUSTOM_ID: pokemacs-layout
+:END:
 
 #+begin_src emacs-lisp
   (use-package pokemacs-layout

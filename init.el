@@ -637,15 +637,16 @@ debian, and derivatives). On most it's 'fd'.")
 
 (defun pokemacs-wsl-specific-function ()
   "Change some values if running on WSL"
-  (when (and (eq system-type 'gnu/linux)
-             (string-match
-              "Linux.*Microsoft.*Linux"
-              (shell-command-to-string "uname -a")))
+  (when (getenv "WSLENV")
+    (message "setting wsl env")
     (eshell-command "xmodmap -e 'keycode 191 = space'")
-    (setq
-     browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
-     browse-url-generic-args     '("/c" "start")
-     browse-url-browser-function #'browse-url-generic)))
+    (let ((cmd-exe "/mnt/c/Windows/System32/cmd.exe")
+          (cmd-args '("/c" "start")))
+      (when (file-exists-p cmd-exe)
+        (setq browse-url-generic-program  cmd-exe
+              browse-url-generic-args     cmd-args
+              browse-url-browser-function 'browse-url-generic
+              search-web-default-browser 'browse-url-generic)))))
 
 (add-hook 'after-init-hook #'pokemacs-wsl-specific-function)
 
@@ -1292,7 +1293,13 @@ debian, and derivatives). On most it's 'fd'.")
             "RET" 'jinx-correct)
   ("M-$"  'jinx-correct)
   ("C-M-$" 'pokemacs-change-dict)
-  :config (setq jinx-languages pokemacs-dict))
+  :config
+  (setq jinx-languages pokemacs-dict)
+  ;; Temporary setting tree-sitter faces for jinx-include-faces
+  ;; When tuareg has a proper treesitter mode this will become useless
+  (let* ((prog-faces (alist-get 'prog-mode jinx-include-faces))
+         (new-prog-faces (cl-revappend prog-faces '(tree-sitter-hl-face:doc tree-sitter-hl-face:string tree-sitter-hl-face:comment))))
+    (setf (alist-get 'prog-mode jinx-include-faces) new-prog-faces)))
 
 (use-package highlight-symbol
   :init (highlight-symbol-mode)
@@ -1323,6 +1330,10 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hide-mode-line
   :config (message "`hide-mode-line loaded"))
+
+(use-package vlf
+  :demand t
+  :config (require 'vlf-setup))
 
 (use-package vundo
   :commands (vundo)
