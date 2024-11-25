@@ -113,6 +113,7 @@
  '(use-visual-fill t)
  '(use-web t)
  '(use-window-purpose nil)
+ '(use-zig t)
  '(vertico-multiform-categories
    '((imenu buffer)
      (file (vertico-sort-function . sort-directories-first))

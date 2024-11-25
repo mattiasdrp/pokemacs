@@ -79,7 +79,7 @@ Read the [[file:manual.org][manual]], you won't regret it.
       libjpeg-turbo-devel giflib-devel libtiff-devel gnutls-devel ncurses-devel \
       jansson-devel harfbuzz-devel harfbuzz ImageMagick ImageMagick-devel libgccjit-devel \
       libtree-sitter libtree-sitter-devel webkit2gtk4.1-devel Xaw3d-devel texinfo \
-      libX11-devel enchant-devel pkgconf  
+      libX11-devel enchant-devel pkgconf
   #+end_src
 
   #+begin_src sh
@@ -229,6 +229,23 @@ You need to initialize the ~combobulate~ submodule until it is available on Melp
   #+begin_src sh
     pip install pyright black isort yapf
   #+end_src
+
+
+*** Zig
+
+- Download a prebuilt tarball from https://ziglang.org/download/
+- Untar it in the directory of your choice
+  #+begin_src shell
+    tar -xvzf zig-<ver>.tar.xz -C ~/.zig/zig --strip-components=1
+  #+end_src
+- Clone the zls repository and build the version corresponding to the zig tarball you downloaded
+  #+begin_src shell
+    git clone https://github.com/zigtools/zls ~/.zig/zls
+  #+end_src
+  #+begin_src shell
+    cd ~/.zig/zls && zig build -Doptimize=ReleaseSafe
+  #+end_src
+- If you chose the same paths as in the above commands you have nothing to do. Otherwise, Zig expects to find the binary for ~zig~ and ~zls~ to be able to run LSP. Customize ~lsp-zig-zig-exe-path~ and ~lsp-zig-zls-executable~.
 
 ** Once emacs is installed:
 :PROPERTIES:

@@ -298,8 +298,12 @@ Pokemacs uses:
 - ~Imenu~ allows to navigate through a file by point of interests. Give it a try.
 - ~Projectile~ to handle what a "project" is.
 - ~Treesit~ for syntax colouring (the time of big regexps is finally behind us)
-  - There's an issue (that I can't fix since it's coming from an external package) with Java. If you don't have anything working when opening a Java file do the following until it's fixed:
+  - There's an issue (that I can't fix since it's coming from an external package) when using new languages when grammar were already installed. If you don't have anything working when opening a file do the following until it's fixed (and there's a ~*Warnings*~ buffer mentioning treesit being unable to install an unavailable language:
     #+begin_src emacs-lisp
+      M-x pokemacs-fix-treesit-auto
+
+      ;; Or:
+
       (setq treesit-auto-langs '(java))
       M-x treesit-auto-install-all
     #+end_src

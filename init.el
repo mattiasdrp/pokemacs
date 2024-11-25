@@ -67,6 +67,15 @@
         ;; Assume :ensure t unless otherwise specified.
         (setq elpaca-use-package-by-default t))
 
+(use-package system-packages
+  :ensure t
+  :config (message "`system-packages' loaded"))
+
+(use-package use-package-ensure-system-package
+  :after (system-packages)
+  :ensure nil
+  :config (message "`use-package-ensure-system-package' loaded"))
+
 (elpaca-wait)
 
 (eval-and-compile
@@ -76,10 +85,6 @@
    use-package-compute-statistics t
    use-package-always-defer t
    use-package-enable-imenu-support t))
-
-(use-package use-package-ensure-system-package
-  ;; :ensure nil
-  :config (message "`use-package-ensure-system-package' loaded"))
 
 (setq byte-compile-warnings '(cl-functions))
 
@@ -1302,7 +1307,9 @@ debian, and derivatives). On most it's 'fd'.")
     (setf (alist-get 'prog-mode jinx-include-faces) new-prog-faces)))
 
 (use-package highlight-symbol
+  :demand t
   :init (highlight-symbol-mode)
+  :hook (prog-mode . highlight-symbol-nav-mode)
   :general
   (:keymaps 'highlight-symbol-nav-mode-map
             "M-n" nil
@@ -1310,7 +1317,6 @@ debian, and derivatives). On most it's 'fd'.")
   ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
   ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
   :config
-  (add-hook 'prog-mode-hook #'highlight-symbol-nav-mode)
   (message "`highlight-symbol' loaded"))
 
 (use-package multiple-cursors
@@ -2060,7 +2066,7 @@ debian, and derivatives). On most it's 'fd'.")
             [remap xref-find-references] 'lsp-ui-peek-find-references
             )
   (:keymaps 'lsp-ui-doc-mode-map
-            "f" 'lsp-ui-doc-focus-frame)
+            "M-f" 'lsp-ui-doc-focus-frame)
   (:keymaps 'lsp-ui-doc-frame-mode-map
             "q" (lambda () (interactive) (lsp-ui-doc--delete-frame)))
   (:keymaps 'lsp-command-map
@@ -3493,6 +3499,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package treesit-auto
   :demand t
+  :init
+  (defun pokemacs-fix-treesit-auto (lang)
+    (interactive
+     (let ((langs treesit-auto-langs))
+       (list (completing-read "Lang: " langs))))
+    (let ((treesit-auto-langs `(,(intern lang))))
+      (treesit-auto-install-all)))
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -3660,6 +3673,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :group 'pokemacs-languages
   :type 'boolean
   :tag " Web")
+
+(defcustom use-zig nil
+  "If non-nil, uses the zig packages."
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Zig")
 
 (when use-markdown
   (use-package markdown-mode
@@ -4424,26 +4443,28 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package web-beautify
   :ensure (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
 
-(use-package zig-mode
-  :custom
-  (lsp-zig-zig-exe-path (file-truename "~/.zig/zig/zig"))
-  (zig-format-on-save nil))
+(when use-zig
+  (use-package zig-mode
+    :custom
+    (lsp-zig-zig-exe-path (file-truename "~/.zig/zig/zig"))
+    (lsp-zig-zls-executable (file-truename "~/.zig/zls/zig-out/bin/zls"))
+    (zig-format-on-save nil))
 
-(use-package zig-ts-mode
-  :ensure (:type git :host codeberg :repo "meow_king/zig-ts-mode")
-  :init
-  (setq my-zig-tsauto-config
-      (make-treesit-auto-recipe
-       :lang 'zig
-       :ts-mode 'zig-ts-mode
-       :remap 'zig-mode
-       :url "https://github.com/maxxnino/tree-sitter-zig"
-       :ext "\\.zig\\'"))
-  (add-to-list 'treesit-auto-recipe-list my-zig-tsauto-config)
-  (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-ts-mode))
-  :config
-  (require 'zig-mode)
-  (set-keymap-parent zig-ts-mode-map zig-mode-map))
+  (use-package zig-ts-mode
+    :ensure (:type git :host codeberg :repo "meow_king/zig-ts-mode")
+    :init
+    (setq my-zig-tsauto-config
+          (make-treesit-auto-recipe
+           :lang 'zig
+           :ts-mode 'zig-ts-mode
+           :remap 'zig-mode
+           :url "https://github.com/maxxnino/tree-sitter-zig"
+           :ext "\\.zig\\'"))
+    (add-to-list 'treesit-auto-recipe-list my-zig-tsauto-config)
+    (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-ts-mode))
+    :config
+    (require 'zig-mode)
+    (set-keymap-parent zig-ts-mode-map zig-mode-map)))
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
