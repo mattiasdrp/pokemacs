@@ -1952,7 +1952,9 @@ debian, and derivatives). On most it's 'fd'.")
          (kotlin-mode . lsp-deferred)
          (enh-ruby-mode . lsp-deferred)
          (rustic-mode . lsp-deferred)
-         (tuareg-mode . lsp-deferred))
+         (tuareg-mode . lsp-deferred)
+         (zig-mode    . lsp-deferred)
+         (zig-ts-mode    . lsp-deferred))
   :general
   (:keymaps 'lsp-mode-map
             "C-c C-t" 'lsp-describe-thing-at-point
@@ -2051,16 +2053,19 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :general
-  ("C-M-d" 'lsp-ui-doc-show)
+  ("C-M-i" 'lsp-ui-doc-show)
   ("C-c i" 'lsp-ui-imenu)
   (:keymaps 'lsp-ui-mode-map
             [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
             [remap xref-find-references] 'lsp-ui-peek-find-references
             )
+  (:keymaps 'lsp-ui-doc-mode-map
+            "f" 'lsp-ui-doc-focus-frame)
+  (:keymaps 'lsp-ui-doc-frame-mode-map
+            "q" (lambda () (interactive) (lsp-ui-doc--delete-frame)))
   (:keymaps 'lsp-command-map
             "u f" 'lsp-ui-doc-focus-frame
-            "u i" 'lsp-ui-imenu
-            )
+            "u i" 'lsp-ui-imenu)
   :custom
   (lsp-ui-doc-delay 0.9)
   (lsp-ui-doc-position 'at-point)
@@ -2074,6 +2079,8 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-ui-doc-border (face-foreground 'default))
   ;; Whether or not to enable lsp-ui-sideline
   (lsp-ui-sideline-enable nil)
+  (lsp-ui-doc-use-webkit t)
+  (lsp-ui-doc-use-childframe t)
   ;; Ignore duplicates when there is a same symbol with same contents
   ;; (lsp-ui-sideline-ignore-duplicate t)
   ;; Whether to show code actions in sideline.
@@ -4077,8 +4084,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
              (rl (-map #'cons-reverse l))
              (l (pokemacs-map l))
              (rl (pokemacs-map rl)))
-        (setq find-sibling-rules (append find-sibling-rules l rl)))
-      (message "`tuareg' loaded"))
+        (setq find-sibling-rules (append find-sibling-rules l rl))))
+    (message "`tuareg' loaded")
     :hook
     (tuareg-mode . (lambda () (pokemacs-set-local-tempel-template 'pokemacs-ocaml-templates)))
     (tuareg-mode . (lambda ()
@@ -4416,6 +4423,27 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package web-beautify
   :ensure (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
+
+(use-package zig-mode
+  :custom
+  (lsp-zig-zig-exe-path (file-truename "~/.zig/zig/zig"))
+  (zig-format-on-save nil))
+
+(use-package zig-ts-mode
+  :ensure (:type git :host codeberg :repo "meow_king/zig-ts-mode")
+  :init
+  (setq my-zig-tsauto-config
+      (make-treesit-auto-recipe
+       :lang 'zig
+       :ts-mode 'zig-ts-mode
+       :remap 'zig-mode
+       :url "https://github.com/maxxnino/tree-sitter-zig"
+       :ext "\\.zig\\'"))
+  (add-to-list 'treesit-auto-recipe-list my-zig-tsauto-config)
+  (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-ts-mode))
+  :config
+  (require 'zig-mode)
+  (set-keymap-parent zig-ts-mode-map zig-mode-map))
 
 (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
 (load post-custom-file)
