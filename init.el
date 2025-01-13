@@ -19,7 +19,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
-(defvar elpaca-installer-version 0.8)
+(defvar elpaca-installer-version 0.9)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -1308,12 +1308,12 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package highlight-symbol
   :demand t
-  :init (highlight-symbol-mode)
   :hook (prog-mode . highlight-symbol-nav-mode)
   :general
   (:keymaps 'highlight-symbol-nav-mode-map
             "M-n" nil
             "M-p" nil)
+  ("M-<f6>"       '(highlight-symbol :which-key "highlight the symbol at point"))
   ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
   ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
   :config
@@ -2267,8 +2267,8 @@ have one rule for each file type."
      ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
   ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
-    (message "%S" args)
-    (funcall-interactively 'which-key-show-keymap 'global-map))
+    (run-with-idle-timer 0.1 nil   ; Delay of 0.1 seconds before executing
+     'which-key-show-keymap 'pokemacs-flycheck-overlay-map t))
 
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
@@ -2281,6 +2281,7 @@ have one rule for each file type."
     (dolist (overlay overlays)
       (put overlay 'keymap pokemacs-flycheck-overlay-map)
       (put overlay 'cursor-sensor-functions '(pokemacs-show-which-key-flycheck-overlay))))
+  (cursor-sensor-mode 1)
   (message "`flycheck' loaded"))
 
 (use-package flycheck-correct
