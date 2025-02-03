@@ -94,13 +94,19 @@ Read the [[file:manual.org][manual]], you won't regret it.
 
   and
   #+begin_src sh
-    ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --without-compress-install --with-threads --with-included-regex --with-x-toolkit=gtk3 --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls --with-xft --with-xml2 --with-mailutils --with-tree-sitter
+    ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --without-compress-install --with-threads --with-included-regex --with-x-toolkit=gtk3 --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls --with-xft --with-xml2 --with-mailutils --with-tree-sitter CFLAGS="-march=native -mtune=native -O2 -g3"
   #+end_src
 
   tell you you can make,
   #+begin_src sh
     make -j $(nproc)
   #+end_src
+
+  Note that with Fedora 41, tree-sitter is not installed at the expected path (see [[https://www.reddit.com/r/emacs/comments/1ic29ht/fix_compiling_with_treesitter_in_fedora_41/][this r/emacs post]]), as such compile it with
+  #+begin_src sh
+    TREE_SITTER_LIBS=/usr/lib64/libtree-sitter.so make -j $(nproc)
+  #+end_src
+
 
   then
 
