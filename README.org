@@ -79,7 +79,7 @@ Read the [[file:manual.org][manual]], you won't regret it.
       libjpeg-turbo-devel giflib-devel libtiff-devel gnutls-devel ncurses-devel \
       jansson-devel harfbuzz-devel harfbuzz ImageMagick ImageMagick-devel libgccjit-devel \
       libtree-sitter libtree-sitter-devel webkit2gtk4.1-devel Xaw3d-devel texinfo \
-      libX11-devel enchant-devel pkgconf
+      libX11-devel enchant2-devel pkgconf
   #+end_src
 
   #+begin_src sh
