@@ -2293,21 +2293,23 @@ have one rule for each file type."
           "M-RET" 'pokemacs-correct-or-newline)
   :config (message "`flycheck-correct' loaded"))
 
-(use-package quick-peek
-  :config (message "`quick-peek' loaded"))
+(if window-system
+    (use-package quick-peek
+      :config (message "`quick-peek' loaded")))
 
-(use-package flycheck-inline
-  :hook (flycheck-mode . flycheck-inline-mode)
-  :config
-  (setq flycheck-inline-display-function
-        (lambda (msg pos err)
-          (let* ((ov (quick-peek-overlay-ensure-at pos))
-                 (contents (quick-peek-overlay-contents ov)))
-            (setf (quick-peek-overlay-contents ov)
-                  (concat contents (when contents "\n") msg))
-            (quick-peek-update ov)))
-        flycheck-inline-clear-function #'quick-peek-hide)
-  (message "`flycheck-inline' loaded"))
+(when window-system
+  (use-package flycheck-inline
+    :hook (flycheck-mode . flycheck-inline-mode)
+    :config
+    (setq flycheck-inline-display-function
+          (lambda (msg pos err)
+            (let* ((ov (quick-peek-overlay-ensure-at pos))
+                   (contents (quick-peek-overlay-contents ov)))
+              (setf (quick-peek-overlay-contents ov)
+                    (concat contents (when contents "\n") msg))
+              (quick-peek-update ov)))
+          flycheck-inline-clear-function #'quick-peek-hide)
+    (message "`flycheck-inline' loaded")))
 
 (use-package consult-flycheck
   :general
