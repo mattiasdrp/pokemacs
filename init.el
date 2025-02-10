@@ -1906,6 +1906,12 @@ debian, and derivatives). On most it's 'fd'.")
                     :before (lambda (&rest _) (require 'ox-awesomecv)))
   :config (message "`ox-moderncv' loaded"))
 
+(use-package crdt
+  :commands (crdt-share-buffer crdt-connect)
+  :custom
+  (crdt-use-tuntox 'confirm)
+  (crdt-tuntox-password-in-url t))
+
 ;; Taken from doomemacs
 
 (defvar pokemacs-lsp--default-read-process-output-max nil)

@@ -129,6 +129,7 @@ Literate configuration for init.el.
   - [[#org-roam][Org roam]]
   - [[#org-make-toc][Org make toc]]
   - [[#org-cv][Org CV]]
+- [[#collaborative-editing][Collaborative editing]]
 - [[#lsp][LSP]]
   - [[#main-mode-0][Main mode]]
   - [[#lsp-ui][Lsp ui]]
@@ -252,6 +253,7 @@ Literate configuration for init.el.
     - [[#css-mode][CSS mode]]
     - [[#simple-httpd][Simple HTTPD]]
     - [[#beautify][Beautify]]
+- [[#zig][Zig]]
 - [[#end][End]]
 :END:
 
@@ -3078,6 +3080,19 @@ Helper to create table of contents in org files.
     :init (advice-add #'org-export-to-file
                       :before (lambda (&rest _) (require 'ox-awesomecv)))
     :config (message "`ox-moderncv' loaded"))
+#+end_src
+
+* Collaborative editing
+:PROPERTIES:
+:CUSTOM_ID: collaborative-editing
+:END:
+
+#+begin_src emacs-lisp
+  (use-package crdt
+    :commands (crdt-share-buffer crdt-connect)
+    :custom
+    (crdt-use-tuntox 'confirm)
+    (crdt-tuntox-password-in-url t))
 #+end_src
 
 * [[https://github.com/emacs-lsp/lsp-mode/][LSP]]
@@ -6534,6 +6549,9 @@ Some people use this, not my responsibility.
 #+end_src
 
 * Zig
+:PROPERTIES:
+:CUSTOM_ID: zig
+:END:
 
 Zig expects to find the binary for ~zig~ and ~zls~ to be able to run LSP. Customize ~lsp-zig-zig-exe-path~ and ~lsp-zig-zls-executable~.
 
