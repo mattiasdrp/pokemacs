@@ -59,7 +59,7 @@
  '(show-paren-priority -50)
  '(show-paren-style 'expression)
  '(tuple-mono-font
-   (if (window-system)
+   (if (display-graphic-p)
        (cond ((x-list-fonts pokemacs-mono-font) `(:font ,pokemacs-mono-font))
              ((x-list-fonts "Fira Code") '(:font "Fira Code"))
              ((x-list-fonts "Inconsolata") '(:font "Inconsolata"))
@@ -67,7 +67,7 @@
              (nil (warn "Cannot find a monospaced font.")))
      '(:family "Monospace")) t)
  '(tuple-variable-font
-   (if (window-system)
+   (if (display-graphic-p)
        (cond
         ((x-list-fonts pokemacs-variable-font) `(:font ,pokemacs-variable-font))
         ((x-list-fonts "Iosevka Aile") '(:font "Iosevka Aile"))

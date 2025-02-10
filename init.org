@@ -3588,7 +3588,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 :END:
 
 #+begin_src emacs-lisp
-  (if window-system
+  (if (display-graphic-p)
       (use-package quick-peek
         :config (message "`quick-peek' loaded")))
 #+end_src
@@ -3599,7 +3599,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 :END:
 
 #+begin_src emacs-lisp
-  (when window-system
+  (when (display-graphic-p)
     (use-package flycheck-inline
       :hook (flycheck-mode . flycheck-inline-mode)
       :config

@@ -2293,11 +2293,11 @@ have one rule for each file type."
           "M-RET" 'pokemacs-correct-or-newline)
   :config (message "`flycheck-correct' loaded"))
 
-(if window-system
+(if (display-graphic-p)
     (use-package quick-peek
       :config (message "`quick-peek' loaded")))
 
-(when window-system
+(when (display-graphic-p)
   (use-package flycheck-inline
     :hook (flycheck-mode . flycheck-inline-mode)
     :config
