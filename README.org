@@ -371,6 +371,10 @@ And, of course, you need to let both tools know who you are:
 
 Restart emacs and everything should work
 
+** Collaborative editing
+
+install [[https://github.com/gjedeer/tuntox][tuntox]] and set ~crdt-tuntox-executable~ to your ~tuntox~ binary.
+
 * Emacs config
 :PROPERTIES:
 :CUSTOM_ID: emacs-config

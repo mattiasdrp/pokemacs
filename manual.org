@@ -40,6 +40,7 @@ So here it is!
   - [[#magit][Magit]]
   - [[#programming-utilities][Programming utilities]]
 - [[#pokemacs-appearance][Pokemacs appearance]]
+- [[#collaborative-editing][Collaborative editing]]
 - [[#conclusion][Conclusion]]
 :END:
 
@@ -325,6 +326,21 @@ There are four custom variables you should customise:
 You can toggle between light and dark theme with ~M-x pokemacs-toggle-dark-light-theme~ (you can actually look at what pokemacs allows you to do by hitting ~M-x pokemacs~ see what the completion offers. Curiousity should always be rewarded.
 
 Try ~M-x pokemacs-restore-session~ or ~M-7 M-x pokemacs-restore-session~. That's a work in progress but I'm quite proud of it.
+
+* Collaborative editing
+:PROPERTIES:
+:CUSTOM_ID: collaborative-editing
+:END:
+
+Pokemacs comes with ~crdt~ that allows you to share buffers or connect to shared ones.
+
+For this you need to install [[https://github.com/gjedeer/tuntox][tuntox]] and set ~crdt-tuntox-executable~ to your ~tuntox~ binary. Once this is done you can start a session:
+- ~M-x crdt-share-buffer~
+- Choose a port and a password
+- If you want to share this session remotely, answer ~y~ otherwise ~n~
+- Copy the ~tuntox~ link with ~M-x crdt-copy-url~ and give it to the ones you want to work with
+  - They'll be able to connect to your session with ~M-x crdt-connect~ (be careful, this function does not raise errors easily so it can silently fail without you noticing it)
+- You can now add new files to the session etc
 
 * Conclusion
 :PROPERTIES:
