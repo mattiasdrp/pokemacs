@@ -1443,9 +1443,11 @@ debian, and derivatives). On most it's 'fd'.")
 
     "Utility"
     (("c" git-messenger:popup-message "Commit at point M-v G"))))
+  :custom
+  (magit-auto-revert-mode t)
+  (magit-auto-revert-immediately t)
+  (magit-format-file-function #'magit-format-file-nerd-icons)
   :config
-  (setq magit-auto-revert-mode t)
-  (setq magit-auto-revert-immediately t)
   (defun pokemacs-smerge-or-flycheck-next ()
     (interactive)
     (let (files (vc-git-conflicted-files default-directory))
