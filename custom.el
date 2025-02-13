@@ -91,6 +91,7 @@
  '(use-java t)
  '(use-kotlin t)
  '(use-latex nil)
+ '(use-ligature t)
  '(use-magit-todos t)
  '(use-markdown t)
  '(use-maximize t)

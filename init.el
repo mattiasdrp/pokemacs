@@ -264,6 +264,12 @@ nerd-icons is a better choice and I plan to stop using all-the-icons completely.
   :type 'boolean
   :tag "〜 Header-line")
 
+(defcustom use-ligature t
+  "If non-nil, join graphemes to form single glyphs"
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag "Ꜩ Ligature")
+
 (defcustom use-maximize nil
   "If non-nil, maximize Emacs at startup."
   :group 'pokemacs-appearance
@@ -724,32 +730,33 @@ debian, and derivatives). On most it's 'fd'.")
   ;; Remember to add an entry for `t', the library uses that as default.
   )
 
-(use-package ligature
-  :demand t
-  :config
-  ;; Enable the "www" ligature in every possible major mode
-  (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  ;; Enable all Fira Code ligatures in programming modes
-  (ligature-set-ligatures
-   'prog-mode '(
-                "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
-                ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
-                "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
-                "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
-                ;; "..""..."
-                "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
-                "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
-                "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
-                "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
-                "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
-                "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t)
-  (message "`ligature' loaded"))
+(when use-ligature
+  (use-package ligature
+    :demand t
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Fira Code ligatures in programming modes
+    (ligature-set-ligatures
+     'prog-mode '(
+                  "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+                  ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+                  "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+                  "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
+                  ;; "..""..."
+                  "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+                  "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+                  "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+                  "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+                  "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+                  "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t)
+    (message "`ligature' loaded")))
 
 (use-package ansi-color
   :ensure nil
@@ -4027,7 +4034,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (message "Window Point %S" (window-point (get-buffer-window buffer))))))
 
 (when use-ocaml
-
   (defcustom pokemacs-ocaml-templates
     '(
       (af "assert false;" n>)
@@ -4093,6 +4099,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (progn
         (add-hook 'post-command-hook 'pokemacs-update-opam-env)
         (add-hook 'post-command-hook 'pokemacs-update-load-path-opam)))
+
     (unless (version< emacs-version "29")
       (message "unbind c-c c-a")
       (general-unbind tuareg-mode-map "C-c C-a")
@@ -4115,38 +4122,43 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
              (l (pokemacs-map l))
              (rl (pokemacs-map rl)))
         (setq find-sibling-rules (append find-sibling-rules l rl))))
+
+    (if use-ligature
+      (add-hook 'tuareg-mode-hook
+                (lambda ()
+                  ;; Commented symbols are actually prettier with ligatures or just ugly
+                  (setq prettify-symbols-alist
+                        '(
+                          ("sqrt" . ?√)
+                          ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+                          ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
+                          ("<>" . ?≠)
+                          ;; Some greek letters for type parameters.
+                          ("'a" . ?α)
+                          ("'b" . ?β)
+                          ("'c" . ?γ)
+                          ("'d" . ?δ)
+                          ("'e" . ?ε)
+                          ("'f" . ?φ)
+                          ("'i" . ?ι)
+                          ("'k" . ?κ)
+                          ("'m" . ?μ)
+                          ("'n" . ?ν)
+                          ("'o" . ?ω)
+                          ("'p" . ?π)
+                          ("'r" . ?ρ)
+                          ("'s" . ?σ)
+                          ("'t" . ?τ)
+                          ("'x" . ?ξ)
+                          ("fun" . ?λ)
+                          ("not" . ?￢)
+                          (":=" . ?⟸)))))
+      (progn
+        (setq tuareg-prettify-symbols-basic-alist nil)
+        (setq tuareg-prettify-symbols-extra-alist nil)))
     (message "`tuareg' loaded")
     :hook
-    (tuareg-mode . (lambda () (pokemacs-set-local-tempel-template 'pokemacs-ocaml-templates)))
-    (tuareg-mode . (lambda ()
-                     ;; Commented symbols are actually prettier with ligatures or just ugly
-                     (setq prettify-symbols-alist
-                           '(
-                             ("sqrt" . ?√)
-                             ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
-                             ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-                             ("<>" . ?≠)
-                             ;; Some greek letters for type parameters.
-                             ("'a" . ?α)
-                             ("'b" . ?β)
-                             ("'c" . ?γ)
-                             ("'d" . ?δ)
-                             ("'e" . ?ε)
-                             ("'f" . ?φ)
-                             ("'i" . ?ι)
-                             ("'k" . ?κ)
-                             ("'m" . ?μ)
-                             ("'n" . ?ν)
-                             ("'o" . ?ω)
-                             ("'p" . ?π)
-                             ("'r" . ?ρ)
-                             ("'s" . ?σ)
-                             ("'t" . ?τ)
-                             ("'x" . ?ξ)
-                             ("fun" . ?λ)
-                             ("not" . ?￢)
-                             (":=" . ?⟸)
-                             )))))
+    (tuareg-mode . (lambda () (pokemacs-set-local-tempel-template 'pokemacs-ocaml-templates))))
 
   (use-package ocp-indent
     ;; must be careful to always defer this, it has autoloads that adds hooks

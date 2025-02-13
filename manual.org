@@ -339,7 +339,7 @@ For this you need to install [[https://github.com/gjedeer/tuntox][tuntox]] and s
 - Choose a port and a password
 - If you want to share this session remotely, answer ~y~ otherwise ~n~
 - Copy the ~tuntox~ link with ~M-x crdt-copy-url~ and give it to the ones you want to work with
-  - They'll be able to connect to your session with ~M-x crdt-connect~ (be careful, this function does not raise errors easily so it can silently fail without you noticing it)
+  - They'll be able to connect to your session with ~M-x crdt-connect~ (be careful, this function does not raise errors easily, so it can silently fail without you noticing it)
 - You can now add new files to the session etc
 
 * Conclusion
