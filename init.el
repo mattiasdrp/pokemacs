@@ -3106,9 +3106,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config
   (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
 
+(use-package hotfuzz)
+
 (use-package orderless
   :custom
-  (completion-styles '(orderless basic))
   (orderless-matching-styles '(orderless-prefixes))
   (orderless-component-separator 'orderless-escapable-split-on-space)
   (read-file-name-completion-ignore-case t)

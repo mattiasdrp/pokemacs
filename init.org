@@ -4652,6 +4652,12 @@ Need to fork this repo to make it work with the new corfu-popupinfo
     (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
 #+end_src
 
+** [[https://github.com/axelf4/hotfuzz][Hotfuzz]]
+
+#+begin_src emacs-lisp
+  (use-package hotfuzz)
+#+end_src
+
 ** [[https://github.com/oantolin/orderless][Orderless]]
 :PROPERTIES:
 :CUSTOM_ID: orderless
@@ -4662,7 +4668,6 @@ Better completions in minibuffers
 #+begin_src emacs-lisp
   (use-package orderless
     :custom
-    (completion-styles '(orderless basic))
     (orderless-matching-styles '(orderless-prefixes))
     (orderless-component-separator 'orderless-escapable-split-on-space)
     (read-file-name-completion-ignore-case t)
@@ -4713,7 +4718,6 @@ Better completions in minibuffers
     (git-commit-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword)))
     (text-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword))))
 #+end_src
-
 
 ** [[https://github.com/minad/marginalia][Marginalia]]
 :PROPERTIES:
