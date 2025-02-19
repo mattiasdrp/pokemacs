@@ -2223,6 +2223,41 @@ Useful package that allows to go to the next and previous symbols at point with 
     (message "`highlight-symbol' loaded"))
 #+end_src
 
+** Moving
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :general
+    ("M-<up>" 'pokemacs-move-line-up)
+    ("M-<down>" 'pokemacs-move-line-down)
+    :config
+    (defmacro pokemacs-save-column (&rest body)
+      `(let ((column (current-column)))
+         (unwind-protect
+             (progn ,@body)
+           (move-to-column column))))
+
+    (put 'save-column 'lisp-indent-function 0)
+
+    (defun pokemacs-move-line-up ()
+      "Move up the current line."
+      (interactive)
+      (pokemacs-save-column
+       (transpose-lines 1)
+       (forward-line -2)
+       (indent-according-to-mode)))
+
+    (defun pokemacs-move-line-down ()
+      "Move down the current line."
+      (interactive)
+      (pokemacs-save-column
+       (forward-line 1)
+       (transpose-lines 1)
+       (forward-line -1)
+       (indent-according-to-mode))))
+#+end_src
+
 ** [[https://github.com/magnars/multiple-cursors.el][Multiple cursors]]
 :PROPERTIES:
 :CUSTOM_ID: multiple-cursors

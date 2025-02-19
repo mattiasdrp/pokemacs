@@ -1326,6 +1326,37 @@ debian, and derivatives). On most it's 'fd'.")
   :config
   (message "`highlight-symbol' loaded"))
 
+(use-package emacs
+  :ensure nil
+  :general
+  ("M-<up>" 'pokemacs-move-line-up)
+  ("M-<down>" 'pokemacs-move-line-down)
+  :config
+  (defmacro pokemacs-save-column (&rest body)
+    `(let ((column (current-column)))
+       (unwind-protect
+           (progn ,@body)
+         (move-to-column column))))
+
+  (put 'save-column 'lisp-indent-function 0)
+
+  (defun pokemacs-move-line-up ()
+    "Move up the current line."
+    (interactive)
+    (pokemacs-save-column
+     (transpose-lines 1)
+     (forward-line -2)
+     (indent-according-to-mode)))
+
+  (defun pokemacs-move-line-down ()
+    "Move down the current line."
+    (interactive)
+    (pokemacs-save-column
+     (forward-line 1)
+     (transpose-lines 1)
+     (forward-line -1)
+     (indent-according-to-mode))))
+
 (use-package multiple-cursors
   :general
   ("C-c n" 'mc/mark-next-like-this)
