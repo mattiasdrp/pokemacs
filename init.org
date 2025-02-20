@@ -95,6 +95,7 @@ Literate configuration for init.el.
     - [[#ltex-ls][Ltex-ls]]
     - [[#jinx][Jinx]]
   - [[#highlight-symbol][Highlight symbol]]
+  - [[#moving][Moving]]
   - [[#multiple-cursors][Multiple cursors]]
   - [[#hide-region][Hide region]]
   - [[#hide-mode-line][Hide mode line]]
@@ -177,6 +178,7 @@ Literate configuration for init.el.
     - [[#kind-icon][Kind-icon]]
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
   - [[#windmove][Windmove]]
+  - [[#hotfuzz][Hotfuzz]]
   - [[#orderless][Orderless]]
   - [[#cape][Cape]]
   - [[#marginalia][Marginalia]]
@@ -2224,6 +2226,9 @@ Useful package that allows to go to the next and previous symbols at point with 
 #+end_src
 
 ** Moving
+:PROPERTIES:
+:CUSTOM_ID: moving
+:END:
 
 #+begin_src emacs-lisp
   (use-package emacs
@@ -3897,25 +3902,30 @@ Allows to undo and redo changes in window configurations
 This mode will center the text when only one window is displayed.
 
 #+begin_src emacs-lisp
-  (when use-visual-fill
-    (use-package visual-fill-column
-      :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
-      :custom
-      (visual-fill-column-width 100)
-      (visual-fill-column-center-text t)
-      :config
+  (use-package visual-fill-column
+    :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
+    :custom
+    (visual-fill-column-width 100)
+    (visual-fill-column-center-text t)
+    :config
 
-      (defun pokemacs-visual-fill-one-window ()
+    (defun pokemacs-toggle-visual-fill ()
+      (interactive)
+      (setq use-visual-fill (not use-visual-fill))
+      (visual-fill-column-mode 'toggle))
+
+    (defun pokemacs-visual-fill-one-window ()
+      (when use-visual-fill
         (global-visual-fill-column-mode -1)
         (if (window-full-width-p)
             (progn
               (global-visual-fill-column-mode 1)
               (setq mode-line-right-align-edge 'window)
               (set-window-fringes (selected-window) 8 8 nil nil))
-          (global-visual-fill-column-mode -1)))
+          (global-visual-fill-column-mode -1))))
 
-      (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
-      (message "`visual-fill-column' loaded")))
+    (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
+    (message "`visual-fill-column' loaded"))
 #+end_src
 
 ** Pokemacs layout
@@ -4617,7 +4627,8 @@ Need to fork this repo to make it work with the new corfu-popupinfo
       (("l" hl-line-mode "line" :toggle hl-line-mode)
        ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
       "UI"
-      (("d" pokemacs-toggle-dark-light-theme "dark theme" :toggle pokemacs-dark-theme-p))
+      (("d" pokemacs-toggle-dark-light-theme "dark theme" :toggle pokemacs-dark-theme-p)
+       ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
       "Coding"
       (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
        ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
@@ -4653,6 +4664,9 @@ Need to fork this repo to make it work with the new corfu-popupinfo
 #+end_src
 
 ** [[https://github.com/axelf4/hotfuzz][Hotfuzz]]
+:PROPERTIES:
+:CUSTOM_ID: hotfuzz
+:END:
 
 #+begin_src emacs-lisp
   (use-package hotfuzz)

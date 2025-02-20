@@ -2497,25 +2497,30 @@ with a prefix ARG."
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
-(when use-visual-fill
-  (use-package visual-fill-column
-    :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
-    :custom
-    (visual-fill-column-width 100)
-    (visual-fill-column-center-text t)
-    :config
+(use-package visual-fill-column
+  :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
+  :custom
+  (visual-fill-column-width 100)
+  (visual-fill-column-center-text t)
+  :config
 
-    (defun pokemacs-visual-fill-one-window ()
+  (defun pokemacs-toggle-visual-fill ()
+    (interactive)
+    (setq use-visual-fill (not use-visual-fill))
+    (visual-fill-column-mode 'toggle))
+
+  (defun pokemacs-visual-fill-one-window ()
+    (when use-visual-fill
       (global-visual-fill-column-mode -1)
       (if (window-full-width-p)
           (progn
             (global-visual-fill-column-mode 1)
             (setq mode-line-right-align-edge 'window)
             (set-window-fringes (selected-window) 8 8 nil nil))
-        (global-visual-fill-column-mode -1)))
+        (global-visual-fill-column-mode -1))))
 
-    (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
-    (message "`visual-fill-column' loaded")))
+  (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
+  (message "`visual-fill-column' loaded"))
 
 (use-package pokemacs-layout
   :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
@@ -3079,7 +3084,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (("l" hl-line-mode "line" :toggle hl-line-mode)
      ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
     "UI"
-    (("d" pokemacs-toggle-dark-light-theme "dark theme" :toggle pokemacs-dark-theme-p))
+    (("d" pokemacs-toggle-dark-light-theme "dark theme" :toggle pokemacs-dark-theme-p)
+     ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
     "Coding"
     (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
      ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
