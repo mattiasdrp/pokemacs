@@ -779,6 +779,11 @@ debian, and derivatives). On most it's 'fd'.")
   :hook (after-init . global-emojify-mode)
   :config (message "`emojify' loaded"))
 
+(defun pokemacs-unfold-or-indent-for-tab (&optional arg)
+  (interactive "P")
+  (unless (call-interactively #'treesit-fold-open)
+    (call-interactively #'indent-for-tab-command arg)))
+
 (use-package general
   :demand t
   :init
@@ -798,6 +803,7 @@ debian, and derivatives). On most it's 'fd'.")
   (general-define-key
    [remap kill-buffer]                  'kill-current-buffer
    [remap ispell-word]                  'jinx-correct
+   [remap indent-for-tab-command]       'pokemacs-unfold-or-indent-for-tab
    ;; Prefixed by C
    "C-x C-1"                 'delete-other-windows
    "C-x C-2"                 'split-window-below
@@ -1064,21 +1070,6 @@ debian, and derivatives). On most it's 'fd'.")
   (("<escape>"                'god-mode-all)
    ("²"                       'god-mode-all)
    ("C-²"                     'god-mode-all)))
-
-(use-package emacs-lisp-mode
-  :ensure nil
-
-  :mode-hydra
-  ((:color pink :quit-key "q")
-   ("Eval"
-    (("b" eval-buffer "buffer")
-     ("e" eval-defun "defun")
-     ("r" eval-region "region"))
-    "REPL"
-    (("I" ielm "ielm"))
-    "Doc"
-    (("f" describe-function "function")
-     ("v" describe-variable "variable")))))
 
 (use-package root-mode
   :ensure nil
@@ -3565,6 +3556,37 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :custom
   (treesit-auto-install 'prompt)
   :config
+  ;; Add OCaml to treesit parsers even if tuareg can't handle it
+  (setq pokemacs-ocaml-tsauto-config
+        (make-treesit-auto-recipe
+         :lang 'ocaml
+         :ts-mode 'tuareg-mode
+         :remap '(tuareg-mode)
+         :url "https://github.com/tree-sitter/tree-sitter-ocaml"
+         :revision "master"
+         :source-dir "grammars/ocaml/src"
+         :ext "\\.ml\\'"))
+  (add-to-list 'treesit-auto-recipe-list pokemacs-ocaml-tsauto-config)
+
+  (setq pokemacs-elisp-tsauto-config
+        (make-treesit-auto-recipe
+         :lang 'elisp
+         :ts-mode 'elisp-mode
+         :remap '(elisp-mode)
+         :url "https://github.com/Wilfred/tree-sitter-elisp"
+         :revision "main"
+         :ext "\\.el\\'"))
+  (add-to-list 'treesit-auto-recipe-list pokemacs-elisp-tsauto-config)
+
+  (setq my-zig-tsauto-config
+        (make-treesit-auto-recipe
+         :lang 'zig
+         :ts-mode 'zig-ts-mode
+         :remap 'zig-mode
+         :url "https://github.com/maxxnino/tree-sitter-zig"
+         :ext "\\.zig\\'"))
+  (add-to-list 'treesit-auto-recipe-list my-zig-tsauto-config)
+
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode)
   (message "`treesit-auto' loaded"))
@@ -3587,8 +3609,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package treesit-fold
   :ensure (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
+  :general
+  ("<backtab>" 'treesit-fold-toggle)
   :hook
   (emacs-lisp-mode . (lambda () (treesit-parser-create 'elisp)))
+  (elisp-mode . (lambda () (treesit-parser-create 'elisp)))
+  (tuareg-mode . (lambda () (treesit-parser-create 'ocaml)))
   (c-mode . (lambda () (treesit-parser-create 'c)))
   :custom
   ;; (treesit-fold-replacement "  [...]  ")
@@ -3879,7 +3905,19 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package elisp-mode
   :ensure nil
   :hook (elisp-mode . semantic-mode)
-  :config (message "`elisp-mode' loaded"))
+  :mode-hydra
+  ((:color pink :quit-key "q")
+   ("Eval"
+    (("b" eval-buffer "buffer")
+     ("e" eval-defun "defun")
+     ("r" eval-region "region"))
+    "REPL"
+    (("I" ielm "ielm"))
+    "Doc"
+    (("f" describe-function "function")
+     ("v" describe-variable "variable"))))
+  :config
+  (message "`elisp-mode' loaded"))
 
 (use-package puni
   :hook ((clojure-mode elisp-mode) . puni-mode)
@@ -4103,10 +4141,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c o w" 'ocaml-utils-dune-watch)
     :config
     (defun pokemacs-map (l)
-      (-map (lambda (x) (list
-                    (concat "\\([^/]+\\)" (regexp-quote (car x)))
-                    (concat "\\1" (regexp-quote (cdr x))))
-              ) l))
+      (-map (lambda (x)
+              (list
+               (concat "\\([^/]+\\)" (regexp-quote (car x)))
+               (concat "\\1" (regexp-quote (cdr x)))))
+            l))
 
     (defun cons-reverse (c)
       (cons (cdr c) (car c)))
@@ -4159,38 +4198,40 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (setq find-sibling-rules (append find-sibling-rules l rl))))
 
     (if use-ligature
-      (add-hook 'tuareg-mode-hook
-                (lambda ()
-                  ;; Commented symbols are actually prettier with ligatures or just ugly
-                  (setq prettify-symbols-alist
-                        '(
-                          ("sqrt" . ?√)
-                          ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
-                          ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-                          ("<>" . ?≠)
-                          ;; Some greek letters for type parameters.
-                          ("'a" . ?α)
-                          ("'b" . ?β)
-                          ("'c" . ?γ)
-                          ("'d" . ?δ)
-                          ("'e" . ?ε)
-                          ("'f" . ?φ)
-                          ("'i" . ?ι)
-                          ("'k" . ?κ)
-                          ("'m" . ?μ)
-                          ("'n" . ?ν)
-                          ("'o" . ?ω)
-                          ("'p" . ?π)
-                          ("'r" . ?ρ)
-                          ("'s" . ?σ)
-                          ("'t" . ?τ)
-                          ("'x" . ?ξ)
-                          ("fun" . ?λ)
-                          ("not" . ?￢)
-                          (":=" . ?⟸)))))
+        (add-hook
+         'tuareg-mode-hook
+         (lambda ()
+           ;; Commented symbols are actually prettier with ligatures or just ugly
+           (setq prettify-symbols-alist
+                 '(
+                   ("sqrt" . ?√)
+                   ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+                   ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
+                   ("<>" . ?≠)
+                   ;; Some greek letters for type parameters.
+                   ("'a" . ?α)
+                   ("'b" . ?β)
+                   ("'c" . ?γ)
+                   ("'d" . ?δ)
+                   ("'e" . ?ε)
+                   ("'f" . ?φ)
+                   ("'i" . ?ι)
+                   ("'k" . ?κ)
+                   ("'m" . ?μ)
+                   ("'n" . ?ν)
+                   ("'o" . ?ω)
+                   ("'p" . ?π)
+                   ("'r" . ?ρ)
+                   ("'s" . ?σ)
+                   ("'t" . ?τ)
+                   ("'x" . ?ξ)
+                   ("fun" . ?λ)
+                   ("not" . ?￢)
+                   (":=" . ?⟸)))))
       (progn
         (setq tuareg-prettify-symbols-basic-alist nil)
         (setq tuareg-prettify-symbols-extra-alist nil)))
+
     (message "`tuareg' loaded")
     :hook
     (tuareg-mode . (lambda () (pokemacs-set-local-tempel-template 'pokemacs-ocaml-templates))))
@@ -4511,14 +4552,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package zig-ts-mode
     :ensure (:type git :host codeberg :repo "meow_king/zig-ts-mode")
     :init
-    (setq my-zig-tsauto-config
-          (make-treesit-auto-recipe
-           :lang 'zig
-           :ts-mode 'zig-ts-mode
-           :remap 'zig-mode
-           :url "https://github.com/maxxnino/tree-sitter-zig"
-           :ext "\\.zig\\'"))
-    (add-to-list 'treesit-auto-recipe-list my-zig-tsauto-config)
     (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-ts-mode))
     :config
     (require 'zig-mode)
