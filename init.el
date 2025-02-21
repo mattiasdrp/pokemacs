@@ -3585,28 +3585,25 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; (global-tree-sitter-mode)
   :config (message "`tree-sitter' loaded"))
 
-(use-package ts-fold
-  :disabled
-  :ensure (ts-fold :host github :repo "emacs-tree-sitter/ts-fold")
+(use-package treesit-fold
+  :ensure (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
   :hook
-  (tuareg-mode . ts-fold-mode)
-  (c-mode      . ts-fold-mode)
-  (c++-mode    . ts-fold-mode)
-  (python-mode . ts-fold-mode)
-  (rustic-mode . ts-fold-mode)
+  (emacs-lisp-mode . (lambda () (treesit-parser-create 'elisp)))
+  (c-mode . (lambda () (treesit-parser-create 'c)))
   :custom
-  (ts-fold-replacement "  [...]  ")
-  :config (message "`ts-fold' loaded"))
-
-(use-package ts-fold-indicators
-  :disabled
-  :load-path "lisp/ts-fold/"
-  :ensure nil
-  :hook
-  (tree-sitter-after-on . ts-fold-indicators-mode)
+  ;; (treesit-fold-replacement "  [...]  ")
+  (treesit-fold-line-count-show t)
   :config
-  (setq ts-fold-indicators-fringe 'left-fringe)
-  (setq ts-fold-indicators-priority 100)
+  (global-treesit-fold-mode)
+  (message "`treesit-fold' loaded"))
+
+(use-package treesit-fold-indicators
+  :ensure nil
+  :custom
+  (treesit-fold-indicators-fringe 'left-fringe)
+  (treesit-fold-indicators-priority 100)
+  :config
+  (global-treesit-fold-indicators-mode)
   (message "`ts-fold-indicators' loaded"))
 
 (use-package combobulate
