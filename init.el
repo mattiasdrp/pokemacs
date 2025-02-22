@@ -2003,6 +2003,7 @@ debian, and derivatives). On most it's 'fd'.")
             "C-c C-t" 'lsp-describe-thing-at-point
             "C-c C-w" 'pokemacs-lsp-get-type-and-kill
             "C-c C-l" 'lsp-find-definition
+            "C-c C-j" 'lsp-find-type-definition
             "C-c &"   'pop-global-mark :keymaps 'override)
   (:keymaps 'lsp-command-map
             "d"   'lsp-find-definition
