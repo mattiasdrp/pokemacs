@@ -1376,7 +1376,10 @@ debian, and derivatives). On most it's 'fd'.")
   ("C-x u" 'vundo)
   :custom
   (vundo-glyph-alist vundo-unicode-symbols)
-  (vundo-compact-display t))
+  (vundo-compact-display t)
+  :general
+  (:keymaps 'vundo-mode-map
+            "u" 'vundo-backward))
 
 (use-package whitespace
   :ensure nil

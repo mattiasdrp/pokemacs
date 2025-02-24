@@ -2324,7 +2324,10 @@ Used by some packages
     ("C-x u" 'vundo)
     :custom
     (vundo-glyph-alist vundo-unicode-symbols)
-    (vundo-compact-display t))
+    (vundo-compact-display t)
+    :general
+    (:keymaps 'vundo-mode-map
+              "u" 'vundo-backward))
 #+end_src
 
 ** [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace]]
