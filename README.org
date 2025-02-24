@@ -178,6 +178,12 @@ You need to initialize the ~combobulate~ submodule until it is available on Melp
     opam install ocamlformat ocaml-lsp-server -y
   #+end_src
 
+The first time you start emacs, you'll have to
+
+#+begin_src elisp
+M-x pokemacs-fix-treesit-auto RET ocaml RET
+#+end_src
+
 *** Rust
 :PROPERTIES:
 :CUSTOM_ID: rust

@@ -348,3 +348,13 @@ For this you need to install [[https://github.com/gjedeer/tuntox][tuntox]] and s
 :END:
 
 This should be enough for now. Hope you have a nice journey with me. I'm falling asleep now. Love you all.
+
+* FAQ
+
+** LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)
+
+Try
+
+#+begin_src elisp
+M-x pokemacs-fix-treesit-auto RET ocaml RET
+#+end_src
