@@ -101,7 +101,7 @@
 
 (defcustom use-dashboard nil
   "If non-nil, uses the dashboard packages.
-This package greets you with a nice startup screen"
+  This package greets you with a nice startup screen"
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰕮 Dashboard")
@@ -114,75 +114,82 @@ This package greets you with a nice startup screen"
 
 (defcustom use-gcal nil
   "If non-nil, uses the org-gcal package.
-This package is used to link google calendars to org agendas.
-This is way too emacsy for most people"
+  This package is used to link google calendars to org agendas.
+  This is way too emacsy for most people"
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Org Google Calendar")
 
 (defcustom use-god nil
   "If non-nil, uses the god (mode) packages.
-Similar to Vim's separation of command/insert modes"
+  Similar to Vim's separation of command/insert modes"
   :group 'pokemacs-packages
   :type 'boolean
   :tag " God Mode")
 
 (defcustom use-magit-todos nil
   "If non-nil, show todos in the current project in magit buffer.
-If your project contains a lot of todos you may want to disable this package."
+  If your project contains a lot of todos you may want to disable this package."
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Magit todos")
 
 (defcustom use-mu4e nil
   "If non-nil, use mu4e and smtpmail.
-Reading your emails in emacs, what else?"
+  Reading your emails in emacs, what else?"
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Mu4e")
 
+(defcustom use-org nil
+  "If non-nil, install Org mode from it's git repo.
+Otherwise, the org provided with emacs will be used"
+  :group 'pokemacs-languages
+  :type 'boolean
+  :tag " Org mode")
+
 (defcustom use-org-agenda-startup nil
   "Start the org agenda at startup.
-If you don't live the org life you don't need it.
-But you don't live the org life.
-That's on you."
+  If you don't live the org life you don't need it.
+  But you don't live the org life.
+  That's on you."
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Org Agenda")
 
 (defcustom use-org-roam nil
   "If non-nil, uses Org roam.
-The Zettelkasten method.
-In emacs.
-With org-mode."
+  The Zettelkasten method.
+  In emacs.
+  With org-mode."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰠮 Zettelkasten/Org Roam")
 
 (defcustom use-pandoc nil
   "If non-nil, uses the pandoc packages.
-You know, for markdown. Because you don't use org-mode."
+  You know, for markdown. Because you don't use org-mode."
   :group 'pokemacs-packages
   :type 'boolean
   :tag " Pandoc")
 
 (defcustom use-posframe nil
   "If non-nil, uses the vertico-posframe packages.
-Instead of displaying candidate menus in the minibuffer display them in a fancy posframe."
+  Instead of displaying candidate menus in the minibuffer display them in a fancy posframe."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰹉 Posframe")
 
 (defcustom use-treemacs nil
   "If non-nil, uses the treemacs packages.
-Some people want vscode in their emacs. Don't gate-keep, give them their big tree."
+  Some people want vscode in their emacs. Don't gate-keep, give them their big tree."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰙅 Treemacs")
 
 (defcustom use-window-purpose nil
   "If non-nil, uses the window-purpose package.
-Give windows a 'purpose' to prevent them from being populated by buffers that don't have the same purpose."
+  Give windows a 'purpose' to prevent them from being populated by buffers that don't have the same purpose."
   :group 'pokemacs-packages
   :type 'boolean
   :tag "󰡃 Window Purpose")
@@ -221,14 +228,14 @@ Give windows a 'purpose' to prevent them from being populated by buffers that do
 
 (defcustom tuple-mono-font `(:font ,pokemacs-mono-font)
   "List of possible mono fonts (the first available one will be used).
-`pokemacs-mono-font' is the first checked font"
+  `pokemacs-mono-font' is the first checked font"
   :group 'pokemacs-appearance
   :type 'list
   :tag " Mono Fonts")
 
 (defcustom tuple-variable-font `(:font ,pokemacs-variable-font)
   "List of possible mono fonts (the first available one will be used).
-`pokemacs-variable-font' is the first checked font"
+  `pokemacs-variable-font' is the first checked font"
   :group 'pokemacs-appearance
   :type 'list
   :tag " Variable Fonts")
@@ -253,7 +260,7 @@ Give windows a 'purpose' to prevent them from being populated by buffers that do
 
 (defcustom use-all-the-icons nil
   "Use all-the-icons (when t) or nerd-icons (when nil).
-nerd-icons is a better choice and I plan to stop using all-the-icons completely."
+  nerd-icons is a better choice and I plan to stop using all-the-icons completely."
   :group 'pokemacs-appearance
   :type 'boolean
   :tag " Icons")
@@ -278,14 +285,14 @@ nerd-icons is a better choice and I plan to stop using all-the-icons completely.
 
 (defcustom use-rainbow nil
   "If non-nil, don't be @thriim.
-Rainbowify parentheses and other things."
+  Rainbowify parentheses and other things."
   :group 'pokemacs-appearance
   :type 'boolean
   :tag "󱃗 Rainbows")
 
 (defcustom use-solaire t
   "If non-nil, uses the solaire package.
-Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
+  Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter a darker background."
   :group 'pokemacs-appearance
   :type 'boolean
   :tag " Solaire")
@@ -305,7 +312,7 @@ Distinguishes between \"real\" buffers and \"unreal\" ones by giving the latter 
 
 (defcustom pokemacs-dict "en-GB"
   "Dictionary language.
-Specify the chosen language used by spell checking tools in pokemacs."
+  Specify the chosen language used by spell checking tools in pokemacs."
   :group 'pokemacs-dictionaries
   :type '(choice (const :tag "en-GB"   "en-GB")
                  (const :tag "en-US"   "en-US")
@@ -1547,8 +1554,16 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ob-racket
   :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
+;; Install org from its git-repo if use-org is t
+;; Otherwise, use the one provided by emacs
+(if use-org
+    (use-package org)
+  (use-package org
+    :ensure nil))
+
 (use-package org
   :mode ("\\.org\\'" . org-mode)
+  :ensure nil
   :hook
   (org-mode . mixed-pitch-mode)
   (org-mode . pokemacs-org-mode-hook)
@@ -2519,6 +2534,7 @@ with a prefix ARG."
 
 (use-package pokemacs-layout
   :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
+  ;; :load-path "~/pokemacs-layout"
   :commands pokemacs-layout-apply pokemacs-restore-session
   :config
   (defun pokemacs-restore-session (&optional columns)
@@ -3618,7 +3634,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :hook
   (emacs-lisp-mode . (lambda () (treesit-parser-create 'elisp)))
   (elisp-mode . (lambda () (treesit-parser-create 'elisp)))
-  (tuareg-mode . (lambda () (treesit-parser-create 'ocaml)))
+  (tuareg-mode . (lambda ()
+                   (message "create parser for OCaml")
+                   (treesit-parser-create 'ocaml)))
   (c-mode . (lambda () (treesit-parser-create 'c)))
   :custom
   ;; (treesit-fold-replacement "  [...]  ")

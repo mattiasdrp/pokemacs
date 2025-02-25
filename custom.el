@@ -99,6 +99,7 @@
  '(use-michelson nil)
  '(use-mu4e nil)
  '(use-ocaml t)
+ '(use-org nil)
  '(use-org-agenda-startup nil)
  '(use-org-roam t)
  '(use-pandoc t)
