@@ -1997,7 +1997,9 @@ debian, and derivatives). On most it's 'fd'.")
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless))
     (setq-local completion-at-point-functions
-                (list (cape-capf-super #'cape-keyword (cape-capf-buster #'lsp-completion-at-point)))))
+                (list (cape-capf-super
+                       #'cape-keyword
+                       #'lsp-completion-at-point))))
 
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
@@ -2071,6 +2073,8 @@ debian, and derivatives). On most it's 'fd'.")
       (define-key keymap (kbd "C-w") #'pokemacs-lsp-get-type-and-kill)
       keymap)
     "The local map to navigate type enclosing.")
+
+  (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
 
   (defun pokemacs-set-type-map (&rest r)
     (set-transient-map pokemacs-type-map))
@@ -3212,7 +3216,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                 (cons #'tempel-expand
                       completion-at-point-functions)))
 
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
 
   ;; Optionally make the Tempel templates available to Abbrev,
