@@ -788,7 +788,9 @@ debian, and derivatives). On most it's 'fd'.")
 
 (defun pokemacs-unfold-or-indent-for-tab (&optional arg)
   (interactive "P")
-  (unless (call-interactively #'treesit-fold-open)
+  (if (treesit-parser-list)
+      (unless (call-interactively #'treesit-fold-open)
+        (call-interactively #'indent-for-tab-command arg))
     (call-interactively #'indent-for-tab-command arg)))
 
 (use-package general
@@ -1993,9 +1995,10 @@ debian, and derivatives). On most it's 'fd'.")
   :init
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless)))
-  (setq-local completion-at-point-functions
-              (list (cape-capf-buster #'lsp-completion-at-point)))
+          '(orderless))
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super #'cape-keyword (cape-capf-buster #'lsp-completion-at-point)))))
+
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
@@ -3167,6 +3170,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (cape-capf-super #'cape-dict #'cape-keyword)
       (cape-capf-super #'cape-keyword)))
   :hook
+  (org-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-elisp-block)))
   (git-commit-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword)))
   (text-mode . (lambda () (add-to-list 'completion-at-point-functions #'cape-?dict+keyword))))
 
@@ -3632,10 +3636,14 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :general
   ("<backtab>" 'treesit-fold-toggle)
   :hook
-  (emacs-lisp-mode . (lambda () (treesit-parser-create 'elisp)))
-  (elisp-mode . (lambda () (treesit-parser-create 'elisp)))
+  (emacs-lisp-mode . (lambda ()
+                       (pokemacs-fix-treesit-auto "elisp")
+                       (treesit-parser-create 'elisp)))
+  (elisp-mode . (lambda ()
+                  (pokemacs-fix-treesit-auto "elisp")
+                  (treesit-parser-create 'elisp)))
   (tuareg-mode . (lambda ()
-                   (message "create parser for OCaml")
+                   (pokemacs-fix-treesit-auto "ocaml")
                    (treesit-parser-create 'ocaml)))
   (c-mode . (lambda () (treesit-parser-create 'c)))
   :custom
@@ -3949,6 +3957,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;;  "C-<right>" nil
   ;;  "C-<left>" nil)
   )
+
+(use-package package-lint
+  :ensure (:type git :host github :repo "purcell/package-lint" :ref "c30d23d"))
 
 (use-package flycheck-package
   :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
