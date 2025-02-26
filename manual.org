@@ -40,8 +40,11 @@ So here it is!
   - [[#magit][Magit]]
   - [[#programming-utilities][Programming utilities]]
 - [[#pokemacs-appearance][Pokemacs appearance]]
+  - [[#pokemacs-layout][Pokemacs layout]]
 - [[#collaborative-editing][Collaborative editing]]
 - [[#conclusion][Conclusion]]
+- [[#faq][FAQ]]
+  - [[#lsp-doesnt-start-automatically--file-mode-specification-error-treesit-load-language-error-][LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)]]
 :END:
 
 * What is pokemacs?
@@ -323,9 +326,50 @@ There are four custom variables you should customise:
 - ~pokemacs-light-theme~: do I need to explain it? Anyway, you can have a taste of the available themes with ~M-x consult-themes~
 - ~pokemacs-dark-theme~: 󰔎
 
+** Pokemacs layout
+:PROPERTIES:
+:CUSTOM_ID: pokemacs-layout
+:END:
+
 You can toggle between light and dark theme with ~M-x pokemacs-toggle-dark-light-theme~ (you can actually look at what pokemacs allows you to do by hitting ~M-x pokemacs~ see what the completion offers. Curiousity should always be rewarded.
 
-Try ~M-x pokemacs-restore-session~ or ~M-7 M-x pokemacs-restore-session~. That's a work in progress but I'm quite proud of it.
+Try ~M-x pokemacs-restore-session~ or ~M-7 M-x pokemacs-restore-session~. This will create a default layout. You can also create your own layouts by modifying ~pokemacs-layout-layouts~ (it's already filled with some predefined layouts that can inspire you). Apply the layout of your choice with ~M-x pokemacs-layout-apply~. That's a work in progress but I'm quite proud of it.
+Example of a layout:
+
+#+begin_src elisp
+(:name "prog default layout"
+ :layout
+        (:windows ((column nil nil 2))
+         :sides
+                  ((right (1 magit-status-quick t)
+                          (2 ("*compilation*" "*lsp-help*") t))))
+ :description
+        "3 vertical columns with last one being magit | compilation | lsp-help")
+#+end_src
+
+As you can see, a layout is defined as a [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Property-Lists.html][property list]] containing:
+- a ~:name~
+- a ~:layout~
+- a ~:description~
+
+The ~layout~ is also a list that can define ~:windows~ and ~:sides~.
+
+~windows~ are either ~column~ or ~row~ with three other fields:
+- ~content~: ~nil~ means that this window contains the current buffer. Otherwise this can be a buffer name or an elisp function
+- ~lock-window~: ~t~ if this window should be locked to its current buffer, ~nil~ otherwise
+- ~number~: the number of times this window should be created
+
+~sides~ define sidebars. They contain four fields:
+- The position: ~top~, ~left~, ~right~, ~bottom~
+- ~slot~: The position of the window (from 1 to whatever you want/can see. Don't use 0!)
+- ~content~: Same as ~windows~ except that you can give it a list of contents and this will assign this window to all the buffers in this list
+- ~lock-window~: Same as ~windows~
+
+With this knowledge the previous layout is then:
+- Named ~prog default layout~
+- Has two column windows containing the current buffer
+- Has a right sidebar containing two slots, the first one is a magit buffer filled with the result of ~magit-status-quick~, the second one will display the compilation buffer or the lsp-help buffer depending on the last command that was invoked
+- Is described as a layout of ~3 vertical columns with last one being magit | compilation | lsp-help~
 
 * Collaborative editing
 :PROPERTIES:
@@ -350,8 +394,14 @@ For this you need to install [[https://github.com/gjedeer/tuntox][tuntox]] and s
 This should be enough for now. Hope you have a nice journey with me. I'm falling asleep now. Love you all.
 
 * FAQ
+:PROPERTIES:
+:CUSTOM_ID: faq
+:END:
 
 ** LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)
+:PROPERTIES:
+:CUSTOM_ID: lsp-doesnt-start-automatically--file-mode-specification-error-treesit-load-language-error-
+:END:
 
 Try
 
