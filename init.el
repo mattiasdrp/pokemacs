@@ -3128,7 +3128,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                ("<up>" . 'windmove-up)
                ("<down>" . 'windmove-down))
   :config
-  (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
+  (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down windmove-right)))
 
 (use-package hotfuzz)
 

@@ -4679,7 +4679,7 @@ Need to fork this repo to make it work with the new corfu-popupinfo
                  ("<up>" . 'windmove-up)
                  ("<down>" . 'windmove-down))
     :config
-    (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down window-right)))
+    (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down windmove-right)))
 #+end_src
 
 ** [[https://github.com/axelf4/hotfuzz][Hotfuzz]]
