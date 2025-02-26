@@ -277,6 +277,12 @@ Otherwise, the org provided with emacs will be used"
   :type 'boolean
   :tag "Ꜩ Ligature")
 
+(defcustom use-inline-errors t
+  "If non-nil, inline flycheck errors"
+  :group 'pokemacs-appearance
+  :type 'boolean
+  :tag "󰼮 Inline Errors")
+
 (defcustom use-maximize nil
   "If non-nil, maximize Emacs at startup."
   :group 'pokemacs-appearance
@@ -2360,7 +2366,7 @@ have one rule for each file type."
     (use-package quick-peek
       :config (message "`quick-peek' loaded")))
 
-(when (display-graphic-p)
+(when (and use-inline-errors (display-graphic-p))
   (use-package flycheck-inline
     :hook (flycheck-mode . flycheck-inline-mode)
     :config
@@ -3106,6 +3112,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
      ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
     "Coding"
     (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
+     ("i" flycheck-inline-mode "flycheck" :toggle flycheck-inline-mode)
      ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
      )
     "Emacs"

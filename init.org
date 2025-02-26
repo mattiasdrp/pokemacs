@@ -588,6 +588,12 @@ This is a list of custom variables that allow to enable/disable features. If you
     :type 'boolean
     :tag "Ꜩ Ligature")
 
+  (defcustom use-inline-errors t
+    "If non-nil, inline flycheck errors"
+    :group 'pokemacs-appearance
+    :type 'boolean
+    :tag "󰼮 Inline Errors")
+
   (defcustom use-maximize nil
     "If non-nil, maximize Emacs at startup."
     :group 'pokemacs-appearance
@@ -3681,7 +3687,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
 :END:
 
 #+begin_src emacs-lisp
-  (when (display-graphic-p)
+  (when (and use-inline-errors (display-graphic-p))
     (use-package flycheck-inline
       :hook (flycheck-mode . flycheck-inline-mode)
       :config
@@ -4650,6 +4656,7 @@ Need to fork this repo to make it work with the new corfu-popupinfo
        ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
       "Coding"
       (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
+       ("i" flycheck-inline-mode "flycheck" :toggle flycheck-inline-mode)
        ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
        )
       "Emacs"

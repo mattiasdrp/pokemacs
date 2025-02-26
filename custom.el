@@ -89,6 +89,7 @@
  '(use-gcal nil)
  '(use-god nil)
  '(use-header-line nil)
+ '(use-inline-errors t)
  '(use-java t)
  '(use-kotlin t)
  '(use-latex nil)
