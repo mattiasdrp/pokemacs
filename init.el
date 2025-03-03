@@ -382,13 +382,16 @@ Otherwise, the org provided with emacs will be used"
 
 (use-package doom-themes
   :demand t
+  :custom
+  ;; use the colorful treemacs theme
+  (doom-themes-treemacs-theme "doom-colors")
   :config
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   ;; (doom-themes-neotree-config)
   ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  :config
   (doom-themes-treemacs-config)
 
   ;; Corrects (and improves) org-mode's native fontification.
@@ -636,8 +639,9 @@ debian, and derivatives). On most it's 'fd'.")
   :config (gcmh-mode 1))
 
 (use-package esup
+  :custom
+  (esup-depth 0)
   :config
-  (setq esup-depth 0)
   (message "`esup' loaded"))
 
 (use-package prescient
@@ -777,9 +781,9 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`ansi-color' loaded"))
 
 (use-package xterm-color
+  :custom
+  (compilation-environment '("TERM=xterm-256color"))
   :config
-  (setq compilation-environment '("TERM=xterm-256color"))
-
   (defun my/advice-compilation-filter (f proc string)
     (funcall f proc (xterm-color-filter string)))
 
@@ -893,6 +897,10 @@ debian, and derivatives). On most it's 'fd'.")
   :custom
   (which-key-separator " ")
   (which-key-prefix-prefix "+")
+  (which-key-sort-order 'which-key-key-order-alpha)
+  (which-key-side-window-max-width 0.33)
+  (which-key-show-early-on-C-h t)
+  (which-key-idle-delay 0.1)
   :config
   (which-key-add-major-mode-key-based-replacements 'markdown-mode
     "C-c TAB" "markdown/images"
@@ -909,10 +917,6 @@ debian, and derivatives). On most it's 'fd'.")
     "C-c C-e" "web/element"
     "C-c C-t" "web/tags")
   (which-key-setup-side-window-bottom)
-  (setq which-key-sort-order 'which-key-key-order-alpha
-        which-key-side-window-max-width 0.33
-        which-key-show-early-on-C-h t
-        which-key-idle-delay 0.1)
   (message "`which-key' loaded"))
 
 (use-package hydra
@@ -1064,6 +1068,9 @@ debian, and derivatives). On most it's 'fd'.")
   :disabled
   :init
   (setq god-mode-enable-function-key-translation nil)
+  :custom
+  (god-exempt-major-modes nil)
+  (god-exempt-predicates nil)
   :config
   (defun my-god-mode-update-modeline ()
     (cond (god-local-mode
@@ -1079,8 +1086,6 @@ debian, and derivatives). On most it's 'fd'.")
                (set-face-foreground 'mode-line-inactive "white")))))
   (add-hook 'god-mode-enabled-hook #'my-god-mode-update-modeline)
   (add-hook 'god-mode-disabled-hook #'my-god-mode-update-modeline)
-  (setq god-exempt-major-modes nil)
-  (setq god-exempt-predicates nil)
   :general
   (("<escape>"                'god-mode-all)
    ("²"                       'god-mode-all)
@@ -1213,8 +1218,9 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package nlinum
   :init (global-nlinum-mode 1)
+  :custom
+  (nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
   :config
-  (setq nlinum--width (length (number-to-string (count-lines (point-min) (point-max)))))
   (message "`nlinum' loaded"))
 
 (use-package cheatsheet
@@ -1271,6 +1277,7 @@ debian, and derivatives). On most it's 'fd'.")
   ([remap describe-function] 'helpful-callable)
   ([remap describe-variable] 'helpful-variable)
   ([remap describe-symbol] 'helpful-symbol)
+  ("C-c C-d" 'helpful-at-point)
   ("C-h F" 'helpful-function)
   ("C-h C" 'helpful-command))
 
@@ -1295,7 +1302,9 @@ debian, and derivatives). On most it's 'fd'.")
                        (require 'lsp-ltex)
                        (lsp-deferred)))
   :init (setq lsp-ltex-version "16.0.0")
-  :config (setq lsp-ltex-language pokemacs-dict))
+  :custom
+  (lsp-ltex-language pokemacs-dict)
+  :config (message "`lsp-ltex' loaded"))
 
 (use-package jinx
   ;; :ensure-system-package libenchant-2-dev
@@ -1306,13 +1315,14 @@ debian, and derivatives). On most it's 'fd'.")
     (pokemacs-customize-my-custom-variable "pokemacs-dict")
     (setq jinx-languages pokemacs-dict)
     (setq lsp-ltex-language pokemacs-dict))
+  :custom
+  (jinx-languages pokemacs-dict)
   :general
   (:keymaps 'jinx-overlay-map
             "RET" 'jinx-correct)
   ("M-$"  'jinx-correct)
   ("C-M-$" 'pokemacs-change-dict)
   :config
-  (setq jinx-languages pokemacs-dict)
   ;; Temporary setting tree-sitter faces for jinx-include-faces
   ;; When tuareg has a proper treesitter mode this will become useless
   (let* ((prog-faces (alist-get 'prog-mode jinx-include-faces))
@@ -1421,32 +1431,59 @@ debian, and derivatives). On most it's 'fd'.")
             "DEL" 'dired-up-directory))
 
 (use-package dirvish
-  :commands dirvish-find-entry-a dirvish-dired-noselect-a
+  :ensure (dirvish :files (:defaults "extensions/*"))
+  :hook (dirvish-directory-view-mode . (lambda () (nlinum-mode 0)))
   :init
-  (advice-add #'dired-find-file :override #'dirvish-find-entry-a)
-  (advice-add #'dired-noselect :around #'dirvish-dired-noselect-a)
-
-  (defun pokemacs-dired-update-mode-line-height-h ()
-    (when-let (height (bound-and-true-p doom-modeline-height))
-      (setq dirvish-mode-line-height height
-            dirvish-header-line-height height)))
-  :hook (dired-mode . pokemacs-dired-update-mode-line-height-h)
-  :config
+  (dirvish-override-dired-mode)
+  :custom
   ;; From doomemacs/blob/master/modules/emacs/dired/config.el#L84C1-L89C35
   ;; Don't recycle sessions. We don't want leftover buffers lying around,
   ;; especially if users are reconfiguring Dirvish or trying to recover from an
   ;; error. It's too easy to accidentally break Dirvish (e.g. by focusing the
   ;; header window) at the moment, or get stuck in a focus loop with the buried
   ;; buffers. Starting from scratch isn't even that expensive, anyway.
-  (setq dirvish-reuse-session nil)
-  (setq dirvish-attributes '(file-size)
-        dirvish-mode-line-format
-        '(:left (sort file-time symlink) :right (omit yank index)))
-  (setq dirvish-subtree-always-show-state t)
-  (pokemacs-appendq! dirvish-attributes '(nerd-icons subtree-state))
-  (setq dirvish-hide-details '(dirvish dirvish-side)
-        dirvish-hide-cursor '(dirvish dirvish-side))
-  (dirvish-override-dired-mode))
+  ;; (dirvish-default-layout '(1 0.11 nil))
+  (dirvish-reuse-session nil)
+  (dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (dirvish-side-attributes '(vc-state file-size nerd-icons collapse))
+  (dirvish-mode-line-format '(:left (sort file-time symlink) :right (omit yank index)))
+  (dirvish-subtree-always-show-state t)
+  (dirvish-hide-details '(dirvish dirvish-side))
+  (dirvish-hide-cursor '(dirvish dirvish-side))
+  (delete-by-moving-to-trash t)
+  (dired-listing-switches
+   "-l --almost-all --human-readable --group-directories-first --no-group")
+  ;; (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+  ;;  '(("h" "~/"                          "Home")
+  ;;    ("d" "~/Downloads/"                "Downloads")
+  ;;    ("m" "/mnt/"                       "Drives")
+  ;;    ("t" "~/.local/share/Trash/files/" "TrashCan")))
+  :general ; Bind `dirvish-fd|dirvish-side|dirvish-dwim' as you see fit
+  ("C-c f" 'dirvish)
+  (:keymaps 'dirvish-mode-map          ; Dirvish inherits `dired-mode-map'
+            "?"   'dirvish-dispatch     ; contains most of sub-menus in dirvish extensions
+            "a"   'dirvish-quick-access
+            "f"   'dirvish-file-info-menu
+            "y"   'dirvish-yank-menu
+            "N"   'dirvish-narrow
+            "^"   'dirvish-history-last
+            "h"   'dirvish-history-jump ; remapped `describe-mode'
+            "s"   'dirvish-quicksort    ; remapped `dired-sort-toggle-or-edit'
+            "v"   'dirvish-vc-menu      ; remapped `dired-view-file'
+            "TAB" 'dirvish-subtree-toggle
+            "M-f" 'dirvish-history-go-forward
+            "M-b" 'dirvish-history-go-backward
+            "M-l" 'dirvish-ls-switches-menu
+            "M-m" 'dirvish-mark-menu
+            "M-t" 'dirvish-layout-toggle
+            "M-s" 'dirvish-setup-menu
+            "M-e" 'dirvish-emerge-menu
+            "M-j" 'dirvish-fd-jump)
+  :config
+  (message "`dirvish' loaded"))
+
+(use-package dirvish-icons
+  :ensure nil)
 
 (use-package dwim-shell-command
   :ensure (dwim-shell-command :files (:defaults "*.el"))
@@ -1506,8 +1543,9 @@ debian, and derivatives). On most it's 'fd'.")
 (when use-magit-todos
   (use-package magit-todos
     :hook (magit . magit-todos)
+    :custom
+    (magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
     :config
-    (setq magit-todos-keywords-list (-mapcat (lambda (assoc) (list (car assoc))) hl-todo-keyword-faces))
     (message "`magit-todos' loaded")))
 
 (use-package hl-todo
@@ -1516,9 +1554,10 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`hl-todo' loaded"))
 
 (use-package git-messenger
+  :custom
+  (git-messenger:show-detail t)
+  (git-messenger:use-magit-popup t)
   :config
-  (setq git-messenger:show-detail t
-        git-messenger:use-magit-popup t)
   (message "`git-messenger' loaded"))
 
 (use-package git-timemachine
@@ -1529,8 +1568,9 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package code-review
   :disabled t
+  :custom
+  (code-review-download-dir (no-littering-expand-var-file-name "backups/"))
   :config
-  (setq code-review-download-dir (no-littering-expand-var-file-name "backups/"))
   (message "`code-review' loaded"))
 
 (use-package ghub
@@ -1614,26 +1654,17 @@ debian, and derivatives). On most it's 'fd'.")
       (make-local-variable 'minor-mode-overriding-map-alist)
       (push `(lsp-mode . ,newmap) minor-mode-overriding-map-alist)))
 
-  (setq org-list-allow-alphabetical t)
-  ;; If you don't want the agenda in french you can comment the following
-  ;; expression. You can even set it to your preferred language
-  ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
-  (setq calendar-week-start-day 1
-        calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
-                                 "Jeudi" "Vendredi" "Samedi"]
-        calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
-                                   "Juin" "Juillet" "Août" "Septembre"
-                                   "Octobre" "Novembre" "Décembre"])
-
   (defun pokemacs-org-compile-latex-and-update-other-buffer ()
     "Has as a premise that it's run from an org-mode buffer and the
                other buffer already has the PDF open"
     (interactive)
     (org-latex-export-to-pdf)
     (pokemacs-update-other-buffer))
+
   :custom
   ;; Change this value to point to where your org files are
   (org-directory "~/org/")
+  (org-list-allow-alphabetical t)
   ;; Babel
   (org-confirm-babel-evaluate nil)
   (org-insert-heading-respect-content nil)
@@ -1641,6 +1672,15 @@ debian, and derivatives). On most it's 'fd'.")
   (org-src-fontify-natively t)
   (org-src-tab-acts-natively t)
   (org-hide-block-startup t)
+  ;; If you don't want the agenda in french you can comment the following
+  ;; expression. You can even set it to your preferred language
+  ;; https://www.emacswiki.org/emacs/CalendarLocalization#toc16
+  (calendar-week-start-day 1)
+  (calendar-day-name-array ["Dimanche" "Lundi" "Mardi" "Mercredi"
+                            "Jeudi" "Vendredi" "Samedi"])
+  (calendar-month-name-array ["Janvier" "Février" "Mars" "Avril" "Mai"
+                              "Juin" "Juillet" "Août" "Septembre"
+                              "Octobre" "Novembre" "Décembre"])
   ;; Rest
   (org-ellipsis " ▾")
   (org-startup-indented t)
@@ -1667,12 +1707,28 @@ debian, and derivatives). On most it's 'fd'.")
   (org-startup-with-inline-images t)
   (org-support-shift-select 'always)
   (org-roam-v2-ack t) ; anonying startup message
+  (org-todo-keywords
+   '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
+     ))
+  (org-image-actual-width nil)
+  (org-agenda-custom-commands
+   '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
+      ((org-agenda-span 'month)
+       (org-agenda-show-all-dates nil)))))
+
+  (org-capture-templates
+   `(
+     ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+      "* TODO %?\n  %u\n  %a")
+     ("s" "Scheduled" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
+      "* TODO %?\n SCHEDULED: %^t \n %a")
+     ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+      "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+     ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+      "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
 
   :config
   ;; TODO states
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "PLANNING(p)" "IN-PROGRESS(i@/!)" "VERIFYING(v!)" "BLOCKED(b@)"  "|" "DONE(d!)" "OBE(o@!)" "WONT-DO(w@/!)" )
-          ))
   (define-prefix-command 'pokemacs-org-map nil "Org-")
   (defun transform-square-brackets-to-round-ones(string-to-transform)
     "Transforms [ into ( and ] into ), other chars left unchanged."
@@ -1680,7 +1736,7 @@ debian, and derivatives). On most it's 'fd'.")
      (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform)))
   (customize-set-value 'org-latex-with-hyperref nil)
   (add-to-list 'org-latex-default-packages-alist "\\PassOptionsToPackage{hyphens}{url}")
-  (setq org-image-actual-width nil)
+
   (defun org-mode-<>-syntax-fix (start end)
     "Change syntax of characters ?< and ?> to symbol within source code blocks."
     (let ((case-fold-search t))
@@ -1704,10 +1760,6 @@ debian, and derivatives). On most it's 'fd'.")
 
   (add-hook 'org-mode-hook #'org-setup-<>-syntax-fix)
 
-  (setq org-agenda-custom-commands
-        '(("r" "Rendez-vous" agenda* "Rendez-vous du mois"
-           ((org-agenda-span 'month)
-            (org-agenda-show-all-dates nil)))))
   (calendar-set-date-style 'iso)
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -1730,16 +1782,7 @@ debian, and derivatives). On most it's 'fd'.")
               (push '("+ [-]" . "") prettify-symbols-alist)
               (push '("* [-]" . "") prettify-symbols-alist)
               (prettify-symbols-mode)))
-  (setq org-capture-templates
-        `(
-          ("t" "Task" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-           "* TODO %?\n  %u\n  %a")
-          ("s" "Scheduled" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
-           "* TODO %?\n SCHEDULED: %^t \n %a")
-          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")))
+
   (message "`org-mode' loaded"))
 
 ;; (require 'org-protocol)
@@ -1777,15 +1820,16 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package calfw
   :ensure (calfw :files ("calfw-org.el" "calfw.el"))
-  :config
-  (setq cfw:fchar-junction ?╋
-        cfw:fchar-vertical-line ?┃
-        cfw:fchar-horizontal-line ?━
-        cfw:fchar-left-junction ?┣
-        cfw:fchar-right-junction ?┫
-        cfw:fchar-top-junction ?┯
-        cfw:fchar-top-left-corner ?┏
-        cfw:fchar-top-right-corner ?┓))
+  :custom
+  (cfw:fchar-junction ?╋)
+  (cfw:fchar-vertical-line ?┃)
+  (cfw:fchar-horizontal-line ?━)
+  (cfw:fchar-left-junction ?┣)
+  (cfw:fchar-right-junction ?┫)
+  (cfw:fchar-top-junction ?┯)
+  (cfw:fchar-top-left-corner ?┏)
+  (cfw:fchar-top-right-corner ?┓)
+  :config (message "`calfw' loaded"))
 
 (use-package calfw-org
   :after calfw
@@ -1803,10 +1847,8 @@ debian, and derivatives). On most it's 'fd'.")
   (cfw:org-capture-template
    `("c" "calfw2org" entry (file+headline ,(concat org-directory "agenda.org") "Calendrier")
      "* %?\nSCHEDULED: %(cfw:org-capture-day)" :empty-lines 1))
+  (cfw:org-overwrite-default-keybinding t)
   :config
-
-  (setq cfw:org-overwrite-default-keybinding t)
-
   (defun cfw:org-capture-day ()
     (with-current-buffer  (get-buffer-create cfw:calendar-buffer-name)
       (let ((pos (cfw:cursor-to-nearest-date)))
@@ -1845,15 +1887,16 @@ debian, and derivatives). On most it's 'fd'.")
     (message "`org-gcal' loaded")))
 
 (use-package org-super-agenda
+  :custom
+  (org-super-agenda-groups
+   '(;; Each group has an implicit Boolean OR operator between its selectors.
+     (:name "Rendez-vous"  ; Optionally specify section name
+            :time-grid t  ; Items that appear on the time grid
+            )
+     ;; After the last group, the agenda will display items that didn't
+     ;; match any of these groups, with the default order position of 99
+     ))
   :config
-  (setq org-super-agenda-groups
-        '(;; Each group has an implicit Boolean OR operator between its selectors.
-          (:name "Rendez-vous"  ; Optionally specify section name
-                 :time-grid t  ; Items that appear on the time grid
-                 )
-          ;; After the last group, the agenda will display items that didn't
-          ;; match any of these groups, with the default order position of 99
-          ))
   (org-super-agenda-mode)
   (when use-org-agenda-startup (org-agenda nil "a"))
   (message "`org-super-agenda' loaded"))
@@ -1862,9 +1905,10 @@ debian, and derivatives). On most it's 'fd'.")
   :after org
   :ensure (org-appear :host github :repo "awth13/org-appear" :branch "org-9.7-fixes")
   :hook (org-mode . (lambda () (org-appear-mode 1)))
+  :custom
+  (org-appear-autolinks t)
+  (org-appear-autoemphasis t)
   :config
-  (setq org-appear-autolinks t)
-  (setq org-appear-autoemphasis t)
   (message "`org-appear loaded"))
 
 (when use-org-roam
@@ -1872,6 +1916,38 @@ debian, and derivatives). On most it's 'fd'.")
     :after org
     :custom
     (org-roam-directory (file-truename "~/org/org-roam"))
+    (org-roam-capture-templates
+     '(
+       ("d" "default" plain
+        "%?"
+        :if-new (file+head "defaut/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :defaut:\n#+date: %U\n")
+        :unnarrowed t)
+       ("b" "livre" plain
+        "\n* Source\n\nAuteur: %^{Author}\nTitre: ${title}\nAnnée: %^{Year}\n\n* Résumé\n\n%?"
+        :if-new (file+head "art/livre/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :art::livre:\n#+date: %U\n")
+        :unnarrowed t)
+       ("b" "film" plain
+        "\n* Source\n\nRéalisateur: %^{Author}\nTitre: ${title}\nAnnée: %^{Year}\n\n* Résumé\n\n%?"
+        :if-new (file+head "art/cinema/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :art::film:\n#+date: %U\n")
+        :unnarrowed t)
+       ("i" "informatique" plain "%?"
+        :if-new
+        (file+head "science/informatique/%<%Y%m%d%H%M%S>-${slug}.org.org" "#+title: ${title}\n#+filetags: :informatique:\n#+date: %U\n")
+        :immediate-finish t
+        :unnarrowed t)
+       ("l" "langage" plain
+        "* Characteristics\n\n- Famille: %?\n- Inspirations: \n\n* Référence:\n\n"
+        :if-new (file+head "science/informatique/langages/${title}.org" "#+title: ${title}\n#+filetags: :langage:\n#+date: %U\n")
+        :unnarrowed t)
+       ("p" "projet" plain
+        "* Objectifs\n\n%?\n\n* Tâches\n\n** TODO Ajouter de nouvelles tâches\n\n* Dates\n\n"
+        :if-new (file+head "projets/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :projet:")
+        :unnarrowed t)
+       ("s" "sciences" plain "%?"
+        :if-new
+        (file+head "sciences/${title}.org" "#+title: ${title}\n#+filetags: :sciences:\n#+filetags: :science:#+date: %U\n")
+        :immediate-finish t
+        :unnarrowed t)))
     :general
     (:keymaps 'pokemacs-org-map
               "r" 'org-roam-buffer-toggle
@@ -1881,42 +1957,15 @@ debian, and derivatives). On most it's 'fd'.")
               "c" 'org-roam-capture
               ;; Dailies
               "j" 'org-roam-dailies-capture-today)
+    :custom
+    (org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-roam-node-display-template
+     (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
     :config
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
-    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
     (org-roam-db-autosync-mode)
-    (setq org-roam-capture-templates
-          '(
-            ("d" "default" plain
-             "%?"
-             :if-new (file+head "defaut/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :defaut:\n#+date: %U\n")
-             :unnarrowed t)
-            ("b" "livre" plain
-             "\n* Source\n\nAuteur: %^{Author}\nTitre: ${title}\nAnnée: %^{Year}\n\n* Résumé\n\n%?"
-             :if-new (file+head "art/livre/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :art::livre:\n#+date: %U\n")
-             :unnarrowed t)
-            ("b" "film" plain
-             "\n* Source\n\nRéalisateur: %^{Author}\nTitre: ${title}\nAnnée: %^{Year}\n\n* Résumé\n\n%?"
-             :if-new (file+head "art/cinema/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :art::film:\n#+date: %U\n")
-             :unnarrowed t)
-            ("i" "informatique" plain "%?"
-             :if-new
-             (file+head "science/informatique/%<%Y%m%d%H%M%S>-${slug}.org.org" "#+title: ${title}\n#+filetags: :informatique:\n#+date: %U\n")
-             :immediate-finish t
-             :unnarrowed t)
-            ("l" "langage" plain
-             "* Characteristics\n\n- Famille: %?\n- Inspirations: \n\n* Référence:\n\n"
-             :if-new (file+head "science/informatique/langages/${title}.org" "#+title: ${title}\n#+filetags: :langage:\n#+date: %U\n")
-             :unnarrowed t)
-            ("p" "projet" plain
-             "* Objectifs\n\n%?\n\n* Tâches\n\n** TODO Ajouter de nouvelles tâches\n\n* Dates\n\n"
-             :if-new (file+head "projets/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :projet:")
-             :unnarrowed t)
-            ("s" "sciences" plain "%?"
-             :if-new
-             (file+head "sciences/${title}.org" "#+title: ${title}\n#+filetags: :sciences:\n#+filetags: :science:#+date: %U\n")
-             :immediate-finish t
-             :unnarrowed t)))
+
     (cl-defmethod org-roam-node-type ((node org-roam-node))
       "Return the TYPE of NODE."
       (condition-case nil
@@ -1925,8 +1974,7 @@ debian, and derivatives). On most it's 'fd'.")
             (file-name-directory
              (file-relative-name (org-roam-node-file node) org-roam-directory))))
         (error "")))
-    (setq org-roam-node-display-template
-          (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
 
 
     ;; If using org-roam-protocol
@@ -1935,11 +1983,12 @@ debian, and derivatives). On most it's 'fd'.")
 
   (use-package org-roam-ui
     :after org-roam
+    :custom
+    (org-roam-ui-sync-theme t)
+    (org-roam-ui-follow t)
+    (org-roam-ui-update-on-save t)
+    (org-roam-ui-open-on-start t)
     :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t)
     (message "`org-roam-ui' loaded")))
 
 (use-package org-make-toc
@@ -2202,8 +2251,10 @@ debian, and derivatives). On most it's 'fd'.")
          (dap-session-created . (lambda (&_rest) (dap-hydra)))
          (dap-terminated . (lambda (&_rest) (dap-hydra/nil))))
 
+  :custom
+  (dap-auto-configure-features '(sessions locals controls tooltip))
+
   :config
-  (setq dap-auto-configure-features '(sessions locals controls tooltip))
   (message "`dap' loaded"))
 
 (use-package dumb-jump
@@ -2369,15 +2420,17 @@ have one rule for each file type."
 (when (and use-inline-errors (display-graphic-p))
   (use-package flycheck-inline
     :hook (flycheck-mode . flycheck-inline-mode)
+    :after quick-peek
+    :custom
+    (flycheck-inline-display-function
+     (lambda (msg pos err)
+       (let* ((ov (quick-peek-overlay-ensure-at pos))
+              (contents (quick-peek-overlay-contents ov)))
+         (setf (quick-peek-overlay-contents ov)
+               (concat contents (when contents "\n") msg))
+         (quick-peek-update ov)))
+     flycheck-inline-clear-function #'quick-peek-hide)
     :config
-    (setq flycheck-inline-display-function
-          (lambda (msg pos err)
-            (let* ((ov (quick-peek-overlay-ensure-at pos))
-                   (contents (quick-peek-overlay-contents ov)))
-              (setf (quick-peek-overlay-contents ov)
-                    (concat contents (when contents "\n") msg))
-              (quick-peek-update ov)))
-          flycheck-inline-clear-function #'quick-peek-hide)
     (message "`flycheck-inline' loaded")))
 
 (use-package consult-flycheck
@@ -2399,8 +2452,9 @@ have one rule for each file type."
   :commands (hs-minor-mode
              hs-toggle-hiding)
   :diminish hs-minor-mode
+  :custom
+  (hs-isearch-open t)
   :config
-  (setq hs-isearch-open t)
   (message "`hideshow' loaded"))
 
 (use-package projectile
@@ -2431,8 +2485,9 @@ with a prefix ARG."
 (use-package separedit
   :general
   ("C-c C-e"                 'separedit)
+  :custom
+  (separedit-default-mode 'markdown-mode)
   :config
-  (setq separedit-default-mode 'markdown-mode)
   (message "`separedit' loaded"))
 
 (use-package treemacs
@@ -2440,11 +2495,12 @@ with a prefix ARG."
 
 (use-package uniquify
   :disabled
+  :custom
+  (uniquify-buffer-name-style 'reverse)
+  (uniquify-separator " • ")
+  (uniquify-after-kill-buffer-p t)
+  (uniquify-ignore-buffers-re "^\\*")
   :config
-  (setq uniquify-buffer-name-style 'reverse
-        uniquify-separator " • "
-        uniquify-after-kill-buffer-p t
-        uniquify-ignore-buffers-re "^\\*")
   (message "`uniquify' loaded"))
 
 (use-package winner
@@ -2468,55 +2524,56 @@ with a prefix ARG."
 
 (use-package ace-window
   :demand t
+  :custom
+  (aw-dispatch-always t)
   :config
   (pretty-hydra-define
-   hydra-window (:title "Window management" :quit-key "q")
-   ("Movement"
-    (("<left>" windmove-left "←")
-     ("<down>" windmove-down "↓")
-     ("<up>" windmove-up "↑")
-     ("<right>" windmove-right "→"))
+    hydra-window (:title "Window management" :quit-key "q")
+    ("Movement"
+     (("<left>" windmove-left "←")
+      ("<down>" windmove-down "↓")
+      ("<up>" windmove-up "↑")
+      ("<right>" windmove-right "→"))
 
-    "Split"
-    (("v" (lambda ()
-            (interactive)
-            (split-window-right)
-            (windmove-right)) "Vertical")
-     ("h" (lambda ()
-            (interactive)
-            (split-window-below)
-            (windmove-down)) "Horizontal")
-     ("u" (progn
-            (winner-undo)
-            (setq this-command 'winner-undo)) "Undo")
-     ("r" winner-redo "Redo"))
+     "Split"
+     (("v" (lambda ()
+             (interactive)
+             (split-window-right)
+             (windmove-right)) "Vertical")
+      ("h" (lambda ()
+             (interactive)
+             (split-window-below)
+             (windmove-down)) "Horizontal")
+      ("u" (progn
+             (winner-undo)
+             (setq this-command 'winner-undo)) "Undo")
+      ("r" winner-redo "Redo"))
 
-    "Switch"
-    (("f" find-file "Find file")
-     ("a" (lambda ()
-            (interactive)
-            (ace-window 1)
-            (add-hook 'ace-window-end-once-hook
-                      'hydra-window/body)) "Ace window")
-     ("s" (lambda ()
-            (interactive)
-            (ace-swap-window)
-            (add-hook 'ace-window-end-once-hook
-                      'hydra-window/body)) "Swap"))
+     "Switch"
+     (("f" find-file "Find file")
+      ("a" (lambda ()
+             (interactive)
+             (ace-window 1)
+             (add-hook 'ace-window-end-once-hook
+                       'hydra-window/body)) "Ace window")
+      ("s" (lambda ()
+             (interactive)
+             (ace-swap-window)
+             (add-hook 'ace-window-end-once-hook
+                       'hydra-window/body)) "Swap"))
 
-    "Resize"
-    (("C-<left>" (lambda () (interactive) (pokemacs-resize-window t -5)) "X←")
-     ("C-<right>" (lambda () (interactive) (pokemacs-resize-window t 5)) "X→")
-     ("C-<up>" (lambda () (interactive) (pokemacs-resize-window nil 5)) "X↑")
-     ("C-<down>" (lambda () (interactive) (pokemacs-resize-window nil -5)) "X↓"))
+     "Resize"
+     (("C-<left>" (lambda () (interactive) (pokemacs-resize-window t -5)) "X←")
+      ("C-<right>" (lambda () (interactive) (pokemacs-resize-window t 5)) "X→")
+      ("C-<up>" (lambda () (interactive) (pokemacs-resize-window nil 5)) "X↑")
+      ("C-<down>" (lambda () (interactive) (pokemacs-resize-window nil -5)) "X↓"))
 
-    "Purpose"
-    (("M" delete-other-windows "Delete other")
-     ("d" delete-window "Delete")
-     ("P" purpose-set-window-purpose "Set purpose")
-     ("!" purpose-toggle-window-purpose-dedicated "Toggle purpose")
-     ("#" purpose-toggle-window-buffer-dedicated "Toggle buffer"))))
-  (setq aw-dispatch-always t)
+     "Purpose"
+     (("M" delete-other-windows "Delete other")
+      ("d" delete-window "Delete")
+      ("P" purpose-set-window-purpose "Set purpose")
+      ("!" purpose-toggle-window-purpose-dedicated "Toggle purpose")
+      ("#" purpose-toggle-window-buffer-dedicated "Toggle buffer"))))
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
@@ -2722,15 +2779,12 @@ with a prefix ARG."
             [remap next-matching-history-element] 'consult-history
             [remap prev-matching-history-element] 'consult-history)
 
-
   ;; The :init configuration is always executed (Not lazy)
   :init
 
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
 
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
@@ -2742,6 +2796,12 @@ with a prefix ARG."
 
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
+  :custom
+  (register-preview-delay 0.5)
+  (register-preview-function #'consult-register-format)
+  (consult-narrow-key "<") ;; (kbd "C-+")
+  (consult-project-function (lambda (_) (projectile-project-root)))
+
   :config
 
   (defun pokemacs-consult-with-region (old-consult-function &optional dir given-initial)
@@ -2812,7 +2872,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
 
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
@@ -2825,7 +2884,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; (setq consult-project-function #'consult--default-project--function)
     ;;;; 2. projectile.el (projectile-project-root)
   (autoload 'projectile-project-root "projectile")
-  (setq consult-project-function (lambda (_) (projectile-project-root)))
     ;;;; 3. vc.el (vc-root-dir)
   ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
     ;;;; 4. locate-dominating-file
@@ -3472,32 +3530,33 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       :config (message "`rainbow-delimiters' loaded")))
 
 (use-package pulsar
-  :config
-  (setq pulsar-pulse-functions
-        '(recenter-top-bottom
-          move-to-window-line-top-bottom
-          reposition-window
-          forward-page
-          backward-page
-          scroll-up-command
-          scroll-down-command
-          org-next-visible-heading
-          org-previous-visible-heading
-          org-forward-heading-same-level
-          org-backward-heading-same-level
-          outline-backward-same-level
-          outline-forward-same-level
-          outline-next-visible-heading
-          outline-previous-visible-heading
-          outline-up-heading
-          ))
+  :custom
+  (pulsar-pulse-functions
+   '(recenter-top-bottom
+     move-to-window-line-top-bottom
+     reposition-window
+     forward-page
+     backward-page
+     scroll-up-command
+     scroll-down-command
+     org-next-visible-heading
+     org-previous-visible-heading
+     org-forward-heading-same-level
+     org-backward-heading-same-level
+     outline-backward-same-level
+     outline-forward-same-level
+     outline-next-visible-heading
+     outline-previous-visible-heading
+     outline-up-heading
+     ))
 
-  (setq pulsar-pulse-on-window-change t)
-  (setq pulsar-pulse t)
-  (setq pulsar-delay 0.055)
-  (setq pulsar-iterations 10)
-  (setq pulsar-face 'pulsar-magenta)
-  (setq pulsar-highlight-face 'pulsar-yellow)
+  (pulsar-pulse-on-window-change t)
+  (pulsar-pulse t)
+  (pulsar-delay 0.055)
+  (pulsar-iterations 10)
+  (pulsar-face 'pulsar-magenta)
+  (pulsar-highlight-face 'pulsar-yellow)
+  :config
   (pulsar-global-mode 1)
   (message "`pulsar' loaded"))
 
@@ -3590,7 +3649,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :custom
   (treesit-auto-install 'prompt)
   :config
-  ;; Add OCaml to treesit parsers even if tuareg can't handle it
   (setq pokemacs-ocaml-tsauto-config
         (make-treesit-auto-recipe
          :lang 'ocaml
@@ -3600,8 +3658,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
          :revision "master"
          :source-dir "grammars/ocaml/src"
          :ext "\\.ml\\'"))
-  (add-to-list 'treesit-auto-recipe-list pokemacs-ocaml-tsauto-config)
-
   (setq pokemacs-elisp-tsauto-config
         (make-treesit-auto-recipe
          :lang 'elisp
@@ -3610,17 +3666,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
          :url "https://github.com/Wilfred/tree-sitter-elisp"
          :revision "main"
          :ext "\\.el\\'"))
-  (add-to-list 'treesit-auto-recipe-list pokemacs-elisp-tsauto-config)
-
-  (setq my-zig-tsauto-config
+  (setq pokemacs-zig-tsauto-config
         (make-treesit-auto-recipe
          :lang 'zig
          :ts-mode 'zig-ts-mode
          :remap 'zig-mode
          :url "https://github.com/maxxnino/tree-sitter-zig"
          :ext "\\.zig\\'"))
-  (add-to-list 'treesit-auto-recipe-list my-zig-tsauto-config)
 
+  ;; Add OCaml to treesit parsers even if tuareg can't handle it
+  (add-to-list 'treesit-auto-recipe-list pokemacs-ocaml-tsauto-config)
+  (add-to-list 'treesit-auto-recipe-list pokemacs-elisp-tsauto-config)
+  (add-to-list 'treesit-auto-recipe-list pokemacs-zig-tsauto-config)
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode)
   (message "`treesit-auto' loaded"))
@@ -3633,11 +3690,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :hook
   (tuareg-mode . tree-sitter-mode)
   (tree-sitter-after-on . tree-sitter-hl-mode)
-  :config
+  :custom
   ;; This makes every node a link to a section of code
-  (setq tree-sitter-debug-jump-buttons t)
+  (tree-sitter-debug-jump-buttons t)
   ;; and this highlights the entire sub tree in your code
-  (setq tree-sitter-debug-highlight-jump-region t)
+  (tree-sitter-debug-highlight-jump-region t)
   ;; (global-tree-sitter-mode)
   :config (message "`tree-sitter' loaded"))
 
@@ -3968,9 +4025,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;;  "C-<left>" nil)
   )
 
-(use-package package-lint
-  :ensure (:type git :host github :repo "purcell/package-lint" :ref "c30d23d"))
-
 (use-package flycheck-package
   :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
   :config (message "`flycheck-package' loaded"))
@@ -4027,20 +4081,22 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (LaTeX-mode . TeX-PDF-mode)
     (LaTeX-mode . flycheck-mode)
     (LaTeX-mode . LaTeX-math-mode)
-    :init
-    (setq TeX-auto-save t)
-    (setq TeX-parse-self t)
-    (setq-default TeX-master 'dwim)
-    (setq reftex-plug-into-AUCTeX t)
-    (setq TeX-PDF-mode t)
-    (setq TeX-source-correlate-mode t)
-    (setq TeX-source-correlate-method 'synctex)
-    (setq TeX-source-correlate-start-server t)
-    (setq TeX-electric-sub-and-superscript t)
+
+    :custom
+    (TeX-auto-save t)
+    (TeX-parse-self t)
+    (TeX-master 'dwim)
+    (reftex-plug-into-AUCTeX t)
+    (TeX-PDF-mode t)
+    (TeX-source-correlate-mode t)
+    (TeX-source-correlate-method 'synctex)
+    (TeX-source-correlate-start-server t)
+    (TeX-electric-sub-and-superscript t)
+    (TeX-view-program-selection '((output-pdf "PDF Tools")))
+    (TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view)))
+    (TeX-source-correlate-start-server t) ;; not sure if last line is neccessary
+
     :config
-    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-          TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-          TeX-source-correlate-start-server t) ;; not sure if last line is neccessary
     ;; to have the buffer refresh after compilation,
     ;; very important so that PDFView refesh itself after comilation
     (add-hook 'TeX-after-compilation-finished-functions
@@ -4051,10 +4107,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package preview
     :ensure nil
     :hook (LaTeX-mode . LaTeX-preview-setup)
+    :custom
+    (preview-scale 1.4)
+    (preview-scale-function
+     (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale)))
     :config
-    (setq-default preview-scale 1.4
-                  preview-scale-function
-                  (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale)))
     ;; Don't cache preamble, it creates issues with SyncTeX. Let users enable
     ;; caching if they have compilation times that long.
     (setq preview-auto-cache-preamble nil))
@@ -4067,10 +4124,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     :hook
     (LaTeX-mode . cdlatex-mode)
     (org-mode . org-cdlatex-mode)
-    :config
+    :custom
     ;; Use \( ... \) instead of $ ... $.
-    (setq cdlatex-use-dollar-to-ensure-math nil)
-    ;; Disabling keys that have overlapping functionality with other parts of Doom.
+    (cdlatex-use-dollar-to-ensure-math nil)
     :general
     (:keymaps 'cdlatex-mode-map
               ;; Smartparens takes care of inserting closing delimiters, and if you
@@ -4182,7 +4238,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c C-w" nil
               "C-c C-l" nil
               "C-c o w" 'ocaml-utils-dune-watch)
+
     :config
+    (setq tuareg-opam-insinuate t)
+    (setq tuareg-electric-indent t)
     (defun pokemacs-map (l)
       (-map (lambda (x)
               (list
@@ -4194,8 +4253,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (cons (cdr c) (car c)))
 
     ;; Use opam to set environment
-    (setq tuareg-opam-insinuate t)
-    (setq tuareg-electric-indent t)
 
     (tuareg-opam-update-env (tuareg-opam-current-compiler))
     (defun pokemacs-update-opam-env (&rest _)
@@ -4314,11 +4371,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :magic ("%PDF" . pdf-view-mode)
   :hook
   (pdf-view-mode . (lambda () (nlinum-mode 0)))
-  :config
-  (setq-default pdf-view-display-size 'fit-page)
+  :custom
+  (pdf-view-display-size 'fit-page)
   ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
-  (setq pdf-view-use-scaling t
-        pdf-view-use-imagemagick nil)
+  (pdf-view-use-scaling t)
+  (pdf-view-use-imagemagick nil)
+
+  :config
   (message "`pdf-tools' loaded"))
 
 (use-package saveplace-pdf-view
@@ -4329,9 +4388,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package python
     :ensure nil
     :hook (python-ts-mode . semantic-mode)
+    :custom
+    (python-indent-guess-indent-offset-verbose nil)
     :config
     ;; Remove guess indent python message
-    (setq python-indent-guess-indent-offset-verbose nil)
     ;; Use IPython when available or fall back to regular Python
     (cond
      ((executable-find "ipython")
@@ -4350,14 +4410,15 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (when use-python
   (use-package pyvenv
     :hook (python-ts-mode . pyvenv-mode)
+    :custom
+    ;; Display virtual envs in the menu bar
+    (pyvenv-menu t)
     :config
     ;; Setting work on to easily switch between environments
     (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs/"))
-    ;; Display virtual envs in the menu bar
-    (setq pyvenv-menu t)
     ;; Restart the python process when switching environments
-    (add-hook 'pyvenv-post-activate-hooks (lambda ()
-                                            (pyvenv-restart-python)))
+    (add-hook 'pyvenv-post-activate-hooks
+              (lambda () (pyvenv-restart-python)))
     (message "`pyvenv' loaded")))
 
 (when use-python
@@ -4366,13 +4427,14 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     :hook (python-ts-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp-deferred)))
+    :custom
+    (lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
+    (lsp-pyright-disable-language-service nil)
+    (lsp-pyright-disable-organize-imports nil)
+    (lsp-pyright-auto-import-completions t)
+    (lsp-pyright-use-library-code-for-types t)
+    (lsp-pyright-venv-path "~/miniconda3/envs")
     :config
-    (setq lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
-    (setq lsp-pyright-disable-language-service nil
-          lsp-pyright-disable-organize-imports nil
-          lsp-pyright-auto-import-completions t
-          lsp-pyright-use-library-code-for-types t
-          lsp-pyright-venv-path "~/miniconda3/envs")
     (message "`lsp-pyright' loaded")))
 
 (when use-racket
