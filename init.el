@@ -883,11 +883,11 @@ debian, and derivatives). On most it's 'fd'.")
    "h"                       'pokemacs-resize-window-height)
   (general-define-key
    :prefix "M-h"
-   "d"                       '(hydra-dates/body :which-key "Date Utils")
-   "f"                       '(hydra-flycheck/body :which-key "Flycheck")
-   "g"                       '(hydra-smerge/body :which-key "Git/Smerge")
-   "w"                       '(hydra-window/body :which-key "Window")
-   "t"                       '(pokemacs-toggles/body :which-key "Toggles"))
+   "d"                       '("Date Utils" . hydra-dates/body)
+   "f"                       '("Flycheck" . hydra-flycheck/body)
+   "g"                       '("Git/Smerge" . hydra-smerge/body)
+   "w"                       '("Window" . hydra-window/body)
+   "t"                       '("Toggles" . pokemacs-toggles/body))
   (general-def minibuffer-local-map
     "C-<tab>" 'dabbrev-expand)
   :config (message "`general' loaded"))
@@ -970,8 +970,8 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure t
   :demand t
   :general
-  ("M-h h" '(major-mode-hydra :which-key "Major mode"))
-  ("M-h m" '(pokemacs-major-mode-hydra-custom :which-key "Custom mode"))
+  ("M-h h" '("Major mode" . major-mode-hydra))
+  ("M-h m" '("Custom mode" . pokemacs-major-mode-hydra-custom))
   :custom
   (major-mode-hydra-invisible-quit-key "q")
   :config
@@ -1062,7 +1062,7 @@ debian, and derivatives). On most it's 'fd'.")
             "C-c s s"                 'sort-lines
             "C-c s w"                 'pokemacs-sort-words
             "C-<return>"              'hide-region-hide
-            "C-p"                     '(hide-region-pin :which-key "Pins the selected region on top of the current window"))
+            "C-p"                     '("Pins the selected region on top of the current window" . hide-region-pin))
   :config (message "`selected' loaded"))
 
 (use-package god-mode
@@ -1113,72 +1113,6 @@ debian, and derivatives). On most it's 'fd'.")
             "c"   'pokemacs-toggle-case)
   :config
 
-  ;; (defvar pokemacs-progress-reporter--pulse-characters ["a" "b" "c" "d"]
-  ;;   "Characters to use for pulsing progress reporters.")
-
-  ;; (defun progress-reporter-do-update (reporter value &optional suffix)
-  ;;   (let* ((parameters   (cdr reporter))
-  ;;          (update-time  (aref parameters 0))
-  ;;          (min-value    (aref parameters 1))
-  ;;          (max-value    (aref parameters 2))
-  ;;          (text         (aref parameters 3))
-  ;;          (enough-time-passed
-  ;;           ;; See if enough time has passed since the last update.
-  ;;           (or (not update-time)
-  ;;               (when (time-less-p update-time nil)
-  ;; 	              ;; Calculate time for the next update
-  ;; 	              (aset parameters 0 (+ update-time (aref parameters 5)))))))
-  ;;     (cond ((and min-value max-value)
-  ;;            ;; Numerical indicator
-  ;;            (let* ((one-percent (/ (- max-value min-value) 100.0))
-  ;; 	                (percentage  (if (= max-value min-value)
-  ;; 			                             0
-  ;; 			                           (truncate (/ (- value min-value)
-  ;; 				                                      one-percent)))))
-  ;;              ;; Calculate NEXT-UPDATE-VALUE.  If we are not printing
-  ;;              ;; message because not enough time has passed, use 1
-  ;;              ;; instead of MIN-CHANGE.  This makes delays between echo
-  ;;              ;; area updates closer to MIN-TIME.
-  ;;              (setcar reporter
-  ;; 	                   (min (+ min-value (* (+ percentage
-  ;; 				                                     (if enough-time-passed
-  ;; 					                                       ;; MIN-CHANGE
-  ;; 					                                       (aref parameters 4)
-  ;; 				                                       1))
-  ;; 				                                  one-percent))
-  ;; 		                      max-value))
-  ;;              (when (integerp value)
-  ;;                (setcar reporter (ceiling (car reporter))))
-  ;;              ;; Print message only if enough time has passed
-  ;;              (when enough-time-passed
-  ;;                (if suffix
-  ;;                    (aset parameters 6 suffix)
-  ;;                  (setq suffix (or (aref parameters 6) "")))
-  ;;                (if (> percentage 0)
-  ;;                    (message "%s%d%% %s" text percentage suffix)
-  ;;                  (message "%s %s" text suffix)))))
-  ;;           ;; Pulsing indicator
-  ;;           (enough-time-passed
-  ;;            (when (and value (not suffix))
-  ;;              (setq suffix value))
-  ;;            (if suffix
-  ;;                (aset parameters 6 suffix)
-  ;;              (setq suffix (or (aref parameters 6) "")))
-  ;;            (let* ((index (mod (1+ (car reporter)) 4))
-  ;;                   (message-log-max nil)
-  ;;                   (pulse-char (aref pokemacs-progress-reporter--pulse-characters
-  ;;                                     index)))
-  ;;              (setcar reporter index)
-  ;;              (message "%s %s %s" text pulse-char suffix))))))
-  ;; (defun test-progress ()
-  ;;   (interactive)
-  ;;   (let ((progress-reporter
-  ;;          (make-progress-reporter "Collecting mana for Emacs...")))
-  ;;     (dotimes (k 500)
-  ;;       (sit-for 0.01)
-  ;;       (progress-reporter-update progress-reporter k))
-  ;;     (progress-reporter-done progress-reporter)))
-  ;; use current region as first search
   (defadvice isearch-mode (around isearch-mode-default-string (forward &optional regexp op-fun recursive-edit word-p) activate)
     (if (and transient-mark-mode mark-active (not (eq (mark) (point))))
         (progn
@@ -1237,20 +1171,20 @@ debian, and derivatives). On most it's 'fd'.")
   ("C-x K" 'crux-kill-other-buffers)
   ("C-k" 'crux-smart-kill-line)
   (:keymaps 'pokemacs-crux-map
-            "w" '(crux-view-url :which-key "Open a new buffer containing the contents of URL.")
-            "o" '(crux-open-with :which-key "Open visited file in default external program.")
-            "e" '(crux-sudo-edit :which-key "Edit currently visited file as root.")
-            "i" '(crux-insert-date :which-key "Insert a timestamp according to locale's date and time format.")
-            "t" '(crux-transpose-windows :which-key "Transpose the buffers shown in two windows.")
-            "j" '(crux-top-join-line :which-key "Join the current line with the line beneath it.")
-            "u" '(upcase-dwim :which-key "upcase region if a region is active or word at point.")
-            "d" '(downcase-dwim :which-key "downcase region if a region is active or word at point.")
-            "c" '(capitalize-dwim :which-key "capitalize region if a region is active or word at point.")
-            "r" '(crux-recompile-init :which-key "Byte-compile all your dotfiles again.")
-            "k" '(crux-smart-kill-line :which-key "Kill to the end of the line and kill whole line on the next call.")
-            "M-k" '(crux-kill-line-backwards :which-key "Kill line backwards and adjust the indentation.")
-            "a" '(crux-move-beginning-of-line :which-key "Move point back to indentation/beginning (toggle) of line.")
-            "s" '(crux-ispell-word-then-abbrev :which-key "Call `ispell-word', then create an abbrev for it.")
+            "w" '("Open a new buffer containing the contents of URL." . crux-view-url)
+            "o" '("Open visited file in default external program." . crux-open-with)
+            "e" '("Edit currently visited file as root." . crux-sudo-edit)
+            "i" '("Insert a timestamp according to locale's date and time format." . crux-insert-date)
+            "t" '("Transpose the buffers shown in two windows." . crux-transpose-windows)
+            "j" '("Join the current line with the line beneath it." . crux-top-join-line)
+            "u" '("upcase region if a region is active or word at point." . upcase-dwim)
+            "d" '("downcase region if a region is active or word at point." . downcase-dwim)
+            "c" '("capitalize region if a region is active or word at point." . capitalize-dwim)
+            "r" '("Byte-compile all your dotfiles again." . crux-recompile-init)
+            "k" '("Kill to the end of the line and kill whole line on the next call." . crux-smart-kill-line)
+            "M-k" '("Kill line backwards and adjust the indentation." . crux-kill-line-backwards)
+            "a" '("Move point back to indentation/beginning (toggle) of line." . crux-move-beginning-of-line)
+            "s" '("Call `ispell-word', then create an abbrev for it." . crux-ispell-word-then-abbrev)
             )
   :config
   (crux-with-region-or-buffer indent-region)
@@ -1337,9 +1271,9 @@ debian, and derivatives). On most it's 'fd'.")
   (:keymaps 'highlight-symbol-nav-mode-map
             "M-n" nil
             "M-p" nil)
-  ("M-<f6>"       '(highlight-symbol :which-key "highlight the symbol at point"))
-  ("M-S-<down>"   '(highlight-symbol-next :which-key "go to the next symbol"))
-  ("M-S-<up>"     '(highlight-symbol-prev :which-key "go to the previous symbol"))
+  ("M-<f6>"       '("highlight the symbol at point" . highlight-symbol))
+  ("M-S-<down>"   '("go to the next symbol" . highlight-symbol-next))
+  ("M-S-<up>"     '("go to the previous symbol" . highlight-symbol-prev))
   :config
   (message "`highlight-symbol' loaded"))
 
@@ -2061,7 +1995,13 @@ debian, and derivatives). On most it's 'fd'.")
         '(project file)
       '(project path-up-to-project file symbols)))
 
+  (defun pokemacs-define-correct-key ()
+    (general-define-key
+     :keymaps 'pokemacs-flycheck-overlay-map
+     "M-$" '("LSP code action" . lsp-execute-code-action)))
+
   :hook ((lsp-mode . pokemacs-lsp-optimization-mode)
+         (lsp-mode . pokemacs-define-correct-key)
          (lsp-completion-mode . minad/lsp-mode-setup-completion)
          (caml-mode . lsp-deferred)
          (cc-mode . lsp-deferred)
@@ -2094,10 +2034,7 @@ debian, and derivatives). On most it's 'fd'.")
             "R"   'lsp-rename
             "f"   'consult-flycheck
             "t r" 'lsp-treemacs-references
-            "t s" 'lsp-treemacs-symbols
-            )
-  (:keymaps 'pokemacs-flycheck-overlay-map
-            "M-$" '(lsp-execute-code-action :which-key "LSP code action"))
+            "t s" 'lsp-treemacs-symbols)
 
   :custom
   (lsp-log-io nil)
@@ -2390,7 +2327,7 @@ have one rule for each file type."
      ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
   ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
-    (run-with-idle-timer 0.3 nil   ; Delay of 0.1 seconds before executing
+    (run-with-idle-timer 0.1 nil   ; Delay of 0.1 seconds before executing
      'which-key-show-keymap 'pokemacs-flycheck-overlay-map t))
 
   (defun flycheck-reset (&optional n reset)
@@ -3494,24 +3431,24 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ("C-o" 'cm-map)
   (:keymaps 'cm-map
             ;; HIDE
-            "q" '(outline-hide-sublevels :which-key "Hide everything but the top-level headings")
-            "t" '(outline-hide-body :which-key "Hide everything but headings (all body lines")
-            "o" '(outline-hide-other :which-key "Hide other branche")
-            "c" '(outline-hide-entry :which-key "Hide this entry's bod")
-            "l" '(outline-hide-leaves :which-key "Hide body lines in this entry and sub-entrie")
-            "d" '(outline-hide-subtree :which-key "Hide everything in this entry and sub-entrie")
+            "q" '("Hide everything but the top-level headings" . outline-hide-sublevels)
+            "t" '("Hide everything but headings (all body lines" . outline-hide-body)
+            "o" '("Hide other branche" . outline-hide-other)
+            "c" '("Hide this entry's bod" . outline-hide-entry)
+            "l" '("Hide body lines in this entry and sub-entrie" . outline-hide-leaves)
+            "d" '("Hide everything in this entry and sub-entrie" . outline-hide-subtree)
             ;; SHOW
-            "a" '(outline-show-all :which-key "Show (expand) everythin")
-            "e" '(outline-show-entry :which-key "Show this heading's bod")
-            "i" '(outline-show-children :which-key "Show this heading's immediate child sub-heading")
-            "k" '(outline-show-branches :which-key "Show all sub-headings under this headin")
-            "s" '(outline-show-subtree :which-key "Show (expand) everything in this heading & belo")
+            "a" '("Show (expand) everythin" . outline-show-all)
+            "e" '("Show this heading's bod" . outline-show-entry)
+            "i" '("Show this heading's immediate child sub-heading" . outline-show-children)
+            "k" '("Show all sub-headings under this headin" . outline-show-branches)
+            "s" '("Show (expand) everything in this heading & belo" . outline-show-subtree)
             ;; MOVE
-            "u" '(outline-up-heading :which-key "U")
-            "n" '(outline-next-visible-heading :which-key "Nex")
-            "p" '(outline-previous-visible-heading :which-key "Previou")
-            "f" '(outline-forward-same-level :which-key "Forward - same leve")
-            "b" '(outline-backward-same-level :which-key "Backward - same leve")
+            "u" '("U" . outline-up-heading)
+            "n" '("Nex" . outline-next-visible-heading)
+            "p" '("Previou" . outline-previous-visible-heading)
+            "f" '("Forward - same leve" . outline-forward-same-level)
+            "b" '("Backward - same leve" . outline-backward-same-level)
             )
   :config
   (define-prefix-command 'cm-map nil "Outline-")
@@ -4012,7 +3949,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (("f" describe-function "function")
      ("v" describe-variable "variable"))))
   :config
-  (message "`elisp-mode' loaded"))
+  (message "`emacs-lisp-mode' loaded"))
+
+(use-package lisp-extra-font-lock
+  :demand t
+  :config
+  (lisp-extra-font-lock-global-mode 1)
+  (message "`lisp-extra-font-lock' loaded"))
 
 (use-package puni
   :hook ((clojure-mode emacs-lisp-mode) . puni-mode)
