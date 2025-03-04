@@ -257,7 +257,7 @@ Literate configuration for init.el.
     - [[#css-mode][CSS mode]]
     - [[#simple-httpd][Simple HTTPD]]
     - [[#beautify][Beautify]]
-- [[#zig][Zig]]
+  - [[#zig][Zig]]
 - [[#end][End]]
 :END:
 
@@ -267,7 +267,7 @@ Literate configuration for init.el.
 :END:
 
 #+begin_src emacs-lisp
-  ;;; init.el --- Emacs init -*- lexical-binding: t -*-
+  ;;; init.el --- Emacs init configuration -*- lexical-binding: t -*-
   ;;
 
   ;; Copyright (c) 2022 mattiasdrp and contributors.
@@ -275,10 +275,11 @@ Literate configuration for init.el.
   ;; Author: mattiasdrp
   ;; Maintainer: mattiasdrp <https://github.com/mattiasdrp>
   ;; Created: 17 august 2022
-  ;; Version: 1.0
+  ;; Version: 1.0.0
   ;; Licence: MIT
   ;; Keywords: emacs, init, convenience, configuration
   ;; URL: https://github.com/mattiasdrp/pokemacs
+  ;; Package-Requires: ((emacs "28.1"))
 
   ;;; Commentary:
 
@@ -2465,7 +2466,7 @@ Simple mode to visualize blanks
               "M-l" 'dirvish-ls-switches-menu
               "M-m" 'dirvish-mark-menu
               "M-t" 'dirvish-layout-toggle
-              "M-s" 'dirvish-setup-menu
+              "M-r" 'dirvish-setup-menu
               "M-e" 'dirvish-emerge-menu
               "M-j" 'dirvish-fd-jump)
     :config
@@ -3273,11 +3274,11 @@ Minor mode acting as a client between a language server protocol and Emacs.
                   (list (cape-capf-super
                          #'cape-keyword
                          #'lsp-completion-at-point))))
-
     (defconst pokemacs-lsp-mode-breadcrumb-segments
       (if use-header-line
           '(project file)
         '(project path-up-to-project file symbols)))
+
     :hook ((lsp-mode . pokemacs-lsp-optimization-mode)
            (lsp-completion-mode . minad/lsp-mode-setup-completion)
            (caml-mode . lsp-deferred)
@@ -3294,6 +3295,7 @@ Minor mode acting as a client between a language server protocol and Emacs.
            (tuareg-mode . lsp-deferred)
            (zig-mode    . lsp-deferred)
            (zig-ts-mode    . lsp-deferred))
+
     :general
     (:keymaps 'lsp-mode-map
               "C-c C-t" 'lsp-describe-thing-at-point
@@ -3312,6 +3314,9 @@ Minor mode acting as a client between a language server protocol and Emacs.
               "t r" 'lsp-treemacs-references
               "t s" 'lsp-treemacs-symbols
               )
+    (:keymaps 'pokemacs-flycheck-overlay-map
+              "M-$" '(lsp-execute-code-action :which-key "LSP code action"))
+
     :custom
     (lsp-log-io nil)
     (lsp-headerline-breadcrumb-enable t)
@@ -3339,8 +3344,8 @@ Minor mode acting as a client between a language server protocol and Emacs.
     (lsp-rust-analyzer-display-parameter-hints nil)
     (lsp-rust-analyzer-display-reborrow-hints nil)
     (lsp-ui-peek-find-references nil (list :folders (vector (projectile-project-root))))
-    :config
 
+    :config
     (defvar pokemacs-type-map
       (let ((keymap (make-sparse-keymap)))
         (define-key keymap (kbd "C-w") #'pokemacs-lsp-get-type-and-kill)
@@ -3677,8 +3682,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
     :general
     (:keymaps 'pokemacs-fly-map
               "p" 'flycheck-prev-error)
-    (:keymaps 'pokemacs-flycheck-overlay-map
-              "M-$" '(lsp-execute-code-action :which-key "LSP code action"))
     :custom
     (flycheck-indication-mode 'left-fringe)
     :config
@@ -3700,7 +3703,7 @@ On the fly syntax checking. One of the greatest package there is for making prog
        ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
     ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
     (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
-      (run-with-idle-timer 0.1 nil   ; Delay of 0.1 seconds before executing
+      (run-with-idle-timer 0.3 nil   ; Delay of 0.1 seconds before executing
        'which-key-show-keymap 'pokemacs-flycheck-overlay-map t))
 
     (defun flycheck-reset (&optional n reset)
@@ -3754,18 +3757,16 @@ On the fly syntax checking. One of the greatest package there is for making prog
   (when (and use-inline-errors (display-graphic-p))
     (use-package flycheck-inline
       :hook (flycheck-mode . flycheck-inline-mode)
-      :after quick-peek
-      :custom
-      (flycheck-inline-display-function
-       (lambda (msg pos err)
-         (let* ((ov (quick-peek-overlay-ensure-at pos))
-                (contents (quick-peek-overlay-contents ov)))
-           (setf (quick-peek-overlay-contents ov)
-                 (concat contents (when contents "\n") msg))
-           (quick-peek-update ov)))
-       flycheck-inline-clear-function #'quick-peek-hide)
       :config
-      (message "`flycheck-inline' loaded")))
+      (setq flycheck-inline-display-function
+            (lambda (msg pos err)
+              (let* ((ov (quick-peek-overlay-ensure-at pos))
+                     (contents (quick-peek-overlay-contents ov)))
+                (setf (quick-peek-overlay-contents ov)
+                      (concat contents (when contents "\n") msg))
+                (quick-peek-update ov)))
+            flycheck-inline-clear-function #'quick-peek-hide))
+    (message "`flycheck-inline' loaded"))
 #+end_src
 
 *** [[https://github.com/minad/consult-flycheck][Consult flycheck]]
@@ -5398,8 +5399,8 @@ There's currently a bug where if grammars were already installed new ones can't 
     (setq pokemacs-elisp-tsauto-config
           (make-treesit-auto-recipe
            :lang 'elisp
-           :ts-mode 'elisp-mode
-           :remap '(elisp-mode)
+           :ts-mode 'emacs-lisp-mode
+           :remap '(emacs-lisp-mode)
            :url "https://github.com/Wilfred/tree-sitter-elisp"
            :revision "main"
            :ext "\\.el\\'"))
@@ -5466,9 +5467,6 @@ Code folding based on treesit.el tree.
     (emacs-lisp-mode . (lambda ()
                          (pokemacs-fix-treesit-auto "elisp")
                          (treesit-parser-create 'elisp)))
-    (elisp-mode . (lambda ()
-                    (pokemacs-fix-treesit-auto "elisp")
-                    (treesit-parser-create 'elisp)))
     (tuareg-mode . (lambda ()
                      (pokemacs-fix-treesit-auto "ocaml")
                      (treesit-parser-create 'ocaml)))
@@ -5895,9 +5893,9 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 :END:
 
 #+begin_src emacs-lisp
-  (use-package elisp-mode
+  (use-package emacs-lisp-mode
     :ensure nil
-    :hook (elisp-mode . semantic-mode)
+    :hook (emacs-lisp-mode . semantic-mode)
     :mode-hydra
     ((:color pink :quit-key "q")
      ("Eval"
@@ -5920,7 +5918,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package puni
-    :hook ((clojure-mode elisp-mode) . puni-mode)
+    :hook ((clojure-mode emacs-lisp-mode) . puni-mode)
     :config (message "`puni' loaded")
     ;; :general
     ;; (:keymaps 'paredit-mode-map
@@ -5938,6 +5936,82 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
   (use-package flycheck-package
     :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
     :config (message "`flycheck-package' loaded"))
+#+end_src
+
+*** [[https://github.com/emacs-elsa/Elsa][Elsa]]
+
+#+begin_src elisp
+  (use-package elsa)
+
+  (use-package flycheck-elsa
+    :custom (flycheck-elsa-backend 'eask)
+    :hook (emacs-lisp-mode . flycheck-elsa-setup))
+#+end_src
+
+*** [[https://github.com/elisp-lsp/ellsp][Ellsp]]
+
+#+begin_src elisp
+  (use-package msgu
+    :disabled
+    :ensure (msgu :type git :host github :repo "jcs-elpa/msgu"))
+
+  (use-package ellsp
+    :disabled
+    :ensure (ellsp :type git :host github :repo "elisp-lsp/ellsp")
+    :hook (emacs-lisp-mode . (lambda ()
+                               (ellsp-register)
+                               (lsp-deferred))))
+#+end_src
+
+*** [[https://github.com/Malabarba/Nameless][Nameless]]
+
+#+begin_src elisp
+  (use-package nameless
+    :hook (emacs-lisp-mode . nameless-mode))
+#+end_src
+
+*** [[https://github.com/xiongtx/eros][Eros]]
+
+#+begin_src elisp
+  (use-package eros
+    :hook (emacs-lisp . (lambda () (eros-mode 1))))
+#+end_src
+
+*** [[https://github.com/Wilfred/suggest.el][Suggest]]
+
+#+begin_src elisp
+  (use-package suggest)
+#+end_src
+
+*** [[https://github.com/syohex/ipretty][Ipretty]]
+
+#+begin_src elisp
+  (use-package ipretty
+    :general
+    ("C-h C-j" 'ipretty-last-sexp)
+    ("C-h C-k" 'ipretty-last-sexp-other-buffer))
+#+end_src
+
+*** [[https://github.com/emacsorphanage/macrostep][Macrostep]]
+
+#+begin_src elisp
+  (use-package macrostep)
+#+end_src
+
+*** [[https://github.com/Fanael/highlight-quoted][Highlight-quoted]]
+
+#+begin_src elisp
+  (use-package highlight-quoted
+    :hook (emacs-lisp-mode . highlight-quoted-mode))
+#+end_src
+
+*** [[https://github.com/daimrod/highlight-sexp][Highlight-sexp]]
+
+#+begin_src elisp
+  (use-package highlight-sexp
+    :disabled
+    :ensure (highlight-sexp :type git :host github :repo "daimrod/highlight-sexp")
+    :hook (emacs-lisp-mode . highlight-sexp-mode))
 #+end_src
 
 ** Elm
@@ -6772,7 +6846,7 @@ Some people use this, not my responsibility.
     :ensure (web-beautify :repo "https://github.com/yasuyk/web-beautify"))
 #+end_src
 
-* Zig
+** Zig
 :PROPERTIES:
 :CUSTOM_ID: zig
 :END:

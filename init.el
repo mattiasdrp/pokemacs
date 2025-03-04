@@ -1,4 +1,4 @@
-;;; init.el --- Emacs init -*- lexical-binding: t -*-
+;;; init.el --- Emacs init configuration -*- lexical-binding: t -*-
 ;;
 
 ;; Copyright (c) 2022 mattiasdrp and contributors.
@@ -6,10 +6,11 @@
 ;; Author: mattiasdrp
 ;; Maintainer: mattiasdrp <https://github.com/mattiasdrp>
 ;; Created: 17 august 2022
-;; Version: 1.0
+;; Version: 1.0.0
 ;; Licence: MIT
 ;; Keywords: emacs, init, convenience, configuration
 ;; URL: https://github.com/mattiasdrp/pokemacs
+;; Package-Requires: ((emacs "28.1"))
 
 ;;; Commentary:
 
@@ -1476,7 +1477,7 @@ debian, and derivatives). On most it's 'fd'.")
             "M-l" 'dirvish-ls-switches-menu
             "M-m" 'dirvish-mark-menu
             "M-t" 'dirvish-layout-toggle
-            "M-s" 'dirvish-setup-menu
+            "M-r" 'dirvish-setup-menu
             "M-e" 'dirvish-emerge-menu
             "M-j" 'dirvish-fd-jump)
   :config
@@ -2055,11 +2056,11 @@ debian, and derivatives). On most it's 'fd'.")
                 (list (cape-capf-super
                        #'cape-keyword
                        #'lsp-completion-at-point))))
-
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
       '(project path-up-to-project file symbols)))
+
   :hook ((lsp-mode . pokemacs-lsp-optimization-mode)
          (lsp-completion-mode . minad/lsp-mode-setup-completion)
          (caml-mode . lsp-deferred)
@@ -2076,6 +2077,7 @@ debian, and derivatives). On most it's 'fd'.")
          (tuareg-mode . lsp-deferred)
          (zig-mode    . lsp-deferred)
          (zig-ts-mode    . lsp-deferred))
+
   :general
   (:keymaps 'lsp-mode-map
             "C-c C-t" 'lsp-describe-thing-at-point
@@ -2094,6 +2096,9 @@ debian, and derivatives). On most it's 'fd'.")
             "t r" 'lsp-treemacs-references
             "t s" 'lsp-treemacs-symbols
             )
+  (:keymaps 'pokemacs-flycheck-overlay-map
+            "M-$" '(lsp-execute-code-action :which-key "LSP code action"))
+
   :custom
   (lsp-log-io nil)
   (lsp-headerline-breadcrumb-enable t)
@@ -2121,8 +2126,8 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
   (lsp-ui-peek-find-references nil (list :folders (vector (projectile-project-root))))
-  :config
 
+  :config
   (defvar pokemacs-type-map
     (let ((keymap (make-sparse-keymap)))
       (define-key keymap (kbd "C-w") #'pokemacs-lsp-get-type-and-kill)
@@ -2364,8 +2369,6 @@ have one rule for each file type."
   :general
   (:keymaps 'pokemacs-fly-map
             "p" 'flycheck-prev-error)
-  (:keymaps 'pokemacs-flycheck-overlay-map
-            "M-$" '(lsp-execute-code-action :which-key "LSP code action"))
   :custom
   (flycheck-indication-mode 'left-fringe)
   :config
@@ -2387,7 +2390,7 @@ have one rule for each file type."
      ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
   ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
-    (run-with-idle-timer 0.1 nil   ; Delay of 0.1 seconds before executing
+    (run-with-idle-timer 0.3 nil   ; Delay of 0.1 seconds before executing
      'which-key-show-keymap 'pokemacs-flycheck-overlay-map t))
 
   (defun flycheck-reset (&optional n reset)
@@ -2420,18 +2423,16 @@ have one rule for each file type."
 (when (and use-inline-errors (display-graphic-p))
   (use-package flycheck-inline
     :hook (flycheck-mode . flycheck-inline-mode)
-    :after quick-peek
-    :custom
-    (flycheck-inline-display-function
-     (lambda (msg pos err)
-       (let* ((ov (quick-peek-overlay-ensure-at pos))
-              (contents (quick-peek-overlay-contents ov)))
-         (setf (quick-peek-overlay-contents ov)
-               (concat contents (when contents "\n") msg))
-         (quick-peek-update ov)))
-     flycheck-inline-clear-function #'quick-peek-hide)
     :config
-    (message "`flycheck-inline' loaded")))
+    (setq flycheck-inline-display-function
+          (lambda (msg pos err)
+            (let* ((ov (quick-peek-overlay-ensure-at pos))
+                   (contents (quick-peek-overlay-contents ov)))
+              (setf (quick-peek-overlay-contents ov)
+                    (concat contents (when contents "\n") msg))
+              (quick-peek-update ov)))
+          flycheck-inline-clear-function #'quick-peek-hide))
+  (message "`flycheck-inline' loaded"))
 
 (use-package consult-flycheck
   :general
@@ -3661,8 +3662,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (setq pokemacs-elisp-tsauto-config
         (make-treesit-auto-recipe
          :lang 'elisp
-         :ts-mode 'elisp-mode
-         :remap '(elisp-mode)
+         :ts-mode 'emacs-lisp-mode
+         :remap '(emacs-lisp-mode)
          :url "https://github.com/Wilfred/tree-sitter-elisp"
          :revision "main"
          :ext "\\.el\\'"))
@@ -3706,9 +3707,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (emacs-lisp-mode . (lambda ()
                        (pokemacs-fix-treesit-auto "elisp")
                        (treesit-parser-create 'elisp)))
-  (elisp-mode . (lambda ()
-                  (pokemacs-fix-treesit-auto "elisp")
-                  (treesit-parser-create 'elisp)))
   (tuareg-mode . (lambda ()
                    (pokemacs-fix-treesit-auto "ocaml")
                    (treesit-parser-create 'ocaml)))
@@ -3999,9 +3997,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package cider
     :config (message "`cider' loaded")))
 
-(use-package elisp-mode
+(use-package emacs-lisp-mode
   :ensure nil
-  :hook (elisp-mode . semantic-mode)
+  :hook (emacs-lisp-mode . semantic-mode)
   :mode-hydra
   ((:color pink :quit-key "q")
    ("Eval"
@@ -4017,7 +4015,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`elisp-mode' loaded"))
 
 (use-package puni
-  :hook ((clojure-mode elisp-mode) . puni-mode)
+  :hook ((clojure-mode emacs-lisp-mode) . puni-mode)
   :config (message "`puni' loaded")
   ;; :general
   ;; (:keymaps 'paredit-mode-map
@@ -4028,6 +4026,46 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package flycheck-package
   :hook (flycheck-mode . (lambda () (flycheck-package-setup)))
   :config (message "`flycheck-package' loaded"))
+
+(use-package elsa)
+
+(use-package flycheck-elsa
+  :custom (flycheck-elsa-backend 'eask)
+  :hook (emacs-lisp-mode . flycheck-elsa-setup))
+
+(use-package msgu
+  :disabled
+  :ensure (msgu :type git :host github :repo "jcs-elpa/msgu"))
+
+(use-package ellsp
+  :disabled
+  :ensure (ellsp :type git :host github :repo "elisp-lsp/ellsp")
+  :hook (emacs-lisp-mode . (lambda ()
+                             (ellsp-register)
+                             (lsp-deferred))))
+
+(use-package nameless
+  :hook (emacs-lisp-mode . nameless-mode))
+
+(use-package eros
+  :hook (emacs-lisp . (lambda () (eros-mode 1))))
+
+(use-package suggest)
+
+(use-package ipretty
+  :general
+  ("C-h C-j" 'ipretty-last-sexp)
+  ("C-h C-k" 'ipretty-last-sexp-other-buffer))
+
+(use-package macrostep)
+
+(use-package highlight-quoted
+  :hook (emacs-lisp-mode . highlight-quoted-mode))
+
+(use-package highlight-sexp
+  :disabled
+  :ensure (highlight-sexp :type git :host github :repo "daimrod/highlight-sexp")
+  :hook (emacs-lisp-mode . highlight-sexp-mode))
 
 (when use-elm
   (use-package elm-mode
