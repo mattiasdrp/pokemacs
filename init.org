@@ -3217,7 +3217,8 @@ Minor mode acting as a client between a language server protocol and Emacs.
       (setq-local completion-at-point-functions
                   (list (cape-capf-super
                          #'cape-keyword
-                         #'lsp-completion-at-point))))
+                         #'lsp-completion-at-point
+                         #'tempel-complete))))
     (defconst pokemacs-lsp-mode-breadcrumb-segments
       (if use-header-line
           '(project file)
@@ -4420,7 +4421,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
     (corfu-auto t)                 ;; Enable auto completion
     (corfu-quit-no-match t)
     (corfu-auto-prefix 1)
-    (corfu-auto-delay 0)
+    (corfu-auto-delay 0.01)
     (corfu-separator ?\s)
     ;; (corfu-quit-at-boundary nil)
     (corfu-on-exact-match nil)

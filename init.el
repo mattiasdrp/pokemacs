@@ -1989,7 +1989,8 @@ debian, and derivatives). On most it's 'fd'.")
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
                        #'cape-keyword
-                       #'lsp-completion-at-point))))
+                       #'lsp-completion-at-point
+                       #'tempel-complete))))
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
@@ -2902,7 +2903,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (corfu-auto t)                 ;; Enable auto completion
   (corfu-quit-no-match t)
   (corfu-auto-prefix 1)
-  (corfu-auto-delay 0)
+  (corfu-auto-delay 0.01)
   (corfu-separator ?\s)
   ;; (corfu-quit-at-boundary nil)
   (corfu-on-exact-match nil)
