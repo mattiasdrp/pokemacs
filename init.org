@@ -1490,7 +1490,6 @@ ANSI coloring didn't work, xterm-color works as expected
 
 #+begin_src emacs-lisp
   (use-package emojify
-    :hook (after-init . global-emojify-mode)
     :config (message "`emojify' loaded"))
 #+end_src
 

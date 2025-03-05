@@ -794,7 +794,6 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`kurecolor' loaded"))
 
 (use-package emojify
-  :hook (after-init . global-emojify-mode)
   :config (message "`emojify' loaded"))
 
 (defun pokemacs-unfold-or-indent-for-tab (&optional arg)
