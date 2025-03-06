@@ -2381,12 +2381,6 @@ have one rule for each file type."
 
 (use-package hideshow
   :ensure nil
-  :hook (prog-mode . (lambda ()
-                       (unless
-                           (or
-                            (eq major-mode 'rust-ts-mode)
-                            (eq major-mode 'tree-sitter-query-mode))
-                         (hs-minor-mode))))
   :commands (hs-minor-mode
              hs-toggle-hiding)
   :diminish hs-minor-mode

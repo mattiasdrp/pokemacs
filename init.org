@@ -3745,12 +3745,6 @@ On the fly syntax checking. One of the greatest package there is for making prog
 #+begin_src emacs-lisp
   (use-package hideshow
     :ensure nil
-    :hook (prog-mode . (lambda ()
-                         (unless
-                             (or
-                              (eq major-mode 'rust-ts-mode)
-                              (eq major-mode 'tree-sitter-query-mode))
-                           (hs-minor-mode))))
     :commands (hs-minor-mode
                hs-toggle-hiding)
     :diminish hs-minor-mode
