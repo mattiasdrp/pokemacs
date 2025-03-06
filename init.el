@@ -208,6 +208,12 @@ Otherwise, the org provided with emacs will be used"
   :type 'integer
   :tag "Repeat")
 
+(defcustom pokemacs-which-key-idle-delay 0.5
+  "Time before which-key appears."
+  :group 'pokemacs-values
+  :type 'integer
+  :tag "󱎫 Overlay")
+
 ;; Themes
 
 (defgroup pokemacs-appearance nil
@@ -900,7 +906,7 @@ debian, and derivatives). On most it's 'fd'.")
   (which-key-sort-order 'which-key-key-order-alpha)
   (which-key-side-window-max-width 0.33)
   (which-key-show-early-on-C-h t)
-  (which-key-idle-delay 0.1)
+  (which-key-idle-delay pokemacs-which-key-idle-delay)
   :config
   (which-key-add-major-mode-key-based-replacements 'markdown-mode
     "C-c TAB" "markdown/images"
@@ -2327,7 +2333,7 @@ have one rule for each file type."
      ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
   ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
   (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
-    (run-with-idle-timer 0.1 nil   ; Delay of 0.1 seconds before executing
+    (run-with-idle-timer pokemacs-which-key-idle-delay nil   ; Delay of 0.1 seconds before executing
      'which-key-show-keymap 'pokemacs-flycheck-overlay-map t))
 
   (defun flycheck-reset (&optional n reset)

@@ -44,15 +44,15 @@
  '(magit-diff-refine-hunk 'all)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages nil)
- '(pokemacs-columns 3)
+ '(pokemacs-dark-theme 'doom-nord t)
  '(pokemacs-dict "en-GB")
  '(pokemacs-mono-font "Fira Code" t)
- '(pokemacs-repeat-timeout 0.5)
- '(pokemacs-dark-theme 'doom-nord t)
  '(pokemacs-layout-columns 2)
  '(pokemacs-light-theme 'doom-nord-light t)
  '(pokemacs-mode-line-right-align 'right-fringe t)
+ '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-variable-font "Iosevka Aile" t)
+ '(pokemacs-which-key-idle-delay 0.5)
  '(safe-local-variable-values
    '((projectile-project-root-functions projectile-root-top-down
                                         projectile-root-bottom-up
