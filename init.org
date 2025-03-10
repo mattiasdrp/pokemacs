@@ -7137,6 +7137,18 @@ Some people use this, not my responsibility.
 #+end_src
 
 
+*** Copilot-chat
+:PROPERTIES:
+:CUSTOM_ID: copilot-chat
+:END:
+
+#+begin_src emacs-lisp
+  (when use-copilot
+    (use-package copilot-chat))
+
+#+end_src
+
+
 
 
 ** Web modes
