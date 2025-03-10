@@ -18,7 +18,7 @@
  '(calendar-month-abbrev-array
    ["Jan" "Fév" "Mar" "Avr" "Mai" "Jun" "Jul" "Aoû" "Sep" "Oct" "Nov" "Déc"])
  '(completion-ignored-extensions (remove ".git/" completion-ignored-extensions))
- '(completion-styles '(orderless basic))
+ '(completion-styles '(hotfuzz basic))
  '(crdt-tuntox-executable (file-truename "~/tuntox-x64"))
  '(cursor-intangible-mode t t)
  '(cursor-type t)
