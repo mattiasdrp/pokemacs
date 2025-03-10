@@ -214,6 +214,12 @@ Otherwise, the org provided with emacs will be used"
   :type 'integer
   :tag "󱎫 Overlay")
 
+(defcustom pokemacs-hotfuzz-module-path (expand-file-name "etc/hotfuzz/" user-emacs-directory)
+  "Where should the dynamic hotfuzz module be installed."
+  :group 'pokemacs-values
+  :type 'string
+  :tag " Hotfuzz")
+
 ;; Themes
 
 (defgroup pokemacs-appearance nil
@@ -2739,6 +2745,8 @@ with a prefix ARG."
   (register-preview-function #'consult-register-format)
   (consult-narrow-key "<") ;; (kbd "C-+")
   (consult-project-function (lambda (_) (projectile-project-root)))
+  (consult--tofu-char #x100000)
+  (consult--tofu-range #x00fffe)
 
   :config
 
@@ -3133,7 +3141,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :config
   (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down windmove-right)))
 
-(use-package hotfuzz)
+(use-package hotfuzz
+  :init
+  (update-to-load-path pokemacs-hotfuzz-module-path)
+  (unless (file-exists-p (expand-file-name "hotfuzz-module.so" pokemacs-hotfuzz-module-path))
+    (async-shell-command
+     (concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/ && "
+             "cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native && "
+	           "cmake --build build && "
+             "mkdir -p " pokemacs-hotfuzz-module-path " && "
+             "cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
+  :config
+  (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
 
 (use-package orderless
   :custom
