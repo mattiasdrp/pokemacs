@@ -378,10 +378,9 @@ Will be used to download non-emacs packages needed by emacs packages
     :config (message "`system-packages' loaded"))
 
   (use-package use-package-ensure-system-package
-    :after (system-packages)
     :ensure nil
+    :after (system-packages)
     :config (message "`use-package-ensure-system-package' loaded"))
-
   (elpaca-wait)
 
   (eval-and-compile
@@ -392,7 +391,6 @@ Will be used to download non-emacs packages needed by emacs packages
      use-package-always-defer t
      use-package-enable-imenu-support t))
 #+end_src
-
 
 ** Disable warnings
 :PROPERTIES:
@@ -758,6 +756,7 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
 #+begin_src emacs-lisp
   (use-package doom-themes
     :demand t
+    :ensure (:wait t)
     :custom
     ;; use the colorful treemacs theme
     (doom-themes-treemacs-theme "doom-colors")
@@ -774,7 +773,6 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
     (doom-themes-org-config)
     (pokemacs-load-theme)
     (message "`doom-themes' loaded"))
-  (elpaca-wait)
 #+end_src
 
 ** Maximize and fullscreen at start-up
@@ -1145,8 +1143,8 @@ Stop creating files everywhere and put them all in a single place
 #+begin_src emacs-lisp
   (use-package no-littering
     :demand t
+    :ensure (:wait t)
     :config (message "`no-littering' loaded"))
-  (elpaca-wait)
 #+end_src
 
 Create a ~#file#~ while waiting for it to be saved and for backup (if emacs crashes you can recover your previous session with ~M-x recover-session~)
@@ -1525,6 +1523,7 @@ ANSI coloring didn't work, xterm-color works as expected
 
   (use-package general
     :demand t
+    :ensure (:wait t)
     :init
     (if (display-graphic-p)
         (general-unbind "C-z"))
@@ -1610,7 +1609,6 @@ ANSI coloring didn't work, xterm-color works as expected
     (general-def minibuffer-local-map
       "C-<tab>" 'dabbrev-expand)
     :config (message "`general' loaded"))
-  (elpaca-wait)
 #+end_src
 
 ** [[https://github.com/justbur/emacs-which-key][Which-key]]
@@ -1659,6 +1657,7 @@ Not using it to its full potential right now but only for useful dates:
 #+begin_src emacs-lisp
   (use-package hydra
     :demand t
+    :ensure (:wait t)
     :custom
     (hydra-default-hint nil)
     (hydra-look-for-remap t)
@@ -1695,7 +1694,6 @@ Not using it to its full potential right now but only for useful dates:
       (insert (format-time-string "%Y.%m.%d %H:%M")))
     :config
     (message "`hydra' loaded"))
-  (elpaca-wait)
 #+end_src
 
 ** [[https://github.com/Ladicle/hydra-posframe][Hydra-posframe]]
@@ -1718,7 +1716,7 @@ Not using it to its full potential right now but only for useful dates:
 
 #+begin_src emacs-lisp
   (use-package major-mode-hydra
-    :ensure t
+    :ensure (:wait t)
     :demand t
     :general
     ("M-h h" '("Major mode" . major-mode-hydra))
@@ -1761,7 +1759,6 @@ Not using it to its full potential right now but only for useful dates:
                            (s-repeat 10 " ")
                            (s-capitalize (symbol-name mode))
                            " commands"))))))
-  (elpaca-wait)
 #+end_src
 
 ** Pretty-hydra
@@ -4728,11 +4725,24 @@ Need to fork this repo to make it work with the new corfu-popupinfo
       (async-shell-command
        (concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/ && "
                "cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native && "
-  	           "cmake --build build && "
+               "cmake --build build && "
                "mkdir -p " pokemacs-hotfuzz-module-path " && "
                "cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
     :config
     (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
+
+  ;; (use-package hotfuzz
+  ;;   :demand t
+  ;;   :init
+  ;;   (update-to-load-path pokemacs-hotfuzz-module-path)
+  ;;   :ensure (:post-build
+  ;;            (((concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/"))
+  ;;             ("cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native")
+  ;; 	          ("cmake --build build")
+  ;;             ("mkdir -p " pokemacs-hotfuzz-module-path)
+  ;;             ("cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
+  ;;   :config
+  ;;   (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
 #+end_src
 
 ** [[https://github.com/oantolin/orderless][Orderless]]

@@ -73,10 +73,9 @@
   :config (message "`system-packages' loaded"))
 
 (use-package use-package-ensure-system-package
-  :after (system-packages)
   :ensure nil
+  :after (system-packages)
   :config (message "`use-package-ensure-system-package' loaded"))
-
 (elpaca-wait)
 
 (eval-and-compile
@@ -395,6 +394,7 @@ Otherwise, the org provided with emacs will be used"
 
 (use-package doom-themes
   :demand t
+  :ensure (:wait t)
   :custom
   ;; use the colorful treemacs theme
   (doom-themes-treemacs-theme "doom-colors")
@@ -411,7 +411,6 @@ Otherwise, the org provided with emacs will be used"
   (doom-themes-org-config)
   (pokemacs-load-theme)
   (message "`doom-themes' loaded"))
-(elpaca-wait)
 
 (when use-maximize
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
@@ -614,8 +613,8 @@ Otherwise, the org provided with emacs will be used"
 
 (use-package no-littering
   :demand t
+  :ensure (:wait t)
   :config (message "`no-littering' loaded"))
-(elpaca-wait)
 
 (auto-save-visited-mode 1)
 (setq auto-save-default t)
@@ -817,6 +816,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package general
   :demand t
+  :ensure (:wait t)
   :init
   (if (display-graphic-p)
       (general-unbind "C-z"))
@@ -902,7 +902,6 @@ debian, and derivatives). On most it's 'fd'.")
   (general-def minibuffer-local-map
     "C-<tab>" 'dabbrev-expand)
   :config (message "`general' loaded"))
-(elpaca-wait)
 
 (use-package which-key
   :init (which-key-mode)
@@ -933,6 +932,7 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package hydra
   :demand t
+  :ensure (:wait t)
   :custom
   (hydra-default-hint nil)
   (hydra-look-for-remap t)
@@ -969,7 +969,6 @@ debian, and derivatives). On most it's 'fd'.")
     (insert (format-time-string "%Y.%m.%d %H:%M")))
   :config
   (message "`hydra' loaded"))
-(elpaca-wait)
 
 ;; NOTE: hydra and posframe are required
 (when use-posframe
@@ -978,7 +977,7 @@ debian, and derivatives). On most it's 'fd'.")
     :hook (after-init . hydra-posframe-mode)))
 
 (use-package major-mode-hydra
-  :ensure t
+  :ensure (:wait t)
   :demand t
   :general
   ("M-h h" '("Major mode" . major-mode-hydra))
@@ -1021,7 +1020,6 @@ debian, and derivatives). On most it's 'fd'.")
                          (s-repeat 10 " ")
                          (s-capitalize (symbol-name mode))
                          " commands"))))))
-(elpaca-wait)
 
 (use-package pretty-hydra
   :ensure nil
@@ -3148,11 +3146,24 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (async-shell-command
      (concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/ && "
              "cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native && "
-	           "cmake --build build && "
+             "cmake --build build && "
              "mkdir -p " pokemacs-hotfuzz-module-path " && "
              "cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
   :config
   (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
+
+;; (use-package hotfuzz
+;;   :demand t
+;;   :init
+;;   (update-to-load-path pokemacs-hotfuzz-module-path)
+;;   :ensure (:post-build
+;;            (((concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/"))
+;;             ("cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native")
+;; 	          ("cmake --build build")
+;;             ("mkdir -p " pokemacs-hotfuzz-module-path)
+;;             ("cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
+;;   :config
+;;   (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
 
 (use-package orderless
   :custom
