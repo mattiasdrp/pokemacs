@@ -4750,6 +4750,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (add-to-list 'copilot-indentation-alist '(closure-mode 2))
   (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
 
+(use-package copilot-chat)
+
 (when use-web
   (use-package web-mode
     :mode "\\.php\\'"
