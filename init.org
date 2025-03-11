@@ -831,11 +831,11 @@ If you experience stuttering, increase this.
       (unless (member base load-path)
         (add-to-list 'load-path base))
       (dolist (f (directory-files base))
-        (let ((name (concat base "/" f)))
+        (let ((name (expand-file-name f base)))
           (when (and (file-directory-p name)
                      (not (equal f ".."))
                      (not (equal f ".")))
-            (unless (member base load-path)
+            (unless (member name load-path)
               (add-to-list 'load-path name)))))))
 
   (update-to-load-path (expand-file-name "lisp" user-emacs-directory))
@@ -2386,7 +2386,7 @@ Simple mode to visualize blanks
     ;; buffers. Starting from scratch isn't even that expensive, anyway.
     ;; (dirvish-default-layout '(1 0.11 nil))
     (dirvish-reuse-session nil)
-    (dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg))
+    (dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state))
     (dirvish-side-attributes '(vc-state file-size nerd-icons collapse))
     (dirvish-mode-line-format '(:left (sort file-time symlink) :right (omit yank index)))
     (dirvish-subtree-always-show-state t)
@@ -3225,8 +3225,7 @@ Minor mode acting as a client between a language server protocol and Emacs.
       (setq-local completion-at-point-functions
                   (list (cape-capf-super
                          #'cape-keyword
-                         #'lsp-completion-at-point
-                         #'tempel-complete))))
+                         #'lsp-completion-at-point))))
     (defconst pokemacs-lsp-mode-breadcrumb-segments
       (if use-header-line
           '(project file)
@@ -4239,11 +4238,9 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
     (register-preview-function #'consult-register-format)
     (consult-narrow-key "<") ;; (kbd "C-+")
     (consult-project-function (lambda (_) (projectile-project-root)))
-    (consult--tofu-char #x100000)
-    (consult--tofu-range #x00fffe)
-
     :config
-
+    (setq consult--tofu-char #x100000)
+    (setq consult--tofu-range #x00fffe)
     (defun pokemacs-consult-with-region (old-consult-function &optional dir given-initial)
       "Pass the region to consult-grep/ripgrep if available.
 
@@ -5781,7 +5778,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+begin_src emacs-lisp
   (use-package ccls
     :after projectile
-    :demand t
     :hook ((c-mode c++-mode objc-mode cuda-mode) . (lambda () (require 'ccls) (lsp)))
     :config
     (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
@@ -5964,7 +5960,9 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 #+begin_src emacs-lisp
   (use-package nameless
-    :hook (emacs-lisp-mode . nameless-mode))
+    :hook (emacs-lisp-mode . nameless-mode)
+    :custom
+    (nameless-private-prefix t))
 #+end_src
 
 *** [[https://github.com/xiongtx/eros][Eros]]

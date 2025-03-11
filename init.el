@@ -433,11 +433,11 @@ Otherwise, the org provided with emacs will be used"
     (unless (member base load-path)
       (add-to-list 'load-path base))
     (dolist (f (directory-files base))
-      (let ((name (concat base "/" f)))
+      (let ((name (expand-file-name f base)))
         (when (and (file-directory-p name)
                    (not (equal f ".."))
                    (not (equal f ".")))
-          (unless (member base load-path)
+          (unless (member name load-path)
             (add-to-list 'load-path name)))))))
 
 (update-to-load-path (expand-file-name "lisp" user-emacs-directory))
@@ -1388,7 +1388,7 @@ debian, and derivatives). On most it's 'fd'.")
   ;; buffers. Starting from scratch isn't even that expensive, anyway.
   ;; (dirvish-default-layout '(1 0.11 nil))
   (dirvish-reuse-session nil)
-  (dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state))
   (dirvish-side-attributes '(vc-state file-size nerd-icons collapse))
   (dirvish-mode-line-format '(:left (sort file-time symlink) :right (omit yank index)))
   (dirvish-subtree-always-show-state t)
@@ -1998,8 +1998,7 @@ debian, and derivatives). On most it's 'fd'.")
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
                        #'cape-keyword
-                       #'lsp-completion-at-point
-                       #'tempel-complete))))
+                       #'lsp-completion-at-point))))
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
@@ -2743,11 +2742,9 @@ with a prefix ARG."
   (register-preview-function #'consult-register-format)
   (consult-narrow-key "<") ;; (kbd "C-+")
   (consult-project-function (lambda (_) (projectile-project-root)))
-  (consult--tofu-char #x100000)
-  (consult--tofu-range #x00fffe)
-
   :config
-
+  (setq consult--tofu-char #x100000)
+  (setq consult--tofu-range #x00fffe)
   (defun pokemacs-consult-with-region (old-consult-function &optional dir given-initial)
     "Pass the region to consult-grep/ripgrep if available.
 
@@ -3909,7 +3906,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package ccls
   :after projectile
-  :demand t
   :hook ((c-mode c++-mode objc-mode cuda-mode) . (lambda () (require 'ccls) (lsp)))
   :config
   (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
@@ -4018,7 +4014,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                              (lsp-deferred))))
 
 (use-package nameless
-  :hook (emacs-lisp-mode . nameless-mode))
+  :hook (emacs-lisp-mode . nameless-mode)
+  :custom
+  (nameless-private-prefix t))
 
 (use-package eros
   :hook (emacs-lisp . (lambda () (eros-mode 1))))
