@@ -3137,30 +3137,15 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (pokemacs-set-repeat-exit-timeout '(windmove-left windmove-up windmove-down windmove-right)))
 
 (use-package hotfuzz
+  :demand t
   :init
   (update-to-load-path pokemacs-hotfuzz-module-path)
-  (unless (file-exists-p (expand-file-name "hotfuzz-module.so" pokemacs-hotfuzz-module-path))
-    (async-shell-command
-     (concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/ && "
-             "cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native && "
-             "cmake --build build && "
-             "mkdir -p " pokemacs-hotfuzz-module-path " && "
-             "cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
+  :ensure `(:post-build
+            (("cmake" "-B" "build" "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_C_FLAGS=-march=native")
+	           ("cmake" "--build" "build")
+             ("cp" "hotfuzz-module.so" ,pokemacs-hotfuzz-module-path)))
   :config
   (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
-
-;; (use-package hotfuzz
-;;   :demand t
-;;   :init
-;;   (update-to-load-path pokemacs-hotfuzz-module-path)
-;;   :ensure (:post-build
-;;            (((concat "cd " user-emacs-directory "elpaca/repos/hotfuzz/"))
-;;             ("cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-march=native")
-;; 	          ("cmake --build build")
-;;             ("mkdir -p " pokemacs-hotfuzz-module-path)
-;;             ("cp hotfuzz-module.so " pokemacs-hotfuzz-module-path)))
-;;   :config
-;;   (message "`hotfuzz' loaded %s" (when (featurep 'hotfuzz-module) "with `hotfuzz-module'")))
 
 (use-package orderless
   :custom
