@@ -48,6 +48,35 @@
  '(pokemacs-dict "en-GB")
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-layout-columns 2)
+ '(pokemacs-layout-layouts
+   '((:name "Prog default layout" :layout
+            (:windows ((column nil nil 2)) :sides
+                      ((right (1 magit-status-quick t)
+                              (2 ("*compilation*" "*lsp-help*") t))))
+            :description
+            "3 vertical columns with last one being magit | compilation | lsp-help")
+     (:name "OCaml watch default layout" :layout
+            (:windows ((column nil nil 2)) :sides
+                      ((right (1 magit-status-quick t)
+                              (2 ("*compilation*" "*lsp-help*" "*dune watch*") t))))
+            :description
+            "3 vertical columns with last one being magit | (compilation, lsp-help or dune watch)")
+     (:name "Prog default layout no magit" :layout
+            (:windows ((column nil nil 2)) :sides
+                      ((right (1 "*compilation*" t) (2 "*lsp-help*" t))))
+            :description
+            "3 vertical columns with last one being compilation | lsp-help")
+     (:name "Prog custom layout" :layout
+            (:windows ((column nil nil pokemacs-layout-columns)) :sides
+                      ((right (1 magit-status-quick t)
+                              (2 ("*compilation*" "*lsp-help*") t))))
+            :description
+            "vertical custom number of columns with last one being magit | compilation | lsp-help")
+     (:name "Elisp default layout" :layout
+            (:windows ((column nil nil 2)) :sides
+                      ((right (1 magit-status-quick t) (2 ielm t) (3 "*Messages*" t))))
+            :description
+            "vertical columns with last one being magit | ielm | messages")))
  '(pokemacs-light-theme 'doom-nord-light t)
  '(pokemacs-mode-line-right-align 'right-fringe t)
  '(pokemacs-repeat-timeout 0.5)
