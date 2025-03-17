@@ -169,9 +169,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- `(default ((t (,@tuple-mono-font :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
- `(fixed-pitch ((t (,@tuple-mono-font :slant normal :weight normal :height 118 :width normal :foundry "CTDB"))))
+ `(default ((t (,@tuple-mono-font :slant normal :weight normal :height 100 :width normal :foundry "CTDB"))))
+ `(fixed-pitch ((t (,@tuple-mono-font :slant normal :weight normal :height 100 :width normal :foundry "CTDB"))))
  `(lsp-lens-face ((t (,@tuple-mono-font :foundry "CTDB" :inherit lsp-details-face))))
+ '(marginalia-key ((t :inherit font-lock-keyword-face)))
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
  `(mode-line-inactive ((nil ,@tuple-mono-font)))
