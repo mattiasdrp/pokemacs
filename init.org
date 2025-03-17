@@ -103,6 +103,8 @@ Literate configuration for init.el.
   - [[#vundo][Vundo]]
   - [[#whitespace][Whitespace]]
   - [[#window-locking][Window locking]]
+- [[#process-management][Process management]]
+  - [[#proced][Proced]]
 - [[#diredshell][Dired/Shell]]
   - [[#dired][Dired]]
   - [[#dirvish][Dirvish]]
@@ -211,6 +213,7 @@ Literate configuration for init.el.
   - [[#enabledisable-packages-related-to-languages][Enable/Disable packages related to languages]]
   - [[#markdown][Markdown]]
     - [[#main-mode-8][Main mode]]
+    - [[#lsp-marksman][LSP-marksman]]
     - [[#markdown-toc][Markdown toc]]
     - [[#pandoc][Pandoc]]
   - [[#dataconfig-formats][Data/Config formats]]
@@ -591,6 +594,12 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'pokemacs-appearance
     :type 'symbol
     :tag "󰖙 Light Theme")
+
+  (defcustom pokemacs-proced-important-executables '("emacs" "ocamllsp" "dune")
+    "Executables that should be highlighted in the proced buffer."
+    :group 'pokemacs-appearance
+    :type 'list
+    :tag " Important executables")
 
   (defcustom use-all-the-icons nil
     "Use all-the-icons (when t) or nerd-icons (when nil).
@@ -2343,6 +2352,58 @@ Simple mode to visualize blanks
     :general ("M-l l"    'locked-window-buffer-mode))
 #+end_src
 
+* Process management
+:PROPERTIES:
+:CUSTOM_ID: process-management
+:END:
+
+** Proced
+:PROPERTIES:
+:CUSTOM_ID: proced
+:END:
+
+#+begin_src emacs-lisp
+  (use-package proced
+    :ensure nil
+    :commands proced
+    :init
+    (setq pokemacs-proced-important-executables-regex (regexp-opt pokemacs-proced-important-executables))
+    (defun pokemacs--proced-format-args-names-only (args)
+      "Format attribute ARGS.
+  Replace newline characters by \"^J\" (two characters)."
+      (string-replace "\n" "^J"
+                      (pcase-let* ((exe (f-base args))
+                                   (exe (proced-format-args exe))
+                                   (`(,exe . _args) (split-string exe))
+                                   (exe-prop
+                                    (if (string-match-p exe pokemacs-proced-important-executables-regex)
+                                        (propertize exe 'font-lock-face 'pokemacs-proced-important-executable)
+                                      exe)))
+                        exe-prop)))
+    :custom
+    (proced-auto-update-flag t)
+    (proced-auto-update-interval 1)
+    (proced-goal-attribute nil)
+    (proced-show-remote-processes t)
+    (proced-enable-color-flag t)
+    (proced-format 'custom)
+    :config
+    (defface pokemacs-proced-important-executable '((t :inherit proced-executable :weight bold))
+      "font face for important executables."
+      :group 'my-mode)
+    (setf (alist-get 'args proced-grammar-alist)
+          '("Args"               ; name of the column
+            pokemacs--proced-format-args-names-only  ; format function
+            left                 ; alignment within column
+            proced-string-lessp  ; defines the sort method (ascending)
+            nil                  ; non-nil reverses sort order
+            (args pid)           ; sort scheme
+            (nil t nil)))        ; refiner for custom refinement logic - see proced-refine
+    (add-to-list
+     'proced-format-alist
+     '(custom user pid ppid sess tree pcpu pmem rss state args)))
+#+end_src
+
 * Dired/Shell
 :PROPERTIES:
 :CUSTOM_ID: diredshell
@@ -3246,9 +3307,9 @@ Minor mode acting as a client between a language server protocol and Emacs.
            (clojurescript-mode-hook . lsp-deferred)
            (clojurec-mode-hook . lsp-deferred)
            (elm-mode . lsp-deferred)
+           (enh-ruby-mode . lsp-deferred)
            (fsharp-mode . lsp-deferred)
            (kotlin-mode . lsp-deferred)
-           (enh-ruby-mode . lsp-deferred)
            (rustic-mode . lsp-deferred)
            (tuareg-mode . lsp-deferred)
            (zig-mode    . lsp-deferred)
@@ -5604,18 +5665,44 @@ Code folding based on treesit.el tree.
 
 #+begin_src emacs-lisp
   (when use-markdown
-    (use-package markdown-mode
+    (use-package markdown-ts-mode
       :ensure nil
       :mode (("README\\.md\\'" . gfm-mode)
-             ("\\.md\\'"       . markdown-mode)
+             ("\\.md\\'"       . markdown-ts-mode)
              ("\\.markdown\\'" . gfm-mode))
       :init
-      (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
-      (setq markdown-command "markdown")
-      (setq markdown-open-command "retext")
+      (add-to-list 'treesit-language-source-alist
+                   '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+      (add-to-list 'treesit-language-source-alist
+                   '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))
       :hook (gfm-mode . (lambda ()
                           (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
-      :config (message "`markdown-mode' loaded")))
+      :config
+      (require 'lsp-marksman)
+      ;; (setq auto-mode-alist (delete '("\\.md\\'" . markdown-ts-mode) auto-mode-alist))
+      (setq markdown-command "markdown")
+      (setq markdown-open-command "retext")
+      (message "`markdown-ts-mode' loaded"))
+
+    )
+
+#+end_src
+
+**** LSP-marksman
+:PROPERTIES:
+:CUSTOM_ID: lsp-marksman
+:END:
+
+#+begin_src emacs-lisp
+  (when use-markdown
+    (use-package lsp-marksman
+      :ensure nil
+      :hook
+      (markdown-ts-mode . (lambda ()
+                            (add-to-list 'lsp-language-id-configuration
+                                         '(markdown-ts-mode . "markdown"))
+                            (lsp-deferred)))
+      (markdow-mode . lsp-deferred)))
 #+end_src
 
 **** [[https://github.com/ardumont/markdown-toc][Markdown toc]]

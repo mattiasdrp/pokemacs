@@ -270,6 +270,12 @@ Otherwise, the org provided with emacs will be used"
   :type 'symbol
   :tag "󰖙 Light Theme")
 
+(defcustom pokemacs-proced-important-executables '("emacs" "ocamllsp" "dune")
+  "Executables that should be highlighted in the proced buffer."
+  :group 'pokemacs-appearance
+  :type 'list
+  :tag " Important executables")
+
 (defcustom use-all-the-icons nil
   "Use all-the-icons (when t) or nerd-icons (when nil).
   nerd-icons is a better choice and I plan to stop using all-the-icons completely."
@@ -1368,6 +1374,46 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure nil
   :general ("M-l l"    'locked-window-buffer-mode))
 
+(use-package proced
+  :ensure nil
+  :commands proced
+  :init
+  (setq pokemacs-proced-important-executables-regex (regexp-opt pokemacs-proced-important-executables))
+  (defun pokemacs--proced-format-args-names-only (args)
+    "Format attribute ARGS.
+Replace newline characters by \"^J\" (two characters)."
+    (string-replace "\n" "^J"
+                    (pcase-let* ((exe (f-base args))
+                                 (exe (proced-format-args exe))
+                                 (`(,exe . _args) (split-string exe))
+                                 (exe-prop
+                                  (if (string-match-p exe pokemacs-proced-important-executables-regex)
+                                      (propertize exe 'font-lock-face 'pokemacs-proced-important-executable)
+                                    exe)))
+                      exe-prop)))
+  :custom
+  (proced-auto-update-flag t)
+  (proced-auto-update-interval 1)
+  (proced-goal-attribute nil)
+  (proced-show-remote-processes t)
+  (proced-enable-color-flag t)
+  (proced-format 'custom)
+  :config
+  (defface pokemacs-proced-important-executable '((t :inherit proced-executable :weight bold))
+    "font face for important executables."
+    :group 'my-mode)
+  (setf (alist-get 'args proced-grammar-alist)
+        '("Args"               ; name of the column
+          pokemacs--proced-format-args-names-only  ; format function
+          left                 ; alignment within column
+          proced-string-lessp  ; defines the sort method (ascending)
+          nil                  ; non-nil reverses sort order
+          (args pid)           ; sort scheme
+          (nil t nil)))        ; refiner for custom refinement logic - see proced-refine
+  (add-to-list
+   'proced-format-alist
+   '(custom user pid ppid sess tree pcpu pmem rss state args)))
+
 (use-package dired
   :ensure nil
   :general
@@ -2019,9 +2065,9 @@ debian, and derivatives). On most it's 'fd'.")
          (clojurescript-mode-hook . lsp-deferred)
          (clojurec-mode-hook . lsp-deferred)
          (elm-mode . lsp-deferred)
+         (enh-ruby-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (kotlin-mode . lsp-deferred)
-         (enh-ruby-mode . lsp-deferred)
          (rustic-mode . lsp-deferred)
          (tuareg-mode . lsp-deferred)
          (zig-mode    . lsp-deferred)
@@ -3804,18 +3850,36 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :tag " Zig")
 
 (when use-markdown
-  (use-package markdown-mode
+  (use-package markdown-ts-mode
     :ensure nil
     :mode (("README\\.md\\'" . gfm-mode)
-           ("\\.md\\'"       . markdown-mode)
+           ("\\.md\\'"       . markdown-ts-mode)
            ("\\.markdown\\'" . gfm-mode))
     :init
-    (setq native-comp-deferred-compilation-deny-list '("markdown-mode\\.el$"))
-    (setq markdown-command "markdown")
-    (setq markdown-open-command "retext")
+    (add-to-list 'treesit-language-source-alist
+                 '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+    (add-to-list 'treesit-language-source-alist
+                 '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))
     :hook (gfm-mode . (lambda ()
                         (setq-local markdown-command "pandoc --metadata title:Title -t html5 --css ~/markdown_css/github-markdown-dark.css -f gfm -s")))
-    :config (message "`markdown-mode' loaded")))
+    :config
+    (require 'lsp-marksman)
+    ;; (setq auto-mode-alist (delete '("\\.md\\'" . markdown-ts-mode) auto-mode-alist))
+    (setq markdown-command "markdown")
+    (setq markdown-open-command "retext")
+    (message "`markdown-ts-mode' loaded"))
+
+  )
+
+(when use-markdown
+  (use-package lsp-marksman
+    :ensure nil
+    :hook
+    (markdown-ts-mode . (lambda ()
+                          (add-to-list 'lsp-language-id-configuration
+                                       '(markdown-ts-mode . "markdown"))
+                          (lsp-deferred)))
+    (markdow-mode . lsp-deferred)))
 
 (when use-markdown
   (use-package markdown-toc

@@ -51,13 +51,13 @@
  '(pokemacs-layout-layouts
    '((:name "Prog default layout" :layout
             (:windows ((column nil nil 2)) :sides
-                      ((right (1 magit-status-quick t)
+                      ((right (1 (proced magit-status-quick) t)
                               (2 ("*compilation*" "*lsp-help*") t))))
             :description
             "3 vertical columns with last one being magit | compilation | lsp-help")
      (:name "OCaml watch default layout" :layout
             (:windows ((column nil nil 2)) :sides
-                      ((right (1 magit-status-quick t)
+                      ((right (1 (proced magit-status-quick) t)
                               (2 ("*compilation*" "*lsp-help*" "*dune watch*") t))))
             :description
             "3 vertical columns with last one being magit | (compilation, lsp-help or dune watch)")
@@ -68,13 +68,13 @@
             "3 vertical columns with last one being compilation | lsp-help")
      (:name "Prog custom layout" :layout
             (:windows ((column nil nil pokemacs-layout-columns)) :sides
-                      ((right (1 magit-status-quick t)
+                      ((right (1 (proced magit-status-quick) t)
                               (2 ("*compilation*" "*lsp-help*") t))))
             :description
             "vertical custom number of columns with last one being magit | compilation | lsp-help")
      (:name "Elisp default layout" :layout
             (:windows ((column nil nil 2)) :sides
-                      ((right (1 magit-status-quick t) (2 ielm t) (3 "*Messages*" t))))
+                      ((right (1 (proced magit-status-quick) t) (2 ielm t) (3 "*Messages*" t))))
             :description
             "vertical columns with last one being magit | ielm | messages")))
  '(pokemacs-light-theme 'doom-nord-light t)
