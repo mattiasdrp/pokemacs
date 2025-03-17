@@ -1382,15 +1382,14 @@ debian, and derivatives). On most it's 'fd'.")
   (defun pokemacs--proced-format-args-names-only (args)
     "Format attribute ARGS.
 Replace newline characters by \"^J\" (two characters)."
-    (string-replace "\n" "^J"
-                    (pcase-let* ((exe (f-base args))
-                                 (exe (proced-format-args exe))
-                                 (`(,exe . _args) (split-string exe))
-                                 (exe-prop
-                                  (if (string-match-p exe pokemacs-proced-important-executables-regex)
-                                      (propertize exe 'font-lock-face 'pokemacs-proced-important-executable)
-                                    exe)))
-                      exe-prop)))
+    (pcase-let* ((exe (f-base args))
+                 (exe (proced-format-args exe))
+                 (`(,exe . _args) (split-string exe))
+                 (exe-prop
+                  (if (string-match-p exe pokemacs-proced-important-executables-regex)
+                      (propertize exe 'font-lock-face 'pokemacs-proced-important-executable)
+                    exe)))
+      exe-prop))
   :custom
   (proced-auto-update-flag t)
   (proced-auto-update-interval 1)
