@@ -172,7 +172,6 @@
  `(default ((t (,@tuple-mono-font :slant normal :weight normal :height 100 :width normal :foundry "CTDB"))))
  `(fixed-pitch ((t (,@tuple-mono-font :slant normal :weight normal :height 100 :width normal :foundry "CTDB"))))
  `(lsp-lens-face ((t (,@tuple-mono-font :foundry "CTDB" :inherit lsp-details-face))))
- '(marginalia-key ((t :inherit font-lock-keyword-face)))
  '(menu ((t (:inherit mode-line))))
  '(mode-line ((t :inherit fixed-pitch)))
  `(mode-line-inactive ((nil ,@tuple-mono-font)))

@@ -1385,6 +1385,7 @@ Replace newline characters by \"^J\" (two characters)."
     (pcase-let* ((exe (f-base args))
                  (exe (proced-format-args exe))
                  (`(,exe . _args) (split-string exe))
+                 (exe (string-trim exe "[\\]+" "[\\]+"))
                  (exe-prop
                   (if (string-match-p exe pokemacs-proced-important-executables-regex)
                       (propertize exe 'font-lock-face 'pokemacs-proced-important-executable)
