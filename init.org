@@ -2588,6 +2588,16 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
       (message "`magit-todos' loaded")))
 #+end_src
 
+** Ediff
+
+#+begin_src emacs-lisp
+  (use-package ediff
+    :ensure nil
+    :custom
+    (ediff-split-window-function 'split-window-horizontally)
+    (ediff-window-setup-function 'ediff-setup-windows-plain))
+#+end_src
+
 ** [[https://github.com/tarsius/hl-todo][Highlight todo]]
 :PROPERTIES:
 :CUSTOM_ID: highlight-todo

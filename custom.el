@@ -171,6 +171,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  `(default ((t (,@tuple-mono-font :slant normal :weight normal :height 100 :width normal :foundry "CTDB"))))
+ '(ediff-even-diff-A ((t (:inherit magit-diff-added-highlight))))
+ '(ediff-fine-diff-A ((t (:inherit diff-refine-added))))
  `(fixed-pitch ((t (,@tuple-mono-font :slant normal :weight normal :height 100 :width normal :foundry "CTDB"))))
  `(lsp-lens-face ((t (,@tuple-mono-font :foundry "CTDB" :inherit lsp-details-face))))
  '(menu ((t (:inherit mode-line))))

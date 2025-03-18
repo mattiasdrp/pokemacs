@@ -1539,6 +1539,12 @@ Replace newline characters by \"^J\" (two characters)."
     :config
     (message "`magit-todos' loaded")))
 
+(use-package ediff
+  :ensure nil
+  :custom
+  (ediff-split-window-function 'split-window-horizontally)
+  (ediff-window-setup-function 'ediff-setup-windows-plain))
+
 (use-package hl-todo
   :ensure (:depth nil)
   :init (global-hl-todo-mode 1)
