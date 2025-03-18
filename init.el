@@ -1393,7 +1393,7 @@ Replace newline characters by \"^J\" (two characters)."
       exe-prop))
   :custom
   (proced-auto-update-flag t)
-  (proced-auto-update-interval 1)
+  (proced-auto-update-interval 5)
   (proced-goal-attribute nil)
   (proced-show-remote-processes t)
   (proced-enable-color-flag t)
@@ -1518,6 +1518,7 @@ Replace newline characters by \"^J\" (two characters)."
     "Utility"
     (("c" git-messenger:popup-message "Commit at point M-v G"))))
   :custom
+  (magit-bury-buffer-function 'magit-restore-window-configuration)
   (magit-auto-revert-mode t)
   (magit-auto-revert-immediately t)
   (magit-format-file-function #'magit-format-file-nerd-icons)
