@@ -63,10 +63,10 @@
 (elpaca bind-key)
 
 (elpaca elpaca-use-package
-        ;; Enable :ensure use-package keyword.
-        (elpaca-use-package-mode)
-        ;; Assume :ensure t unless otherwise specified.
-        (setq elpaca-use-package-by-default t))
+  ;; Enable :ensure use-package keyword.
+  (elpaca-use-package-mode)
+  ;; Assume :ensure t unless otherwise specified.
+  (setq elpaca-use-package-by-default t))
 
 (use-package system-packages
   :ensure t

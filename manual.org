@@ -386,6 +386,20 @@ For this you need to install [[https://github.com/gjedeer/tuntox][tuntox]] and s
   - They'll be able to connect to your session with ~M-x crdt-connect~ (be careful, this function does not raise errors easily, so it can silently fail without you noticing it)
 - You can now add new files to the session etc
 
+* Getting to know or debugging emacs
+
+Emacs is a great tool regarding exploring and debugging. You can have information about almost everything. Let's summarize the ones I use the most:
+
+- ~C-h k~ followed by any key combinations: opens a buffer telling you what this key combination does.
+- ~M-x describe-*~ will show you a help buffer with the information you want (the first choice you have is the "thing" at point). ~*~ can be:
+  - ~char~: describes the char at point. How it is displayed, its overlays, face and much more
+  - ~face~: describes the face at point or any other face (and the minibuffer even gives you a preview of each face)
+  - ~value~: describes the value at point or any other value (and the minibuffer even gives you the current value associated to it)
+  - ~function~: this one is mostly for emacs-lisp programming, but it will tell you what the function at point or any other function does
+  - ~keymap~: describes the main keymap of the current buffer or any other keymap, really useful if you want to know the keybindings associated to your current major mode, for example. But it's better to use
+  - ~mode~: describes the major mode and all the minor modes enabled in your current buffer with their associated keybindings
+  - ~symbol~: this is the mother of all describes, it describes any symbol if you don't know if your symbol is a variable, a function, a face, a keymap etc
+
 * Conclusion
 :PROPERTIES:
 :CUSTOM_ID: conclusion
