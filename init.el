@@ -252,10 +252,10 @@ Otherwise, the org provided with emacs will be used"
   :type 'list
   :tag " Variable Fonts")
 
-(defcustom pokemacs-dark-theme-p t
+(defcustom pokemacs-theme-type 'dark
   "Dark or light theme."
   :group 'pokemacs-appearance
-  :type 'boolean
+  :type 'symbol
   :tag "󰔎 Dark/Light")
 
 (defcustom pokemacs-dark-theme 'doom-solarized-dark
@@ -351,56 +351,57 @@ Otherwise, the org provided with emacs will be used"
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror)
 
-(defun pokemacs-get-current-theme ()
-  (if pokemacs-dark-theme-p
-      pokemacs-dark-theme
-    pokemacs-light-theme))
+(use-package heaven-and-hell
+  :config
+  (setq heaven-and-hell-theme-type pokemacs-theme-type)
+  (setq heaven-and-hell-themes
+        `((light . ,pokemacs-light-theme)
+          (dark . ,pokemacs-dark-theme)))
+  ;; Optionall, load themes without asking for confirmation.
+  (setq heaven-and-hell-load-theme-no-confirm t)
+  :hook (after-init . heaven-and-hell-init-hook)
+  :bind (("C-c <f6>" . heaven-and-hell-load-default-theme)))
 
-(setq reface-list nil)
+(defalias 'pokemacs-toggle-theme 'heaven-and-hell-toggle-theme)
 
-(defun fill-reface-list (face)
-  ;; saved-face is nil if the face hasn't been customized
-  (message "reface %S is %S" face (get face 'saved-face))
-  (unless (get face 'saved-face)
-    (add-to-list 'reface-list face)))
+(use-package solarized-emacs
+  :ensure (solarized :host github :repo "bbatsov/solarized-emacs")
+  :custom
+  ;; make the fringe stand out from the background
+  (solarized-distinct-fringe-background t)
 
-(fill-reface-list 'show-paren-match)
-(fill-reface-list 'show-paren-mismatch)
+  ;; Don't change the font for some headings and titles
+  (solarized-use-variable-pitch nil)
 
-(defun reface-p (face)
-  (member face reface-list))
+  ;; make the modeline high contrast
+  (solarized-high-contrast-mode-line t)
 
-(defun pokemacs--reface (&rest _)
-  (custom-set-faces
-   `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
-   `(org-block-begin-line ((t)) t)
-   `(org-block-end-line ((t :foreground unspecified :background unspecified))))
-  (when (reface-p 'show-paren-match)
-    (message "reface show paren match")
-    (custom-set-faces
-     `(show-paren-match
-       ((t (:inherit region :background ,(doom-color 'base3)
-                     :weight unspecified :foreground unspecified))))))
-  (when (reface-p 'show-paren-mismatch)
-    (custom-set-faces
-     `(show-paren-mismatch
-       ((t (:foreground unspecified :weight unspecified
-                        :background ,(doom-color 'warning))))))))
+  ;; Use less bolding
+  (solarized-use-less-bold nil)
 
-(defun pokemacs-load-theme ()
-  (load-theme (pokemacs-get-current-theme) t)
-  (pokemacs--reface))
+  ;; Use more italics
+  (solarized-use-more-italic t)
 
-(advice-add #'consult-theme :after #'pokemacs--reface)
+  ;; Use less colors for indicators such as git:gutter, flycheck and similar
+  (solarized-emphasize-indicators t)
 
-(defun pokemacs-toggle-dark-light-theme ()
-  (interactive)
-  (setq pokemacs-dark-theme-p (not pokemacs-dark-theme-p))
-  (pokemacs-load-theme))
+  ;; Don't change size of org-mode headlines (but keep other size-changes)
+  (solarized-scale-org-headlines nil)
+
+  ;; Change the size of markdown-mode headlines (off by default)
+  (solarized-scale-markdown-headlines t)
+
+  ;; Avoid all font-size changes
+  (solarized-height-minus-1 1.0)
+  (solarized-height-plus-1 1.0)
+  (solarized-height-plus-2 1.0)
+  (solarized-height-plus-3 1.0)
+  (solarized-height-plus-4 1.0)
+
+  ;; Highlight all numbers
+  (solarized-highlight-numbers t))
 
 (use-package doom-themes
-  :demand t
-  :ensure (:wait t)
   :custom
   ;; use the colorful treemacs theme
   (doom-themes-treemacs-theme "doom-colors")
@@ -415,7 +416,6 @@ Otherwise, the org provided with emacs will be used"
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
-  (pokemacs-load-theme)
   (message "`doom-themes' loaded"))
 
 (when use-maximize
@@ -3160,7 +3160,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (("l" hl-line-mode "line" :toggle hl-line-mode)
      ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
     "UI"
-    (("d" pokemacs-toggle-dark-light-theme "dark theme" :toggle pokemacs-dark-theme-p)
+    (("d" pokemacs-toggle-theme "dark theme" :toggle (eq heaven-and-hell-theme-type 'dark))
      ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
     "Coding"
     (("f" flycheck-mode "flycheck" :toggle flycheck-mode)

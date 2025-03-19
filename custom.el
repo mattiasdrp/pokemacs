@@ -44,7 +44,9 @@
  '(magit-diff-refine-hunk 'all)
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages nil)
- '(pokemacs-dark-theme 'doom-nord t)
+ '(pokemacs-dark-theme 'doom-nord)
+ '(pokemacs-light-theme 'doom-nord-light)
+ '(pokemacs-theme-type 'light)
  '(pokemacs-dict "en-GB")
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-layout-columns 2)
@@ -77,7 +79,6 @@
                       ((right (1 (magit-status-quick "*Proced*") t) (2 ielm t) (3 "*Messages*" t))))
             :description
             "vertical columns with last one being magit | ielm | messages")))
- '(pokemacs-light-theme 'doom-nord-light t)
  '(pokemacs-mode-line-right-align 'right-fringe t)
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-variable-font "Iosevka Aile" t)
