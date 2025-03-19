@@ -352,6 +352,7 @@ Otherwise, the org provided with emacs will be used"
 (load custom-file 'noerror)
 
 (use-package heaven-and-hell
+  :demand t
   :config
   (setq heaven-and-hell-theme-type pokemacs-theme-type)
   (setq heaven-and-hell-themes
@@ -359,8 +360,7 @@ Otherwise, the org provided with emacs will be used"
           (dark . ,pokemacs-dark-theme)))
   ;; Optionall, load themes without asking for confirmation.
   (setq heaven-and-hell-load-theme-no-confirm t)
-  :hook (after-init . heaven-and-hell-init-hook)
-  :bind (("C-c <f6>" . heaven-and-hell-load-default-theme)))
+  (message "`doom-themes' loaded"))
 
 (defalias 'pokemacs-toggle-theme 'heaven-and-hell-toggle-theme)
 
@@ -402,6 +402,40 @@ Otherwise, the org provided with emacs will be used"
   (solarized-highlight-numbers t))
 
 (use-package doom-themes
+  :demand t
+  :after (heaven-and-hell)
+  :ensure (:wait t)
+  :init
+  (defun pokemacs--reface (&rest _)
+    "Reface some faces."
+    (let ((bg-attribute (face-attribute 'region :background)))
+      (custom-set-faces
+       `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
+       `(org-block-begin-line ((t)) t)
+       `(org-block-end-line ((t :foreground unspecified :background unspecified)))
+       `(show-paren-match
+         ((t
+           (:foreground unspecified
+                        :weight unspecified
+                        :background ,(if (eq heaven-and-hell-theme-type 'dark)
+                                         (doom-darken bg-attribute 0.15)
+                                       (doom-lighten bg-attribute 0.15))
+                        :bold nil))))
+       `(show-paren-mismatch ((t (:foreground unspecified)))))))
+
+  (defun pokemacs-disable-all-active-themes (&rest _)
+    "Disable all currently active themes."
+    (dolist (theme custom-enabled-themes)
+      (disable-theme theme)))
+
+  (defun pokemacs-load-theme ()
+    (pokemacs-disable-all-active-themes)
+    (heaven-and-hell-clean-load-themes (heaven-and-hell-themes-switch-to))
+    (pokemacs--reface))
+
+  (advice-add #'heaven-and-hell-toggle-theme :after #'pokemacs--reface)
+  (advice-add #'consult-theme :after #'pokemacs--reface)
+
   :custom
   ;; use the colorful treemacs theme
   (doom-themes-treemacs-theme "doom-colors")
@@ -416,6 +450,7 @@ Otherwise, the org provided with emacs will be used"
 
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
+  (pokemacs-load-theme)
   (message "`doom-themes' loaded"))
 
 (when use-maximize
