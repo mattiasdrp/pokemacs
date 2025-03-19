@@ -1,4 +1,4 @@
-;;; post-custom.el --- Emacs customization -*- lexical-binding: t -*-
+;;; post-init.el --- Emacs customization -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2022 mattiasdrp and contributors.
 
@@ -47,6 +47,6 @@
 ;;  "C-x M-1"                 'delete-other-windows
 ;;  )
 
-(provide 'post-custom)
+(provide 'post-init)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; post-custom.el ends here
+;;; post-init.el ends here

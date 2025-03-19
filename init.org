@@ -6971,11 +6971,11 @@ Zig expects to find the binary for ~zig~ and ~zls~ to be able to run LSP. Custom
 :CUSTOM_ID: end
 :END:
 
-After everything has been done, load [[file:post-custom.el][post-custom.el]] to override some keybindings and close [[file:init.el][init.el]].
+After everything has been done, load [[file:post-init.el][post-init.el]] to override some keybindings and close [[file:init.el][init.el]].
 
 #+begin_src emacs-lisp
-  (setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
-  (load post-custom-file)
+  (setq post-init-file (expand-file-name "post-init.el" user-emacs-directory))
+  (load post-init-file)
 
   (message "`init' file loaded")
   ;;;; Footer

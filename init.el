@@ -4727,8 +4727,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (require 'zig-mode)
     (set-keymap-parent zig-ts-mode-map zig-mode-map)))
 
-(setq post-custom-file (expand-file-name "post-custom.el" user-emacs-directory))
-(load post-custom-file)
+(setq post-init-file (expand-file-name "post-init.el" user-emacs-directory))
+(load post-init-file)
 
 (message "`init' file loaded")
 ;;;; Footer

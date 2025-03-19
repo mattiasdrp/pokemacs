@@ -7,7 +7,7 @@
 #+AUTO_TANGLE: t
 #+keywords: Emacs
 
-Literate configuration for [[file:post-custom.el][post-custom.el]].
+Literate configuration for [[file:post-custom.el][post-init.el]].
 
 * Table of Contents
 :PROPERTIES:
@@ -34,7 +34,7 @@ Literate configuration for [[file:post-custom.el][post-custom.el]].
 :END:
 
 #+begin_src emacs-lisp
-  ;;; post-custom.el --- Emacs customization -*- lexical-binding: t -*-
+  ;;; post-init.el --- Emacs customization -*- lexical-binding: t -*-
 
   ;; Copyright (c) 2022 mattiasdrp and contributors.
 
@@ -239,7 +239,7 @@ You can obviously combine ~:keymaps~ and ~:prefix~
 :END:
 
 #+begin_src emacs-lisp
-  (provide 'post-custom)
+  (provide 'post-init)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;; post-custom.el ends here
+  ;;; post-init.el ends here
 #+end_src
