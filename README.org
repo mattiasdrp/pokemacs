@@ -8,11 +8,9 @@
 
 :CONTENTS:
 - [[#documentation][Documentation]]
-- [[#system][System]]
-  - [[#emacs][Emacs]]
-    - [[#building][Building]]
-      - [[#from-sources][From sources]]
-      - [[#with-guix][With guix]]
+- [[#install][Install]]
+- [[#rtfm][RTFM]]
+- [[#emacs-dependencies][Emacs dependencies]]
   - [[#languages][Languages]]
     - [[#combobulate][Combobulate]]
     - [[#lsp][LSP]]
@@ -20,6 +18,7 @@
     - [[#ocaml][OCaml]]
     - [[#rust][Rust]]
     - [[#python][Python]]
+    - [[#zig][Zig]]
   - [[#once-emacs-is-installed][Once emacs is installed:]]
   - [[#fonts][Fonts]]
   - [[#configure-packages][Configure packages]]
@@ -27,6 +26,10 @@
     - [[#ghub][Ghub]]
     - [[#code-review][Code Review]]
   - [[#external-files][External files]]
+  - [[#collaborative-editing][Collaborative editing]]
+- [[#installing-emacs-manually][Installing emacs manually]]
+  - [[#from-sources][From sources]]
+  - [[#with-guix][With guix]]
 - [[#emacs-config][Emacs config]]
 - [[#big-thanks][Big Thanks]]
 - [[#todos][Todos]]
@@ -37,89 +40,24 @@
 :CUSTOM_ID: documentation
 :END:
 
+* Install
+:PROPERTIES:
+:CUSTOM_ID: install
+:END:
+
+Clone this repo in ~.emacs.d~ if you want it to be your default config.
+
+* RTFM
+:PROPERTIES:
+:CUSTOM_ID: rtfm
+:END:
+
 Read the [[file:manual.org][manual]], you won't regret it.
 
-* System
+* Emacs dependencies
 :PROPERTIES:
-:CUSTOM_ID: system
+:CUSTOM_ID: emacs-dependencies
 :END:
-
-** Emacs
-:PROPERTIES:
-:CUSTOM_ID: emacs
-:END:
-
- - Your version of emacs should be at least 27.1
-
-*** Building
-:PROPERTIES:
-:CUSTOM_ID: building
-:END:
-
-**** From sources
-:PROPERTIES:
-:CUSTOM_ID: from-sources
-:END:
-
-- For this you need to either:
-  - ~git submodule init && git submodule update~ will download my own version of emacs that should be optimised for lsp
-  - clone [[https://github.com/emacs-mirror/emacs][the emacs repository]] and either checkout the ~emacs.27.1~ (or higher) branch or compile from the ~main~ branch.
-- I tend to forget what dependencies are needed by emacs so here is the command I usually invoke before configuring and compiling emacs:
-
-  #+begin_src sh
-    sudo apt install -y autoconf make gcc texinfo libgtk-3-dev libxpm-dev \
-      libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev \
-      libjansson-dev libharfbuzz-dev libharfbuzz-bin imagemagick libmagickwand-dev \
-      libgccjit-14-dev libgccjit0 gcc-14 libjansson4 libjansson-dev libtree-sitter-dev \
-      xaw3dg-dev texinfo libx11-dev libenchant-2-dev pkgconf
-  #+end_src
-
-  #+begin_src sh
-    sudo dnf install autoconf make gcc texinfo gtk3 gtk3-devel libXpm-devel \
-      libjpeg-turbo-devel giflib-devel libtiff-devel gnutls-devel ncurses-devel \
-      jansson-devel harfbuzz-devel harfbuzz ImageMagick ImageMagick-devel libgccjit-devel \
-      libtree-sitter libtree-sitter-devel webkit2gtk4.1-devel Xaw3d-devel texinfo \
-      libX11-devel enchant2-devel pkgconf
-  #+end_src
-
-  #+begin_src sh
-    export CC="gcc-14"
-  #+end_src
-
-- If you feel confident and better than me at installing emacs from scratch, don't hesitate to tell me where I'm wrong, I always love to learn
-- Once
-  #+begin_src sh
-    ./autogen.sh
-  #+end_src
-
-  and
-  #+begin_src sh
-    ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --without-compress-install --with-threads --with-included-regex --with-x-toolkit=gtk3 --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls --with-xft --with-xml2 --with-mailutils --with-tree-sitter CFLAGS="-march=native -mtune=native -O2 -g3"
-  #+end_src
-
-  tell you you can make,
-  #+begin_src sh
-    make -j $(nproc)
-  #+end_src
-
-  Note that with Fedora 41, tree-sitter is not installed at the expected path (see [[https://www.reddit.com/r/emacs/comments/1ic29ht/fix_compiling_with_treesitter_in_fedora_41/][this r/emacs post]]), as such compile it with
-  #+begin_src sh
-    TREE_SITTER_LIBS=/usr/lib64/libtree-sitter.so make -j $(nproc)
-  #+end_src
-
-
-  then
-
-  #+begin_src sh
-    sudo make install
-  #+end_src
-
-**** With guix
-:PROPERTIES:
-:CUSTOM_ID: with-guix
-:END:
-
-- I just follow [[https://systemcrafters.net/craft-your-system-with-guix/installing-the-package-manager/][this link]]
 
 ** Languages
 :PROPERTIES:
@@ -244,6 +182,9 @@ M-x pokemacs-fix-treesit-auto RET ocaml RET
 
 
 *** Zig
+:PROPERTIES:
+:CUSTOM_ID: zig
+:END:
 
 - Download a prebuilt tarball from https://ziglang.org/download/
 - Untar it in the directory of your choice
@@ -378,8 +319,83 @@ And, of course, you need to let both tools know who you are:
 Restart emacs and everything should work
 
 ** Collaborative editing
+:PROPERTIES:
+:CUSTOM_ID: collaborative-editing
+:END:
 
 install [[https://github.com/gjedeer/tuntox][tuntox]] and set ~crdt-tuntox-executable~ to your ~tuntox~ binary.
+
+* Installing emacs manually
+:PROPERTIES:
+:CUSTOM_ID: installing-emacs-manually
+:END:
+
+- Your version of emacs should be at least 27.1
+
+*** From sources
+:PROPERTIES:
+:CUSTOM_ID: from-sources
+:END:
+
+- For this you need to either:
+  - ~git submodule init && git submodule update~ will download my own version of emacs that should be optimised for lsp
+  - clone [[https://github.com/emacs-mirror/emacs][the emacs repository]] and either checkout the ~emacs.27.1~ (or higher) branch or compile from the ~main~ branch.
+- I tend to forget what dependencies are needed by emacs so here is the command I usually invoke before configuring and compiling emacs:
+
+  #+begin_src sh
+    sudo apt install -y autoconf make gcc texinfo libgtk-3-dev libxpm-dev \
+      libjpeg-dev libgif-dev libtiff5-dev libgnutls28-dev libncurses5-dev \
+      libjansson-dev libharfbuzz-dev libharfbuzz-bin imagemagick libmagickwand-dev \
+      libgccjit-14-dev libgccjit0 gcc-14 libjansson4 libjansson-dev libtree-sitter-dev \
+      xaw3dg-dev texinfo libx11-dev libenchant-2-dev pkgconf
+  #+end_src
+
+  #+begin_src sh
+    sudo dnf install autoconf make gcc texinfo gtk3 gtk3-devel libXpm-devel \
+      libjpeg-turbo-devel giflib-devel libtiff-devel gnutls-devel ncurses-devel \
+      jansson-devel harfbuzz-devel harfbuzz ImageMagick ImageMagick-devel libgccjit-devel \
+      libtree-sitter libtree-sitter-devel webkit2gtk4.1-devel Xaw3d-devel texinfo \
+      libX11-devel enchant2-devel pkgconf
+  #+end_src
+
+  #+begin_src sh
+    export CC="gcc-14"
+  #+end_src
+
+- If you feel confident and better than me at installing emacs from scratch, don't hesitate to tell me where I'm wrong, I always love to learn
+- Once
+  #+begin_src sh
+    ./autogen.sh
+  #+end_src
+
+  and
+  #+begin_src sh
+    ./configure --with-native-compilation -with-json --with-modules --with-harfbuzz --without-compress-install --with-threads --with-included-regex --with-x-toolkit=gtk3 --with-zlib --with-jpeg --with-png --with-imagemagick --with-tiff --with-xpm --with-gnutls --with-xft --with-xml2 --with-mailutils --with-tree-sitter CFLAGS="-march=native -mtune=native -O2 -g3"
+  #+end_src
+
+  tell you you can make,
+  #+begin_src sh
+    make -j $(nproc)
+  #+end_src
+
+  Note that with Fedora 41, tree-sitter is not installed at the expected path (see [[https://www.reddit.com/r/emacs/comments/1ic29ht/fix_compiling_with_treesitter_in_fedora_41/][this r/emacs post]]), as such compile it with
+  #+begin_src sh
+    TREE_SITTER_LIBS=/usr/lib64/libtree-sitter.so make -j $(nproc)
+  #+end_src
+
+
+  then
+
+  #+begin_src sh
+    sudo make install
+  #+end_src
+
+*** With guix
+:PROPERTIES:
+:CUSTOM_ID: with-guix
+:END:
+
+- I just follow [[https://systemcrafters.net/craft-your-system-with-guix/installing-the-package-manager/][this link]]
 
 * Emacs config
 :PROPERTIES:
