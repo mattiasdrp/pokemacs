@@ -1,4 +1,4 @@
-#+title: Emacs Early Init
+#+title: Emacs Post Init
 #+author: mattiasdrp
 #+date: <2022-08-17 Wed>
 #+language: en_US
