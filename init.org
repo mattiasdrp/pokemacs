@@ -2294,7 +2294,7 @@ Allows to have multiple cursors. There are a lot of functions provided by this m
     ("C-c n" 'mc/mark-next-like-this)
     ("C-c p" 'mc/mark-previous-like-this)
     ("C-c a" 'mc/mark-all-like-this)
-    :config (message "`a loaded"))
+    :config (message "`multiple-cursors' loaded"))
 #+end_src
 
 ** TODO Hide region
@@ -2313,7 +2313,7 @@ TODO: hide-region-unpin doesn't work when changing buffer.
     :commands hide-region-pin
     :general
     ("C-c r u" 'hide-region-unpin)
-    :config (message "`hide-region loaded"))
+    :config (message "`hide-region' loaded"))
 #+end_src
 
 ** [[https://github.com/hlissner/emacs-hide-mode-line][Hide mode line]]
@@ -2325,7 +2325,7 @@ Used by some packages
 
 #+begin_src emacs-lisp
   (use-package hide-mode-line
-    :config (message "`hide-mode-line loaded"))
+    :config (message "`hide-mode-line' loaded"))
 #+end_src
 
 ** [[https://github.com/m00natic/vlfi][View Large Files]]
@@ -2346,15 +2346,18 @@ Used by some packages
 
 #+begin_src emacs-lisp
   (use-package vundo
+    :ensure (:wait t)
+    :demand t
     :commands (vundo)
     :general
     ("C-x u" 'vundo)
+    (:keymaps 'vundo-mode-map
+              "u" 'vundo-backward)
     :custom
     (vundo-glyph-alist vundo-unicode-symbols)
     (vundo-compact-display t)
-    :general
-    (:keymaps 'vundo-mode-map
-              "u" 'vundo-backward))
+    :config
+    (message "`vundo' loaded"))
 #+end_src
 
 ** [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace]]
@@ -2372,7 +2375,7 @@ Simple mode to visualize blanks
     (text-mode . whitespace-mode)
     :custom
     (whitespace-style '(face empty indentation::space tab trailing))
-    :config (message "`whitespace loaded"))
+    :config (message "`whitespace' loaded"))
 #+end_src
 
 ** Window locking
@@ -2409,7 +2412,7 @@ Simple mode to visualize blanks
     (setq pokemacs-proced-important-executables-regex (regexp-opt pokemacs-proced-important-executables))
     (defun pokemacs--proced-format-args-names-only (args)
       "Format attribute ARGS.
-  Replace newline characters by \"^J\" (two characters)."
+    Replace newline characters by \"^J\" (two characters)."
       (pcase-let* ((exe (f-base args))
                    (exe (proced-format-args exe))
                    (`(,exe . _args) (split-string exe))
@@ -3329,6 +3332,8 @@ Minor mode acting as a client between a language server protocol and Emacs.
         (setq pokemacs-lsp--optimization-init-p t))))
 
   (use-package lsp-mode
+    :ensure nil
+    ;; :ensure (:repo "~/lsp-mode")
     :init
     (defun minad/lsp-mode-setup-completion ()
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -4098,7 +4103,7 @@ This mode will center the text when only one window is displayed.
       (interactive "P")
       (let ((pokemacs-layout-columns (or columns pokemacs-layout-columns)))
         (setq current-prefix-arg nil)
-        (pokemacs-layout--apply "prog custom layout"))))
+        (pokemacs-layout--apply "Prog custom layout"))))
 #+end_src
 
 ** Window Purpose

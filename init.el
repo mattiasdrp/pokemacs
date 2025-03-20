@@ -1363,7 +1363,7 @@ debian, and derivatives). On most it's 'fd'.")
   ("C-c n" 'mc/mark-next-like-this)
   ("C-c p" 'mc/mark-previous-like-this)
   ("C-c a" 'mc/mark-all-like-this)
-  :config (message "`a loaded"))
+  :config (message "`multiple-cursors' loaded"))
 
 (use-package hide-region
   :load-path "lisp/"
@@ -1371,25 +1371,28 @@ debian, and derivatives). On most it's 'fd'.")
   :commands hide-region-pin
   :general
   ("C-c r u" 'hide-region-unpin)
-  :config (message "`hide-region loaded"))
+  :config (message "`hide-region' loaded"))
 
 (use-package hide-mode-line
-  :config (message "`hide-mode-line loaded"))
+  :config (message "`hide-mode-line' loaded"))
 
 (use-package vlf
   :demand t
   :config (require 'vlf-setup))
 
 (use-package vundo
+  :ensure (:wait t)
+  :demand t
   :commands (vundo)
   :general
   ("C-x u" 'vundo)
+  (:keymaps 'vundo-mode-map
+            "u" 'vundo-backward)
   :custom
   (vundo-glyph-alist vundo-unicode-symbols)
   (vundo-compact-display t)
-  :general
-  (:keymaps 'vundo-mode-map
-            "u" 'vundo-backward))
+  :config
+  (message "`vundo' loaded"))
 
 (use-package whitespace
   :ensure nil
@@ -1398,7 +1401,7 @@ debian, and derivatives). On most it's 'fd'.")
   (text-mode . whitespace-mode)
   :custom
   (whitespace-style '(face empty indentation::space tab trailing))
-  :config (message "`whitespace loaded"))
+  :config (message "`whitespace' loaded"))
 
 (define-minor-mode locked-window-buffer-mode
   "Make the current window always display this buffer."
@@ -1416,7 +1419,7 @@ debian, and derivatives). On most it's 'fd'.")
   (setq pokemacs-proced-important-executables-regex (regexp-opt pokemacs-proced-important-executables))
   (defun pokemacs--proced-format-args-names-only (args)
     "Format attribute ARGS.
-Replace newline characters by \"^J\" (two characters)."
+  Replace newline characters by \"^J\" (two characters)."
     (pcase-let* ((exe (f-base args))
                  (exe (proced-format-args exe))
                  (`(,exe . _args) (split-string exe))
@@ -2079,6 +2082,8 @@ Replace newline characters by \"^J\" (two characters)."
       (setq pokemacs-lsp--optimization-init-p t))))
 
 (use-package lsp-mode
+  :ensure nil
+  ;; :ensure (:repo "~/lsp-mode")
   :init
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -2641,7 +2646,7 @@ with a prefix ARG."
     (interactive "P")
     (let ((pokemacs-layout-columns (or columns pokemacs-layout-columns)))
       (setq current-prefix-arg nil)
-      (pokemacs-layout--apply "prog custom layout"))))
+      (pokemacs-layout--apply "Prog custom layout"))))
 
 (when use-window-purpose
   (use-package window-purpose
