@@ -3968,11 +3968,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package dune
   :mode ("^dune$" "^dune-project$")
-  :init
-  (define-prefix-command 'pokemacs-dune-map nil "Dune-")
   :general
-  ("M-d" pokemacs-dune-map)
-  (:keymaps 'pokemacs-dune-map
+  (:keymaps 'dune-mode-map
+            :prefix "C-d"
             "C-c" 'compile
             "l" 'dune-insert-library-form
             "e" 'dune-insert-executable-form
