@@ -76,7 +76,8 @@
             "vertical custom number of columns with last one being magit | compilation | lsp-help")
      (:name "Elisp default layout" :layout
             (:windows ((column nil nil 2)) :sides
-                      ((right (1 (magit-status-quick "*Proced*") t) (2 ielm t) (3 "*Messages*" t))))
+                      ((right (1 (magit-status-quick "*Proced*") t) (2 ielm t)
+                              (3 "*Messages*" t))))
             :description
             "vertical columns with last one being magit | ielm | messages")))
  '(pokemacs-mode-line-right-align 'right-fringe t)

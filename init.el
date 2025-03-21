@@ -801,8 +801,70 @@ debian, and derivatives). On most it's 'fd'.")
   )
 
 (when use-ligature
+  (defcustom pokemacs-ligatures
+    '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
+      ;; =:= =!=
+      ;; ;; ;;;
+      ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
+      (";" (rx (+ ";")))
+      ;; && &&&
+      ("&" (rx (+ "&")))
+      ;; !! !!! !. !: !!. != !== !~
+      ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+      ;; ?? ??? ?:  ?=  ?.
+      ("?" (rx (or ":" "=" "\." (+ "?"))))
+      ;; %% %%%
+      ("%" (rx (+ "%")))
+      ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+      ;; |->>-||-<<-| |- |== ||=||
+      ;; |==>>==<<==<=>==//==/=!==:===>
+      ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
+                      "-" "=" ))))
+      ;; \\ \\\ \/
+      ("\\" (rx (or "/" (+ "\\"))))
+      ;; ++ +++ ++++ +>
+      ("+" (rx (or ">" (+ "+"))))
+      ;; :: ::: :::: :> :< := :// ::=
+      (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+      ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+      ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
+                      "="))))
+      ;; .. ... .... .= .- .? ..= ..<
+      ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+      ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+      ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
+      ;; *> */ *)  ** *** ****
+      ("*" (rx (or ">" "/" ")" (+ "*"))))
+      ;; www wwww
+      ("w" (rx (+ "w")))
+      ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+      ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
+      ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+      ;; << <<< <<<<
+      ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
+                      "-"  "/" "|" "="))))
+      ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
+      ;; >> >>> >>>>
+      (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+      ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+      ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
+                   (+ "#"))))
+      ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+      ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+      ;; __ ___ ____ _|_ __|____|_
+      ("_" (rx (+ (or "_" "|"))))
+      ;; Fira code: 0xFF 0x12
+      ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
+      ;; Fira code:
+      "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
+      ;; The few not covered by the regexps.
+      "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^=")
+    "List of all character sequences that should joined to form a single glyph."
+    :group 'pokemacs-appearance
+    :type '(repeat (choice string (cons string (sexp :tag "A valid regex"))))
+    :tag " Ligatures")
+
   (use-package ligature
-    :demand t
     :config
     ;; Enable the "www" ligature in every possible major mode
     (ligature-set-ligatures 't '("www"))
@@ -810,19 +872,7 @@ debian, and derivatives). On most it's 'fd'.")
     ;; `variable-pitch' face supports it
     (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
     ;; Enable all Fira Code ligatures in programming modes
-    (ligature-set-ligatures
-     'prog-mode '(
-                  "www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
-                  ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
-                  "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
-                  "#_(" ".-" ".=""..<""?=" "??" ";;" "/*" "/**"
-                  ;; "..""..."
-                  "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
-                  "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
-                  "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
-                  "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
-                  "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
-                  "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%" "[|" "|]"))
+    (ligature-set-ligatures 'prog-mode pokemacs-ligatures)
     ;; Enables ligature checks globally in all buffers. You can also do it
     ;; per mode with `ligature-mode'.
     (global-ligature-mode t)
@@ -2656,7 +2706,7 @@ with a prefix ARG."
     (message "`window-purpose' loaded")))
 
 (use-package vertico
-  :ensure (vertico :files (:defaults "extensions/*"))
+  :ensure (vertico :wait t :files (:defaults "extensions/*"))
   :after general
   :init (vertico-mode)
   :general
@@ -2756,6 +2806,7 @@ with a prefix ARG."
     (message "`vertico-posframe' loaded")))
 
 (use-package consult
+  :ensure nil
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
@@ -4325,6 +4376,39 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     :type '(repeat sexp)
     :tag " OCaml Templates")
 
+  (defcustom pokemacs-tuareg-prettify-symbols-alist
+    '(
+      ("sqrt" . ?√)
+      ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
+      ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
+      ("<>" . ?≠)
+      ;; Some greek letters for type parameters.
+      ("'a" . ?α)
+      ("'b" . ?β)
+      ("'c" . ?γ)
+      ("'d" . ?δ)
+      ("'e" . ?ε)
+      ("'f" . ?φ)
+      ("'i" . ?ι)
+      ("'k" . ?κ)
+      ("'m" . ?μ)
+      ("'n" . ?ν)
+      ("'o" . ?ω)
+      ("'p" . ?π)
+      ("'r" . ?ρ)
+      ("'s" . ?σ)
+      ("'t" . ?τ)
+      ("'x" . ?ξ)
+      ("fun" . ?λ)
+      ("not" . ?￢)
+      (":=" . ?⟸))
+    "Alist mapping characters to a prettified symbol"
+    :group 'pokemacs-appearance
+    :type '(alist
+            :key-type string
+            :value-type integer)
+    :tag "󰘧 OCaml Ligatures")
+
   (use-package tuareg
     :ensure-system-package
     ((ocamllsp . "opam install ocaml-lsp-server")
@@ -4405,32 +4489,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
          'tuareg-mode-hook
          (lambda ()
            ;; Commented symbols are actually prettier with ligatures or just ugly
-           (setq prettify-symbols-alist
-                 '(
-                   ("sqrt" . ?√)
-                   ("&&" . ?⋀)        ; 'N-ARY LOGICAL AND' (U+22C0)
-                   ("||" . ?⋁)        ; 'N-ARY LOGICAL OR' (U+22C1)
-                   ("<>" . ?≠)
-                   ;; Some greek letters for type parameters.
-                   ("'a" . ?α)
-                   ("'b" . ?β)
-                   ("'c" . ?γ)
-                   ("'d" . ?δ)
-                   ("'e" . ?ε)
-                   ("'f" . ?φ)
-                   ("'i" . ?ι)
-                   ("'k" . ?κ)
-                   ("'m" . ?μ)
-                   ("'n" . ?ν)
-                   ("'o" . ?ω)
-                   ("'p" . ?π)
-                   ("'r" . ?ρ)
-                   ("'s" . ?σ)
-                   ("'t" . ?τ)
-                   ("'x" . ?ξ)
-                   ("fun" . ?λ)
-                   ("not" . ?￢)
-                   (":=" . ?⟸)))))
+           (setq prettify-symbols-alist pokemacs-tuareg-prettify-symbols-alist)))
       (progn
         (setq tuareg-prettify-symbols-basic-alist nil)
         (setq tuareg-prettify-symbols-extra-alist nil)))
