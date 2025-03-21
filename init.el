@@ -865,6 +865,7 @@ debian, and derivatives). On most it's 'fd'.")
     :tag " Ligatures")
 
   (use-package ligature
+    :demand t
     :config
     ;; Enable the "www" ligature in every possible major mode
     (ligature-set-ligatures 't '("www"))
