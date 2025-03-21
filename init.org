@@ -29,6 +29,7 @@ Literate configuration for init.el.
     - [[#load-custom-file][Load custom file]]
   - [[#themes-etc][Themes etc]]
     - [[#swap-between-darklight-themes][Swap between dark/light themes]]
+    - [[#solarized][Solarized]]
     - [[#doom-theme][Doom theme]]
   - [[#maximize-and-fullscreen-at-start-up][Maximize and fullscreen at start-up]]
   - [[#revert-early-init][Revert early-init]]
@@ -114,6 +115,7 @@ Literate configuration for init.el.
 - [[#git][Git]]
   - [[#magit][Magit]]
   - [[#magit-todos][Magit todos]]
+  - [[#ediff][Ediff]]
   - [[#highlight-todo][Highlight todo]]
   - [[#git-messenger][Git messenger]]
   - [[#git-timemachine][Git timemachine]]
@@ -188,6 +190,9 @@ Literate configuration for init.el.
   - [[#marginalia][Marginalia]]
   - [[#iedit][Iedit]]
   - [[#tempel][Tempel]]
+  - [[#copilot][Copilot]]
+    - [[#main-mode-6][Main mode]]
+    - [[#copilot-chat][Copilot-chat]]
 - [[#gui][GUI]]
   - [[#mode-line][Mode-line]]
     - [[#anzu][Anzu]]
@@ -203,16 +208,16 @@ Literate configuration for init.el.
 - [[#eaf][EAF]]
 - [[#tree-sitter][Tree sitter]]
   - [[#treesit][Treesit]]
-    - [[#main-mode-6][Main Mode]]
+    - [[#main-mode-7][Main Mode]]
     - [[#treesit-auto][Treesit-auto]]
   - [[#tree-sitter-elisp][Tree sitter elisp]]
-    - [[#main-mode-7][Main mode]]
+    - [[#main-mode-8][Main mode]]
     - [[#tree-sitter-folding][Tree sitter folding]]
   - [[#combobulate][Combobulate]]
 - [[#programming-languages][Programming languages]]
   - [[#enabledisable-packages-related-to-languages][Enable/Disable packages related to languages]]
   - [[#markdown][Markdown]]
-    - [[#main-mode-8][Main mode]]
+    - [[#main-mode-9][Main mode]]
     - [[#lsp-marksman][LSP-marksman]]
     - [[#markdown-toc][Markdown toc]]
     - [[#pandoc][Pandoc]]
@@ -222,13 +227,13 @@ Literate configuration for init.el.
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
   - [[#cc][C/C++]]
-    - [[#main-mode-9][Main mode]]
+    - [[#main-mode-10][Main mode]]
     - [[#ccls][CCLS]]
   - [[#clojure][Clojure]]
-    - [[#main-mode-10][Main mode]]
+    - [[#main-mode-11][Main mode]]
     - [[#cider][CIDER]]
   - [[#emacs-lisp][Emacs-Lisp]]
-    - [[#main-mode-11][Main mode]]
+    - [[#main-mode-12][Main mode]]
     - [[#lisp-extra-font-lock][Lisp extra font lock]]
     - [[#puni][Puni]]
     - [[#flycheck-package][Flycheck package]]
@@ -249,14 +254,14 @@ Literate configuration for init.el.
   - [[#michelson][Michelson]]
   - [[#ocaml][OCaml]]
     - [[#useful-functions][Useful functions]]
-    - [[#main-mode-12][Main mode]]
+    - [[#main-mode-13][Main mode]]
     - [[#tuareg-menhir][Tuareg Menhir]]
     - [[#dune-commands][Dune commands]]
     - [[#ocaml-utils][OCaml utils]]
   - [[#pdf-files][Pdf files]]
     - [[#saveplace-in-pdf][Saveplace in pdf]]
   - [[#python][Python]]
-    - [[#main-mode-13][Main mode]]
+    - [[#main-mode-14][Main mode]]
     - [[#pyvenv][Pyvenv]]
     - [[#lsp-pyright][Lsp pyright]]
   - [[#racket][Racket]]
@@ -266,7 +271,7 @@ Literate configuration for init.el.
   - [[#rust][Rust]]
   - [[#sicp][SICP]]
   - [[#web-modes][Web modes]]
-    - [[#main-mode-14][Main mode]]
+    - [[#main-mode-15][Main mode]]
     - [[#css-mode][CSS mode]]
     - [[#simple-httpd][Simple HTTPD]]
     - [[#beautify][Beautify]]
@@ -722,6 +727,9 @@ This is a list of custom variables that allow to enable/disable features. If you
 #+end_src
 
 *** [[https://github.com/bbatsov/solarized-emacs][Solarized]]
+:PROPERTIES:
+:CUSTOM_ID: solarized
+:END:
 
 #+begin_src emacs-lisp
   (use-package solarized-emacs
@@ -2396,7 +2404,6 @@ Used by some packages
 
 #+begin_src emacs-lisp
   (use-package vundo
-    :ensure (:wait t)
     :demand t
     :commands (vundo)
     :general
@@ -2681,6 +2688,9 @@ Adds a list of TODOS and other keywords (that can be found with ~M-h v magit-tod
 #+end_src
 
 ** Ediff
+:PROPERTIES:
+:CUSTOM_ID: ediff
+:END:
 
 #+begin_src emacs-lisp
   (use-package ediff
@@ -4193,7 +4203,7 @@ Vertico works with the default completion system instead of reimplementing a who
 
 #+begin_src emacs-lisp
   (use-package vertico
-    :ensure (vertico :wait t :files (:defaults "extensions/*"))
+    :ensure (vertico :files (:defaults "extensions/*"))
     :after general
     :init (vertico-mode)
     :general
@@ -4234,7 +4244,6 @@ Vertico works with the default completion system instead of reimplementing a who
                      "  ")
                    cand)))
     (message "`vertico' loaded"))
-
 #+end_src
 
 *** Vertico directory
@@ -5481,7 +5490,7 @@ Will pulse when the focus changes to show where the cursor is.
 
 *** Main Mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-6
+:CUSTOM_ID: main-mode-7
 :END:
 
 #+begin_src emacs-lisp
@@ -5554,7 +5563,7 @@ Minor mode that uses tree-sitter, an incremental parsing library. As well as LSP
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-7
+:CUSTOM_ID: main-mode-8
 :END:
 
 #+begin_src emacs-lisp
@@ -5766,7 +5775,7 @@ Code folding based on treesit.el tree.
 
 **** [[https://github.com/jrblevin/markdown-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-8
+:CUSTOM_ID: main-mode-9
 :END:
 
 #+begin_src emacs-lisp
@@ -5935,7 +5944,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-9
+:CUSTOM_ID: main-mode-10
 :END:
 
 #+begin_src emacs-lisp
@@ -6008,7 +6017,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-10
+:CUSTOM_ID: main-mode-11
 :END:
 
 #+begin_src emacs-lisp
@@ -6036,7 +6045,7 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 
 *** Main mode
 :PROPERTIES:
-:CUSTOM_ID: main-mode-11
+:CUSTOM_ID: main-mode-12
 :END:
 
 #+begin_src emacs-lisp
@@ -6437,7 +6446,7 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
 
 *** [[https://github.com/ocaml/tuareg][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-12
+:CUSTOM_ID: main-mode-13
 :END:
 
 #+begin_src emacs-lisp
@@ -6675,7 +6684,7 @@ In order to use this package you need to run ~M-x pdf-tools-install~ the first t
 
 *** [[https://gitlab.com/python-mode-devs/python-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-13
+:CUSTOM_ID: main-mode-14
 :END:
 
 #+begin_src emacs-lisp
@@ -6999,7 +7008,7 @@ Some people use this, not my responsibility.
 
 *** [[https://github.com/fxbois/web-mode][Main mode]]
 :PROPERTIES:
-:CUSTOM_ID: main-mode-14
+:CUSTOM_ID: main-mode-15
 :END:
 
 #+begin_src emacs-lisp
@@ -7075,8 +7084,10 @@ Zig expects to find the binary for ~zig~ and ~zls~ to be able to run LSP. Custom
 After everything has been done, load [[file:post-init.el][post-init.el]] to override some keybindings and close [[file:init.el][init.el]].
 
 #+begin_src emacs-lisp
-  (setq post-init-file (expand-file-name "post-init.el" user-emacs-directory))
-  (load post-init-file)
+  (add-hook 'elpaca-after-init-hook
+            (lambda ()
+              (setq post-init-file (expand-file-name "post-init.el" user-emacs-directory))
+              (load post-init-file)))
 
   (message "`init' file loaded")
   ;;;; Footer

@@ -1431,7 +1431,6 @@ debian, and derivatives). On most it's 'fd'.")
   :config (require 'vlf-setup))
 
 (use-package vundo
-  :ensure (:wait t)
   :demand t
   :commands (vundo)
   :general
@@ -2706,7 +2705,7 @@ with a prefix ARG."
     (message "`window-purpose' loaded")))
 
 (use-package vertico
-  :ensure (vertico :wait t :files (:defaults "extensions/*"))
+  :ensure (vertico :files (:defaults "extensions/*"))
   :after general
   :init (vertico-mode)
   :general
@@ -4824,8 +4823,10 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (require 'zig-mode)
     (set-keymap-parent zig-ts-mode-map zig-mode-map)))
 
-(setq post-init-file (expand-file-name "post-init.el" user-emacs-directory))
-(load post-init-file)
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            (setq post-init-file (expand-file-name "post-init.el" user-emacs-directory))
+            (load post-init-file)))
 
 (message "`init' file loaded")
 ;;;; Footer
