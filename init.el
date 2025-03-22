@@ -2132,8 +2132,9 @@ debian, and derivatives). On most it's 'fd'.")
       (setq pokemacs-lsp--optimization-init-p t))))
 
 (use-package lsp-mode
-  :ensure nil
-  ;; :ensure (:repo "~/lsp-mode")
+  :ensure (:host github
+                 :repo "mattiasdrp/lsp-mode"
+                 :branch "mattias@ocaml-lsp-type-enclosing")
   :init
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
@@ -2172,8 +2173,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   :general
   (:keymaps 'lsp-mode-map
-            "C-c C-t" 'lsp-describe-thing-at-point
-            "C-c C-w" 'pokemacs-lsp-get-type-and-kill
+            "C-c C-t" 'lsp-ocaml-type-enclosing
             "C-c C-l" 'lsp-find-definition
             "C-c C-j" 'lsp-find-type-definition
             "C-c &"   'pop-global-mark :keymaps 'override)
@@ -2217,44 +2217,12 @@ debian, and derivatives). On most it's 'fd'.")
   (lsp-ui-peek-find-references nil (list :folders (vector (projectile-project-root))))
 
   :config
-  (defvar pokemacs-type-map
-    (let ((keymap (make-sparse-keymap)))
-      (define-key keymap (kbd "C-w") #'pokemacs-lsp-get-type-and-kill)
-      keymap)
-    "The local map to navigate type enclosing.")
-
   (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
 
   (defun pokemacs-set-type-map (&rest r)
     (set-transient-map pokemacs-type-map))
 
   (advice-add 'lsp-describe-thing-at-point :after #'pokemacs-set-type-map)
-
-  (defun pokemacs-lsp-get-type-and-kill ()
-    (interactive)
-    (let ((contents (-some->> (lsp--text-document-position-params)
-                      (lsp--make-request "textDocument/hover")
-                      (lsp--send-request)
-                      (lsp:hover-contents))))
-      (let ((contents (and contents
-                           (lsp--render-on-hover-content
-                            contents
-                            t))))
-        (let ((contents
-               (pcase (lsp-workspaces)
-                 (`(,workspace)
-                  (lsp-clients-extract-signature-on-hover
-                   contents
-                   (lsp--workspace-server-id workspace)
-                   t))
-                 (lsp-clients-extract-signature-on-hover
-                  contents
-                  nil)
-                 )))
-          (message "Copied %s to kill-ring" contents)
-          (kill-new contents)
-          ))))
-
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
   (lsp-enable-which-key-integration t)
 
