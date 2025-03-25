@@ -408,7 +408,15 @@ Otherwise, the org provided with emacs will be used"
   :init
   (defun pokemacs--reface (&rest _)
     "Reface some faces."
-    (let ((bg-attribute (face-attribute 'region :background)))
+    (let ((bg-attribute (face-background 'region)))
+      (when (featurep 'magit-diff)
+        (custom-set-faces
+         `(ediff-current-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-removed-highlight)))))
+         `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
+         `(ediff-fine-diff-A ((t (:weight normal :background ,(face-background 'diff-refine-removed)))))
+         `(ediff-current-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+         `(ediff-even-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+         `(ediff-fine-diff-B ((t (:weight normal :background ,(face-background 'diff-refine-added)))))))
       (custom-set-faces
        `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
        `(org-block-begin-line ((t)) t)
@@ -1631,7 +1639,16 @@ debian, and derivatives). On most it's 'fd'.")
   :ensure nil
   :custom
   (ediff-split-window-function 'split-window-horizontally)
-  (ediff-window-setup-function 'ediff-setup-windows-plain))
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  :config
+  (require 'magit-diff)
+  (custom-set-faces
+   `(ediff-current-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-removed-highlight)))))
+   `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
+   `(ediff-fine-diff-A ((t (:weight normal :background ,(face-background 'diff-refine-removed)))))
+   `(ediff-current-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+   `(ediff-even-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+   `(ediff-fine-diff-B ((t (:weight normal :background ,(face-background 'diff-refine-added)))))))
 
 (use-package hl-todo
   :ensure (:depth nil)
