@@ -412,11 +412,11 @@ Otherwise, the org provided with emacs will be used"
       (when (featurep 'magit-diff)
         (custom-set-faces
          `(ediff-current-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-removed-highlight)))))
-         `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
-         `(ediff-fine-diff-A ((t (:weight normal :background ,(face-background 'diff-refine-removed)))))
          `(ediff-current-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+         `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
          `(ediff-even-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
-         `(ediff-fine-diff-B ((t (:weight normal :background ,(face-background 'diff-refine-added)))))))
+         `(ediff-fine-diff-A ((t (:inherit 'diff-refine-removed :weight normal))))
+         `(ediff-fine-diff-B ((t (:inherit 'diff-refine-added :weight normal))))))
       (custom-set-faces
        `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
        `(org-block-begin-line ((t)) t)
@@ -453,9 +453,68 @@ Otherwise, the org provided with emacs will be used"
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   ;; (doom-themes-neotree-config)
   ;; or for treemacs users
+
   :config
   (doom-themes-treemacs-config)
+  ;; (defvar pokemacs--font-lock-faces
+  ;;   '(font-lock-doc-face
+  ;;     font-lock-type-face
+  ;;     font-lock-string-face
+  ;;     font-lock-escape-face
+  ;;     font-lock-number-face
+  ;;     font-lock-regexp-face
+  ;;     font-lock-keyword-face
+  ;;     font-lock-bracket-face
+  ;;     font-lock-builtin-face
+  ;;     font-lock-comment-face
+  ;;     font-lock-warning-face
+  ;;     font-lock-operator-face
+  ;;     font-lock-constant-face
+  ;;     font-lock-delimiter-face
+  ;;     font-lock-doc-markup-face
+  ;;     font-lock-punctuation-face
+  ;;     font-lock-variable-use-face
+  ;;     font-lock-preprocessor-face
+  ;;     font-lock-property-use-face
+  ;;     font-lock-property-name-face
+  ;;     font-lock-variable-name-face
+  ;;     font-lock-function-call-face
+  ;;     font-lock-function-name-face
+  ;;     font-lock-negation-char-face
+  ;;     font-lock-misc-punctuation-face
+  ;;     font-lock-comment-delimiter-face))
 
+  ;; (defvar pokemacs--font-lock-faces-light '())
+  ;; (defvar pokemacs--font-lock-faces-dark '())
+
+  ;; (defun pokemacs--populate-font-lock-faces-plist (faces)
+  ;;   (load-theme pokemacs-light-theme t)
+  ;;   (dolist (face faces)
+  ;;     (message "--------- %S" face)
+  ;;     (setq pokemacs--font-lock-faces-light (plist-put pokemacs--font-lock-faces-light face (face-foreground face))))
+  ;;   (load-theme pokemacs-dark-theme t)
+  ;;   (dolist (face faces)
+  ;;     (message "--------- %S" face)
+  ;;     (setq pokemacs--font-lock-faces-dark (plist-put pokemacs--font-lock-faces-dark face (face-foreground face)))))
+
+  ;; (pokemacs--populate-font-lock-faces-plist pokemacs--font-lock-faces)
+  ;; (defun assoc-other-face-attribute (face)
+  ;;   (if (eq heaven-and-hell-theme-type 'dark)
+  ;;       (plist-get pokemacs--font-lock-faces-light face)
+  ;;     (plist-get pokemacs--font-lock-faces-dark face)))
+
+  ;; (defun update-foreground-if-ediff-refine ()
+  ;;   "Automatically update the foreground color in `ediff-mode` when text is changed
+  ;;  and the overlay is 'ediff-refine'."
+  ;;   (let ((overlay (car (overlays-at (point))))) ; Check for overlay at the beginning of the change
+  ;;     (when (and overlay
+  ;;                (or (overlay-get overlay 'ediff-fine-diff-A)
+  ;;                    (overlay-get overlay 'ediff-fine-diff-B)))
+  ;;       (let* ((face (get-text-property beg 'face)) ; Get the font-lock face at the beginning of the change
+  ;;              (new-foreground-color (assoc-other-face-attribute face)))
+  ;;         (when new-foreground-color
+  ;;           (set-text-properties (point) (1+ (point))
+  ;;                                (list (cons 'foreground-color new-foreground-color))))))))
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
   (pokemacs-load-theme)
@@ -1644,11 +1703,11 @@ debian, and derivatives). On most it's 'fd'.")
   (require 'magit-diff)
   (custom-set-faces
    `(ediff-current-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-removed-highlight)))))
-   `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
-   `(ediff-fine-diff-A ((t (:weight normal :background ,(face-background 'diff-refine-removed)))))
    `(ediff-current-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+   `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
    `(ediff-even-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
-   `(ediff-fine-diff-B ((t (:weight normal :background ,(face-background 'diff-refine-added)))))))
+   `(ediff-fine-diff-A ((t (:inherit 'diff-refine-removed :weight normal))))
+   `(ediff-fine-diff-B ((t (:inherit 'diff-refine-added :weight normal))))))
 
 (use-package hl-todo
   :ensure (:depth nil)
@@ -3776,6 +3835,50 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (tree-sitter-debug-highlight-jump-region t)
   ;; (global-tree-sitter-mode)
   :config (message "`tree-sitter' loaded"))
+
+;; (use-package tree-sitter-hl
+;;   :ensure nil
+;;   :config
+;;   (defvar pokemacs--tree-sitter-hl-faces
+;;     '(tree-sitter-hl-face:keyword
+;;       tree-sitter-hl-face:doc
+;;       tree-sitter-hl-face:tag
+;;       tree-sitter-hl-face:type
+;;       tree-sitter-hl-face:label
+;;       tree-sitter-hl-face:escape
+;;       tree-sitter-hl-face:number
+;;       tree-sitter-hl-face:method
+;;       tree-sitter-hl-face:string
+;;       tree-sitter-hl-face:comment
+;;       tree-sitter-hl-face:embedded
+;;       tree-sitter-hl-face:variable
+;;       tree-sitter-hl-face:property
+;;       tree-sitter-hl-face:operator
+;;       tree-sitter-hl-face:function
+;;       tree-sitter-hl-face:constant
+;;       tree-sitter-hl-face:attribute
+;;       tree-sitter-hl-face:type.super
+;;       tree-sitter-hl-face:method.call
+;;       tree-sitter-hl-face:punctuation
+;;       tree-sitter-hl-face:constructor
+;;       tree-sitter-hl-face:type.builtin
+;;       tree-sitter-hl-face:function.call
+;;       tree-sitter-hl-face:type.argument
+;;       tree-sitter-hl-face:function.macro
+;;       tree-sitter-hl-face:type.parameter
+;;       tree-sitter-hl-face:string.special
+;;       tree-sitter-hl-face:constant.builtin
+;;       tree-sitter-hl-face:function.builtin
+;;       tree-sitter-hl-face:function.special
+;;       tree-sitter-hl-face:variable.special
+;;       tree-sitter-hl-face:variable.builtin
+;;       tree-sitter-hl-face:variable.parameter
+;;       tree-sitter-hl-face:property.definition
+;;       tree-sitter-hl-face:punctuation.special
+;;       tree-sitter-hl-face:punctuation.bracket
+;;       tree-sitter-hl-face:punctuation.delimiter))
+;;   (pokemacs--populate-font-lock-faces-plist pokemacs--tree-sitter-hl-faces)
+;;   (pokemacs-load-theme))
 
 (use-package treesit-fold
   :ensure (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
