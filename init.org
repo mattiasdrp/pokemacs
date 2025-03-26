@@ -270,6 +270,8 @@ Literate configuration for init.el.
   - [[#ruby][Ruby]]
   - [[#rust][Rust]]
   - [[#sicp][SICP]]
+    - [[#copilot][Copilot]]
+    - [[#copilot-chat][Copilot-chat]]
   - [[#web-modes][Web modes]]
     - [[#main-mode-15][Main mode]]
     - [[#css-mode][CSS mode]]
@@ -470,6 +472,12 @@ This is a list of custom variables that allow to enable/disable features. If you
     :group 'pokemacs-packages
     :type 'boolean
     :tag " Mu4e")
+
+  (defcustom use-copilot nil
+    "If non-nil, uses the copilot packages."
+    :group 'pokemacs-packages
+    :type 'boolean
+    :tag " Copilot")
 
   (defcustom use-org nil
     "If non-nil, install Org mode from it's git repo.
@@ -7089,6 +7097,59 @@ Some people use this, not my responsibility.
   (when use-sicp
     (use-package sicp))
 #+end_src
+
+
+*** Copilot
+:PROPERTIES:
+:CUSTOM_ID: copilot
+:END:
+
+#+begin_src emacs-lisp
+    (when use-copilot
+      (use-package copilot
+        :ensure (copilot :host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+        :init (copilot-mode)
+        :hook (prog-mode . copilot-mode)
+        :general
+        (:keymaps 'copilot-completion-map
+                  "<tab>" 'copilot-accept-completion
+                  "TAB" 'copilot-accept-completion
+                  "C-TAB" 'copilot-accept-completion-by-word
+                  "C-<tab>" 'copilot-accept-completion-by-word
+                  "C-n" 'copilot-next-completion
+                  "C-p" 'copilot-previous-completion)
+        (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+        (add-to-list 'copilot-indentation-alist '(org-mode 2))
+        (add-to-list 'copilot-indentation-alist '(text-mode 2))
+        (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+        (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
+#+end_src
+
+
+*** Copilot-chat
+:PROPERTIES:
+:CUSTOM_ID: copilot-chat
+:END:
+
+#+begin_src emacs-lisp
+  (when use-copilot
+    (use-package copilot-chat))
+#+end_src
+
+
+*** Copilot-chat
+:PROPERTIES:
+:CUSTOM_ID: copilot-chat
+:END:
+
+#+begin_src emacs-lisp
+  (when use-copilot
+    (use-package copilot-chat))
+
+#+end_src
+
+
+
 
 ** Web modes
 :PROPERTIES:
