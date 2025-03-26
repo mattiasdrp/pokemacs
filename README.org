@@ -180,6 +180,19 @@ M-x pokemacs-fix-treesit-auto RET ocaml RET
     pip install pyright black isort yapf
   #+end_src
 
+*** Java
+
+#+begin_src sh
+curl -s "https://get.sdkman.io" | bash
+#+end_src
+
+#+begin_src sh
+sdk install java
+#+end_src
+
+#+begin_src sh
+sdk default java 21.0.6-tem
+#+end_src
 
 *** Zig
 :PROPERTIES:
