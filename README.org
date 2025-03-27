@@ -226,11 +226,11 @@ Just start emacs and let it install all the packages and dependencies.
 :END:
 
 #+begin_src emacs-lisp
-  sudo apt install fonts-firacode fonts-material-design-icons-iconfont texlive-fonts-extra
+  sudo apt install fonts-firacode fonts-material-design-icons-iconfont
 #+end_src
 
 #+begin_src emacs-lisp
-sudo dnf install fira-code-fonts material-icons-fonts texlive-collection-fontsextra
+sudo dnf install fira-code-fonts material-icons-fonts
 #+end_src
 
 ** Configure packages
