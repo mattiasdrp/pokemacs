@@ -45,7 +45,8 @@
 :CUSTOM_ID: install
 :END:
 
-Clone this repo in ~.emacs.d~ if you want it to be your default config.
+Replace your ~.emacs.d~ directory with a clone of this repository and remove your
+~.emacs~ file if you want it to be your default configuration.
 
 * RTFM
 :PROPERTIES:
