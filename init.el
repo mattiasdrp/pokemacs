@@ -2506,25 +2506,31 @@ have one rule for each file type."
   (flycheck-indication-mode 'left-fringe)
   :config
   (pretty-hydra-define
-   hydra-flycheck
-   ( :title "Flycheck"
-     :pre (flycheck-list-errors)
-     :post (quit-windows-on "*Flycheck errors*")
-     :hint nil
-     :quit-key "q")
-   (
-    "Errors"
-    (("f" flycheck-error-list-set-filter "Filter"))
+    hydra-flycheck
+    ( :title "Flycheck"
+      :pre (flycheck-list-errors)
+      :post (quit-windows-on "*Flycheck errors*")
+      :hint nil
+      :quit-key "q")
+    (
+     "Errors"
+     (("f" flycheck-error-list-set-filter "Filter"))
 
-    "Navigation"
-    (("j" flycheck-next-error "Next")
-     ("k" flycheck-previous-error "Previous")
-     ("gg" flycheck-first-error "First")
-     ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
+     "Navigation"
+     (("j" flycheck-next-error "Next")
+      ("k" flycheck-previous-error "Previous")
+      ("gg" flycheck-first-error "First")
+      ("G" (progn (goto-char (point-max)) (flycheck-previous-error)) "Last"))))
   ;; (advice-add 'flycheck-next-error :filter-args #'flycheck-reset)
+
   (defun pokemacs-show-which-key-flycheck-overlay (&rest args)
-    (run-with-idle-timer pokemacs-which-key-idle-delay nil   ; Delay of 0.1 seconds before executing
-     'which-key-show-keymap 'pokemacs-flycheck-overlay-map t))
+    ;; Delay of 0.1 seconds before executing
+    (run-with-idle-timer
+     pokemacs-which-key-idle-delay nil
+     (lambda ()
+       (let ((which-key-use-C-h-commands nil)
+             (which-key-paging-key "C-<f5>"))
+         (which-key-show-keymap 'pokemacs-flycheck-overlay-map t)))))
 
   (defun flycheck-reset (&optional n reset)
     (if (flycheck-next-error-pos n reset)
