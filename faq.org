@@ -1,0 +1,54 @@
+:PROPERTIES:
+:TOC:      :include all :force ((nothing)) :ignore ((nothing)) :local ((nothing))
+:END:
+#+TITLE: FAQ Pokemacs
+#+AUTHOR: mattiasdrp
+#+DATE: <2022-08-17 Wed>
+#+LANGUAGE: en_US
+#+PROPERTY: header-args :results silent :exports code :tangle no
+#+AUTO_TANGLE: no
+#+STARTUP: hideblocks
+
+#+KEYWORDS: Emacs
+
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :ignore this
+:END:
+:CONTENTS:
+- [[#faq][FAQ]]
+  - [[#treesitter][Treesitter]]
+    - [[#lsp-doesnt-start-automatically--file-mode-specification-error-treesit-load-language-error-][LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)]]
+    - [[#warning-treesit-cannot-activate-tree-sitter-because-language-grammar-for-rust-is-unavailable-not-found][Warning (treesit): Cannot activate tree-sitter, because language grammar for rust is unavailable (not-found)]]
+:END:
+
+* Treesitter
+:PROPERTIES:
+:CUSTOM_ID: treesitter
+:END:
+
+** ~LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)~
+:PROPERTIES:
+:CUSTOM_ID: lsp-doesnt-start-automatically--file-mode-specification-error-treesit-load-language-error-
+:END:
+
+Try
+
+#+begin_src elisp
+M-x pokemacs-fix-treesit-auto RET ocaml RET
+#+end_src
+
+** ~Warning (treesit): Cannot activate tree-sitter, because language grammar for rust is unavailable (not-found)~
+:PROPERTIES:
+:CUSTOM_ID: warning-treesit-cannot-activate-tree-sitter-because-language-grammar-for-rust-is-unavailable-not-found
+:END:
+
+#+begin_src elisp
+M-x pokemacs-fix-treesit-auto RET rust RET
+#+end_src
+
+* LSP
+
+** ~Wrong type argument: hash-table-p~
+
+This means you installed lsp-mode without setting ~LSP_USE_PLISTS~ to ~true~ (meaning you didn't read the README nor the manual). It shouldn't happen since this env var is set when starting emacs. Reinstall lsp-mode after setting ~LSP_USE_PLISTS~.
