@@ -2306,9 +2306,6 @@ Library for parsing and generating JSON
 
 #+begin_src emacs-lisp
   (use-package lsp-ltex
-    :hook (text-mode . (lambda ()
-                         (require 'lsp-ltex)
-                         (lsp-deferred)))
     :init (setq lsp-ltex-version "16.0.0")
     :custom
     (lsp-ltex-language pokemacs-dict)

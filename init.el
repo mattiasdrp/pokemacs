@@ -1401,9 +1401,6 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`json' loaded"))
 
 (use-package lsp-ltex
-  :hook (text-mode . (lambda ()
-                       (require 'lsp-ltex)
-                       (lsp-deferred)))
   :init (setq lsp-ltex-version "16.0.0")
   :custom
   (lsp-ltex-language pokemacs-dict)
