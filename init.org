@@ -268,6 +268,7 @@ Literate configuration for init.el.
   - [[#rust][Rust]]
   - [[#sicp][SICP]]
   - [[#copilot][Copilot]]
+  - [[#copilot-chat][Copilot-chat]]
   - [[#web-modes][Web modes]]
     - [[#main-mode-14][Main mode]]
     - [[#css-mode][CSS mode]]
@@ -7120,6 +7121,19 @@ Some people use this, not my responsibility.
         (add-to-list 'copilot-indentation-alist '(text-mode 2))
         (add-to-list 'copilot-indentation-alist '(closure-mode 2))
         (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
+#+end_src
+
+
+
+** Copilot-chat
+:PROPERTIES:
+:CUSTOM_ID: copilot-chat
+:END:
+
+#+begin_src emacs-lisp
+  (when use-copilot
+    (use-package copilot-chat))
+
 #+end_src
 
 
