@@ -1,4 +1,15 @@
-#+title: Pokemacs documentation
+:PROPERTIES:
+:TOC:      :include all :force ((nothing)) :ignore ((nothing)) :local ((nothing))
+:END:
+#+TITLE: Pokemacs manual
+#+AUTHOR: mattiasdrp
+#+DATE: <2025-04-01 Tue>
+#+LANGUAGE: en_US
+#+PROPERTY: header-args :results silent :exports code :tangle no
+#+AUTO_TANGLE: nil
+#+STARTUP: hideblocks
+
+#+KEYWORDS: Emacs
 
 * Introduction
 :PROPERTIES:
@@ -42,9 +53,8 @@ So here it is!
 - [[#pokemacs-appearance][Pokemacs appearance]]
   - [[#pokemacs-layout][Pokemacs layout]]
 - [[#collaborative-editing][Collaborative editing]]
+- [[#getting-to-know-or-debugging-emacs][Getting to know or debugging emacs]]
 - [[#conclusion][Conclusion]]
-- [[#faq][FAQ]]
-  - [[#lsp-doesnt-start-automatically--file-mode-specification-error-treesit-load-language-error-][LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)]]
 :END:
 
 * What is pokemacs?
@@ -387,6 +397,9 @@ For this you need to install [[https://github.com/gjedeer/tuntox][tuntox]] and s
 - You can now add new files to the session etc
 
 * Getting to know or debugging emacs
+:PROPERTIES:
+:CUSTOM_ID: getting-to-know-or-debugging-emacs
+:END:
 
 Emacs is a great tool regarding exploring and debugging. You can have information about almost everything. Let's summarize the ones I use the most:
 
@@ -406,19 +419,3 @@ Emacs is a great tool regarding exploring and debugging. You can have informatio
 :END:
 
 This should be enough for now. Hope you have a nice journey with me. I'm falling asleep now. Love you all.
-
-* FAQ
-:PROPERTIES:
-:CUSTOM_ID: faq
-:END:
-
-** LSP doesn't start automatically / File mode specification error: (treesit-load-language-error ...)
-:PROPERTIES:
-:CUSTOM_ID: lsp-doesnt-start-automatically--file-mode-specification-error-treesit-load-language-error-
-:END:
-
-Try
-
-#+begin_src elisp
-M-x pokemacs-fix-treesit-auto RET ocaml RET
-#+end_src

@@ -2216,9 +2216,7 @@ debian, and derivatives). On most it's 'fd'.")
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless))
     (setq-local completion-at-point-functions
-                (list (cape-capf-super
-                       #'cape-keyword
-                       #'lsp-completion-at-point))))
+                (list (cape-capf-super #'lsp-completion-at-point #'cape-keyword))))
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)

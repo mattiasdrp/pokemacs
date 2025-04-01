@@ -57,6 +57,8 @@
 
 (setq site-run-file nil)
 
+(setenv "LSP_USE_PLISTS" "true")
+
 (setq default-frame-alist
       '(
         ;; (min-height . 1) '(height . 45)
@@ -67,6 +69,7 @@
         (right-fringe . 8)
         (tool-bar-lines . 0)
         (menu-bar-lines . 0)))
+
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode)
