@@ -3273,7 +3273,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t)
   ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
-  (defun pokemacs-highlight-selected-window (_)
+  (defun pokemacs-highlight-selected-window (&rest _)
     "Highlight selected window with a different background color."
     (with-current-buffer (window-buffer (selected-window))
       (buffer-face-set `(:background ,(face-attribute 'match :background)))
