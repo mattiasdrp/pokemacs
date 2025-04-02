@@ -354,8 +354,214 @@ Otherwise, the org provided with emacs will be used"
 (setq user-init-file (or load-file-name (buffer-file-name)))
 (setq user-emacs-directory (file-name-directory user-init-file))
 
+(defvar better-gc-cons-threshold (* 128 1024 1024)) ; 128mb
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq file-name-handler-alist file-name-handler-alist-original)
+            (makunbound 'file-name-handler-alist-original)))
+
+(setq gc-cons-threshold better-gc-cons-threshold)
+(setq gc-cons-percentage 0.1)
+(setq garbage-collection-messages nil)
+
+(defun update-to-load-path (folder)
+  "Update FOLDER and its subdirectories to `load-path'."
+  (let ((base folder))
+    (unless (member base load-path)
+      (add-to-list 'load-path base))
+    (dolist (f (directory-files base))
+      (let ((name (expand-file-name f base)))
+        (when (and (file-directory-p name)
+                   (not (equal f ".."))
+                   (not (equal f ".")))
+          (unless (member name load-path)
+            (add-to-list 'load-path name)))))))
+
+(update-to-load-path (expand-file-name "lisp" user-emacs-directory))
+
+(setq frame-title-format '(buffer-file-name "%b (%f)" "%b"))
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(setq-default
+ ;; Save backup files in a .backup directory
+ backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
+ backup-by-copying t
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t
+ desktop-save-mode 1
+ delete-by-moving-to-trash t)
+
+(setq-default
+ ;; Briefly move cursor to the matching open-paren
+ ;; even if it is not visible in the window.
+ blink-matching-paren 'jump-offscreen
+
+ ;; Show matching parenthesis even for comments
+ blink-matching-paren-dont-ignore-comments t
+
+ ;; Show matching parentheses even when on screen
+ blink-matching-paren-on-screen t
+
+ ;; Show column with line in the modeline
+ column-number-mode t
+
+ ;; Full comments per line
+ comment-style 'indent
+
+ ;; Always kill compilation process before starting another
+ compilation-always-kill t
+
+ ;; Save all buffers before compiling
+ compilation-ask-about-save nil
+
+ ;; TODO: Not exactly sure what this does
+ compilation-context-lines t
+
+ ;; TODO: Not exactly sure what this does
+ compilation-error-screen-columns t
+
+ ;; Scroll to the first error in the compilation buffer
+ compilation-scroll-output 'first-error
+
+ ;; Number of lines in a compilation window
+ compilation-window-height 12
+
+ ;; Ask before killing emacs
+ confirm-kill-emacs 'y-or-n-p
+
+ ;; Don't lock files, I know what I'm doing
+ create-lockfiles nil
+
+ ;; If two dired are opened with two different locations
+ ;; copy command will copy from one to the other
+ dired-dwim-target t
+
+ ;; Show Keystrokes in Progress Instantly
+ echo-keystrokes 0.1
+
+ ;; Turn font lock mode for all modes that allow it
+ ;; TODO: Specify a list when we'll start using tree-sitter
+ font-lock-global-modes t
+
+ ;; Never insert tabs when indenting (default is now to always use space)
+ indent-tabs-mode nil
+
+ ;; I know emacs, I really don't need the startup-screen
+ inhibit-startup-screen t
+
+ ;; Don't put anything in the scratch buffer
+ initial-scratch-message nil
+
+ ;; Move point by visual lines
+ line-move-visual t
+
+ ;; Highlight the location of the next-error in the source buffer
+ next-error-highlight t
+
+ ;; Highlight the locus indefinitely until some other locus replaces it.
+ next-error-highlight-no-select t
+
+ ;; Add a newline automatically at the end of the file upon save.
+ require-final-newline t
+
+ ;; Turn Off Cursor Alarms
+ ring-bell-function 'ignore
+
+ ;; Use the clipboard too when cutting and pasting
+ select-enable-clipboard t
+
+ ;; TODO: Not sure why I'm using it
+ sentence-end-double-space nil
+
+ ;; I don't need scroll bars
+ scroll-bar-mode nil
+
+ tab-width 2
+
+ ;; Long lines will span on a continuation line (makes the whole line visible)
+ truncate-lines nil
+
+ ;; Save undos even when closing emacs
+ undo-tree-auto-save-history t
+
+ ;; yes or no replace by y or n everywhere
+ use-short-answers t
+
+ vc-follow-symlinks t
+
+ ;; Flash the screen
+ visible-bell nil)
+
+(use-package server
+  :demand t
+  :ensure nil
+  :config
+  (unless (server-running-p) (server-start))
+  (message "`server' loaded"))
+
+;; Allows to repeat just one key to allow shorter key sequences
+(use-package repeat
+  :ensure nil
+  :init (repeat-mode t)
+  :config
+  (setopt repeat-exit-timeout nil)
+  (defun pokemacs-set-repeat-exit-timeout (list)
+    (dolist (command list)
+      (put command 'repeat-exit-timeout pokemacs-repeat-timeout))))
+
+(global-auto-revert-mode t)
+(auto-revert-mode t)
+
+(show-paren-mode 1)
+
+;; (global-display-line-numbers-mode t)
+
+(setq save-place-forget-unreadable-files t)
+(save-place-mode 1)
+
+(delete-selection-mode t)
+
+(when (fboundp 'global-so-long-mode)
+  (global-so-long-mode))
+
+(unless (version< emacs-version "29")
+  (pixel-scroll-precision-mode t))
+
+(add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
+(add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
+(add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(use-package auto-package-update
+  :custom
+  (auto-package-update-show-preview t)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-delete-old-version t)
+  :config (message "`auto-package-update' loaded"))
+
+(use-package no-littering
+  :demand t
+  :ensure (:wait t)
+  :config (message "`no-littering' loaded"))
+
+(auto-save-visited-mode 1)
+(setq auto-save-default t)
+(setq auto-save-timeout 60)
+(setq auto-save-interval 200)
+
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror)
+
+(when use-ligature
+  (global-prettify-symbols-mode t)
+  (prettify-symbols-mode))
+
+(setq prettify-symbols-unprettify-at-point 1)
 
 (use-package heaven-and-hell
   :demand t
@@ -528,211 +734,6 @@ Otherwise, the org provided with emacs will be used"
 (when use-maximize
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
-
-(defvar better-gc-cons-threshold (* 128 1024 1024)) ; 128mb
-
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq file-name-handler-alist file-name-handler-alist-original)
-            (makunbound 'file-name-handler-alist-original)))
-
-(setq gc-cons-threshold better-gc-cons-threshold)
-(setq gc-cons-percentage 0.1)
-(setq garbage-collection-messages nil)
-
-(defun update-to-load-path (folder)
-  "Update FOLDER and its subdirectories to `load-path'."
-  (let ((base folder))
-    (unless (member base load-path)
-      (add-to-list 'load-path base))
-    (dolist (f (directory-files base))
-      (let ((name (expand-file-name f base)))
-        (when (and (file-directory-p name)
-                   (not (equal f ".."))
-                   (not (equal f ".")))
-          (unless (member name load-path)
-            (add-to-list 'load-path name)))))))
-
-(update-to-load-path (expand-file-name "lisp" user-emacs-directory))
-
-(setq frame-title-format '(buffer-file-name "%b (%f)" "%b"))
-
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(setq-default
- ;; Save backup files in a .backup directory
- backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
- backup-by-copying t
- delete-old-versions t
- kept-new-versions 6
- kept-old-versions 2
- version-control t
- desktop-save-mode 1
- delete-by-moving-to-trash t)
-
-(setq-default
- ;; Briefly move cursor to the matching open-paren
- ;; even if it is not visible in the window.
- blink-matching-paren 'jump-offscreen
-
- ;; Show matching parenthesis even for comments
- blink-matching-paren-dont-ignore-comments t
-
- ;; Show matching parentheses even when on screen
- blink-matching-paren-on-screen t
-
- ;; Show column with line in the modeline
- column-number-mode t
-
- ;; Full comments per line
- comment-style 'indent
-
- ;; Always kill compilation process before starting another
- compilation-always-kill t
-
- ;; Save all buffers before compiling
- compilation-ask-about-save nil
-
- ;; TODO: Not exactly sure what this does
- compilation-context-lines t
-
- ;; TODO: Not exactly sure what this does
- compilation-error-screen-columns t
-
- ;; Scroll to the first error in the compilation buffer
- compilation-scroll-output 'first-error
-
- ;; Number of lines in a compilation window
- compilation-window-height 12
-
- ;; Ask before killing emacs
- confirm-kill-emacs 'y-or-n-p
-
- ;; Don't lock files, I know what I'm doing
- create-lockfiles nil
-
- ;; If two dired are opened with two different locations
- ;; copy command will copy from one to the other
- dired-dwim-target t
-
- ;; Show Keystrokes in Progress Instantly
- echo-keystrokes 0.1
-
- ;; Turn font lock mode for all modes that allow it
- ;; TODO: Specify a list when we'll start using tree-sitter
- font-lock-global-modes t
-
- ;; Never insert tabs when indenting (default is now to always use space)
- indent-tabs-mode nil
-
- ;; I know emacs, I really don't need the startup-screen
- inhibit-startup-screen t
-
- ;; Don't put anything in the scratch buffer
- initial-scratch-message nil
-
- ;; Move point by visual lines
- line-move-visual t
-
- ;; Highlight the location of the next-error in the source buffer
- next-error-highlight t
-
- ;; Highlight the locus indefinitely until some other locus replaces it.
- next-error-highlight-no-select t
-
- ;; Add a newline automatically at the end of the file upon save.
- require-final-newline t
-
- ;; Turn Off Cursor Alarms
- ring-bell-function 'ignore
-
- ;; Use the clipboard too when cutting and pasting
- select-enable-clipboard t
-
- ;; TODO: Not sure why I'm using it
- sentence-end-double-space nil
-
- ;; I don't need scroll bars
- scroll-bar-mode nil
-
- tab-width 2
-
- ;; Long lines will span on a continuation line (makes the whole line visible)
- truncate-lines nil
-
- ;; Save undos even when closing emacs
- undo-tree-auto-save-history t
-
- ;; yes or no replace by y or n everywhere
- use-short-answers t
-
- vc-follow-symlinks t
-
- ;; Flash the screen
- visible-bell nil)
-
-(use-package server
-  :demand t
-  :ensure nil
-  :config
-  (unless (server-running-p) (server-start))
-  (message "`server' loaded"))
-
-;; Allows to repeat just one key to allow shorter key sequences
-(use-package repeat
-  :ensure nil
-  :init (repeat-mode t)
-  :config
-  (setopt repeat-exit-timeout nil)
-  (defun pokemacs-set-repeat-exit-timeout (list)
-    (dolist (command list)
-      (put command 'repeat-exit-timeout pokemacs-repeat-timeout))))
-
-(global-prettify-symbols-mode t)
-(prettify-symbols-mode)
-
-(setq prettify-symbols-unprettify-at-point 1)
-
-(global-auto-revert-mode t)
-(auto-revert-mode t)
-
-(show-paren-mode 1)
-
-;; (global-display-line-numbers-mode t)
-
-(setq save-place-forget-unreadable-files t)
-(save-place-mode 1)
-
-(delete-selection-mode t)
-
-(when (fboundp 'global-so-long-mode)
-  (global-so-long-mode))
-
-(unless (version< emacs-version "29")
-  (pixel-scroll-precision-mode t))
-
-(add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
-(add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
-(add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
-
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-(use-package auto-package-update
-  :custom
-  (auto-package-update-show-preview t)
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-delete-old-version t)
-  :config (message "`auto-package-update' loaded"))
-
-(use-package no-littering
-  :demand t
-  :ensure (:wait t)
-  :config (message "`no-littering' loaded"))
-
-(auto-save-visited-mode 1)
-(setq auto-save-default t)
-(setq auto-save-timeout 60)
-(setq auto-save-interval 200)
 
 (require 'cl-lib)
 (require 'package)

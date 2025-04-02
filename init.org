@@ -26,12 +26,6 @@ Literate configuration for init.el.
   - [[#disableenable-features][Disable/Enable features]]
   - [[#set-useful-variables][Set useful variables]]
     - [[#init-file][Init file]]
-    - [[#load-custom-file][Load custom file]]
-  - [[#themes-etc][Themes etc]]
-    - [[#swap-between-darklight-themes][Swap between dark/light themes]]
-    - [[#solarized][Solarized]]
-    - [[#doom-theme][Doom theme]]
-  - [[#maximize-and-fullscreen-at-start-up][Maximize and fullscreen at start-up]]
   - [[#revert-early-init][Revert early-init]]
   - [[#gc-when-emacs-is-idle-and-never-when-using-minibuffer][GC when emacs is idle and never when using minibuffer]]
   - [[#load-functions][Load functions]]
@@ -41,7 +35,6 @@ Literate configuration for init.el.
   - [[#default-values][Default values]]
   - [[#start-emacs-as-a-server][Start emacs as a server]]
   - [[#repeat-mode][Repeat-mode]]
-  - [[#prettifying][Prettifying]]
   - [[#revert-files-when-they-changed][Revert files when they changed]]
   - [[#show-parenthesis][Show parenthesis]]
   - [[#other-useful-global-modes][Other useful global modes]]
@@ -49,6 +42,13 @@ Literate configuration for init.el.
   - [[#delete-whitespace][Delete whitespace]]
   - [[#auto-update-packages][Auto update packages]]
   - [[#no-littering][No littering]]
+  - [[#load-custom-file][Load custom file]]
+  - [[#prettifying][Prettifying]]
+  - [[#themes-etc][Themes etc]]
+    - [[#swap-between-darklight-themes][Swap between dark/light themes]]
+    - [[#solarized][Solarized]]
+    - [[#doom-theme][Doom theme]]
+  - [[#maximize-and-fullscreen-at-start-up][Maximize and fullscreen at start-up]]
 - [[#requirements][Requirements]]
 - [[#constants-and-variables][Constants and variables]]
 - [[#packages-initialization-and-configuration][Packages initialization and configuration]]
@@ -696,225 +696,6 @@ This is a list of custom variables that allow to enable/disable features. If you
   (setq user-emacs-directory (file-name-directory user-init-file))
 #+end_src
 
-*** Load custom file
-:PROPERTIES:
-:CUSTOM_ID: load-custom-file
-:END:
-
-#+begin_src emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file 'noerror)
-#+end_src
-
-** Themes etc
-:PROPERTIES:
-:CUSTOM_ID: themes-etc
-:END:
-
-*** Swap between dark/light themes
-:PROPERTIES:
-:CUSTOM_ID: swap-between-darklight-themes
-:END:
-
-#+begin_src emacs-lisp
-  (use-package heaven-and-hell
-    :demand t
-    :config
-    (setq heaven-and-hell-theme-type pokemacs-theme-type)
-    (setq heaven-and-hell-themes
-          `((light . ,pokemacs-light-theme)
-            (dark . ,pokemacs-dark-theme)))
-    ;; Optionall, load themes without asking for confirmation.
-    (setq heaven-and-hell-load-theme-no-confirm t)
-    (message "`doom-themes' loaded"))
-
-  (defalias 'pokemacs-toggle-theme 'heaven-and-hell-toggle-theme)
-#+end_src
-
-*** [[https://github.com/bbatsov/solarized-emacs][Solarized]]
-:PROPERTIES:
-:CUSTOM_ID: solarized
-:END:
-
-#+begin_src emacs-lisp
-  (use-package solarized-emacs
-    :ensure (solarized :host github :repo "bbatsov/solarized-emacs")
-    :custom
-    ;; make the fringe stand out from the background
-    (solarized-distinct-fringe-background t)
-
-    ;; Don't change the font for some headings and titles
-    (solarized-use-variable-pitch nil)
-
-    ;; make the modeline high contrast
-    (solarized-high-contrast-mode-line t)
-
-    ;; Use less bolding
-    (solarized-use-less-bold nil)
-
-    ;; Use more italics
-    (solarized-use-more-italic t)
-
-    ;; Use less colors for indicators such as git:gutter, flycheck and similar
-    (solarized-emphasize-indicators t)
-
-    ;; Don't change size of org-mode headlines (but keep other size-changes)
-    (solarized-scale-org-headlines nil)
-
-    ;; Change the size of markdown-mode headlines (off by default)
-    (solarized-scale-markdown-headlines t)
-
-    ;; Avoid all font-size changes
-    (solarized-height-minus-1 1.0)
-    (solarized-height-plus-1 1.0)
-    (solarized-height-plus-2 1.0)
-    (solarized-height-plus-3 1.0)
-    (solarized-height-plus-4 1.0)
-
-    ;; Highlight all numbers
-    (solarized-highlight-numbers t))
-#+end_src
-
-*** [[https://github.com/doomemacs/themes][Doom theme]]
-:PROPERTIES:
-:CUSTOM_ID: doom-theme
-:END:
-
-Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/screenshots][here]]. Need to load it before custom to be able to use ~doom-color~
-
-#+begin_src emacs-lisp
-  (use-package doom-themes
-    :demand t
-    :after (heaven-and-hell)
-    :ensure (:wait t)
-    :init
-    (defun pokemacs--reface (&rest _)
-      "Reface some faces."
-      (let ((bg-attribute (face-background 'region)))
-        (when (featurep 'magit-diff)
-          (custom-set-faces
-           `(ediff-current-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-removed-highlight)))))
-           `(ediff-current-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
-           `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
-           `(ediff-even-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
-           `(ediff-fine-diff-A ((t (:inherit 'diff-refine-removed :weight normal))))
-           `(ediff-fine-diff-B ((t (:inherit 'diff-refine-added :weight normal))))))
-        (custom-set-faces
-         `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
-         `(org-block-begin-line ((t)) t)
-         `(org-block-end-line ((t :foreground unspecified :background unspecified)))
-         `(show-paren-match
-           ((t
-             (:foreground unspecified
-                          :weight unspecified
-                          :background ,(if (eq heaven-and-hell-theme-type 'dark)
-                                           (doom-darken bg-attribute 0.15)
-                                         (doom-lighten bg-attribute 0.15))
-                          :bold nil))))
-         `(show-paren-mismatch ((t (:foreground unspecified)))))))
-
-    (defun pokemacs-disable-all-active-themes (&rest _)
-      "Disable all currently active themes."
-      (dolist (theme custom-enabled-themes)
-        (disable-theme theme)))
-
-    (defun pokemacs-load-theme ()
-      (pokemacs-disable-all-active-themes)
-      (heaven-and-hell-clean-load-themes (heaven-and-hell-themes-switch-to))
-      (pokemacs--reface))
-
-    (advice-add #'heaven-and-hell-toggle-theme :after #'pokemacs--reface)
-    (advice-add #'consult-theme :after #'pokemacs--reface)
-
-    :custom
-    ;; use the colorful treemacs theme
-    (doom-themes-treemacs-theme "doom-colors")
-    :config
-    ;; Enable flashing mode-line on errors
-    (doom-themes-visual-bell-config)
-    ;; Enable custom neotree theme (all-the-icons must be installed!)
-    ;; (doom-themes-neotree-config)
-    ;; or for treemacs users
-
-    :config
-    ;; (defvar pokemacs--font-lock-faces
-    ;;   '(font-lock-doc-face
-    ;;     font-lock-type-face
-    ;;     font-lock-string-face
-    ;;     font-lock-escape-face
-    ;;     font-lock-number-face
-    ;;     font-lock-regexp-face
-    ;;     font-lock-keyword-face
-    ;;     font-lock-bracket-face
-    ;;     font-lock-builtin-face
-    ;;     font-lock-comment-face
-    ;;     font-lock-warning-face
-    ;;     font-lock-operator-face
-    ;;     font-lock-constant-face
-    ;;     font-lock-delimiter-face
-    ;;     font-lock-doc-markup-face
-    ;;     font-lock-punctuation-face
-    ;;     font-lock-variable-use-face
-    ;;     font-lock-preprocessor-face
-    ;;     font-lock-property-use-face
-    ;;     font-lock-property-name-face
-    ;;     font-lock-variable-name-face
-    ;;     font-lock-function-call-face
-    ;;     font-lock-function-name-face
-    ;;     font-lock-negation-char-face
-    ;;     font-lock-misc-punctuation-face
-    ;;     font-lock-comment-delimiter-face))
-
-    ;; (defvar pokemacs--font-lock-faces-light '())
-    ;; (defvar pokemacs--font-lock-faces-dark '())
-
-    ;; (defun pokemacs--populate-font-lock-faces-plist (faces)
-    ;;   (load-theme pokemacs-light-theme t)
-    ;;   (dolist (face faces)
-    ;;     (message "--------- %S" face)
-    ;;     (setq pokemacs--font-lock-faces-light (plist-put pokemacs--font-lock-faces-light face (face-foreground face))))
-    ;;   (load-theme pokemacs-dark-theme t)
-    ;;   (dolist (face faces)
-    ;;     (message "--------- %S" face)
-    ;;     (setq pokemacs--font-lock-faces-dark (plist-put pokemacs--font-lock-faces-dark face (face-foreground face)))))
-
-    ;; (pokemacs--populate-font-lock-faces-plist pokemacs--font-lock-faces)
-    ;; (defun assoc-other-face-attribute (face)
-    ;;   (if (eq heaven-and-hell-theme-type 'dark)
-    ;;       (plist-get pokemacs--font-lock-faces-light face)
-    ;;     (plist-get pokemacs--font-lock-faces-dark face)))
-
-    ;; (defun update-foreground-if-ediff-refine ()
-    ;;   "Automatically update the foreground color in `ediff-mode` when text is changed
-    ;;  and the overlay is 'ediff-refine'."
-    ;;   (let ((overlay (car (overlays-at (point))))) ; Check for overlay at the beginning of the change
-    ;;     (when (and overlay
-    ;;                (or (overlay-get overlay 'ediff-fine-diff-A)
-    ;;                    (overlay-get overlay 'ediff-fine-diff-B)))
-    ;;       (let* ((face (get-text-property beg 'face)) ; Get the font-lock face at the beginning of the change
-    ;;              (new-foreground-color (assoc-other-face-attribute face)))
-    ;;         (when new-foreground-color
-    ;;           (set-text-properties (point) (1+ (point))
-    ;;                                (list (cons 'foreground-color new-foreground-color))))))))
-    ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config)
-    (pokemacs-load-theme)
-    (message "`doom-themes' loaded"))
-#+end_src
-
-** Maximize and fullscreen at start-up
-:PROPERTIES:
-:CUSTOM_ID: maximize-and-fullscreen-at-start-up
-:END:
-
-This can be opted in or out by customising ~use-maximize~.
-
-#+begin_src emacs-lisp
-  (when use-maximize
-    (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-    (add-to-list 'default-frame-alist '(fullscreen . maximized)))
-#+end_src
-
 ** Revert early-init
 :PROPERTIES:
 :CUSTOM_ID: revert-early-init
@@ -1145,24 +926,6 @@ If you experience stuttering, increase this.
         (put command 'repeat-exit-timeout pokemacs-repeat-timeout))))
 #+end_src
 
-** Prettifying
-:PROPERTIES:
-:CUSTOM_ID: prettifying
-:END:
-
-Enable prettifying everywhere
-
-#+begin_src emacs-lisp
-  (global-prettify-symbols-mode t)
-  (prettify-symbols-mode)
-#+end_src
-
-When the cursor in on a prettified symbol, unprettify it
-
-#+begin_src emacs-lisp
-  (setq prettify-symbols-unprettify-at-point 1)
-#+end_src
-
 ** Revert files when they changed
 :PROPERTIES:
 :CUSTOM_ID: revert-files-when-they-changed
@@ -1281,6 +1044,244 @@ Create a ~#file#~ while waiting for it to be saved and for backup (if emacs cras
   (setq auto-save-default t)
   (setq auto-save-timeout 60)
   (setq auto-save-interval 200)
+#+end_src
+
+** Load custom file
+:PROPERTIES:
+:CUSTOM_ID: load-custom-file
+:END:
+
+#+begin_src emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (load custom-file 'noerror)
+#+end_src
+
+** Prettifying
+:PROPERTIES:
+:CUSTOM_ID: prettifying
+:END:
+
+Enable prettifying everywhere
+
+#+begin_src emacs-lisp
+  (when use-ligature
+    (global-prettify-symbols-mode t)
+    (prettify-symbols-mode))
+#+end_src
+
+When the cursor in on a prettified symbol, unprettify it
+
+#+begin_src emacs-lisp
+  (setq prettify-symbols-unprettify-at-point 1)
+#+end_src
+
+** Themes etc
+:PROPERTIES:
+:CUSTOM_ID: themes-etc
+:END:
+
+*** Swap between dark/light themes
+:PROPERTIES:
+:CUSTOM_ID: swap-between-darklight-themes
+:END:
+
+#+begin_src emacs-lisp
+  (use-package heaven-and-hell
+    :demand t
+    :config
+    (setq heaven-and-hell-theme-type pokemacs-theme-type)
+    (setq heaven-and-hell-themes
+          `((light . ,pokemacs-light-theme)
+            (dark . ,pokemacs-dark-theme)))
+    ;; Optionall, load themes without asking for confirmation.
+    (setq heaven-and-hell-load-theme-no-confirm t)
+    (message "`doom-themes' loaded"))
+
+  (defalias 'pokemacs-toggle-theme 'heaven-and-hell-toggle-theme)
+#+end_src
+
+*** [[https://github.com/bbatsov/solarized-emacs][Solarized]]
+:PROPERTIES:
+:CUSTOM_ID: solarized
+:END:
+
+#+begin_src emacs-lisp
+  (use-package solarized-emacs
+    :ensure (solarized :host github :repo "bbatsov/solarized-emacs")
+    :custom
+    ;; make the fringe stand out from the background
+    (solarized-distinct-fringe-background t)
+
+    ;; Don't change the font for some headings and titles
+    (solarized-use-variable-pitch nil)
+
+    ;; make the modeline high contrast
+    (solarized-high-contrast-mode-line t)
+
+    ;; Use less bolding
+    (solarized-use-less-bold nil)
+
+    ;; Use more italics
+    (solarized-use-more-italic t)
+
+    ;; Use less colors for indicators such as git:gutter, flycheck and similar
+    (solarized-emphasize-indicators t)
+
+    ;; Don't change size of org-mode headlines (but keep other size-changes)
+    (solarized-scale-org-headlines nil)
+
+    ;; Change the size of markdown-mode headlines (off by default)
+    (solarized-scale-markdown-headlines t)
+
+    ;; Avoid all font-size changes
+    (solarized-height-minus-1 1.0)
+    (solarized-height-plus-1 1.0)
+    (solarized-height-plus-2 1.0)
+    (solarized-height-plus-3 1.0)
+    (solarized-height-plus-4 1.0)
+
+    ;; Highlight all numbers
+    (solarized-highlight-numbers t))
+#+end_src
+
+*** [[https://github.com/doomemacs/themes][Doom theme]]
+:PROPERTIES:
+:CUSTOM_ID: doom-theme
+:END:
+
+Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/screenshots][here]]. Need to load it before custom to be able to use ~doom-color~
+
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :demand t
+    :after (heaven-and-hell)
+    :ensure (:wait t)
+    :init
+    (defun pokemacs--reface (&rest _)
+      "Reface some faces."
+      (let ((bg-attribute (face-background 'region)))
+        (when (featurep 'magit-diff)
+          (custom-set-faces
+           `(ediff-current-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-removed-highlight)))))
+           `(ediff-current-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+           `(ediff-even-diff-A ((t (:weight normal :background ,(face-background 'magit-diff-context-highlight)))))
+           `(ediff-even-diff-B ((t (:weight normal :background ,(face-background 'magit-diff-added-highlight)))))
+           `(ediff-fine-diff-A ((t (:inherit 'diff-refine-removed :weight normal))))
+           `(ediff-fine-diff-B ((t (:inherit 'diff-refine-added :weight normal))))))
+        (custom-set-faces
+         `(org-block ((t :background ,(doom-darken (doom-color 'bg) 0.15))) t)
+         `(org-block-begin-line ((t)) t)
+         `(org-block-end-line ((t :foreground unspecified :background unspecified)))
+         `(show-paren-match
+           ((t
+             (:foreground unspecified
+                          :weight unspecified
+                          :background ,(if (eq heaven-and-hell-theme-type 'dark)
+                                           (doom-darken bg-attribute 0.15)
+                                         (doom-lighten bg-attribute 0.15))
+                          :bold nil))))
+         `(show-paren-mismatch ((t (:foreground unspecified)))))))
+
+    (defun pokemacs-disable-all-active-themes (&rest _)
+      "Disable all currently active themes."
+      (dolist (theme custom-enabled-themes)
+        (disable-theme theme)))
+
+    (defun pokemacs-load-theme ()
+      (pokemacs-disable-all-active-themes)
+      (heaven-and-hell-clean-load-themes (heaven-and-hell-themes-switch-to))
+      (pokemacs--reface))
+
+    (advice-add #'heaven-and-hell-toggle-theme :after #'pokemacs--reface)
+    (advice-add #'consult-theme :after #'pokemacs--reface)
+
+    :custom
+    ;; use the colorful treemacs theme
+    (doom-themes-treemacs-theme "doom-colors")
+    :config
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+    ;; Enable custom neotree theme (all-the-icons must be installed!)
+    ;; (doom-themes-neotree-config)
+    ;; or for treemacs users
+
+    :config
+    ;; (defvar pokemacs--font-lock-faces
+    ;;   '(font-lock-doc-face
+    ;;     font-lock-type-face
+    ;;     font-lock-string-face
+    ;;     font-lock-escape-face
+    ;;     font-lock-number-face
+    ;;     font-lock-regexp-face
+    ;;     font-lock-keyword-face
+    ;;     font-lock-bracket-face
+    ;;     font-lock-builtin-face
+    ;;     font-lock-comment-face
+    ;;     font-lock-warning-face
+    ;;     font-lock-operator-face
+    ;;     font-lock-constant-face
+    ;;     font-lock-delimiter-face
+    ;;     font-lock-doc-markup-face
+    ;;     font-lock-punctuation-face
+    ;;     font-lock-variable-use-face
+    ;;     font-lock-preprocessor-face
+    ;;     font-lock-property-use-face
+    ;;     font-lock-property-name-face
+    ;;     font-lock-variable-name-face
+    ;;     font-lock-function-call-face
+    ;;     font-lock-function-name-face
+    ;;     font-lock-negation-char-face
+    ;;     font-lock-misc-punctuation-face
+    ;;     font-lock-comment-delimiter-face))
+
+    ;; (defvar pokemacs--font-lock-faces-light '())
+    ;; (defvar pokemacs--font-lock-faces-dark '())
+
+    ;; (defun pokemacs--populate-font-lock-faces-plist (faces)
+    ;;   (load-theme pokemacs-light-theme t)
+    ;;   (dolist (face faces)
+    ;;     (message "--------- %S" face)
+    ;;     (setq pokemacs--font-lock-faces-light (plist-put pokemacs--font-lock-faces-light face (face-foreground face))))
+    ;;   (load-theme pokemacs-dark-theme t)
+    ;;   (dolist (face faces)
+    ;;     (message "--------- %S" face)
+    ;;     (setq pokemacs--font-lock-faces-dark (plist-put pokemacs--font-lock-faces-dark face (face-foreground face)))))
+
+    ;; (pokemacs--populate-font-lock-faces-plist pokemacs--font-lock-faces)
+    ;; (defun assoc-other-face-attribute (face)
+    ;;   (if (eq heaven-and-hell-theme-type 'dark)
+    ;;       (plist-get pokemacs--font-lock-faces-light face)
+    ;;     (plist-get pokemacs--font-lock-faces-dark face)))
+
+    ;; (defun update-foreground-if-ediff-refine ()
+    ;;   "Automatically update the foreground color in `ediff-mode` when text is changed
+    ;;  and the overlay is 'ediff-refine'."
+    ;;   (let ((overlay (car (overlays-at (point))))) ; Check for overlay at the beginning of the change
+    ;;     (when (and overlay
+    ;;                (or (overlay-get overlay 'ediff-fine-diff-A)
+    ;;                    (overlay-get overlay 'ediff-fine-diff-B)))
+    ;;       (let* ((face (get-text-property beg 'face)) ; Get the font-lock face at the beginning of the change
+    ;;              (new-foreground-color (assoc-other-face-attribute face)))
+    ;;         (when new-foreground-color
+    ;;           (set-text-properties (point) (1+ (point))
+    ;;                                (list (cons 'foreground-color new-foreground-color))))))))
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config)
+    (pokemacs-load-theme)
+    (message "`doom-themes' loaded"))
+#+end_src
+
+** Maximize and fullscreen at start-up
+:PROPERTIES:
+:CUSTOM_ID: maximize-and-fullscreen-at-start-up
+:END:
+
+This can be opted in or out by customising ~use-maximize~.
+
+#+begin_src emacs-lisp
+  (when use-maximize
+    (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+    (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 #+end_src
 
 * Requirements

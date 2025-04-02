@@ -14,6 +14,7 @@
  ;; If there is more than one, they won't work right.
  '(auth-source-save-behavior nil)
  '(auth-sources '("~/.authinfo"))
+ '(auto-save-timeout 60)
  '(blink-cursor-mode t)
  '(calendar-month-abbrev-array
    ["Jan" "Fév" "Mar" "Avr" "Mai" "Jun" "Jul" "Aoû" "Sep" "Oct" "Nov" "Déc"])
