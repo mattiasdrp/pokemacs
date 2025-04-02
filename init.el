@@ -461,7 +461,6 @@ Otherwise, the org provided with emacs will be used"
   ;; or for treemacs users
 
   :config
-  (doom-themes-treemacs-config)
   ;; (defvar pokemacs--font-lock-faces
   ;;   '(font-lock-doc-face
   ;;     font-lock-type-face
@@ -2211,9 +2210,9 @@ debian, and derivatives). On most it's 'fd'.")
       (setq pokemacs-lsp--optimization-init-p t))))
 
 (use-package lsp-mode
-  :ensure (:host github
-                 :repo "mattiasdrp/lsp-mode"
-                 :branch "mattias@ocaml-lsp-type-enclosing")
+  ;; :ensure (:host github
+  ;;                :repo "mattiasdrp/lsp-mode"
+  ;;                :branch "mattias@ocaml-lsp-type-enclosing")
   :init
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))

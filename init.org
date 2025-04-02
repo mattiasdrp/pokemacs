@@ -837,7 +837,6 @@ Nice themes that can be previewed [[https://github.com/doomemacs/themes/tree/scr
     ;; or for treemacs users
 
     :config
-    (doom-themes-treemacs-config)
     ;; (defvar pokemacs--font-lock-faces
     ;;   '(font-lock-doc-face
     ;;     font-lock-type-face
@@ -3471,9 +3470,9 @@ Minor mode acting as a client between a language server protocol and Emacs.
         (setq pokemacs-lsp--optimization-init-p t))))
 
   (use-package lsp-mode
-    :ensure (:host github
-                   :repo "mattiasdrp/lsp-mode"
-                   :branch "mattias@ocaml-lsp-type-enclosing")
+    ;; :ensure (:host github
+    ;;                :repo "mattiasdrp/lsp-mode"
+    ;;                :branch "mattias@ocaml-lsp-type-enclosing")
     :init
     (defun minad/lsp-mode-setup-completion ()
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
