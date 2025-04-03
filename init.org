@@ -2874,7 +2874,7 @@ Org mode is, well, org mode.
 :END:
 
 #+begin_src emacs-lisp
-  (use-package ox-pandoc)
+  (when use-org (use-package ox-pandoc))
 
   (use-package ox
     :ensure nil

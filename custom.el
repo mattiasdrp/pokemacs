@@ -54,7 +54,7 @@
  '(pokemacs-layout-layouts
    '((:name "Prog default layout" :layout
             (:windows ((column nil nil 2)) :sides
-                      ((right (1 (magit-status-quick "*Proced*" t))
+                      ((right (1 (magit-status-quick "*Proced*") t)
                               (2 ("*compilation*" "*lsp-help*") t))))
             :description
             "3 vertical columns with last one being magit | compilation | lsp-help")

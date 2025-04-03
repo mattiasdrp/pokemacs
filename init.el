@@ -1740,7 +1740,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ghub
   :config (message "`ghub' loaded"))
 
-(use-package ox-pandoc)
+(when use-org (use-package ox-pandoc))
 
 (use-package ox
   :ensure nil
