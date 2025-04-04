@@ -2726,12 +2726,12 @@ with a prefix ARG."
 
   (defun pokemacs-visual-fill-one-window ()
     (when use-visual-fill
-      (global-visual-fill-column-mode -1)
       (if (window-full-width-p)
-          (progn
-            (global-visual-fill-column-mode 1)
-            (setq mode-line-right-align-edge 'window)
-            (set-window-fringes (selected-window) 8 8 nil nil))
+          (unless (global-visual-fill-column-mode)
+            (progn
+              (global-visual-fill-column-mode 1)
+              (setq mode-line-right-align-edge 'window)
+              (set-window-fringes (selected-window) 8 8 nil nil)))
         (global-visual-fill-column-mode -1))))
 
   (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
