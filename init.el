@@ -10,7 +10,7 @@
 ;; Licence: MIT
 ;; Keywords: emacs, init, convenience, configuration
 ;; URL: https://github.com/mattiasdrp/pokemacs
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "29.1"))
 
 ;;; Commentary:
 
@@ -66,7 +66,7 @@
   ;; Enable :ensure use-package keyword.
   (elpaca-use-package-mode)
   ;; Assume :ensure t unless otherwise specified.
-  (setq elpaca-use-package-by-default t))
+  (setopt elpaca-use-package-by-default t))
 
 (use-package system-packages
   :ensure t
@@ -79,7 +79,7 @@
 (elpaca-wait)
 
 (eval-and-compile
-  (setq
+  (setopt
    use-package-verbose t
    use-package-expand-minimally t
    use-package-compute-statistics t
@@ -361,9 +361,10 @@ Otherwise, the org provided with emacs will be used"
             (setq file-name-handler-alist file-name-handler-alist-original)
             (makunbound 'file-name-handler-alist-original)))
 
-(setq gc-cons-threshold better-gc-cons-threshold)
-(setq gc-cons-percentage 0.1)
-(setq garbage-collection-messages nil)
+(setopt
+ gc-cons-threshold better-gc-cons-threshold
+ gc-cons-percentage 0.1
+ garbage-collection-messages nil)
 
 (defun update-to-load-path (folder)
   "Update FOLDER and its subdirectories to `load-path'."
@@ -384,7 +385,7 @@ Otherwise, the org provided with emacs will be used"
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(setq-default
+(setopt
  ;; Save backup files in a .backup directory
  backup-directory-alist `(("." . ,(expand-file-name ".backup" user-emacs-directory)))
  backup-by-copying t
@@ -392,10 +393,9 @@ Otherwise, the org provided with emacs will be used"
  kept-new-versions 6
  kept-old-versions 2
  version-control t
- desktop-save-mode 1
  delete-by-moving-to-trash t)
 
-(setq-default
+(setopt
  ;; Briefly move cursor to the matching open-paren
  ;; even if it is not visible in the window.
  blink-matching-paren 'jump-offscreen
@@ -520,7 +520,7 @@ Otherwise, the org provided with emacs will be used"
 
 ;; (global-display-line-numbers-mode t)
 
-(setq save-place-forget-unreadable-files t)
+(setopt save-place-forget-unreadable-files t)
 (save-place-mode 1)
 
 (delete-selection-mode t)
@@ -528,21 +528,18 @@ Otherwise, the org provided with emacs will be used"
 (when (fboundp 'global-so-long-mode)
   (global-so-long-mode))
 
-(unless (version< emacs-version "29")
-  (pixel-scroll-precision-mode t))
+(pixel-scroll-precision-mode t)
 
-(add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
-(add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
-(add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode))
+(use-package text-mode
+  :ensure nil
+  :custom
+  (text-mode-ispell-word-completion nil)
+  :init
+  (add-to-list 'auto-mode-alist '("\\.in\\'" . text-mode))
+  (add-to-list 'auto-mode-alist '("\\.out\\'" . text-mode))
+  (add-to-list 'auto-mode-alist '("\\.args\\'" . text-mode)))
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-(use-package auto-package-update
-  :custom
-  (auto-package-update-show-preview t)
-  (auto-package-update-prompt-before-update t)
-  (auto-package-update-delete-old-version t)
-  :config (message "`auto-package-update' loaded"))
 
 (use-package no-littering
   :demand t
@@ -550,28 +547,28 @@ Otherwise, the org provided with emacs will be used"
   :config (message "`no-littering' loaded"))
 
 (auto-save-visited-mode 1)
-(setq auto-save-default t)
-(setq auto-save-timeout 60)
-(setq auto-save-interval 200)
+(setopt
+ auto-save-default t
+ auto-save-timeout 60
+ auto-save-interval 200)
 
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(setopt custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file 'noerror)
 
 (when use-ligature
   (global-prettify-symbols-mode t)
   (prettify-symbols-mode))
 
-(setq prettify-symbols-unprettify-at-point 1)
+(setopt prettify-symbols-unprettify-at-point t)
 
 (use-package heaven-and-hell
   :demand t
   :config
-  (setq heaven-and-hell-theme-type pokemacs-theme-type)
-  (setq heaven-and-hell-themes
-        `((light . ,pokemacs-light-theme)
-          (dark . ,pokemacs-dark-theme)))
-  ;; Optionall, load themes without asking for confirmation.
-  (setq heaven-and-hell-load-theme-no-confirm t)
+  (setopt heaven-and-hell-theme-type pokemacs-theme-type)
+  (setopt heaven-and-hell-themes
+          `((light . ,pokemacs-light-theme)
+            (dark . ,pokemacs-dark-theme)))
+  (setopt heaven-and-hell-load-theme-no-confirm t)
   (message "`doom-themes' loaded"))
 
 (defalias 'pokemacs-toggle-theme 'heaven-and-hell-toggle-theme)
@@ -735,8 +732,8 @@ Otherwise, the org provided with emacs will be used"
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
   (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 
-(require 'cl-lib)
-(require 'package)
+(use-package cl-lib :ensure nil)
+(use-package package :ensure nil)
 (require 'pokemacs-functions)
 
 (defconst pokemacs-sys/win32
@@ -771,8 +768,10 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`esup' loaded"))
 
 (use-package prescient
-  :init (setq prescient-persist-mode 1)
-  :config (message "`prescient' loaded"))
+  :demand t
+  :config
+  (prescient-persist-mode 1)
+  (message "`prescient' loaded"))
 
 (use-package savehist
   :ensure nil
@@ -800,7 +799,7 @@ debian, and derivatives). On most it's 'fd'.")
         (setq browse-url-generic-program  cmd-exe
               browse-url-generic-args     cmd-args
               browse-url-browser-function 'browse-url-generic
-              search-web-default-browser 'browse-url-generic)))))
+              search-web-default-browser  'browse-url-generic)))))
 
 (add-hook 'after-init-hook #'pokemacs-wsl-specific-function)
 
@@ -1323,7 +1322,7 @@ debian, and derivatives). On most it's 'fd'.")
     "Help message while in `query-replace'.")
   (message "`emacs' config loaded"))
 
-(setq-default cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
+(setopt cursor-in-non-selected-windows t) ; Hide the cursor in inactive windows
 
 (use-package nlinum
   :init (global-nlinum-mode 1)
@@ -1407,7 +1406,7 @@ debian, and derivatives). On most it's 'fd'.")
   (message "`json' loaded"))
 
 (use-package lsp-ltex
-  :init (setq lsp-ltex-version "16.0.0")
+  :init (setopt lsp-ltex-version "16.0.0")
   :custom
   (lsp-ltex-language pokemacs-dict)
   :config (message "`lsp-ltex' loaded"))
@@ -1498,7 +1497,7 @@ debian, and derivatives). On most it's 'fd'.")
   :config (message "`hide-mode-line' loaded"))
 
 (use-package vlf
-  :demand t
+  :defer 2
   :config (require 'vlf-setup))
 
 (use-package vundo
@@ -1535,7 +1534,14 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package proced
   :ensure nil
   :commands proced
-  :init
+      :custom
+  (proced-auto-update-flag t)
+  (proced-auto-update-interval 5)
+  (proced-goal-attribute nil)
+  (proced-show-remote-processes t)
+  (proced-enable-color-flag t)
+  (proced-format 'custom)
+  :config
   (setq pokemacs-proced-important-executables-regex (regexp-opt pokemacs-proced-important-executables))
   (defun pokemacs--proced-format-args-names-only (args)
     "Format attribute ARGS.
@@ -1549,14 +1555,6 @@ debian, and derivatives). On most it's 'fd'.")
                       (propertize exe 'font-lock-face 'pokemacs-proced-important-executable)
                     exe)))
       exe-prop))
-  :custom
-  (proced-auto-update-flag t)
-  (proced-auto-update-interval 5)
-  (proced-goal-attribute nil)
-  (proced-show-remote-processes t)
-  (proced-enable-color-flag t)
-  (proced-format 'custom)
-  :config
   (defface pokemacs-proced-important-executable '((t :inherit proced-executable :weight bold))
     "font face for important executables."
     :group 'my-mode)
@@ -1740,7 +1738,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ghub
   :config (message "`ghub' loaded"))
 
-(when use-org (use-package ox-pandoc))
+(use-package ox-pandoc)
 
 (use-package ox
   :ensure nil
@@ -1764,6 +1762,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package ob-rust)
 
 (use-package ob-racket
+  :defer t
   :ensure (:type git :host github :repo "hasu/emacs-ob-racket"))
 
 ;; Install org from its git-repo if use-org is t
@@ -2410,84 +2409,84 @@ debian, and derivatives). On most it's 'fd'.")
     ("b" dumb-jump-back "Back"))
   (message "`dumb-jump' loaded"))
 
-(unless (version< emacs-version "29")
-  (setq find-sibling-rules
-        '(
-          ("\\([^/]+\\)\\.org\\'" "\\1.el")
-          ("\\([^/]+\\)\\.el\\'" "\\1.org")
-          ("\\([^/]+\\)\\.c\\'" "\\1.h")
-          ("\\([^/]+\\)\\.h\\'" "\\1.c")))
+(setq find-sibling-rules
+      '(
+        ("\\([^/]+\\)\\.org\\'" "\\1.el")
+        ("\\([^/]+\\)\\.el\\'" "\\1.org")
+        ("\\([^/]+\\)\\.c\\'" "\\1.h")
+        ("\\([^/]+\\)\\.h\\'" "\\1.c")))
 
-  (defcustom create-sibling-rules nil
-    "Rules for creating \"sibling\" files.
-This is used by the `pokemacs-find-sibling-file-wrapper' command.
+(defcustom create-sibling-rules nil
+  "Rules for creating \"sibling\" files.
+this is used by the `pokemacs-find-sibling-file-wrapper' command.
 
 See `find-sibling-rules' for more informations.
 
 Unlike `find-sibling-rules', `create-sibling-rules' should only
 have one rule for each file type."
-    :group 'pokemacs-languages
-    :type 'sexp
-    :version "29.1"
-    :tag " Create sibling rules")
+  :group 'pokemacs-languages
+  :type 'sexp
+  :version "29.1"
+  :tag " Create sibling rules")
 
-  (setq create-sibling-rules
-        '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
+(setq create-sibling-rules
+      '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
 
-  (defun pokemacs-find-sibling-file (file)
-    "Visit a \"sibling\" file of FILE.
+(defun pokemacs-find-sibling-file (file)
+  "Visit a \"sibling\" file of FILE.
    When called interactively, FILE is the currently visited file.
 
    The \"sibling\" file is defined by the `find-sibling-rules' variable."
-    (interactive
-     (progn
-       (unless buffer-file-name
-         (user-error "Not visiting a file"))
-       (list buffer-file-name)))
-    (condition-case
-        nil
-        (find-sibling-file file)
-      (user-error
-       (-let* (((expansion . command)
-                (alist-get file create-sibling-rules nil nil 'string-match))
-               (match-data (match-data))
-               (start 0))
-         (cond
-          ((null expansion)
-           (user-error "Couldn't find any sibling files nor a way to create a sibling"))
+  (interactive
+   (progn
+     (unless buffer-file-name
+       (user-error "Not visiting a file"))
+     (list buffer-file-name)))
+  (condition-case
+      nil
+      (find-sibling-file file)
+    (user-error
+     (-let* (((expansion . command)
+              (alist-get file create-sibling-rules nil nil 'string-match))
+             (match-data (match-data))
+             (start 0))
+       (cond
+        ((null expansion)
+         (user-error "Couldn't find any sibling files nor a way to create a sibling"))
 
-          (t
-           ;; Expand \\1 forms in the expansions.
-           (while (string-match "\\\\\\([&0-9]+\\)" expansion start)
-             (let ((index (string-to-number (match-string 1 expansion))))
-               (setq start (match-end 0)
-                     expansion
-                     (replace-match
-                      (substring file
-                                 (elt match-data (* index 2))
-                                 (elt match-data (1+ (* index 2))))
-                      t t expansion))
-               (let* ((file (file-relative-name file (projectile-project-root)))
-                      (output-buffer (get-buffer-create "*temp*" t))
-                      (new-file (expand-file-name expansion))
-                      (display-buffer-alist
-                       (list
-                        (cons "\\*temp\\*.*"
-                              (cons #'display-buffer-no-window nil)))))
-                 (when
-                     (y-or-n-p (format-message "Create `%s'?" new-file))
-                   (with-current-buffer output-buffer
-                     ;; (projectile-run-shell-command-in-root
-                     ;;  (concat "dune exec -- ocaml-print-intf " file))
-                     (projectile-run-shell-command-in-root
-                      (concat command " " file) output-buffer)
-                     (dired-create-empty-file new-file)
-                     (write-file new-file))
-                   (kill-buffer output-buffer)
-                   (find-file new-file)))))))))))
-  (general-define-key
-   [remap find-sibling-file]    'pokemacs-find-sibling-file
-   "C-c C-a"                    'pokemacs-find-sibling-file))
+        (t
+         ;; Expand \\1 forms in the expansions.
+         (while (string-match "\\\\\\([&0-9]+\\)" expansion start)
+           (let ((index (string-to-number (match-string 1 expansion))))
+             (setq start (match-end 0)
+                   expansion
+                   (replace-match
+                    (substring file
+                               (elt match-data (* index 2))
+                               (elt match-data (1+ (* index 2))))
+                    t t expansion))
+             (let* ((file (file-relative-name file (projectile-project-root)))
+                    (output-buffer (get-buffer-create "*temp*" t))
+                    (new-file (expand-file-name expansion))
+                    (display-buffer-alist
+                     (list
+                      (cons "\\*temp\\*.*"
+                            (cons #'display-buffer-no-window nil)))))
+               (when
+                   (y-or-n-p (format-message "Create `%s'?" new-file))
+                 (with-current-buffer output-buffer
+                   ;; (projectile-run-shell-command-in-root
+                   ;;  (concat "dune exec -- ocaml-print-intf " file))
+                   (projectile-run-shell-command-in-root
+                    (concat command " " file) output-buffer)
+                   (dired-create-empty-file new-file)
+                   (write-file new-file))
+                 (kill-buffer output-buffer)
+                 (find-file new-file)))))))))))
+
+(general-define-key
+ [remap find-sibling-file]    'pokemacs-find-sibling-file
+ "C-c C-a"                    'pokemacs-find-sibling-file)
 
 (use-package fontify-face
   :hook (font-lock-mode . fontify-face-mode)
@@ -2812,6 +2811,19 @@ with a prefix ARG."
   ;; Tidy shadowed file names
   :config (message "`vertico-directory' loaded"))
 
+(use-package vertico-prescient
+  :demand t
+  :after vertico prescient
+  :custom
+  ;; Sorting
+  (vertico-prescient-enable-sorting t)
+  (vertico-prescient-override-sorting nil) ; Don't override `display-sort-function'
+  ;; Filtering
+  (vertico-prescient-enable-filtering nil) ; We want orderless to do the filtering
+  :config
+  (vertico-prescient-mode 1)
+  (message "`vertico-prescient' loaded"))
+
 (use-package vertico-multiform
   :after vertico
   :hook (vertico-mode . vertico-multiform-mode)
@@ -3036,8 +3048,9 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
+  :custom
+  (embark-quit-after-action nil)
   :config
-  (setq embark-quit-after-action nil)
   (defun embark-default-act-noquit ()
     (interactive)
     (let ((embark-quit-after-action nil))
@@ -3071,8 +3084,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                 (bound-and-true-p vertico--input)
                 (eq (current-local-map) read-passwd-map))
       ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                  corfu-popupinfo-delay nil)
+      (setopt corfu-echo-delay nil ;; Disable automatic echo and popup
+              corfu-popupinfo-delay nil)
       (corfu-mode 1)))
 
   (defun corfu-move-to-minibuffer ()
@@ -3102,6 +3115,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (corfu-auto-prefix 1)
   (corfu-auto-delay 0.01)
   (corfu-separator ?\s)
+  (corfu-history-mode t)
   ;; (corfu-quit-at-boundary nil)
   (corfu-on-exact-match nil)
   (corfu-preview-current 'insert)
@@ -3132,9 +3146,17 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (corfu-popupinfo-max-width 80))
 
 (use-package corfu-prescient
+  :demand t
+  :after corfu prescient
+  :custom
+  ;; Sorting
+  (corfu-prescient-enable-sorting t)
+  (corfu-prescient-override-sorting nil) ; Don't override `display-sort-function'
+  ;; Filtering
+  (corfu-prescient-enable-filtering nil) ; We want orderless to do the filtering
   :config
   (corfu-prescient-mode 1)
-  (message "`corfu-precient' loaded"))
+  (message "`corfu-prescient' loaded"))
 
 (use-package corfu-terminal
   :unless (display-graphic-p)
@@ -3147,115 +3169,24 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :ensure (corfu-doc-terminal :type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git")
   :config (corfu-doc-terminal-mode +1))
 
-(use-package kind-icon
-  :disabled
-  :after corfu
-  :custom
-  (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
-  (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
-  (kind-icon-blend-frac 0.08)
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
-  (setq kind-icon-mapping
-        '((array "a" :icon "code-brackets" :face font-lock-type-face)
-          (boolean "b" :icon "circle-half-full" :face font-lock-builtin-face)
-          (class "c" :icon "view-grid-plus-outline" :face font-lock-type-face)
-          (color "#" :icon "palette" :face success)
-          (command "cm" :icon "code-greater-than" :face default)
-          (constant "co" :icon "lock-remove-outline" :face font-lock-constant-face)
-          (constructor "cn" :icon "table-column-plus-after" :face font-lock-function-name-face)
-          (enummember "em" :icon "order-bool-ascending-variant" :face font-lock-builtin-face)
-          (enum-member "em" :icon "order-bool-ascending-variant" :face font-lock-builtin-face)
-          (enum "e" :icon "format-list-bulleted-square" :face font-lock-builtin-face)
-          (event "ev" :icon "lightning-bolt-outline" :face font-lock-warning-face)
-          (field "fd" :icon "application-braces-outline" :face font-lock-variable-name-face)
-          (file "f" :icon "file-document-outline" :face font-lock-string-face)
-          (folder "d" :icon "folder" :face font-lock-doc-face)
-          (interface "if" :icon "application-brackets-outline" :face font-lock-type-face)
-          (keyword "kw" :icon "key-variant" :face font-lock-keyword-face)
-          (macro "mc" :icon "lambda" :face font-lock-keyword-face)
-          (magic "ma" :icon "auto-fix" :face font-lock-builtin-face)
-          (method "m" :icon "function-variant" :face font-lock-function-name-face)
-          (function "f" :icon "function" :face font-lock-function-name-face)
-          (module "{" :icon "file-code-outline" :face font-lock-preprocessor-face)
-          (numeric "nu" :icon "numeric" :face font-lock-builtin-face)
-          (operator "op" :icon "plus-minus" :face font-lock-comment-delimiter-face)
-          (param "pa" :icon "cog" :face default)
-          (property "pr" :icon "wrench" :face font-lock-variable-name-face)
-          (reference "rf" :icon "library" :face font-lock-variable-name-face)
-          (snippet "S" :icon "note-text-outline" :face font-lock-string-face)
-          (string "s" :icon "sticker-text-outline" :face font-lock-string-face)
-          (struct "%" :icon "code-braces" :face font-lock-variable-name-face)
-          (text "tx" :icon "script-text-outline" :face font-lock-doc-face)
-          (typeparameter "tp" :icon "format-list-bulleted-type" :face font-lock-type-face)
-          (type-parameter "tp" :icon "format-list-bulleted-type" :face font-lock-type-face)
-          (unit "u" :icon "ruler-square" :face font-lock-constant-face)
-          (value "v" :icon "variable" :face font-lock-variable-name-face)
-          (variable "va" :icon "variable" :face font-lock-variable-name-face)
-          (t "." :icon "crosshairs-question" :face font-lock-warning-face)))
-
-  ;; If you want to use text-based icons (based on NerfFonts):
-
-  ;; (setq kind-icon-use-icons nil)
-  ;; (setq kind-icon-mapping
-  ;;       `(
-  ;;         (array ,(nerd-icons-codicon "nf-cod-symbol_array") :face font-lock-type-face)
-  ;;         (boolean ,(nerd-icons-codicon "nf-cod-symbol_boolean") :face font-lock-builtin-face)
-  ;;         (class ,(nerd-icons-codicon "nf-cod-symbol_class") :face font-lock-type-face)
-  ;;         (color ,(nerd-icons-codicon "nf-cod-symbol_color") :face success)
-  ;;         (command ,(nerd-icons-codicon "nf-cod-terminal") :face default)
-  ;;         (constant ,(nerd-icons-codicon "nf-cod-symbol_constant") :face font-lock-constant-face)
-  ;;         (constructor ,(nerd-icons-codicon "nf-cod-triangle_right") :face font-lock-function-name-face)
-  ;;         (enummember ,(nerd-icons-codicon "nf-cod-symbol_enum_member") :face font-lock-builtin-face)
-  ;;         (enum-member ,(nerd-icons-codicon "nf-cod-symbol_enum_member") :face font-lock-builtin-face)
-  ;;         (enum ,(nerd-icons-codicon "nf-cod-symbol_enum") :face font-lock-builtin-face)
-  ;;         (event ,(nerd-icons-codicon "nf-cod-symbol_event") :face font-lock-warning-face)
-  ;;         (field ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-variable-name-face)
-  ;;         (file ,(nerd-icons-codicon "nf-cod-symbol_file") :face font-lock-string-face)
-  ;;         (folder ,(nerd-icons-codicon "nf-cod-folder") :face font-lock-doc-face)
-  ;;         (interface ,(nerd-icons-codicon "nf-cod-symbol_interface") :face font-lock-type-face)
-  ;;         (keyword ,(nerd-icons-codicon "nf-cod-symbol_keyword") :face font-lock-keyword-face)
-  ;;         (macro ,(nerd-icons-codicon "nf-cod-symbol_misc") :face font-lock-keyword-face)
-  ;;         (magic ,(nerd-icons-codicon "nf-cod-wand") :face font-lock-builtin-face)
-  ;;         (method ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
-  ;;         (function ,(nerd-icons-codicon "nf-cod-symbol_method") :face font-lock-function-name-face)
-  ;;         (module ,(nerd-icons-codicon "nf-cod-file_submodule") :face font-lock-preprocessor-face)
-  ;;         (numeric ,(nerd-icons-codicon "nf-cod-symbol_numeric") :face font-lock-builtin-face)
-  ;;         (operator ,(nerd-icons-codicon "nf-cod-symbol_operator") :face font-lock-comment-delimiter-face)
-  ;;         (param ,(nerd-icons-codicon "nf-cod-symbol_parameter") :face default)
-  ;;         (property ,(nerd-icons-codicon "nf-cod-symbol_property") :face font-lock-variable-name-face)
-  ;;         (reference ,(nerd-icons-codicon "nf-cod-references") :face font-lock-variable-name-face)
-  ;;         (snippet ,(nerd-icons-codicon "nf-cod-symbol_snippet") :face font-lock-string-face)
-  ;;         (string ,(nerd-icons-codicon "nf-cod-symbol_string") :face font-lock-string-face)
-  ;;         (struct ,(nerd-icons-codicon "nf-cod-symbol_structure") :face font-lock-variable-name-face)
-  ;;         (text ,(nerd-icons-codicon "nf-cod-text_size") :face font-lock-doc-face)
-  ;;         (typeparameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
-  ;;         (type-parameter ,(nerd-icons-codicon "nf-cod-list_unordered") :face font-lock-type-face)
-  ;;         (unit ,(nerd-icons-codicon "nf-cod-symbol_ruler") :face font-lock-constant-face)
-  ;;         (value ,(nerd-icons-codicon "nf-cod-symbol_field") :face font-lock-builtin-face)
-  ;;         (variable ,(nerd-icons-codicon "nf-cod-symbol_variable") :face font-lock-variable-name-face)
-  ;;         (t ,(nerd-icons-codicon "nf-cod-code") :face font-lock-warning-face)))
-
-  ;; Add hook to reset cache so the icon colors match my theme
-  ;; ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
-  ;; the theme using my custom defined command for switching themes. If I don't
-  ;; do this, then the backgound color will remain the same, meaning it will not
-  ;; match the background color corresponding to the current theme. Important
-  ;; since I have a light theme and dark theme I switch between. This has no
-  ;; function unless you use something similar
-  ;; (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache)))
-  :config (message "`kind-icon' loaded"))
-
 (use-package emacs
   :ensure nil
-  :init
+  :custom
   ;; FRINGE
   ;; UI: the gutter looks less cramped with some space between it and  buffer.
-  (setq-default fringes-outside-margins nil)
-  (setq-default describe-mode-outline nil)
-
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt))
+  (fringes-outside-margins nil)
+  (describe-mode-outline nil)
   ;; Try to indent and if already indented, complete
-  (setq tab-always-indent 'complete)
+  (tab-always-indent 'complete)
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (enable-recursive-minibuffers t)
+  :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
@@ -3268,16 +3199,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  (setq read-extended-command-predicate #'command-completion-default-include-p)
-
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t)
   ;; (add-to-list 'completion-at-point-functions #'dabbrev-capf)
   (defun pokemacs-highlight-selected-window (&rest _)
     "Highlight selected window with a different background color."
@@ -3433,7 +3356,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
   ;; (global-tempel-abbrev-mode)
   :config
-  (setq-local tempel-template-sources tempel-template-sources)
   (put 'tempel-template-sources 'permanent-local t))
 
 ;; Optional: Add tempel-collection.
@@ -3465,12 +3387,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;; This is done by adjusting `lisp-imenu-generic-expression' to
   ;; include support for finding `doom-modeline-def-*' forms.
   ;; Must be set before loading doom-modeline.
-  (setq doom-modeline-support-imenu t)
-  ;; I don't care about the percentage position of the cursor
-  (setq mode-line-percent-position nil)
-  (setq mode-line-right-align-edge pokemacs-mode-line-right-align)
+  (setopt doom-modeline-support-imenu t)
   :custom
-
+  ;; I don't care about the percentage position of the cursor
+  (mode-line-percent-position nil)
+  (mode-line-right-align-edge pokemacs-mode-line-right-align)
   ;; Whether to use hud instead of default bar. It's only respected in GUI.
   (doom-modeline-hud nil)
 
@@ -3584,14 +3505,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (doom-modeline-def-modeline 'pokemacs-lsp-line
     '(" " matches follow lsp modals remote-host buffer-position word-count parrot selection-info)
     '(misc-info persp-name grip debug minor-modes major-mode process vcs check))
-
-  ;; TEMP: Emacs 29 adds position to symbols after using doom-modeline-def-modeline.
-  (setq doom-modeline-fn-alist
-        (unless (version< emacs-version "29")
-          (--map
-           (cons (remove-pos-from-symbol (car it)) (cdr it))
-           doom-modeline-fn-alist)
-          doom-modeline-fn-alist))
 
   (defun pokemacs-mode-line-to-header-line ()
     (when use-header-line
@@ -4520,10 +4433,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c C-w" nil
               "C-c C-l" nil
               "C-c o w" 'ocaml-utils-dune-watch)
+    :custom
+    (tuareg-opam-insinuate t)
+    (tuareg-electric-indent t)
 
     :config
-    (setq tuareg-opam-insinuate t)
-    (setq tuareg-electric-indent t)
     (defun pokemacs-map (l)
       (-map (lambda (x)
               (list
@@ -4556,28 +4470,26 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (add-hook 'post-command-hook 'pokemacs-update-opam-env)
         (add-hook 'post-command-hook 'pokemacs-update-load-path-opam)))
 
-    (unless (version< emacs-version "29")
-      (message "unbind c-c c-a")
-      (general-unbind tuareg-mode-map "C-c C-a")
-      (let* ((l '(
-                  (".mli" . ".ml")
-                  (".mli" . ".mll")
-                  (".mli" . ".mly")
-                  (".mli" . ".pp.ml")
-                  (".mli" . "_intf.ml")
-                  ("_intf.ml" . ".ml")
-                  (".pp.mli" . ".ml")
-                  (".pp.mli" . ".mll")
-                  (".pp.mli" . ".mly")
-                  (".pp.mli" . ".pp.ml")
-                  (".mll" . ".ml")
-                  (".mll" . ".ml")
-                  (".mly" . ".ml")
-                  (".eliomi" . ".eliom")))
-             (rl (-map #'cons-reverse l))
-             (l (pokemacs-map l))
-             (rl (pokemacs-map rl)))
-        (setq find-sibling-rules (append find-sibling-rules l rl))))
+    (general-unbind tuareg-mode-map "C-c C-a")
+    (let* ((l '(
+                (".mli" . ".ml")
+                (".mli" . ".mll")
+                (".mli" . ".mly")
+                (".mli" . ".pp.ml")
+                (".mli" . "_intf.ml")
+                ("_intf.ml" . ".ml")
+                (".pp.mli" . ".ml")
+                (".pp.mli" . ".mll")
+                (".pp.mli" . ".mly")
+                (".pp.mli" . ".pp.ml")
+                (".mll" . ".ml")
+                (".mll" . ".ml")
+                (".mly" . ".ml")
+                (".eliomi" . ".eliom")))
+           (rl (-map #'cons-reverse l))
+           (l (pokemacs-map l))
+           (rl (pokemacs-map rl)))
+      (setq find-sibling-rules (append find-sibling-rules l rl)))
 
     (if use-ligature
         (add-hook
@@ -4618,6 +4530,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     :config (message "`dune-minor' loaded")))
 
 (use-package ocaml-utils-mode
+  ;; :ensure nil
   :ensure (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
   :hook (tuareg-mode . ocaml-utils-mode)
   ;; :load-path "~/ocaml-utils-mode/"
@@ -4653,15 +4566,16 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (cond
      ((executable-find "ipython")
       (progn
-        (setq python-shell-buffer-name "IPython")
-        (setq python-shell-interpreter "ipython")
-        (setq python-shell-interpreter-args "-i --simple-prompt")))
+        (setopt
+         python-shell-buffer-name "IPython"
+         python-shell-interpreter "ipython"
+         python-shell-interpreter-args "-i --simple-prompt")))
      ((executable-find "python3")
-      (setq python-shell-interpreter "python3"))
+      (setopt python-shell-interpreter "python3"))
      ((executable-find "python2")
-      (setq python-shell-interpreter "python2"))
+      (setopt python-shell-interpreter "python2"))
      (t
-      (setq python-shell-interpreter "python")))
+      (setopt python-shell-interpreter "python")))
     (message "`python' loaded")))
 
 (when use-python
@@ -4739,15 +4653,13 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
            ("\\(Rake\\|Thor\\|Guard\\|Gem\\|Cap\\|Vagrant\\|Berks\\|Pod\\|Puppet\\)file\\'" . enh-ruby-mode)
            ("\\.\\(rb\\|rabl\\|ru\\|builder\\|rake\\|thor\\|gemspec\\|jbuilder\\|pryrc\\)\\'" . enh-ruby-mode))
     :after lsp-mode
+    :ensure-system-package (solargraph . "gem install --user-install solargraph")
     :hook (enh-ruby-mode . lsp-deferred)
     :interpreter "ruby"
-    :init
-    (setq enh-ruby-deep-indent-paren nil
-          enh-ruby-hanging-paren-deep-indent-level 2)
     :custom
-    (ruby-insert-encoding-magic-comment nil "Not needed in Ruby 2")
-
-    :ensure-system-package (solargraph . "gem install --user-install solargraph"))
+    (enh-ruby-deep-indent-paren nil)
+    (enh-ruby-hanging-paren-deep-indent-level 2)
+    (ruby-insert-encoding-magic-comment nil "Not needed in Ruby 2"))
 
   (use-package rbenv)
 
@@ -4762,18 +4674,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (when use-rust
 
-  (use-package rust-mode
-    :demand t
-    :ensure t
-    :init
-    (setq rust-mode-treesitter-derive t)
-    :config
-    (require 'rustic nil t)
-    (message "`rust-mode' loaded"))
-
   (use-package rustic
     :ensure (:repo "emacs-rustic/rustic")
-    :after (rust-mode)
     :ensure-system-package
     ((taplo . "cargo install taplo-cli --features lsp")
      (rustfmt . "cargo install rustfmt"))
@@ -4784,6 +4686,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               "C-c s" 'lsp-rust-analyzer-status
               "C-M-;" 'pokemacs-rust-doc-comment-dwim-following
               "C-M-," 'pokemacs-rust-doc-comment-dwim-enclosing)
+    :init
+    (setq auto-mode-alist (delete '("\\.rs\\'" . rust-mode) auto-mode-alist))
+    (setq auto-mode-alist (delete '("\\.rs\\'" . rust-ts-mode) auto-mode-alist))
+    (setopt rust-mode-treesitter-derive t)
+    :custom
+    (rust-prettify-symbols-alist nil)
+    ;; Allign to `.`
+    (rustic-indent-method-chain t)
+    ;; Let apheleia handle reformatting
+    (rustic-babel-format-src-block nil)
+    (rustic-format-trigger nil)
+
     :init
     (defun pokemacs-rust-doc-comment-dwim (c)
       "Comment or uncomment the current line or text selection."
@@ -4868,13 +4782,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
     (defun pokemacs-set-rustic-compilation-mode ()
       (add-to-list 'compilation-finish-functions 'pokemacs-function-rustic-compilation-mode))
-
-    (setq rust-prettify-symbols-alist nil)
-    ;; Allign to `.`
-    (setq rustic-indent-method-chain t)
-    ;; Let apheleia handle reformatting
-    (setq rustic-babel-format-src-block nil)
-    (setq rustic-format-trigger nil)
     ;; uncomment for less flashiness
     ;; (setq lsp-eldoc-hook nil)
     ;; (setq lsp-enable-symbol-highlighting nil)

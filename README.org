@@ -343,7 +343,8 @@ install [[https://github.com/gjedeer/tuntox][tuntox]] and set ~crdt-tuntox-execu
 :CUSTOM_ID: installing-emacs-manually
 :END:
 
-- Your version of emacs should be at least 27.1
+- Your version of emacs should be at least 29.1
+  - I tend to use new features and don't care about being retro-compatible with older versions of emacs.
 
 *** From sources
 :PROPERTIES:

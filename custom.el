@@ -154,17 +154,11 @@
  '(use-zig t)
  '(vertico-multiform-categories
    '((imenu buffer)
-     (file (vertico-sort-function . sort-directories-first))
-     (corfu (vertico-sort-function . vertico-sort-alpha))
-     (jinx grid (vertico-grid-annotate . 20))
-     (symbol (vertico-sort-function . vertico-sort-history-length-alpha))))
+     (jinx grid (vertico-grid-annotate . 20))))
  '(vertico-multiform-commands
    '((consult-imenu buffer)
      (consult-line buffer)
-     (execute-extended-command mouse)
-     (find-file (vertico-sort-function . sort-directories-first))
-     (insert-char (vertico-sort-function . sort-characters))
-     (describe-symbol (vertico-sort-override-function . vertico-sort-alpha))))
+     (execute-extended-command mouse)))
  '(warning-suppress-types '((flycheck syntax-checker) (treesit) (comp)))
  '(x-stretch-cursor nil))
 
