@@ -2249,7 +2249,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   :general
   (:keymaps 'lsp-mode-map
-            "C-c C-t" 'lsp-ocaml-type-enclosing
+            "C-c C-t" 'lsp-describe-thing-at-point
             "C-c C-l" 'lsp-find-definition
             "C-c C-j" 'lsp-find-type-definition
             "C-c &"   'pop-global-mark :keymaps 'override)
@@ -2294,11 +2294,6 @@ debian, and derivatives). On most it's 'fd'.")
 
   :config
   (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
-
-  (defun pokemacs-set-type-map (&rest r)
-    (set-transient-map pokemacs-type-map))
-
-  (advice-add 'lsp-describe-thing-at-point :after #'pokemacs-set-type-map)
   (which-key-add-keymap-based-replacements lsp-command-map "u" "UI")
   (lsp-enable-which-key-integration t)
 
@@ -4427,6 +4422,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
     ;; I'm not really sure that it's useful.
     ;; :load-path (lambda () (pokemacs-load-path-opam))
+    :hook
+    (tuareg-mode . (lambda ()
+                     (general-define-key
+                      :keymaps 'lsp-mode-map
+                      "C-c C-t" 'lsp-ocaml-type-enclosing)))
     :general
     (:keymaps 'tuareg-mode-map
               "C-c C-t" nil
@@ -4501,9 +4501,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
         (setq tuareg-prettify-symbols-basic-alist nil)
         (setq tuareg-prettify-symbols-extra-alist nil)))
 
-    (message "`tuareg' loaded")
-    :hook
-    (tuareg-mode . (lambda () (pokemacs-set-local-tempel-template 'pokemacs-ocaml-templates))))
+    (message "`tuareg' loaded"))
 
   (use-package ocp-indent
     ;; must be careful to always defer this, it has autoloads that adds hooks
