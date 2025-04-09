@@ -159,6 +159,8 @@
    '((consult-imenu buffer)
      (consult-line buffer)
      (execute-extended-command mouse)))
+ '(vertico-resize t nil nil "Set to nil if you don't want the minibuffer to shrink and grow")
+ '(vertico-count 10 nil nil "Size of the minibuffer")
  '(warning-suppress-types '((flycheck syntax-checker) (treesit) (comp)))
  '(x-stretch-cursor nil))
 

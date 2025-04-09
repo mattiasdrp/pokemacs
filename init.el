@@ -2767,8 +2767,6 @@ with a prefix ARG."
   (:keymaps 'minibuffer-local-map
             "M-h" #'backward-kill-word)
   :custom
-  ;; Grow and shrink the Vertico minibuffer
-  (vertico-resize t)
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (vertico-cycle t)
   :config
