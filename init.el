@@ -2216,9 +2216,11 @@ debian, and derivatives). On most it's 'fd'.")
   :init
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless))
+          '(hotfuzz))
     (setq-local completion-at-point-functions
-                (list (cape-capf-super #'lsp-completion-at-point #'cape-keyword))))
+                (list #'lsp-completion-at-point)
+                ;; (list (cape-capf-super #'lsp-completion-at-point #'cape-keyword))
+                ))
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
@@ -2266,6 +2268,7 @@ debian, and derivatives). On most it's 'fd'.")
 
   :custom
   (lsp-log-io nil)
+  (lsp-completion-default-behaviour :insert)
   (lsp-headerline-breadcrumb-enable t)
   (lsp-headerline-breadcrumb-segments pokemacs-lsp-mode-breadcrumb-segments)
   (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
@@ -3111,7 +3114,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (corfu-history-mode t)
   ;; (corfu-quit-at-boundary nil)
   (corfu-on-exact-match nil)
-  (corfu-preview-current 'insert)
   (corfu-echo-documentation t)
   (corfu-preview-current nil)    ;; Disable current candidate preview
   (corfu-preselect-first nil)    ;; Disable candidate preselection
