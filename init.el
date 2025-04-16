@@ -2735,8 +2735,9 @@ with a prefix ARG."
   (message "`visual-fill-column' loaded"))
 
 (use-package pokemacs-layout
-  :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
-  ;; :load-path "~/pokemacs-layout"
+  ;; :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
+  :ensure nil
+  :load-path "~/pokemacs-layout"
   :commands pokemacs-layout-apply pokemacs-restore-session
   :config
   (defun pokemacs-restore-session (&optional columns)
@@ -4530,9 +4531,20 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 (use-package ocaml-utils-mode
   ;; :ensure nil
   :ensure (ocaml-utils-mode :host github :repo "mattiasdrp/ocaml-utils-mode")
-  :hook (tuareg-mode . ocaml-utils-mode)
+  :hook (tuareg-mode . (lambda ()
+                         (require 'pokemacs-layout)
+                         (require 'ocaml-utils-mode)))
   ;; :load-path "~/ocaml-utils-mode/"
-  )
+  :config
+  (setq pokemacs-layout-layouts
+        (add-to-list 'pokemacs-layout-layouts
+                     '(:name "OCaml watch default layout" :layout
+                             (:windows ((column nil nil 2)) :sides
+                                       ((right (1 (magit-status-quick "*Proced*") t)
+                                               (2 ("*compilation*" "*lsp-help*" "*dune watch*") t))))
+                             :description
+                             "3 vertical columns with last one being magit | (compilation, lsp-help or dune watch)")))
+  (message "`ocaml-utils' loaded"))
 
 (use-package pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)
