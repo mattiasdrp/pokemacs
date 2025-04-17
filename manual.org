@@ -299,6 +299,14 @@ Pokemacs uses [[https://github.com/minad/jinx][Jinx]] because I had issues with 
 
 I can't explain magit. You have to discover it by yourself.
 
+Some tips though:
+
+- ~C-c C-i~ when editing a commit message will allow you to add authors/co-authors etc
+- ~C-x l~ (~transient-set-level~) in any transient menu will show you the available options and their level
+
+#+attr_org: :align left :width 800
+[[file:resources/images/magit-transient-level.png]]
+
 ** Programming utilities
 :PROPERTIES:
 :CUSTOM_ID: programming-utilities
@@ -324,6 +332,25 @@ Pokemacs uses:
 - Specific to OCaml:
   - Look at the ~M-x ocaml-utils-*~ commands (WiP)
 
+* LSP mode
+
+LSP mode is a powerful yet under-exploited tool. Here are some of the tricks (some apply in the general case, some are related to OCaml):
+
+- ~M-l u i~ (~lsp-ui-imenu~) will open a buffer containing all the toplevel definitions of the current buffer
+  - ~RET~ shows the line of the entry at point
+  - ~M-RET~ jumps to the entry at point
+- ~M-l r~ (~lsp-find-references~) find all the references of the symbol under point
+  - To enable this in OCaml, you need to have your project compiled with ~@ocaml-index~
+  - ~ocaml-utils-compile~ provides an utility to compile an OCaml project in watch mode with ~@ocaml-index~
+    - Applying ~pokemacs-layout-apply~ to the ~ocaml-layout~ will make sure that the ~*dune watch*~ buffer is displayed in a fitting window
+- [OCaml] ~C-c C-t~ (~lsp-ocaml-type-enclosing~) returns the type and documentation of the symbol at point
+  - Unlike ~lsp-describe-thing-at-point~, you can:
+    - ~C-w~ to copy the type
+    - ~C-<up>~  to go up the enclosing expression and display its type (go down with ~C-<down>~)
+    - ~C-<right>/<left>~ to increase/decrease the verbosity (show/hide the type under aliases)
+
+      If I forgot anything, feel free to open a PR with new tips!
+
 * Pokemacs appearance
 :PROPERTIES:
 :CUSTOM_ID: pokemacs-appearance
@@ -341,7 +368,7 @@ There are four custom variables you should customise:
 :CUSTOM_ID: pokemacs-layout
 :END:
 
-You can toggle between light and dark theme with ~M-x pokemacs-toggle-dark-light-theme~ (you can actually look at what pokemacs allows you to do by hitting ~M-x pokemacs~ see what the completion offers. Curiousity should always be rewarded.
+You can toggle between light and dark theme with ~M-x pokemacs-toggle-dark-light-theme~ (you can actually look at what pokemacs allows you to do by hitting ~M-x pokemacs~ see what the completion offers. Curiosity should always be rewarded.
 
 Try ~M-x pokemacs-restore-session~ or ~M-7 M-x pokemacs-restore-session~. This will create a default layout. You can also create your own layouts by modifying ~pokemacs-layout-layouts~ (it's already filled with some predefined layouts that can inspire you). Apply the layout of your choice with ~M-x pokemacs-layout-apply~. That's a work in progress but I'm quite proud of it.
 Example of a layout:
