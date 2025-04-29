@@ -2560,6 +2560,7 @@ have one rule for each file type."
 (when (and use-inline-errors (display-graphic-p))
   (use-package flycheck-inline
     :hook (flycheck-mode . flycheck-inline-mode)
+    :ensure (:type git :host github :repo "wyuenho/flycheck-inline" :branch "fix-nil-column")
     :config
     (setq flycheck-inline-display-function
           (lambda (msg pos err)
