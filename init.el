@@ -1927,6 +1927,7 @@ debian, and derivatives). On most it's 'fd'.")
   (org-babel-do-load-languages
    'org-babel-load-languages
    '(
+     (dot . t)
      (emacs-lisp . t)
      (latex . t)
      (ocaml . t)
@@ -1962,6 +1963,9 @@ debian, and derivatives). On most it's 'fd'.")
    'user
    '(org-modern-statistics ((t (:height 1.6)))))
   (message "`org-modern' loaded"))
+
+(when use-org
+  (use-package graphviz-dot-mode))
 
 (use-package org-auto-tangle
   :hook (org-mode . org-auto-tangle-mode)
@@ -3970,9 +3974,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     ;; (setq auto-mode-alist (delete '("\\.md\\'" . markdown-ts-mode) auto-mode-alist))
     (setq markdown-command "markdown")
     (setq markdown-open-command "retext")
-    (message "`markdown-ts-mode' loaded"))
-
-  )
+    (message "`markdown-ts-mode' loaded")))
 
 (when use-markdown
   (use-package lsp-marksman
@@ -4047,6 +4049,18 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :ensure nil
   :hook (make-mode . semantic-mode)
   :config (message "`make-mode' loaded"))
+
+(use-package bash-ts-mode
+  :ensure nil
+  :hook (bash-ts-mode .
+                      (lambda ()
+                        (unless (executable-find "shfmt")
+                          (display-warning 'bash-ts-mode
+                                           (format-message "`shfmt' is not installed. You can install it with either:
+  - `sudo apt -y install shfmt'
+  - `sudo pacman -S shfmt'
+  - `curl -sS https://webinstall.dev/shfmt | bash'
+  - etc") :warning)))))
 
 (use-package cc-mode
   :ensure nil

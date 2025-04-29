@@ -3052,6 +3052,7 @@ Org mode is, well, org mode.
     (org-babel-do-load-languages
      'org-babel-load-languages
      '(
+       (dot . t)
        (emacs-lisp . t)
        (latex . t)
        (ocaml . t)
@@ -3094,6 +3095,13 @@ Org mode is, well, org mode.
      'user
      '(org-modern-statistics ((t (:height 1.6)))))
     (message "`org-modern' loaded"))
+#+end_src
+
+** Graphviz-dot-mode
+
+#+begin_src emacs-lisp
+  (when use-org
+    (use-package graphviz-dot-mode))
 #+end_src
 
 ** [[https://github.com/yilkalargaw/org-auto-tangle][Org auto tangle]]
@@ -5790,9 +5798,7 @@ Code folding based on treesit.el tree.
       ;; (setq auto-mode-alist (delete '("\\.md\\'" . markdown-ts-mode) auto-mode-alist))
       (setq markdown-command "markdown")
       (setq markdown-open-command "retext")
-      (message "`markdown-ts-mode' loaded"))
-
-    )
+      (message "`markdown-ts-mode' loaded")))
 #+end_src
 
 **** LSP-marksman
@@ -5888,7 +5894,6 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
     (message "`json-mode' loaded"))
 #+end_src
 
-
 *** Dune files
 :PROPERTIES:
 :CUSTOM_ID: dune-files
@@ -5927,6 +5932,22 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
     :ensure nil
     :hook (make-mode . semantic-mode)
     :config (message "`make-mode' loaded"))
+#+end_src
+
+** Bash-ts-mode
+
+#+begin_src emacs-lisp
+  (use-package bash-ts-mode
+    :ensure nil
+    :hook (bash-ts-mode .
+                        (lambda ()
+                          (unless (executable-find "shfmt")
+                            (display-warning 'bash-ts-mode
+                                             (format-message "`shfmt' is not installed. You can install it with either:
+    - `sudo apt -y install shfmt'
+    - `sudo pacman -S shfmt'
+    - `curl -sS https://webinstall.dev/shfmt | bash'
+    - etc") :warning)))))
 #+end_src
 
 ** C/C++
@@ -7001,7 +7022,6 @@ Some people use this, not my responsibility.
     (use-package sicp))
 #+end_src
 
-
 ** Copilot
 :PROPERTIES:
 :CUSTOM_ID: copilot
@@ -7028,8 +7048,6 @@ Some people use this, not my responsibility.
         (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2))))
 #+end_src
 
-
-
 ** Copilot-chat
 :PROPERTIES:
 :CUSTOM_ID: copilot-chat
@@ -7040,7 +7058,6 @@ Some people use this, not my responsibility.
     (use-package copilot-chat))
 
 #+end_src
-
 
 ** Web modes
 :PROPERTIES:
