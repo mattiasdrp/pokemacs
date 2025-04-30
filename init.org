@@ -4222,7 +4222,8 @@ This mode will center the text when only one window is displayed.
     :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
     ;; :ensure nil
     ;; :load-path "~/pokemacs-layout"
-    :commands pokemacs-layout-apply pokemacs-restore-session
+    :commands pokemacs-layout-apply pokemacs-layout-monitor-names
+    pokemacs-restore-session pokemacs-layout-current-monitor
     :config
     (defun pokemacs-restore-session (&optional columns)
       "Restore a session by creating the proper buffers."
@@ -6679,9 +6680,9 @@ Special tuareg mode when editing ~mly~ files.
     (setq pokemacs-layout-layouts
           (add-to-list 'pokemacs-layout-layouts
                        '(:name "OCaml watch default layout" :layout
-                               (:windows ((column nil nil 2)) :sides
-                                         ((right (1 (magit-status-quick "*Proced*") t)
-                                                 (2 ("*compilation*" "*lsp-help*" "*dune watch*") t))))
+                               ((:windows ((column nil nil 2)) :sides
+                                          ((right (1 (magit-status-quick "*Proced*") t)
+                                                  (2 ("*compilation*" "*lsp-help*" "*dune watch*") t)))))
                                :description
                                "3 vertical columns with last one being magit | (compilation, lsp-help or dune watch)")))
     (message "`ocaml-utils' loaded"))

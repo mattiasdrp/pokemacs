@@ -54,6 +54,7 @@
  '(pokemacs-dict "en-GB")
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-layout-columns 2)
+ '(pokemacs-layout-second-monitor "DP-1")
  '(pokemacs-mode-line-right-align 'right-fringe t)
  '(pokemacs-repeat-timeout 0.5)
  '(pokemacs-variable-font "Iosevka Aile" t)
