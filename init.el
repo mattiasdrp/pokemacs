@@ -217,7 +217,14 @@ Otherwise, the org provided with emacs will be used"
   "Time before which-key appears."
   :group 'pokemacs-values
   :type 'integer
-  :tag "󱎫 Overlay")
+  :tag "󱎫 Which-key idle delay")
+
+(defcustom pokemacs-complete-keywords t
+  "Complete keywords in LSP.
+Enabling this leads to a bug where your completion may replace the following word (see https://github.com/minad/cape/discussions/152)."
+  :group 'pokemacs-values
+  :type 'boolean
+  :tag " Keyword Completion")
 
 (defcustom pokemacs-hotfuzz-module-path (expand-file-name "etc/hotfuzz/" user-emacs-directory)
   "Where should the dynamic hotfuzz module be installed."
@@ -841,7 +848,7 @@ debian, and derivatives). On most it's 'fd'.")
   (use-package nerd-icons
     :demand t
     :config
-    (set-fontset-font t '(#x25d0 . #xf10d7) "Symbols Nerd Font Mono")
+    (set-fontset-font t '(#x25d0 . #xf13ab) "Symbols Nerd Font Mono")
     (set-fontset-font t '(#xe3d0 . #xe3d9) "Material Icons")
     (message "`nerd-icons' loaded")))
 
@@ -2218,13 +2225,23 @@ debian, and derivatives). On most it's 'fd'.")
   ;;                :repo "mattiasdrp/lsp-mode"
   ;;                :branch "mattias@ocaml-lsp-type-enclosing")
   :init
+  (defun pokemacs--set-completion-capf ()
+    (if pokemacs-complete-keywords
+        (setq-local completion-at-point-functions
+                    (list (cape-capf-super #'lsp-completion-at-point #'cape-keyword)))
+      (setq-local completion-at-point-functions
+                  (list #'lsp-completion-at-point))))
+
+  (defun pokemacs-toggle-completion-capf ()
+    (interactive)
+    (setq pokemacs-complete-keywords (not pokemacs-complete-keywords))
+    (pokemacs--set-completion-capf))
+
   (defun minad/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(hotfuzz))
-    (setq-local completion-at-point-functions
-                (list #'lsp-completion-at-point)
-                ;; (list (cape-capf-super #'lsp-completion-at-point #'cape-keyword))
-                ))
+    (pokemacs--set-completion-capf))
+
   (defconst pokemacs-lsp-mode-breadcrumb-segments
     (if use-header-line
         '(project file)
@@ -3232,7 +3249,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
      ("i" flycheck-inline-mode "flycheck" :toggle flycheck-inline-mode)
      ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
-     )
+     ("k" pokemacs-toggle-completion-capf "complete keywords" :toggle pokemacs-complete-keywords))
     "Emacs"
     (("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
      ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
