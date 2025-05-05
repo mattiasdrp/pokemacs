@@ -2377,11 +2377,37 @@ debian, and derivatives). On most it's 'fd'.")
 
 (use-package prog-mode
   :ensure nil
+  :hook
+  (prog-mode . pokemacs-clear-compilation-finish-functions)
   :init
   (defun pokemacs-clear-compilation-finish-functions ()
     (setq compilation-finish-functions nil))
-  :hook
-  (prog-mode . pokemacs-clear-compilation-finish-functions))
+  (defun pokemacs--compilation-goto-locus-no-split (orig-fun &rest args)
+    "Prevent window splitting when clicking on compilation errors."
+    (let ((display-buffer-overriding-action
+           '((display-buffer-reuse-window
+              display-buffer-in-previous-window
+              display-buffer-use-some-window))))
+      (apply orig-fun args)))
+  (defun pokemacs--loop-error (orig-fun &rest args)
+    (condition-case error (apply orig-fun args)
+      (user-error
+       (message "%s" (car (cdr error)))
+       (let ((args (cl-destructuring-bind (arg . reset) args
+                     (cond
+                      ;; arg is nil or > 0 meaning we're going to the next-error
+                      ((or (null arg) (> arg 0))
+                       (list arg t))
+
+                      (t
+                       (with-current-buffer compilation-last-buffer
+                         (setq compilation-current-error (point-max)))
+                       (list arg nil))))))
+         (apply orig-fun args)))))
+  :config
+  ;; Prevent emacs from splitting a window when clicking on an error
+  (advice-add 'compilation-goto-locus :around #'pokemacs--compilation-goto-locus-no-split)
+  (advice-add 'next-error :around #'pokemacs--loop-error))
 
 (use-package apheleia
   :init (apheleia-global-mode +1)
