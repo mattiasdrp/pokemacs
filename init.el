@@ -4598,7 +4598,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (setq pokemacs-layout-layouts
         (add-to-list 'pokemacs-layout-layouts
                      '(:name "OCaml watch default layout" :layout
-                             ((:windows ((column nil nil 2)) :sides
+                             ((:windows ((column nil nil pokemacs-layout-columns)) :sides
                                         ((right (1 (magit-status-quick "*Proced*") t)
                                                 (2 ("*compilation*" "*lsp-help*" "*dune watch*") t)))))
                              :description
