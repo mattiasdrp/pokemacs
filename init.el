@@ -4482,14 +4482,21 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     ;; the tuareg.el file installed with tuareg when running opam install tuareg
     ;; I'm not really sure that it's useful.
     ;; :load-path (lambda () (pokemacs-load-path-opam))
+    :init
+    (defun pokemacs-lsp-set-type-key ()
+      "Set `C-c C-t` in `lsp-mode-map` based on major mode."
+      (general-define-key
+       :keymaps 'lsp-mode-map
+       "C-c C-t"
+       (if (derived-mode-p 'tuareg-mode)
+           #'lsp-ocaml-type-enclosing
+         #'lsp-describe-thing-at-point)))
+
     :hook
-    (tuareg-mode . (lambda ()
-                     (general-define-key
-                      :keymaps 'lsp-mode-map
-                      "C-c C-t" 'lsp-ocaml-type-enclosing)))
+    (lsp-mode . pokemacs-lsp-set-type-key)
+
     :general
     (:keymaps 'tuareg-mode-map
-              "C-c C-t" nil
               "C-c C-w" nil
               "C-c C-l" nil
               "C-c o w" 'ocaml-utils-dune-watch)
