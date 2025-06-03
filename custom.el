@@ -42,6 +42,7 @@
      ("XXXX*" font-lock-constant-face bold)))
  '(lsp-auto-guess-root nil)
  '(lsp-completion-default-behaviour :insert)
+ '(lsp-file-watch-threshold 50000)
  '(lsp-java-completion-lazy-resolve-text-edit-enabled t)
  '(lsp-java-format-enabled nil)
  '(magit-diff-refine-hunk 'all)

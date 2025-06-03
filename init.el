@@ -3758,7 +3758,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
          :ts-mode 'tuareg-mode
          :remap '(tuareg-mode)
          :url "https://github.com/tree-sitter/tree-sitter-ocaml"
-         :revision "master"
+         :revision "v0.24.1"
          :source-dir "grammars/ocaml/src"
          :ext "\\.ml\\'"))
   (setq pokemacs-elisp-tsauto-config

@@ -40,7 +40,6 @@ Literate configuration for init.el.
   - [[#other-useful-global-modes][Other useful global modes]]
   - [[#add-some-files-to-text-mode][Add some files to text-mode]]
   - [[#delete-whitespace][Delete whitespace]]
-  - [[#auto-update-packages][Auto update packages]]
   - [[#no-littering][No littering]]
   - [[#load-custom-file][Load custom file]]
   - [[#prettifying][Prettifying]]
@@ -125,6 +124,7 @@ Literate configuration for init.el.
 - [[#org-mode][Org mode]]
   - [[#main-mode-0][Main mode]]
   - [[#org-modern][Org modern]]
+  - [[#graphviz-dot-mode][Graphviz-dot-mode]]
   - [[#org-auto-tangle][Org auto tangle]]
   - [[#disabled-org-ref][DISABLED Org ref]]
   - [[#org-inline-pdf][Org inline pdf]]
@@ -172,6 +172,7 @@ Literate configuration for init.el.
   - [[#vertico][Vertico]]
     - [[#main-mode-4][Main mode]]
     - [[#vertico-directory][Vertico directory]]
+    - [[#vertico-prescient][Vertico-prescient]]
     - [[#vertico-multiform][Vertico multiform]]
   - [[#consult][Consult]]
   - [[#embark][Embark]]
@@ -181,7 +182,6 @@ Literate configuration for init.el.
     - [[#corfu-prescient][Corfu-prescient]]
     - [[#corfu-terminal][Corfu terminal]]
     - [[#corfu-doc-terminal][Corfu doc terminal]]
-    - [[#kind-icon][Kind-icon]]
   - [[#emacs-configuration-for-minibuffers-and-completion][Emacs configuration for minibuffers and completion]]
   - [[#windmove][Windmove]]
   - [[#hotfuzz][Hotfuzz]]
@@ -223,6 +223,7 @@ Literate configuration for init.el.
     - [[#json-mode][Json-mode]]
     - [[#dune-files][Dune files]]
     - [[#makefile][Makefile]]
+  - [[#bash-ts-mode][Bash-ts-mode]]
   - [[#cc][C/C++]]
     - [[#main-mode-9][Main mode]]
     - [[#ccls][CCLS]]
@@ -4365,6 +4366,9 @@ Useful keybindings are:
 
 
 *** Vertico-prescient
+:PROPERTIES:
+:CUSTOM_ID: vertico-prescient
+:END:
 
 #+begin_src emacs-lisp
   (use-package vertico-prescient
@@ -5527,7 +5531,7 @@ There's currently a bug where if grammars were already installed new ones can't 
            :ts-mode 'tuareg-mode
            :remap '(tuareg-mode)
            :url "https://github.com/tree-sitter/tree-sitter-ocaml"
-           :revision "master"
+           :revision "v0.24.1"
            :source-dir "grammars/ocaml/src"
            :ext "\\.ml\\'"))
     (setq pokemacs-elisp-tsauto-config
@@ -5979,6 +5983,9 @@ This mode will install ~taplo~ through ~cargo~ if it's not already installed to 
 #+end_src
 
 ** Bash-ts-mode
+:PROPERTIES:
+:CUSTOM_ID: bash-ts-mode
+:END:
 
 #+begin_src emacs-lisp
   (use-package bash-ts-mode
