@@ -347,13 +347,13 @@ Enabling this leads to a bug where your completion may replace the following wor
   :group 'pokemacs
   :tag "Dictionaries")
 
-(defcustom pokemacs-dict "en-GB"
+(defcustom pokemacs-dict "en_GB"
   "Dictionary language.
   Specify the chosen language used by spell checking tools in pokemacs."
   :group 'pokemacs-dictionaries
-  :type '(choice (const :tag "en-GB"   "en-GB")
-                 (const :tag "en-US"   "en-US")
-                 (const :tag "fr"      "fr")
+  :type '(choice (const :tag "en_GB" "en_GB")
+                 (const :tag "en_US" "en_US")
+                 (const :tag "fr_FR" "fr_FR")
                  (const :tag "No dict" nil)
                  (string :tag "Other"))
   :tag " Dictionary")
@@ -1412,23 +1412,67 @@ debian, and derivatives). On most it's 'fd'.")
     (cdr (assoc key (json-read-file "~/.secrets/secrets.json"))))
   (message "`json' loaded"))
 
-(use-package lsp-ltex
-  :init (setopt lsp-ltex-version "16.0.0")
+(use-package lsp-ltex-plus
+  :ensure (:type git :host github :repo "emacs-languagetool/lsp-ltex-plus")
+  :init (setopt lsp-ltex-plus-version "18.5.1")
   :custom
-  (lsp-ltex-language pokemacs-dict)
-  :config (message "`lsp-ltex' loaded"))
+  (lsp-ltex-plus-language pokemacs-dict)
+  (lsp-ltex-plus-status-bar-item t)
+  ;; These rules are useless since we use jinx
+  (lsp-ltex-plus-disabled-rules
+   `(:en-US
+     ,(vector
+       "MORFOLOGIK_RULE_EN_GB"
+       "HUNSPELL_RULE"
+       "HUNSPELL_RULE_AR"
+       "MORFOLOGIK_RULE_AST"
+       "MORFOLOGIK_RULE_EN"
+       "MORFOLOGIK_RULE_EN_US"
+       "SYMSPELL_RULE")))
+  :config (message "`lsp-ltex-plus' loaded"))
 
 (use-package jinx
   ;; :ensure-system-package libenchant-2-dev
   :hook (emacs-startup . global-jinx-mode)
   :init
+  (defconst aspell-dicts-dumps
+    (file-name-as-directory (no-littering-expand-etc-file-name "aspell-dicts-dumps/")))
+
+  ;; Create the aspell dictionaries dumps directory
+  (unless (file-exists-p aspell-dicts-dumps)
+    (make-directory aspell-dicts-dumps))
+
+  ;; Dump dictionaries if they don't exist
+  (defconst en-GB-dump (concat aspell-dicts-dumps "en_GB"))
+  (defconst en-US-dump (concat aspell-dicts-dumps "en_US"))
+  (defconst fr-FR-dump (concat aspell-dicts-dumps "fr_FR"))
+
+  (defconst pokemacs-dict-constants
+    `(("en_GB" . ,en-GB-dump)
+      ("en_US" . ,en-US-dump)
+      ("fr_FR" . ,fr-FR-dump)))
+
+  (dolist (pair pokemacs-dict-constants)
+    (let ((locale (car pair))
+          (dump-file (cdr pair)))
+      (unless (file-exists-p dump-file)
+        (async-shell-command
+         (concat "aspell --master=" locale " dump master > " dump-file)))))
+
+  (defun pokemacs-get-dict-file ()
+    (let ((pair (assoc pokemacs-dict pokemacs-dict-constants)))
+      (when pair (cdr pair))))
+
   (defun pokemacs-change-dict ()
     (interactive)
     (pokemacs-customize-my-custom-variable "pokemacs-dict")
     (setq jinx-languages pokemacs-dict)
-    (setq lsp-ltex-language pokemacs-dict))
+    (setq lsp-ltex-plus-language (replace-regexp-in-string "_" "-" pokemacs-dict))
+    (setq cape-dict-file (pokemacs-get-dict-file)))
+
   :custom
   (jinx-languages pokemacs-dict)
+  (cape-dict-file (pokemacs-get-dict-file))
   :general
   (:keymaps 'jinx-overlay-map
             "RET" 'jinx-correct)
@@ -2265,7 +2309,7 @@ debian, and derivatives). On most it's 'fd'.")
          (enh-ruby-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (kotlin-mode . lsp-deferred)
-         (rustic-mode . lsp-deferred)
+         (rustic-mode . pokemacs--setup-and-run-lsp)
          (tuareg-mode . lsp-deferred)
          (zig-mode    . lsp-deferred)
          (zig-ts-mode    . lsp-deferred))
@@ -3362,7 +3406,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   :custom
   (marginalia-align 'center)
   (marginalia-align-offset -1)
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
   :config (message "`marginalia' loaded"))
 
 (use-package iedit
@@ -4766,6 +4809,40 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (setq auto-mode-alist (delete '("\\.rs\\'" . rust-mode) auto-mode-alist))
     (setq auto-mode-alist (delete '("\\.rs\\'" . rust-ts-mode) auto-mode-alist))
     (setopt rust-mode-treesitter-derive t)
+
+    (defun pokemacs--project-root-contains-cargo-toml-p ()
+      "Return t if the project root contains a Cargo.toml file."
+      (let ((project-root (projectile-project-root)))
+        (file-exists-p (expand-file-name "Cargo.toml" project-root))))
+
+    (defun pokemacs--find-cargo-tomls (root-dir)
+      "Find all Cargo.toml files using Projectile's project files."
+      (let* ((project-root (if (string-equal root-dir "Current project")
+                               (projectile-project-root)
+                             (projectile-project-root)))
+             (all-files (projectile-project-files project-root))
+             (cargo-files
+              (seq-filter
+               (lambda (file) (string-suffix-p "Cargo.toml" file))
+               all-files))
+             (absolute-cargo-files
+              (mapcar (lambda (rel-path)
+                        (expand-file-name rel-path project-root)) cargo-files)))
+        (apply #'vector absolute-cargo-files)))
+
+    (defun pokemacs--setup-and-run-lsp ()
+      "Set `lsp-rust-analyzer-linked-projects` based on Cargo.toml files."
+      (when (and
+             (derived-mode-p 'rust-mode)
+             (not (pokemacs--project-root-contains-cargo-toml-p)))
+        (setq-local rustic-compile-directory-method #'rustic-buffer-workspace)
+        (let* ((root-dir (completing-read
+                          "Which projects do you want to load: "
+                          '("Project root" "Current project") nil t nil t))
+               (cargo-files (pokemacs--find-cargo-tomls root-dir)))
+          (setq-local lsp-rust-analyzer-linked-projects cargo-files)))
+      (lsp))
+
     :custom
     (rust-prettify-symbols-alist nil)
     ;; Allign to `.`

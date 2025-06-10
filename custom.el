@@ -52,7 +52,7 @@
  '(pokemacs-light-theme 'doom-nord-light)
  '(pokemacs-theme-type 'light)
  '(pokemacs-complete-keyword t)
- '(pokemacs-dict "en-GB")
+ '(pokemacs-dict "en_GB")
  '(pokemacs-mono-font "Fira Code" t)
  '(pokemacs-layout-columns 2)
  '(pokemacs-layout-second-monitor "DP-1")
