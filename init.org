@@ -249,6 +249,7 @@ Literate configuration for init.el.
   - [[#kotlin][Kotlin]]
   - [[#java][Java]]
   - [[#latex][LaTeX]]
+  - [[#ligo][Ligo]]
   - [[#michelson][Michelson]]
   - [[#ocaml][OCaml]]
     - [[#useful-functions][Useful functions]]
@@ -6486,6 +6487,26 @@ If you want to use it, after downloading ~auctex-latexmk~ replace ~(require tex-
       :config
       (auctex-latexmk-setup)
       (message "`auctex-latexmk' loaded")))
+#+end_src
+
+** Ligo
+:PROPERTIES:
+:CUSTOM_ID: ligo
+:END:
+
+#+begin_src emacs-lisp
+  (use-package ligo-mode
+    :demand t
+    :ensure (:type git :host github :repo "mattiasdrp/ligo-mode")
+    :mode
+    ("\\.mligo\\'" . ligo-caml-mode)
+    ("\\.jsligo\\'" . ligo-javascript-mode)
+    :hook (ligo-caml-mode . (lambda ()
+                              (require 'lsp-mode)
+                              (ligo-setup-lsp)
+                              (lsp-deferred)))
+    :config
+    (message "`ligo-mode' loaded"))
 #+end_src
 
 ** Michelson

@@ -4418,6 +4418,19 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (auctex-latexmk-setup)
     (message "`auctex-latexmk' loaded")))
 
+(use-package ligo-mode
+  :demand t
+  :ensure (:type git :host github :repo "mattiasdrp/ligo-mode")
+  :mode
+  ("\\.mligo\\'" . ligo-caml-mode)
+  ("\\.jsligo\\'" . ligo-javascript-mode)
+  :hook (ligo-caml-mode . (lambda ()
+                            (require 'lsp-mode)
+                            (ligo-setup-lsp)
+                            (lsp-deferred)))
+  :config
+  (message "`ligo-mode' loaded"))
+
 (when use-michelson
   (use-package deferred
     :config (message "`deferred' loaded"))
