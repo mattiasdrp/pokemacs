@@ -1585,7 +1585,7 @@ debian, and derivatives). On most it's 'fd'.")
 (use-package proced
   :ensure nil
   :commands proced
-      :custom
+  :custom
   (proced-auto-update-flag t)
   (proced-auto-update-interval 5)
   (proced-goal-attribute nil)
@@ -1708,22 +1708,22 @@ debian, and derivatives). On most it's 'fd'.")
             "M-g"           'magit-dispatch)
   :init
   (pretty-hydra-define
-   hydra-smerge (:title "Smerge" :hint nil :quit-key "q")
-   (
-    "Resolve Conflict"
-    (("m" smerge-keep-upper "Keep Upper")
-     ("o" smerge-keep-lower "Keep Lower")
-     ("a" smerge-keep-all "Keep All")
-     ("r" smerge-resolve "Auto")
-     ("e" smerge-ediff "Ediff"))
+    hydra-smerge (:title "Smerge" :hint nil :quit-key "q")
+    (
+     "Resolve Conflict"
+     (("m" smerge-keep-upper "Keep Upper")
+      ("o" smerge-keep-lower "Keep Lower")
+      ("a" smerge-keep-all "Keep All")
+      ("r" smerge-resolve "Auto")
+      ("e" smerge-ediff "Ediff"))
 
-    "Navigation"
-    (("n" smerge-vc-next-conflict "Next")
-     ("p" smerge-prev "Previous")
-     ("s" smerge-start-session "Start"))
+     "Navigation"
+     (("n" smerge-vc-next-conflict "Next")
+      ("p" smerge-prev "Previous")
+      ("s" smerge-start-session "Start"))
 
-    "Utility"
-    (("c" git-messenger:popup-message "Commit at point M-v G"))))
+     "Utility"
+     (("c" git-messenger:popup-message "Commit at point M-v G"))))
   :custom
   (magit-bury-buffer-function 'magit-restore-window-configuration)
   (magit-auto-revert-mode t)
@@ -2641,7 +2641,7 @@ have one rule for each file type."
   :hook flycheck-mode
   :general
   (:keymaps 'flycheck-mode-map
-          "M-RET" 'pokemacs-correct-or-newline)
+            "M-RET" 'pokemacs-correct-or-newline)
   :config (message "`flycheck-correct' loaded"))
 
 (if (display-graphic-p)
@@ -3302,28 +3302,28 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (advice-add 'windmove-down :after #'pokemacs-highlight-selected-window)
   :config
   (pretty-hydra-define
-   pokemacs-toggles
-   (:title "Toggles" :quit-key "q")
-   ("Basic"
-    (("n" nlinum-mode "line number" :toggle nlinum-mode)
-     ("w" whitespace-mode "whitespace" :toggle whitespace-mode)
-     ("r" rainbow-mode "rainbow" :toggle rainbow-mode)
-     ("R" rainbow-delimiters-mode "rainbow delim" :toggle rainbow-delimiters-mode)
-     ("L" global-page-break-lines-mode "page break lines" :toggle global-page-break-lines-mode))
-    "Highlight"
-    (("l" hl-line-mode "line" :toggle hl-line-mode)
-     ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
-    "UI"
-    (("d" pokemacs-toggle-theme "dark theme" :toggle (eq heaven-and-hell-theme-type 'dark))
-     ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
-    "Coding"
-    (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
-     ("i" flycheck-inline-mode "flycheck" :toggle flycheck-inline-mode)
-     ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
-     ("k" pokemacs-toggle-completion-capf "complete keywords" :toggle pokemacs-complete-keywords))
-    "Emacs"
-    (("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
-     ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
+    pokemacs-toggles
+    (:title "Toggles" :quit-key "q")
+    ("Basic"
+     (("n" nlinum-mode "line number" :toggle nlinum-mode)
+      ("w" whitespace-mode "whitespace" :toggle whitespace-mode)
+      ("r" rainbow-mode "rainbow" :toggle rainbow-mode)
+      ("R" rainbow-delimiters-mode "rainbow delim" :toggle rainbow-delimiters-mode)
+      ("L" global-page-break-lines-mode "page break lines" :toggle global-page-break-lines-mode))
+     "Highlight"
+     (("l" hl-line-mode "line" :toggle hl-line-mode)
+      ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
+     "UI"
+     (("d" pokemacs-toggle-theme "dark theme" :toggle (eq heaven-and-hell-theme-type 'dark))
+      ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
+     "Coding"
+     (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
+      ("i" flycheck-inline-mode "flycheck" :toggle flycheck-inline-mode)
+      ("e" electric-indent-mode "indent" :toggle electric-indent-mode)
+      ("k" pokemacs-toggle-completion-capf "complete keywords" :toggle pokemacs-complete-keywords))
+     "Emacs"
+     (("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+      ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
   (message "`emacs' loaded"))
 
 (use-package windmove
@@ -4293,7 +4293,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package elm-mode
     :general
     (:keymaps 'elm-mode-map
-     "<tab>" 'elm-indent-cycle)
+              "<tab>" 'elm-indent-cycle)
     :config (message "`elm-mode' loaded"))
 
   (use-package haskell-mode
@@ -4728,8 +4728,8 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (use-package lsp-pyright
     :after (python lsp-mode)
     :hook (python-ts-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp-deferred)))
+                              (require 'lsp-pyright)
+                              (lsp-deferred)))
     :custom
     (lsp-clients-python-library-directories '("/usr/" "~/miniconda3/pkgs"))
     (lsp-pyright-disable-language-service nil)
