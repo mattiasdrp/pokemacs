@@ -3569,7 +3569,7 @@ Minor mode acting as a client between a language server protocol and Emacs.
            (enh-ruby-mode . lsp-deferred)
            (fsharp-mode . lsp-deferred)
            (kotlin-mode . lsp-deferred)
-           (rustic-mode . pokemacs--setup-and-run-lsp)
+           (rustic-mode . lsp-deferred)
            (tuareg-mode . lsp-deferred)
            (zig-mode    . lsp-deferred)
            (zig-ts-mode    . lsp-deferred))
