@@ -7036,10 +7036,9 @@ Some people use this, not my responsibility.
       (setq auto-mode-alist (delete '("\\.rs\\'" . rust-ts-mode) auto-mode-alist))
       (setopt rust-mode-treesitter-derive t)
 
-      (defun pokemacs--project-root-contains-cargo-toml-p ()
+      (defun pokemacs--dir-contains-cargo-toml-p (dir)
         "Return t if the project root contains a Cargo.toml file."
-        (let ((project-root (projectile-project-root)))
-          (file-exists-p (expand-file-name "Cargo.toml" project-root))))
+        (file-exists-p (expand-file-name "Cargo.toml" dir)))
 
       (defun pokemacs--find-cargo-tomls (root-dir)
         "Find all Cargo.toml files using Projectile's project files."
@@ -7056,18 +7055,40 @@ Some people use this, not my responsibility.
                           (expand-file-name rel-path project-root)) cargo-files)))
           (apply #'vector absolute-cargo-files)))
 
-      (defun pokemacs--setup-and-run-lsp ()
-        "Set `lsp-rust-analyzer-linked-projects` based on Cargo.toml files."
+      (defun pokemacs--workspace-folders-alread-exist (dir)
+        (let* ((folders (lsp-session-folders (lsp-session)))
+               (-compare-fn #'string=))
+          (-contains-p folders (directory-file-name dir))))
+
+      (defun pokemacs--setup-rust-lsp (&rest _)
+        "Add a new workspace folder to lsp if a Cargo.toml file can't be find at the project root.
+
+  Return the folder in which rust-analyzer will be started."
         (when (and
                (derived-mode-p 'rust-mode)
-               (not (pokemacs--project-root-contains-cargo-toml-p)))
+               (not (pokemacs--dir-contains-cargo-toml-p (projectile-project-root))))
           (setq-local rustic-compile-directory-method #'rustic-buffer-workspace)
-          (let* ((root-dir (completing-read
-                            "Which projects do you want to load: "
-                            '("Project root" "Current project") nil t nil t))
-                 (cargo-files (pokemacs--find-cargo-tomls root-dir)))
-            (setq-local lsp-rust-analyzer-linked-projects cargo-files)))
-        (lsp))
+          (let* ((project-dir (file-truename (projectile-project-root)))
+                 (current-dir (file-truename  default-directory))
+                 (path (file-relative-name current-dir project-dir))
+                 (cargo-dirs nil)
+                 (existing-folder nil))
+            (while (and
+                    (and (stringp path) (not (string= "./" path)))
+                    (not existing-folder))
+              (let* ((dir (file-name-concat project-dir path)))
+                (if (pokemacs--workspace-folders-alread-exist dir)
+                    (setq existing-folder dir)
+                  (when (pokemacs--dir-contains-cargo-toml-p dir)
+                    (push path cargo-dirs)))
+                (setq path (file-name-parent-directory path))))
+            (or existing-folder
+                (let* ((chosen-dir (completing-read "Which root do you want to load: "
+                                                    cargo-dirs nil nil nil t)))
+                  (lsp-workspace-folders-add (file-name-concat project-dir chosen-dir))
+                  chosen-dir)))))
+
+      (advice-add #'lsp :before #'pokemacs--setup-rust-lsp)
 
       :custom
       (rust-prettify-symbols-alist nil)

@@ -348,8 +348,10 @@ LSP mode is a powerful yet under-exploited tool. Here are some of the tricks (so
     - ~C-w~ to copy the type
     - ~C-<up>~  to go up the enclosing expression and display its type (go down with ~C-<down>~)
     - ~C-<right>/<left>~ to increase/decrease the verbosity (show/hide the type under aliases)
+- [Rust] ~rust-analyzer~ is not able to find the workspace it should be started in if it can't find a ~Cargo.toml~ file at the project root. In this case, a prompt will ask the user in which sub-directory containing a ~Cargo.toml~ file ~rust-analyzer~ should start. This will add the directory to the ~lsp-workspace-folders~ (that can be found in ~.emacs.d/var/lsp/session.el~).
+  - Suppose you're working on ~a/b/c/d.rs~ and you decided to add ~a/b~ to your workspace folders. If you now work on ~a/b/e/f.rs~, ~a/b~ will be automatically selected even if you wanted to load ~a/b/e~. In this case you should use ~lsp-workspace-folders-remove~ (or ~M-l F r~) to remove ~a/b~ from the known folders.
 
-      If I forgot anything, feel free to open a PR with new tips!
+If I forgot anything, feel free to open a PR with new tips!
 
 * Pokemacs appearance
 :PROPERTIES:
