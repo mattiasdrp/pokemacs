@@ -76,18 +76,19 @@
 
         ;; Rust file
         ((derived-mode-p 'rust-mode)
-         (pokemacs-concat-with-newlines "//"
-                 "// SPDX-License-Identifier: MIT"
-                 (concat
-                  "// SPDX-FileCopyrightText: "
-                  year
-                  " "
-                  tezos-organisation-name
-                  " "
-                  tezos-organisation-email)
-                 "//"))))))
+         (pokemacs-concat-with-newlines
+          "//"
+          "// SPDX-License-Identifier: MIT"
+          (concat
+           "// SPDX-FileCopyrightText: "
+           year
+           " "
+           tezos-organisation-name
+           " "
+           tezos-organisation-email)
+          "//"))))))
 
-  (defun auto-insert-enhanced ()
+  (defun auto-insert ()
     "Insert default contents into new files if variable `auto-insert' is non-nil.
 Matches the visited file name against the elements of `auto-insert-alist'."
     (interactive)
@@ -97,26 +98,26 @@ Matches the visited file name against the elements of `auto-insert-alist'."
                   (bobp) (eobp)))
          (let* ((case-fold-search nil)
                 (desc nil)
+                (_ (message "here %S" this-command))
                 ;; Find first matching alist entry.
                 (action
                  (seq-some
                   (pcase-lambda (`(,cond . ,action))
                     (if (atom cond)
                         (setq desc cond)
-                      ;; if `cond' is a lambda, don't split it but set `desc' to a custom string
-                      (if (and (not (symbolp cond)) (functionp cond))
-                          (setq desc "`lambda condition'")
+                      ;; if `cond' is a predicate, don't split it but set `desc' to a custom string
+                      (if (and (consp cond) (equal (car cond) 'predicate))
+                          (setq desc "predicate")
                         (setq desc (cdr cond)
                               cond (car cond))))
                     (when (cond
-                           ;; cond should be a major-mode variable
-                           ((and (symbolp cond) (not (functionp cond)))
+                           ;; `cond' should be a major-mode variable
+                           ((symbolp cond)
                             (derived-mode-p cond))
 
-                           ;; cond should be a predicate that takes no argument
-                           ;; It can either be a named function or a lambda
-                           ((functionp cond)
-                            (funcall cond))
+                           ;; `cond' should be a predicate that takes no argument
+                           ((and (consp cond) (equal (car cond) 'predicate))
+                            (funcall (cadr cond)))
 
                            ;; cond should be a regexp
                            (t
@@ -159,8 +160,6 @@ Matches the visited file name against the elements of `auto-insert-alist'."
     ;; `find-file-not-found-functions', though that's probably inadvisable.
     nil)
 
-  (advice-add 'auto-insert :override 'auto-insert-enhanced)
-
   (defun pokemacs-get-git-repo-url ()
     "Return the URL of the Git repository for the current project."
     (interactive)
@@ -194,8 +193,8 @@ Matches the visited file name against the elements of `auto-insert-alist'."
     :init
     (auto-insert-mode t)
     :config
-    (setq auto-insert-alist
-          '((pokemacs-tezos-repo? . pokemacs-insert-mit-spdx-header)))
+    (add-to-list 'auto-insert-alist
+                 '(pokemacs-tezos-repo? . pokemacs-insert-mit-spdx-header))
     (message "`auto-insert-mode' loaded")))
 
 ;; (general-unbind
