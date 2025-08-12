@@ -3184,6 +3184,23 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
             completion-cycle-threshold completion-cycling)
         (apply #'consult-completion-in-region completion-in-region--data))))
 
+
+  ;; Taken from https://www.reddit.com/r/emacs/comments/1l2fdu8/comment/mw3g9uo/
+  (defun pokemacs--corfu--replace-a (func beg end str)
+    "Replace the text between BEG and END with STR.
+
+  This function checks if the replacement partially matches the text
+  about to be replaced, and if so, deletes the duplicated part"
+
+    (let* ((len (length str))
+           (str-at-point (buffer-substring-no-properties beg (min (pos-eol) (+ beg len))))
+           (len-similar (length (s-shared-start str str-at-point)))
+           (len-diff (max 0 (- len-similar (- end beg)))))
+      (funcall func beg end str)
+      (delete-region end (+ end len-diff))))
+
+  (advice-add 'corfu--replace :around #'pokemacs--corfu--replace-a)
+
   ;; Activate mode globally
   (global-corfu-mode)
 
