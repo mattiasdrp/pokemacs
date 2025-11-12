@@ -2729,6 +2729,13 @@ Simple mode to visualize blanks
 :CUSTOM_ID: git
 :END:
 
+** Cond-let
+
+#+begin_src emacs-lisp
+  (use-package cond-let
+    :ensure (:host github :repo "tarsius/cond-let"))
+#+end_src
+
 ** [[https://magit.vc/][Magit]]
 :PROPERTIES:
 :CUSTOM_ID: magit
@@ -3894,13 +3901,17 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
                               (cons #'display-buffer-no-window nil)))))
                  (when
                      (y-or-n-p (format-message "Create `%s'?" new-file))
-                   (with-current-buffer output-buffer
-                     ;; (projectile-run-shell-command-in-root
-                     ;;  (concat "dune exec -- ocaml-print-intf " file))
-                     (projectile-run-shell-command-in-root
-                      (concat command " " file) output-buffer)
-                     (dired-create-empty-file new-file)
-                     (write-file new-file))
+                   (cond
+                    ((functionp command)
+                     ;; If the command is a function we apply it in the current buffer
+                     (funcall command))
+                    ((stringp command)
+                       ;; If the command is a string, call it as a shell command
+                     (with-current-buffer output-buffer
+                       (projectile-run-shell-command-in-root
+                        (concat command " " file) output-buffer)
+                       (dired-create-empty-file new-file)
+                       (write-file new-file))))
                    (kill-buffer output-buffer)
                    (find-file new-file)))))))))))
 

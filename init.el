@@ -1692,6 +1692,9 @@ debian, and derivatives). On most it's 'fd'.")
             [remap dired-smart-shell-command]    'dwim-shell-command)
   :config (require 'dwim-shell-commands))
 
+(use-package cond-let
+  :ensure (:host github :repo "tarsius/cond-let"))
+
 (use-package transient)
 
 (use-package magit
@@ -2519,7 +2522,7 @@ have one rule for each file type."
   :tag " Create sibling rules")
 
 (setq create-sibling-rules
-      '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
+      '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . lsp-ocaml-infer-interface))))
 
 (defun pokemacs-find-sibling-file (file)
   "Visit a \"sibling\" file of FILE.
@@ -2563,13 +2566,17 @@ have one rule for each file type."
                             (cons #'display-buffer-no-window nil)))))
                (when
                    (y-or-n-p (format-message "Create `%s'?" new-file))
-                 (with-current-buffer output-buffer
-                   ;; (projectile-run-shell-command-in-root
-                   ;;  (concat "dune exec -- ocaml-print-intf " file))
-                   (projectile-run-shell-command-in-root
-                    (concat command " " file) output-buffer)
-                   (dired-create-empty-file new-file)
-                   (write-file new-file))
+                 (cond
+                  ((functionp command)
+                   ;; If the command is a function we apply it in the current buffer
+                   (funcall command))
+                  ((stringp command)
+                     ;; If the command is a string, call it as a shell command
+                   (with-current-buffer output-buffer
+                     (projectile-run-shell-command-in-root
+                      (concat command " " file) output-buffer)
+                     (dired-create-empty-file new-file)
+                     (write-file new-file))))
                  (kill-buffer output-buffer)
                  (find-file new-file)))))))))))
 
