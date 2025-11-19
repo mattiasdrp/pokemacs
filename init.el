@@ -2522,7 +2522,7 @@ have one rule for each file type."
   :tag " Create sibling rules")
 
 (setq create-sibling-rules
-      '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . lsp-ocaml-infer-interface))))
+      '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
 
 (defun pokemacs-find-sibling-file (file)
   "Visit a \"sibling\" file of FILE.
@@ -2807,30 +2807,31 @@ with a prefix ARG."
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
-(use-package visual-fill-column
-  :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
-  :custom
-  (visual-fill-column-width 100)
-  (visual-fill-column-center-text t)
-  :config
+(when use-visual-fill
+  (use-package visual-fill-column
+    :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
+    :custom
+    (visual-fill-column-width 100)
+    (visual-fill-column-center-text t)
+    :config
 
-  (defun pokemacs-toggle-visual-fill ()
-    (interactive)
-    (setq use-visual-fill (not use-visual-fill))
-    (visual-fill-column-mode 'toggle))
+    (defun pokemacs-toggle-visual-fill ()
+      (interactive)
+      (setq use-visual-fill (not use-visual-fill))
+      (visual-fill-column-mode 'toggle))
 
-  (defun pokemacs-visual-fill-one-window ()
-    (when use-visual-fill
-      (if (window-full-width-p)
-          (unless (global-visual-fill-column-mode)
-            (progn
-              (global-visual-fill-column-mode 1)
-              (setq mode-line-right-align-edge 'window)
-              (set-window-fringes (selected-window) 8 8 nil nil)))
-        (global-visual-fill-column-mode -1))))
+    (defun pokemacs-visual-fill-one-window ()
+      (when use-visual-fill
+        (if (window-full-width-p)
+            (unless (global-visual-fill-column-mode)
+              (progn
+                (global-visual-fill-column-mode 1)
+                (setq mode-line-right-align-edge 'window)
+                (set-window-fringes (selected-window) 8 8 nil nil)))
+          (global-visual-fill-column-mode -1))))
 
-  (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
-  (message "`visual-fill-column' loaded"))
+    (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
+    (message "`visual-fill-column' loaded")))
 
 (use-package pokemacs-layout
   :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
