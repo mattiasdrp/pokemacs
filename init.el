@@ -2807,30 +2807,38 @@ with a prefix ARG."
   (set-face-attribute 'aw-leading-char-face nil :height 2.5)
   (message "`ace-window' loaded"))
 
-(use-package visual-fill-column
-  :hook ((prog-mode org-mode text-mode) . visual-fill-column-mode)
-  :custom
-  (visual-fill-column-width 100)
-  (visual-fill-column-center-text t)
-  :config
+(when use-visual-fill
+  (use-package visual-fill-column
+    :hook
+    (window-state-change . pokemacs-visual-fill-one-window)
+    ((prog-mode org-mode text-mode) . visual-fill-column-mode)
 
-  (defun pokemacs-toggle-visual-fill ()
-    (interactive)
-    (setq use-visual-fill (not use-visual-fill))
-    (visual-fill-column-mode 'toggle))
+    :init (defvar pokemacs-visual-fill-enabled t)
 
-  (defun pokemacs-visual-fill-one-window ()
-    (when use-visual-fill
-      (if (window-full-width-p)
-          (unless (global-visual-fill-column-mode)
+    :custom
+    (visual-fill-column-width 100)
+    (visual-fill-column-center-text nil)
+
+    :config
+    (defun pokemacs-toggle-visual-fill ()
+      (interactive)
+      (visual-fill-column-mode 'toggle)
+      (setq pokemacs-visual-fill-enabled (not pokemacs-visual-fill-enabled))
+      (setq global-visual-fill-column-mode pokemacs-visual-fill-enabled)
+      (setq visual-fill-column-center-text pokemacs-visual-fill-enabled))
+
+    (defun pokemacs-visual-fill-one-window ()
+      (message "Triggered visual fill one window")
+      (when pokemacs-visual-fill-enabled
+        (if (and (window-full-width-p) pokemacs-visual-fill-enabled)
             (progn
+              (setq visual-fill-column-center-text t)
               (global-visual-fill-column-mode 1)
               (setq mode-line-right-align-edge 'window)
-              (set-window-fringes (selected-window) 8 8 nil nil)))
-        (global-visual-fill-column-mode -1))))
+              (set-window-fringes (selected-window) 8 8 nil nil))
+          (global-visual-fill-column-mode -1))))
 
-  (add-hook 'window-state-change-hook 'pokemacs-visual-fill-one-window)
-  (message "`visual-fill-column' loaded"))
+    (message "`visual-fill-column' loaded")))
 
 (use-package pokemacs-layout
   :ensure (:type git :repo "https://github.com/mattiasdrp/pokemacs-layout.git")
@@ -3338,7 +3346,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       ("t" hl-todo-mode "todo" :toggle hl-todo-mode))
      "UI"
      (("d" pokemacs-toggle-theme "dark theme" :toggle (eq heaven-and-hell-theme-type 'dark))
-      ("c" pokemacs-toggle-visual-fill "center buffer" :toggle use-visual-fill))
+      ("c" pokemacs-toggle-visual-fill "center buffer" :toggle pokemacs-visual-fill-enabled))
      "Coding"
      (("f" flycheck-mode "flycheck" :toggle flycheck-mode)
       ("i" flycheck-inline-mode "flycheck" :toggle flycheck-inline-mode)
