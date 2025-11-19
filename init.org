@@ -3857,7 +3857,7 @@ Debug Adapter Protocol client for emacs. Need to play a bit with it to know how 
     :tag " Create sibling rules")
 
   (setq create-sibling-rules
-        '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . "dune exec -- ocaml-print-intf"))))
+        '(("\\([^/]+\\)\\.ml\\'" . ("\\1.mli" . lsp-ocaml-infer-interface))))
 
   (defun pokemacs-find-sibling-file (file)
     "Visit a \"sibling\" file of FILE.
