@@ -2828,7 +2828,6 @@ with a prefix ARG."
       (setq visual-fill-column-center-text pokemacs-visual-fill-enabled))
 
     (defun pokemacs-visual-fill-one-window ()
-      (message "Triggered visual fill one window")
       (when pokemacs-visual-fill-enabled
         (if (and (window-full-width-p) pokemacs-visual-fill-enabled)
             (progn
@@ -3061,7 +3060,6 @@ with a prefix ARG."
 
 DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (interactive "P")
-    (message "wrapper")
     (let ((initial
            (or given-initial
                (when (use-region-p)
@@ -3178,7 +3176,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   (message "`embark-consult' loaded"))
 
 (use-package corfu
-  :ensure (corfu :files (:defaults "extensions/*"))
+  ;; :ensure (corfu :ref "69f84fe" :files (:defaults "extensions/*"))
   :init
   ;; Function definitions
 

@@ -4292,7 +4292,6 @@ This mode will center the text when only one window is displayed.
         (setq visual-fill-column-center-text pokemacs-visual-fill-enabled))
 
       (defun pokemacs-visual-fill-one-window ()
-        (message "Triggered visual fill one window")
         (when pokemacs-visual-fill-enabled
           (if (and (window-full-width-p) pokemacs-visual-fill-enabled)
               (progn
@@ -4601,7 +4600,6 @@ TODO: Test all the possible minibuffers and customize them as I'd like them to b
 
   DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (interactive "P")
-      (message "wrapper")
       (let ((initial
              (or given-initial
                  (when (use-region-p)
@@ -4739,7 +4737,7 @@ When using some consult commands (like ~consult-ripgrep~), hitting ~M-RET~ will 
 
 #+begin_src emacs-lisp
   (use-package corfu
-    :ensure (corfu :files (:defaults "extensions/*"))
+    ;; :ensure (corfu :ref "69f84fe" :files (:defaults "extensions/*"))
     :init
     ;; Function definitions
 
