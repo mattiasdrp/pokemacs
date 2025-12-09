@@ -3532,9 +3532,7 @@ Minor mode acting as a client between a language server protocol and Emacs.
         (setq pokemacs-lsp--optimization-init-p t))))
 
   (use-package lsp-mode
-    ;; :ensure (:host github
-    ;;                :repo "mattiasdrp/lsp-mode"
-    ;;                :branch "mattias@ocaml-lsp-type-enclosing")
+    ;; :ensure (:repo "~/lsp-mode")
     :init
     (defun pokemacs--set-completion-capf ()
       (if pokemacs-complete-keywords
@@ -3573,6 +3571,7 @@ Minor mode acting as a client between a language server protocol and Emacs.
            (clojurescript-mode-hook . lsp-deferred)
            (clojurec-mode-hook . lsp-deferred)
            (elm-mode . lsp-deferred)
+           (elixir-mode . lsp-deferred)
            (enh-ruby-mode . lsp-deferred)
            (fsharp-mode . lsp-deferred)
            (kotlin-mode . lsp-deferred)

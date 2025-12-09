@@ -46,6 +46,7 @@
  '(lsp-java-completion-lazy-resolve-text-edit-enabled t)
  '(lsp-java-format-enabled nil)
  '(magit-diff-refine-hunk 'all)
+ '(magit-list-refs-sortby "-creatordate")
  '(org-export-backends '(ascii html icalendar latex md odt pandoc))
  '(package-selected-packages nil)
  '(pokemacs-dark-theme 'doom-nord)

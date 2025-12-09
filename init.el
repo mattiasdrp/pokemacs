@@ -2268,9 +2268,7 @@ debian, and derivatives). On most it's 'fd'.")
       (setq pokemacs-lsp--optimization-init-p t))))
 
 (use-package lsp-mode
-  ;; :ensure (:host github
-  ;;                :repo "mattiasdrp/lsp-mode"
-  ;;                :branch "mattias@ocaml-lsp-type-enclosing")
+  ;; :ensure (:repo "~/lsp-mode")
   :init
   (defun pokemacs--set-completion-capf ()
     (if pokemacs-complete-keywords
@@ -2309,6 +2307,7 @@ debian, and derivatives). On most it's 'fd'.")
          (clojurescript-mode-hook . lsp-deferred)
          (clojurec-mode-hook . lsp-deferred)
          (elm-mode . lsp-deferred)
+         (elixir-mode . lsp-deferred)
          (enh-ruby-mode . lsp-deferred)
          (fsharp-mode . lsp-deferred)
          (kotlin-mode . lsp-deferred)
