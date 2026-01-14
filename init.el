@@ -3111,12 +3111,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
    consult-theme :preview-key '(:debounce 0.2 any)
 
    consult-bookmark consult-recent-file
-   consult--source-project-recent-file
-   consult--source-recent-file consult-buffer
+   consult-source-project-recent-file
+   consult-source-recent-file consult-buffer
    consult-ripgrep consult-git-grep consult-grep
    pokemacs-consult-git-grep-always-prompt-dir
    pokemacs-consult-ripgrep-always-prompt-dir
-   consult-xref consult--source-bookmark
+   consult-xref consult-source-bookmark
    :preview-key '(:debounce 0.5 "M-."))
 
   ;; Optionally configure the narrowing key.
